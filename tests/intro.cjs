@@ -4,7 +4,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
 const path=require('node:path'),vm=require('node:vm');
 const code=fs.readFileSync(path.join(__dirname,'..','test-center.js'),'utf8');
 const no=()=>{},events={},frames=[],stored=new Map(),elements={};
-const context={fillRect:no,strokeRect:no,clearRect:no,beginPath:no,
+const spoken=[],context={fillText:value=>spoken.push(String(value)),fillRect:no,strokeRect:no,clearRect:no,beginPath:no,
  moveTo:no,lineTo:no,stroke:no,save:no,restore:no,translate:no,rotate:no,scale:no,drawImage:no};
 class El{
  constructor(id){this.id=id;this.textContent='';this.value='';this.children=[];this.style={};
@@ -34,7 +34,17 @@ key('w');assert.equal(get('position').textContent,'(8, 12)','Player locked durin
 const room=get('room');
 room.emit('click',{button:0,clientX:8*32+16,clientY:9*32+16});
 assert.match(get('lifeState').textContent,/ALIVE/,'Player remains bound until sacrificed');
-tick(1800);
+tick(145);
+assert(spoken.join(' ').includes('The veil knows your name.'),'Leader cryptic speech balloon visible');
+tick(150);
+assert(spoken.join(' ').includes('Your life ends here.'),'Leader announces death in balloon');
+tick(490);
+assert(spoken.join(' ').includes("You're mine."),'Devil speaks his promised line');
+tick(105);
+assert(spoken.join(' ').includes('Death offers no escape.'),'Devil follows up in a second balloon');
+tick(390);
+assert(spoken.join(' ').includes('In ash and silence'),'Lilith prayer balloon visible');
+tick(560);
 assert.match(get('status').textContent,/Double-left-click the crystal/i);
 assert.equal(get('position').textContent,'(8, 12)','Ghost emerges farther back along the central aisle');
 assert.equal(Number(get('objectCount').textContent),10,'Crystal appears only after Lilith prays');

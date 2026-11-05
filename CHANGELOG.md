@@ -1,5 +1,17 @@
 # Demon Killer Changelog
 
+## v0.2.5 development preview | 2026-11-05 | Sacrifice dialogue and cache refresh
+
+- Added on-screen pixel speech bubbles above the cult leader, Devil, and Lilith, timed to prayer, sacrifice, confrontation, and kneeling.
+- Leader: "The veil knows your name." then "Your life ends here."
+- Devil: "You're mine." then "Death offers no escape."
+- Lilith: "In ash and silence, let one light remain."
+- Allowed a little more time for the leader's death announcement to be read.
+- Temple navigation and its JavaScript request now carry the version to reduce stale browser-cache problems. A footer version provides visual verification.
+- Speech bubbles are visual overlays, not saved objects; no temple geometry, approved art or gameplay controls change.
+- Extended introductory regression coverage. Browser visual review remains necessary.
+
+
 ## v0.2.4 development preview | 2026-11-05 | Sacrifice-scene scale and staging corrections
 
 - Draw the approved living/dead 64×32 lying-hero art at native size, centered on the unchanged 128×64 altar.

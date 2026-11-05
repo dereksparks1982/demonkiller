@@ -1,6 +1,6 @@
 # Demon Killer
 
-**Demon Killer** is an engine-free, top-down Gothic fantasy adventure by **DK Softworks**, built with original pixel art. In the Forsaken Temple opening, the cult sacrifices the bound player, the Devil confronts the emerging ghost, and Lilith leaves a glowing soul crystal after praying at the altar. The player can deliberately resurrect or remain a ghost. The sacrifice-scene composition uses the original 64×32 lying body and correctly oriented cult leader, Devil, Lilith, and cult members.
+**Demon Killer** is an engine-free, top-down Gothic fantasy adventure by **DK Softworks**, built with original pixel art. In the Forsaken Temple opening, the cult sacrifices the bound player, the Devil confronts the emerging ghost, and Lilith leaves a glowing soul crystal after praying at the altar. The cult leader, Devil, and Lilith speak in character-anchored pixel speech bubbles during the ritual. The player can deliberately resurrect or remain a ghost. The sacrifice-scene composition uses the original 64×32 lying body and correctly oriented cult leader, Devil, Lilith, and cult members.
 
 The game includes character save slots and **DK Architect**, an in-game tool for building and editing the temple.
 

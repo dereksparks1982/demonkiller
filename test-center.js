@@ -138,12 +138,12 @@
     if(!opening)return;opening.time+=dt;
     switch(opening.phase){
       case 'gather':
-        if(opening.time>=2)phase('prayer','The cult leader prays over your bound body.');break;
+        if(opening.time>=2)phase('prayer','The cult leader mutters: "The veil knows your name."');break;
       case 'prayer':
-        if(opening.time>=2.5)phase('sacrifice','The cult leader sacrifices you upon the altar.');break;
+        if(opening.time>=2.5)phase('sacrifice','The cult leader announces: "Your life ends here."');break;
       case 'sacrifice':
         if(opening.time>=.45)opening.sacrificed=true;
-        if(opening.time>=1.5){
+        if(opening.time>=2.2){
           for(const m of opening.members){
             const edge=m.x<8?5:11;
             route(m,[[edge,m.y],[edge,2],[8,2],[8,-1]]);
@@ -166,6 +166,10 @@
         if(opening.time>=1.8)phase('devilSpeaks','The Devil stands on your right, Lilith on your left. Devil: "You\u2019re mine."');
         break;
       case 'devilSpeaks':
+        if(opening.time>=1.5&&!opening.devilFollowUp){
+          opening.devilFollowUp=true;
+          message('The Devil whispers: "Death offers no escape."');
+        }
         if(opening.time>=3){
           route(opening.devil,[[11,3],[8,3],[8,-1]]);
           phase('devilExit','The Devil leaves first. Lilith stays behind.');
@@ -179,7 +183,7 @@
       case 'approach':
         if(moveActor(opening.woman,dt,2.8)){
           opening.woman.facing='north';
-          phase('kneel','Lilith kneels and prays toward the altar.');
+          phase('kneel','Lilith prays: "In ash and silence, let one light remain."');
         }break;
       case 'kneel':
         if(opening.time>=5)phase('place','Lilith rises to place a soul crystal.');
@@ -241,6 +245,32 @@
     pixel(ctx,a.kind==='devil'?'#252027':'#392a30',x+8,y+3,16,27);
     pixel(ctx,a.kind==='devil'?'#a33e37':'#b4575b',x+12,y+9,8,9);
   }
+  // Speech balloons are ephemeral Canvas overlays, not Architect room objects.
+  function speechBubble(a,text,border='#ad9a84'){
+    if(!a||a.y<0||!text)return;
+    const lines=[];
+    let line='';
+    for(const word of text.split(/\s+/)){
+      if(line&&(line+' '+word).length>25){lines.push(line);line=word;}
+      else line+=(line?' ':'')+word;
+    }
+    if(line)lines.push(line);
+    const width=Math.max(100,Math.min(218,Math.max(...lines.map(s=>s.length))*7+22));
+    const height=lines.length*16+12;
+    const cx=Math.round((a.x+.5)*TILE);
+    const x=Math.max(4,Math.min(N*TILE-width-4,Math.round(cx-width/2)));
+    const y=Math.max(4,Math.round(a.y*TILE)-height-15);
+    const tail=Math.max(x+12,Math.min(x+width-15,cx-4));
+    ctx.save();
+    ctx.fillStyle='#151019';ctx.fillRect(x,y,width,height);
+    ctx.strokeStyle=border;ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,width-2,height-2);
+    ctx.fillStyle='#151019';ctx.fillRect(tail,y+height-1,9,9);
+    ctx.fillStyle=border;ctx.fillRect(tail,y+height+7,9,2);
+    ctx.font='bold 11px monospace';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillStyle='#fff0d5';
+    for(let i=0;i<lines.length;i++)ctx.fillText?.(lines[i],x+width/2,y+8+i*16);
+    ctx.restore();
+  }
   function drawOpening(){
     if(!opening)return;
     const p=opening.phase;
@@ -251,6 +281,14 @@
     if(['ghostRise','devilSpeaks','devilExit'].includes(p))drawActor(opening.devil);
     if(['ghostRise','devilSpeaks','devilExit','approach','kneel','place','lilithExit'].includes(p))
       drawActor(opening.woman);
+    if(p==='prayer')
+      speechBubble(opening.leader,'The veil knows your name.','#ba8e86');
+    if(p==='sacrifice')
+      speechBubble(opening.leader,'Your life ends here.','#bc575e');
+    if(p==='devilSpeaks')
+      speechBubble(opening.devil,opening.time<1.5?"You're mine.":'Death offers no escape.','#c4464b');
+    if(p==='kneel')
+      speechBubble(opening.woman,'In ash and silence, let one light remain.','#c7ae68');
   }
   function beginResurrection() {
     const p=scene.player;
