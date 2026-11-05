@@ -4,6 +4,8 @@
 
 > **Current development milestone: v0.2.2 | Menu / Crystal Woman Intro / Forsaken Temple / DK Architect.** This is a development prototype, not a finished or released game.
 
+> **Owner-approved redesign, not yet implemented:** The future opening begins with ghost exploration, no crystal present, and a later five-second kneeling prayer/placement scene. The soul crystal will require a **left double-click** to resurrect; a single-click only describes it. Once the woman leaves, the barrier lifts and the player can enter the courtyard either as a ghost (green dress → shimmering golden willow) or alive (red dress → sickly black willow). The **current web player still reflects older behavior**. Read the [Forsaken Temple opening canon](docs/forsaken-temple-opening-canon.md) and [Company Bible](COMPANY_BIBLE.md) before changes.
+
 ## Play the current build
 
 Open **[Demon Killer](index.html)** in Firefox or another modern desktop browser. The root is now a main menu using the approved pixel-art sheet. **New Game** offers three Zelda-I-style save records with a single character name (up to eight characters); **Continue** loads a named record. The existing **[Forsaken Temple / DK Architect](test-center.html)** screen remains intact, with all room-building tools, Save/Load, and JSON Export/Import. No installation, build step, npm dependencies, network connection, or third-party sprite pack is required.
