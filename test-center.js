@@ -77,6 +77,8 @@
       current = 'crystal', selectedId = null, corner = null, hover = null,
       previewRotation = 0,
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
+  const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
+  let cultWorld=null;
   let activeSlot = 0;
   try {
     const n = Number(localStorage.getItem(ACTIVE_STORE));
@@ -212,6 +214,7 @@
     if (!record) return;
     try {
       record.slot.scene = clone(scene);
+      if(cultWorld)record.slot.cultWorld=clone(cultWorld);
       record.slot.updated = Date.now();
       localStorage.setItem(CHARACTERS_STORE, JSON.stringify(record.data));
     } catch (error) { message('Character save unavailable: ' + error.message); }
@@ -898,7 +901,82 @@
     }catch(err){message('Import rejected: '+err.message);}
     finally{e.target.value='';}
   });
+  // The player journal reveals only learned evidence; actual affiliations
+  // remain in this per-world simulation, never in the journal's HTML.
+  function saveCultWorld(){
+    const record=characterRecord();
+    if(!record||!cultWorld)return;
+    try{
+      record.slot.cultWorld=clone(cultWorld);
+      localStorage.setItem(CHARACTERS_STORE,JSON.stringify(record.data));
+    }catch(error){message('Cult record could not be saved: '+error.message);}
+  }
+  function renderCultJournal(){
+    if(!Cult||!cultWorld)return;
+    const container=$('cultJournalCards'),people=Object.keys(cultWorld.knowledge)
+      .map(id=>Cult.dossier(cultWorld,id)).filter(Boolean);
+    container.replaceChildren();
+    $('cultJournalStatus').textContent=people.length
+      ?people.length+' known people · '+Cult.board(cultWorld).length+' leads or confirmed connections.'
+      :'No people or cult connections discovered yet. Investigate citizens and evidence.';
+    for(const person of people.sort((a,b)=>a.name.localeCompare(b.name))){
+      const card=document.createElement('article');card.className='cult-dossier-card';
+      const name=document.createElement('h3');name.textContent=person.name;
+      const occupation=document.createElement('p');occupation.textContent='Occupation: '+person.occupation;
+      const status=document.createElement('p');status.textContent='Cult affiliation: '+person.affiliation.toUpperCase();
+      card.append(name,occupation,status);
+      if(person.affiliation==='confirmed'&&person.rank!=='unknown'){
+        const role=document.createElement('p');role.textContent='Last confirmed position: '+person.rank;
+        card.append(role);
+      }
+      for(const evidence of person.evidence){
+        const clue=document.createElement('p');clue.className='cult-evidence-line';
+        clue.textContent=evidence.kind+': '+evidence.title;
+        card.append(clue);
+      }
+      container.append(card);
+    }
+  }
+  function mountCultJournal(){
+    if(!Cult)return;
+    const record=characterRecord();
+    if(record&&record.slot.cultWorld&&Cult.valid(record.slot.cultWorld)){
+      try{cultWorld=Cult.restore(record.slot.cultWorld);}catch(error){cultWorld=null;}
+    }
+    if(!cultWorld){
+      const seed=record?(record.slot.worldSeed||'legacy-'+record.slot.id+'-'+record.slot.name+'-'+record.slot.updated)
+        :'guest-'+Date.now();
+      // Known story participant, but no secret identity is revealed until discovered.
+      cultWorld=Cult.createWorld(seed,[{id:'temple_ritualist',name:'Unknown robed figure',
+        occupation:'Unknown',fixed:true}]);
+      saveCultWorld();
+    }
+    const panel=$('cultJournal'),toggle=$('cultJournalToggle'),close=$('cultJournalClose');
+    if(!panel||!toggle||!close)return;
+    const show=open=>{
+      panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
+      if(open)renderCultJournal();
+    };
+    toggle.addEventListener('click',()=>show(panel.hidden));
+    close.addEventListener('click',()=>show(false));
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)show(false);});
+    // Future NPC and scene scripts may report discoveries and political events.
+    if(typeof window!=='undefined')window.DemonKillerCultHooks=Object.freeze({
+      registerCitizen:profile=>{const c=Cult.addCitizen(cultWorld,profile);saveCultWorld();return c.id;},
+      meet:id=>{const d=Cult.meet(cultWorld,id);saveCultWorld();renderCultJournal();return d;},
+      evidence:(id,clue)=>{const d=Cult.recordEvidence(cultWorld,id,clue);saveCultWorld();renderCultJournal();return d;},
+      recruit:(id,opts)=>{const r=Cult.recruit(cultWorld,id,opts);saveCultWorld();return r;},
+      depart:id=>{const r=Cult.depart(cultWorld,id);saveCultWorld();return r;},
+      kill:id=>{const r=Cult.kill(cultWorld,id);saveCultWorld();return r;},
+      promote:(id,branch)=>{const r=Cult.promote(cultWorld,id,branch);saveCultWorld();return r;},
+      circumstances:(id,traits)=>{Cult.changeCircumstances(cultWorld,id,traits);saveCultWorld();},
+      dossier:id=>Cult.dossier(cultWorld,id),
+      board:()=>Cult.board(cultWorld)
+    });
+    renderCultJournal();
+  }
   restoreCharacter();
+  mountCultJournal();
   if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
   palette();draw();
   if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);

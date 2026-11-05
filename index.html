@@ -154,7 +154,9 @@ $('nameForm').addEventListener('submit',event=>{
  const name=$('characterName').value.trim().toUpperCase();
  if(!/^[A-Z0-9 _-]{1,8}$/.test(name))return notice('Enter a name of 1 to 8 letters, numbers, spaces, hyphens or underscores.');
  try{
- const slots=readSlots();slots[chosen]={id:chosen+1,name,scene:null,updated:Date.now()};
+ const slots=readSlots();const created=Date.now();
+ slots[chosen]={id:chosen+1,name,scene:null,updated:created,
+  worldSeed:created.toString(36)+'-'+Math.floor(Math.random()*4294967296).toString(36)+'-'+(chosen+1)};
  writeSlots(slots);launch(chosen+1);
  }catch(e){notice('Cannot create a save because browser storage is unavailable.');}
 });

@@ -1,0 +1,12 @@
+/* Optional cult journal overlay. No changes to temple/editor geometry. */
+.cult-journal-toggle{position:fixed;right:12px;bottom:12px;z-index:25;padding:9px 12px;background:#2a202b;border:2px solid #b39256;color:#f2dda7;font:700 12px monospace;cursor:pointer;box-shadow:0 2px 14px #000b}
+.cult-journal[hidden]{display:none!important}
+.cult-journal{position:fixed;z-index:26;right:12px;bottom:53px;width:min(430px,calc(100vw - 24px));max-height:min(72vh,680px);overflow:auto;background:#16131e;border:3px solid #8f7546;color:#e6d9c8;box-shadow:0 8px 38px #000e;padding:14px;font:13px/1.45 monospace}
+.cult-journal-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cult-journal-head h2{font:700 18px monospace;color:#eac27b;margin:2px 0}
+.cult-journal-head button{background:#432a32;border:1px solid #ad875b;color:#f4e0d0;padding:7px 10px;cursor:pointer}
+.cult-journal-cards{display:grid;gap:10px}
+.cult-dossier-card{background:#24202c;border:1px solid #6f5868;padding:10px;text-align:left}
+.cult-dossier-card h3{margin:0 0 6px;color:#f1ce8d}
+.cult-dossier-card p{margin:4px 0}
+.cult-evidence-line{color:#bfad9a;padding-left:10px}

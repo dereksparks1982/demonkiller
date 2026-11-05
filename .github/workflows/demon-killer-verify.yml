@@ -27,4 +27,4 @@ jobs:
         run: |
           node --version
           node --check test-center.js
-          node --test tests/test-center.cjs tests/menu.cjs tests/intro.cjs
+          node --test tests/test-center.cjs tests/menu.cjs tests/intro.cjs tests/cult-system.cjs tests/cult-integration.cjs

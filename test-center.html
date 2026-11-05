@@ -13,8 +13,18 @@
 <title>Demon Killer | DK Architect: Sacrificial Temple Test Center</title>
 <meta name="description" content="Independent, engine-free Gothic temple room prototype for Demon Killer.">
 <link rel="stylesheet" href="./test-center.css">
+<link rel="stylesheet" href="./cult-journal.css">
 </head>
 <body>
+<button id="cultJournalToggle" class="cult-journal-toggle" type="button" aria-controls="cultJournal" aria-expanded="false">CULT JOURNAL</button>
+<aside id="cultJournal" class="cult-journal" hidden role="dialog" aria-label="Character dossiers and cult investigation">
+ <header class="cult-journal-head">
+  <h2>CHARACTER DOSSIERS</h2>
+  <button id="cultJournalClose" type="button" aria-label="Close cult journal">CLOSE</button>
+ </header>
+ <p id="cultJournalStatus" role="status">No discoveries recorded yet.</p>
+ <div id="cultJournalCards" class="cult-journal-cards"></div>
+</aside>
 <main class="lab">
   <header class="masthead">
     <div>
@@ -102,6 +112,7 @@
   </div>
   <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.2</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
+<script src="./cult-system.js" defer></script>
 <script src="./test-center.js" defer></script>
 </body>
 </html>

@@ -1,5 +1,12 @@
 # Demon Killer Changelog
 
+## Unreleased cult system | 2026-11-05
+
+- Added deterministic per-world cult affiliation and dynamic recruitment, exits, deaths, changing circumstances, leadership vacancies and promotions.
+- Added player-only character dossiers, investigation evidence and cult leads separate from the world's hidden truth.
+- Wired a separate cult state into each named character record and added an overlay journal without moving the approved temple or Architect UI.
+- Added independent regression coverage and system documentation. The current temple contains no town NPC roster or playable cult quest chain yet.
+
 ## Unreleased menu music | 2026-11-04
 
 - Added epb9000's CC0 “Creepy Ambient Loop” v2 OGG to `assets/audio/music/creepyloop-v2.ogg` as quiet looping main-menu music.
