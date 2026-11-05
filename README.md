@@ -1,3 +1,9 @@
+# Demon Killer · Experimental Temple Test Center
+
+**This is the `test-center` branch, not the approved `main` game.** Launch [test-center.html](test-center.html) to try the engine-free, grid-based sacrificial temple with a ghost/resurrection choice and DK Architect tools. See [TEST-CENTER.md](TEST-CENTER.md) for controls, coordinate design and regression checks. The historical Godot project remains intact below.
+
+---
+
 # Demon Killer
 
 ## DK Softworks · House of Culture
