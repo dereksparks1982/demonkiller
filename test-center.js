@@ -55,6 +55,7 @@
     walls[index(8,0)] = 0;
     return {
       schema: 1, area_id: AREA, tile_size: TILE, width: N, height: N,
+      introSeen: false,
       floor, walls,
       objects: [
         { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:true },
@@ -82,6 +83,117 @@
   } catch (error) { /* Allow direct offline temple use without storage. */ }
   const visual = { x:scene.player.x, y:scene.player.y, queue:[] };
   let rightMouseHeld = false, rightPointer = null, lastFrameTime = 0;
+  let opening = null, ritual = null;
+  const openingRoute = [
+    [8,0],[8,1],[8,2],[8,3],[9,3],[10,3],[10,4],[10,5],[10,6],
+    [10,7],[9,7],[8,7]
+  ];
+  const womanImages = {};
+  if (typeof Image !== 'undefined') {
+    for (const direction of ['north','east','south','west']) {
+      const img = new Image();
+      img.onload = () => draw();
+      img.onerror = () => { /* Retain an original block-art fallback if unavailable. */ };
+      img.src = './assets/art/characters/crystal-woman/crystal_woman_' + direction + '.png';
+      womanImages[direction] = img;
+    }
+  }
+  function startOpening() {
+    opening = {
+      x:8, y:-1, facing:'south', route:openingRoute.slice(), index:0,
+      phase:'enter', pause:0
+    };
+    rightMouseHeld=false;resetVisual();
+    message('A red-haired woman enters the Forsaken Temple. Wait until she leaves.');
+  }
+  function updateOpening(dt) {
+    if (!opening) return;
+    if (opening.phase === 'wait') {
+      opening.pause-=dt;
+      if (opening.pause<=0) {
+        opening.phase='leave';
+        opening.route=openingRoute.slice(0,-1).reverse().concat([[8,-1]]);
+        opening.index=0;
+      }
+      return;
+    }
+    const point=opening.route[opening.index];
+    if (!point) {
+      if (opening.phase==='enter') {
+        opening.phase='wait'; opening.pause=.95;opening.facing='north';
+      } else {
+        opening=null;scene.introSeen=true;dirty=true;persistCharacter();
+        message('The woman is gone. You are alone with your body and the soul crystal.');
+      }
+      return;
+    }
+    const dx=point[0]-opening.x,dy=point[1]-opening.y,dist=Math.hypot(dx,dy);
+    if (dist<.008) { opening.x=point[0];opening.y=point[1];opening.index++;return; }
+    opening.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'east':'west'):(dy>0?'south':'north');
+    const distance=Math.min(dist,3.5*dt);
+    opening.x+=dx/dist*distance;opening.y+=dy/dist*distance;
+  }
+  function drawCorpse() {
+    if (scene.player.form!=='ghost' || !scene.objects.some(o=>o.type==='altar')) return;
+    const a=scene.objects.find(o=>o.type==='altar');
+    if (!a) return;
+    const xx=a.x*TILE,yy=a.y*TILE;
+    // Primitive horizontal body, kept on the altar until resurrection.
+    pixel(ctx,'#2c2228',xx+18,yy+25,92,14);
+    pixel(ctx,'#d4aea0',xx+20,yy+25,13,13);
+    pixel(ctx,'#3b2930',xx+19,yy+24,14,4);
+    pixel(ctx,'#61404e',xx+34,yy+24,41,16);
+    pixel(ctx,'#987781',xx+74,yy+27,28,5);
+    pixel(ctx,'#3c323d',xx+101,yy+27,9,6);
+  }
+  function drawWoman() {
+    if (!opening) return;
+    const x=Math.round(opening.x*TILE),y=Math.round(opening.y*TILE);
+    const img=womanImages[opening.facing];
+    if (img && img.complete && img.naturalWidth>0) {
+      ctx.drawImage(img,x,y,TILE,TILE);
+    } else {
+      // Same deliberately crude 32x32 color-block style as DK Architect.
+      pixel(ctx,'#6a2727',x+8,y+2,16,11);
+      pixel(ctx,'#ba4e2c',x+9,y+3,14,8);
+      pixel(ctx,'#d4ac91',x+12,y+9,8,7);
+      pixel(ctx,'#285740',x+9,y+16,14,12);
+      pixel(ctx,'#1b3e2d',x+7,y+26,18,4);
+    }
+  }
+  function beginResurrection() {
+    const p=scene.player;
+    rightMouseHeld=false;resetVisual();
+    ritual={phase:'spirit',time:0,fromX:visual.x,fromY:visual.y,visual:{x:visual.x,y:visual.y}};
+    message('The crystal answers. Your spirit moves toward the body on the altar.');
+  }
+  function updateResurrection(dt) {
+    if (!ritual) return;
+    ritual.time+=dt;
+    if (ritual.phase==='spirit') {
+      const t=Math.min(1,ritual.time/1.15),e=t*t*(3-2*t);
+      ritual.visual.x=ritual.fromX+(8-ritual.fromX)*e;
+      ritual.visual.y=ritual.fromY+(5.55-ritual.fromY)*e;
+      if (t>=1) {
+        scene.player.form='living';
+        const crystal=scene.objects.find(o=>o.type==='crystal'&&!o.spent);
+        if (crystal) crystal.spent=true;
+        const landing=[[8,7],[9,7],[7,7],[8,8],[9,8],[7,8]].find(([x,y])=>canStand(x,y,'living'));
+        if (landing) {scene.player.x=landing[0];scene.player.y=landing[1];}
+        else {scene.player.x=scene.spawn.x;scene.player.y=scene.spawn.y;repairPlayer();}
+        scene.player.facing='south';
+        ritual.phase='rise';ritual.time=0;dirty=true;
+      }
+    } else {
+      const t=Math.min(1,ritual.time/.55),e=t*t*(3-2*t);
+      ritual.visual.x=8+(scene.player.x-8)*e;
+      ritual.visual.y=5.55+(scene.player.y-5.55)*e;
+      if(t>=1) {
+        ritual=null;resetVisual();persistCharacter();
+        message('Your spirit rejoins its restored body. Crystal energy has been absorbed.');
+      }
+    }
+  }
   const resetVisual = () => {
     visual.x = scene.player.x; visual.y = scene.player.y; visual.queue.length = 0;
   };
@@ -108,6 +220,7 @@
     if (!record || !record.slot.scene) return;
     try {
       scene = validate(record.slot.scene);
+      if(!('introSeen' in scene))scene.introSeen=true;
       dirty = false; loaded = true; resetVisual();
       message('Welcome back, ' + record.slot.name + '. The Forsaken Temple is ready.');
     } catch (error) { message('Character record is invalid; starting in the original temple.'); }
@@ -266,7 +379,9 @@
     pixel(ctx,'#201c24',ox+14,oy+14,2,17);
   }
   function playerSprite() {
-    const p=scene.player,x=visual.x*TILE,y=visual.y*TILE, ghost=p.form==='ghost';
+    const p=scene.player,position=ritual?ritual.visual:visual,
+      x=position.x*TILE,y=position.y*TILE,
+      ghost=ritual?ritual.phase==='spirit':p.form==='ghost';
     ctx.save();ctx.translate(x,y);
     if(ghost){
       ctx.globalAlpha=.86;ctx.shadowColor='#a3b8ec';ctx.shadowBlur=9;
@@ -294,7 +409,7 @@
     for(let y=0;y<N;y++)for(let x=0;x<N;x++)floorTile(x,y,scene.floor[index(x,y)]);
     for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(scene.walls[index(x,y)])wallTile(x,y);
     scene.objects.forEach(o=>art(ctx,o));
-    playerSprite();
+    drawCorpse();drawWoman();playerSprite();
     if(mode==='edit'){
       ctx.strokeStyle='rgba(190,150,174,.24)';ctx.lineWidth=1;ctx.beginPath();
       for(let i=0;i<=N;i++){
@@ -349,11 +464,12 @@
     rightMouseHeld=false;
     resetVisual();
     mode=next;selectedId=null;corner=null;
-    draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':'Walk Mode active. Find the soul crystal or avoid it and remain a ghost.');
+    draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':opening?'Opening scene is still playing.':ritual?'The resurrection ritual is still playing.':'Walk Mode active. Left-click the soul crystal or avoid it and remain a ghost.');
     canvas.focus({preventScroll:true});
   }
   function facing(dx,dy){return dx>0?'east':dx<0?'west':dy>0?'south':'north';}
   function step(dx,dy) {
+    if (opening||ritual) {message('Wait for the opening or resurrection sequence to finish.');return false;}
     const p=scene.player,nx=p.x+dx,ny=p.y+dy;
     p.facing=facing(dx,dy);
     if(!canStand(nx,ny)){draw();message('Blocked at ('+nx+', '+ny+'). The '+(p.form==='ghost'?'stone boundary':'wall or solid object')+' bars your way.');return false;}
@@ -367,6 +483,7 @@
   // Ultima Online controls: left mouse INTERACTS. Holding right mouse MOVES.
   // The render position animates continuously between logical 32px tiles.
   function interactAt(x,y) {
+    if (opening||ritual) {message('Wait for the current scene to finish.');return;}
     const obj=objectAt(x,y),p=scene.player;
     if (!obj) return message('There is nothing here to interact with.');
     const [w,h]=dims(obj);
@@ -379,9 +496,7 @@
     }
     if(obj.type==='crystal'&&!obj.spent&&p.form==='ghost') {
       // Only a nearby LEFT CLICK activates the crystal, not walking across it.
-      rightMouseHeld=false;resetVisual();
-      p.form='living';obj.spent=true;dirty=true;draw();persistCharacter();
-      message('THE CRYSTAL ANSWERS. You have chosen resurrection.');return;
+      beginResurrection();draw();return;
     }
     message(CATALOG[obj.type].label+(obj.type==='crystal'&&obj.spent?' (spent)':'')+'.');
   }
@@ -393,6 +508,8 @@
   function advanceFrame(now) {
     const dt=lastFrameTime?Math.min((now-lastFrameTime)/1000,.06):0;
     lastFrameTime=now;
+    if(opening){updateOpening(dt);draw();requestAnimationFrame(advanceFrame);return;}
+    if(ritual){updateResurrection(dt);draw();requestAnimationFrame(advanceFrame);return;}
     const target=visual.queue[0];
     if(target) {
       const dx=target.x-visual.x,dy=target.y-visual.y;
@@ -540,6 +657,7 @@
       throw Error('Invalid player or spawn coordinates.');
     if(!['ghost','living'].includes(data.player.form)||!['north','south','east','west'].includes(data.player.facing))
       throw Error('Unknown player state.');
+    if ('introSeen' in data && typeof data.introSeen!=='boolean')throw Error('Invalid intro completion flag.');
     return clone(data);
   }
   function save() {
@@ -548,7 +666,7 @@
   }
   function load() {
     try{const raw=localStorage.getItem(STORE);if(!raw)return message('No saved test-center room found.');
-      const next=validate(JSON.parse(raw));scene=next;undoStack=[];redoStack=[];selectedId=null;corner=null;dirty=false;loaded=true;resetVisual();draw();message('Saved temple room loaded.');}
+      const next=validate(JSON.parse(raw));scene=next;opening=null;ritual=null;rightMouseHeld=false;undoStack=[];redoStack=[];selectedId=null;corner=null;dirty=false;loaded=true;resetVisual();draw();message('Saved temple room loaded.');}
     catch(err){message('Could not load room: '+err.message);}
   }
   function exportRoom() {
@@ -559,8 +677,9 @@
   }
   function reset() {
     undoStack.push(clone(scene));if(undoStack.length>70)undoStack.shift();
-    redoStack=[];scene=fresh();mode='walk';selectedId=null;corner=null;dirty=true;resetVisual();draw();
-    message('Sacrificial temple reset. You awaken as a ghost once more. Saved browser layout remains intact until you press Save.');
+    redoStack=[];scene=fresh();mode='walk';selectedId=null;corner=null;dirty=true;opening=null;ritual=null;resetVisual();
+    if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function')startOpening();
+    draw();message('Sacrificial temple reset. You awaken as a ghost once more. Saved browser layout remains intact until you press Save.');
   }
   function mouseTile(e) {
     const r=canvas.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*N),y=Math.floor((e.clientY-r.top)/r.height*N);
@@ -633,6 +752,7 @@
     finally{e.target.value='';}
   });
   restoreCharacter();
+  if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
   palette();draw();
   if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);
 })();

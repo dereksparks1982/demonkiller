@@ -64,7 +64,10 @@ const click=async(x,y)=>get('room').emit('click',{clientX:x*32+16,clientY:y*32+1
   assert.equal(get('position').textContent,'(8, 9)');
   assert.match(get('lifeState').textContent,/GHOST/,'Walking onto crystal must not resurrect');
   await click(8,9);
-  assert.match(get('lifeState').textContent,/RESURRECTED/,'Left-clicking crystal resurrects');
+  assert.match(get('lifeState').textContent,/GHOST/,'Resurrection is a staged animation, not instant');
+  for(let i=0;i<130;i++){const tick=frameQueue.shift();assert(tick,'Animation frame missing');tick(16*(i+1));}
+  assert.match(get('lifeState').textContent,/RESURRECTED/,'Left-clicking crystal restores the body at altar');
+  assert.equal(get('position').textContent,'(8, 7)','Revived character emerges beside the altar');
   await get('save').emit('click');
   assert.equal(saved.size,1,'Exactly one isolated storage key');
   assert(saved.has('dkSoftworks.demonkiller.testCenter.v1'));
