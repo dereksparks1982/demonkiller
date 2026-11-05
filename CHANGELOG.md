@@ -1,5 +1,17 @@
 # Demon Killer Changelog
 
+## v0.2.3 development preview | 2026-11-05 | Main menu and sacrifice opening
+
+- Preserved the approved sword-and-pixel-art menu and scaled its dimensions to fit available viewport height at ordinary browser zoom.
+- Suppressed the unstyled fallback menu while the sprite sheet loads, while retaining accessible text if the image fails.
+- Added the cult gathering, leader prayer and sacrifice, ghost emergence, Devil encounter and exact "You're mine" line.
+- Devil leaves first; Lilith kneels facing the altar for about five seconds, leaves the soul crystal directly in front, then exits.
+- The starter crystal no longer appears before Lilith places it. Single-click still inspects, double-left-click intentionally resurrects, and the north barrier lifts after the ritual.
+- Rendered the altar body using the existing alive/dead human artwork, relocated the walkway candle, and selected the newer flame-bearing brazier art from the temple sheet.
+- Kept the original altar/walls and 16×16 Architect geometry, movement controls, story branches, JSON tools and named records.
+- Updated the staged-intro and temple regression coverage. Browser visual acceptance remains pending.
+
+
 ## Main menu visual and studio credit corrections | 2026-11-05
 
 - Removed the haunted-house/castle decoration beneath the menu, leaving the approved logo and game-control buttons intact.
