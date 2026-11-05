@@ -1,5 +1,11 @@
 # Demon Killer Changelog
 
+## Unreleased menu music | 2026-11-04
+
+- Added epb9000's CC0 “Creepy Ambient Loop” v2 OGG to `assets/audio/music/creepyloop-v2.ogg` as quiet looping main-menu music.
+- Connected playback to the existing music preference and retried after user gestures when browser autoplay is blocked.
+- Added audio-license documentation and menu regression coverage without altering gameplay, DK Architect or the minimal public README.
+
 ## Unreleased gameplay fixes | 2026-11-04
 
 - Refreshing the temple page now returns to Demon Killer's main menu; normal New Game/Continue still open the temple.

@@ -9,10 +9,16 @@ assert(code,'Menu script not found');
 assert(!html.includes('http-equiv="refresh"'));
 assert(html.includes('assets/art/menu/demon-killer-main-menu-spritesheet.png'));
 assert(fs.existsSync(path.join(root,'assets/art/menu/demon-killer-main-menu-spritesheet.png')));
+assert(html.includes('id="menuMusic"')&&html.includes('assets/audio/music/creepyloop-v2.ogg'),
+ 'Main menu must load the local OGG track');
+const audioPath=path.join(root,'assets/audio/music/creepyloop-v2.ogg');
+assert(fs.existsSync(audioPath),'Selected audio must be present in the game');
+assert.equal(fs.readFileSync(audioPath).subarray(0,4).toString(),'OggS','Audio must be OGG');
 const noop=()=>{},saved=new Map(),elements={};
 class El{
  constructor(id){this.id=id;this.hidden=false;this.checked=true;this.disabled=false;
    this.value='';this.textContent='';this.events={};this.children=[];
+   this.paused=true;this.playCount=0;this.pauseCount=0;
    this.classList={add:noop};}
  addEventListener(n,cb){(this.events[n]??=[]).push(cb);}
  emit(n,e={}){for(const cb of this.events[n]||[])cb(e);}
@@ -20,12 +26,16 @@ class El{
  replaceChildren(...list){this.children=list;}
  getContext(){return{clearRect:noop,drawImage:noop};}
  focus(){}matches(){return false;}
+ play(){this.paused=false;this.playCount++;return Promise.resolve();}
+ pause(){this.paused=true;this.pauseCount++;}
 }
 const get=id=>elements[id]??(elements[id]=new El(id));
 const actions=Object.fromEntries(['new','continue','options','quit'].map(x=>[x,new El(x)]));
 const backs=[new El('back0'),new El('back1'),new El('back2')];
+const documentEvents={};
 const document={
  getElementById:get,createElement:n=>new El(n),
+ addEventListener:(name,fn)=>{(documentEvents[name]??=[]).push(fn);},
  querySelector:sel=>actions[sel.match(/data-action=(\w+)/)?.[1]]||null,
  querySelectorAll:sel=>sel==='.back'?backs:sel==='.art-button'?Object.values(actions):[],
  body:{classList:{add:noop}}
@@ -36,6 +46,8 @@ const window={confirm:()=>true};
 class Image{set src(v){this.file=v;}}
 vm.runInNewContext(code[1],{document,localStorage,location,window,Image,Date,console},
  {filename:'index.html',timeout:3000});
+assert.equal(get('menuMusic').volume,0.26,'Menu music should have quiet volume');
+assert.equal(get('menuMusic').paused,false,'Menu should request music when enabled');
 actions.new.emit('click');
 assert.equal(get('slotsScreen').hidden,false);
 assert.equal(get('slots').children.length,3,'Three name records');
@@ -59,4 +71,10 @@ assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.characters.v1')).slot
 actions.options.emit('click');assert.equal(get('optionsScreen').hidden,false);
 get('musicEnabled').checked=false;get('musicEnabled').emit('change');
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).musicEnabled,false);
+assert.equal(get('menuMusic').paused,true,'Disabling music must pause audio');
+for(const fn of documentEvents.pointerdown||[])fn();
+assert.equal(get('menuMusic').paused,true,'Disabled audio remains silent after interaction');
+get('musicEnabled').checked=true;get('musicEnabled').emit('change');
+assert.equal(get('menuMusic').paused,false,'Enabling music should resume audio');
+assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).musicEnabled,true);
 console.log('PASS: Demon Killer menu, approved art, named records, Continue, overwrite guard, options.');

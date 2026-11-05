@@ -45,6 +45,7 @@ label{cursor:pointer}
 </style>
 </head>
 <body>
+<audio id="menuMusic" src="./assets/audio/music/creepyloop-v2.ogg" preload="none" loop aria-hidden="true"></audio>
 <main class="menu">
 <section class="screen" id="home" aria-label="Demon Killer main menu">
 <h1 id="logoFallback" class="logo-fallback">DEMON KILLER</h1>
@@ -73,7 +74,7 @@ label{cursor:pointer}
 </section>
 <section class="screen panel" id="optionsScreen" hidden aria-label="Game options">
 <h2>OPTIONS</h2>
-<p>The game has no music track yet. When we add the MIDI-style soundtrack, its volume can be controlled here.</p>
+<p>Atmospheric menu music plays when enabled. Your browser may wait for your first click or key press before starting audio.</p>
 <fieldset><legend>Audio preference</legend><label><input id="musicEnabled" type="checkbox" checked> Play music when available</label></fieldset>
 <button class="action secondary back" type="button">BACK</button>
 </section>
@@ -94,6 +95,20 @@ const SLOTS_KEY='dkSoftworks.demonkiller.characters.v1';
 const ACTIVE_KEY='dkSoftworks.demonkiller.activeCharacter.v1';
 const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
 const $=id=>document.getElementById(id);
+const menuMusic=$('menuMusic');
+menuMusic.volume=0.26;
+function syncMenuMusic(){
+ if(!$('musicEnabled').checked){
+  menuMusic.pause();
+  menuMusic.currentTime=0;
+  return;
+ }
+ if(!menuMusic.paused)return;
+ try{
+  const pending=menuMusic.play();
+  if(pending&&typeof pending.catch==='function')pending.catch(()=>{});
+ }catch(e){/* Browsers may require a genuine user gesture to play audio. */}
+}
 const views=['home','slotsScreen','nameScreen','optionsScreen','quitScreen'];
 let mode='new',chosen=0,atlas=null;
 function show(id){for(const view of views)$(view).hidden=view!==id;$('notice').textContent='';}
@@ -148,8 +163,16 @@ document.querySelector('[data-action=new]').addEventListener('click',()=>openSlo
 document.querySelector('[data-action=continue]').addEventListener('click',()=>openSlots('continue'));
 document.querySelector('[data-action=options]').addEventListener('click',()=>show('optionsScreen'));
 document.querySelector('[data-action=quit]').addEventListener('click',()=>show('quitScreen'));
-$('musicEnabled').addEventListener('change',()=>{try{localStorage.setItem(PREFS_KEY,JSON.stringify({musicEnabled:$('musicEnabled').checked}));}catch(e){notice('Audio preference could not be saved.');}});
+$('musicEnabled').addEventListener('change',()=>{
+ try{localStorage.setItem(PREFS_KEY,JSON.stringify({musicEnabled:$('musicEnabled').checked}));}
+ catch(e){notice('Audio preference could not be saved.');}
+ syncMenuMusic();
+});
 try{const v=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');if(v&&typeof v.musicEnabled==='boolean')$('musicEnabled').checked=v.musicEnabled;}catch(e){}
+// If autoplay was blocked, the next keyboard or pointer gesture retries.
+document.addEventListener('pointerdown',syncMenuMusic,{passive:true});
+document.addEventListener('keydown',syncMenuMusic);
+syncMenuMusic();
 const image=new Image();
 function artCanvas(canvas,crop){const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,canvas.width,canvas.height);g.drawImage(image,...crop,0,0,canvas.width,canvas.height);}
 function renderButtons(){
