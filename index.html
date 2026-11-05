@@ -1,9 +1,178 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Demon Killer | Sacrificial Temple</title>
-<meta http-equiv="refresh" content="0;url=./test-center.html">
-<script>location.replace('./test-center.html');</script></head>
-<body style="background:#171219;color:#eee5e8;font:16px system-ui;padding:2rem">
-<p>Opening the <a style="color:#d4a4b5" href="./test-center.html">Demon Killer sacrificial temple</a>…</p>
-</body></html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demon Killer | Main Menu</title>
+<meta name="description" content="Demon Killer, an original engine-free Gothic pixel adventure.">
+<style>
+:root{color-scheme:dark;--paper:#eee2c7;--gold:#d2ad51;--red:#8d2829}
+*{box-sizing:border-box}
+html{min-height:100%;background:#0c0c12}
+body{margin:0;min-height:100vh;color:var(--paper);background:radial-gradient(ellipse at 50% 28%,#252033 0,#14121b 50%,#08090d 100%);font:16px/1.5 monospace}
+.menu{max-width:950px;margin:auto;min-height:100vh;padding:26px 20px 30px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.screen{width:100%}
+[hidden]{display:none!important}
+.logo{display:block;width:min(660px,88vw);max-height:280px;height:auto;object-fit:contain;margin:0 auto 6px;image-rendering:pixelated}
+.logo-fallback{font:900 clamp(38px,8vw,70px) Georgia,serif;color:#da4043;text-shadow:4px 4px #000;margin:20px 0}
+.castle{display:block;width:min(285px,55vw);height:auto;margin:8px auto;image-rendering:pixelated}
+.menu-buttons{display:grid;gap:4px;justify-items:center;margin:4px auto 0}
+.art-button{display:block;position:relative;border:0;padding:0;width:min(315px,83vw);background:transparent;color:var(--paper);cursor:pointer}
+.art-button canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.art-button .fallback{position:absolute;inset:15%;display:grid;place-items:center;background:#282531;border:3px solid #ab7e47;font:bold 22px monospace}
+.art-ready .art-button .fallback{display:none}
+button:focus-visible,input:focus-visible{outline:3px solid #fbe49d;outline-offset:3px}
+.art-button:hover,.art-button:focus-visible{filter:brightness(1.17)}
+.menu-footer{margin-top:auto;padding-top:25px;color:#93858b;font-size:12px;line-height:1.6}
+.panel{max-width:570px;margin:10px auto;padding:22px 22px 19px;background:#1d1a25;border:4px solid #856441;box-shadow:inset 0 0 0 3px #100f15,0 12px 25px #0008;text-align:center}
+.panel h2{margin:0 0 14px;color:#f5d781;font:bold clamp(19px,4vw,27px) monospace;letter-spacing:.08em}
+.panel p{color:#c8bbc1;font-size:14px}
+.slots{display:grid;gap:10px;text-align:left;margin:20px auto}
+.slot{width:100%;padding:13px 14px;background:#292634;border:2px solid #7d6570;color:var(--paper);text-align:left;font:700 16px monospace;cursor:pointer}
+.slot:hover:not(:disabled),.slot:focus-visible{border-color:#e1b85a;background:#44313a}
+.slot:disabled{opacity:.45;cursor:not-allowed}
+.slot small{display:block;color:#b09eac;font-size:11px;font-weight:normal;margin-top:3px}
+.slot-name{color:#f3d68e}
+input[type=text]{width:min(100%,260px);padding:13px;margin:10px auto 15px;background:#0c0e16;border:2px solid #8c6d55;color:white;font:20px monospace;text-align:center;text-transform:uppercase;letter-spacing:.1em}
+.action{padding:12px 17px;border:2px solid #c7a15a;background:#713032;color:#fff0df;font:bold 14px monospace;cursor:pointer;margin:6px}
+.action:hover{background:#a53c3d}
+.action.secondary{background:#2a2734;border-color:#8a7482}
+.notice{min-height:20px;margin:12px auto;font-size:13px;color:#e0c78c}
+fieldset{border:1px solid #795864;text-align:left;margin:12px 0;padding:16px}
+legend{color:#efd58b}
+label{cursor:pointer}
+@media(max-width:530px){.menu{padding:14px 8px 25px}.panel{padding:18px 12px}.logo{max-height:225px}.castle{width:min(225px,55vw)}.slot{font-size:14px}}
+</style>
+</head>
+<body>
+<main class="menu">
+<section class="screen" id="home" aria-label="Demon Killer main menu">
+<h1 id="logoFallback" class="logo-fallback">DEMON KILLER</h1>
+<canvas id="logo" class="logo" width="654" height="555" role="img" aria-label="Demon Killer pixel-art title" hidden></canvas>
+<nav class="menu-buttons" aria-label="Main menu">
+<button type="button" class="art-button" data-action="new" aria-label="New Game"><canvas width="436" height="129" aria-hidden="true"></canvas><span class="fallback">NEW GAME</span></button>
+<button type="button" class="art-button" data-action="continue" aria-label="Continue"><canvas width="436" height="129" aria-hidden="true"></canvas><span class="fallback">CONTINUE</span></button>
+<button type="button" class="art-button" data-action="options" aria-label="Options"><canvas width="436" height="129" aria-hidden="true"></canvas><span class="fallback">OPTIONS</span></button>
+<button type="button" class="art-button" data-action="quit" aria-label="Quit"><canvas width="436" height="129" aria-hidden="true"></canvas><span class="fallback">QUIT</span></button>
+</nav>
+</section>
+<section class="screen panel" id="slotsScreen" hidden aria-label="Character save slots">
+<h2 id="slotsHeading">SELECT A RECORD</h2>
+<p id="slotsHelp">Three records. One character per adventure.</p>
+<div id="slots" class="slots"></div>
+<button class="action secondary back" type="button">BACK</button>
+</section>
+<section class="screen panel" id="nameScreen" hidden aria-label="Name registration">
+<h2>REGISTER YOUR NAME</h2>
+<p id="chosenSlot">Record 1</p>
+<form id="nameForm">
+<label for="characterName">Character name (1 to 8 letters or characters)</label><br>
+<input type="text" id="characterName" name="characterName" maxlength="8" autocomplete="off" required pattern="[A-Za-z0-9 _-]{1,8}">
+<div><button type="submit" class="action">BEGIN ADVENTURE</button><button type="button" class="action secondary back">BACK</button></div>
+</form>
+</section>
+<section class="screen panel" id="optionsScreen" hidden aria-label="Game options">
+<h2>OPTIONS</h2>
+<p>The game has no music track yet. When we add the MIDI-style soundtrack, its volume can be controlled here.</p>
+<fieldset><legend>Audio preference</legend><label><input id="musicEnabled" type="checkbox" checked> Play music when available</label></fieldset>
+<button class="action secondary back" type="button">BACK</button>
+</section>
+<section class="screen panel" id="quitScreen" hidden>
+<h2>QUIT GAME</h2>
+<p>Browsers do not allow a page to close an ordinary tab. You can close this tab to leave the game.</p>
+<button class="action secondary back" type="button">BACK TO MENU</button>
+</section>
+<p id="notice" class="notice" role="status" aria-live="polite"></p>
+<canvas class="castle" id="castle" width="485" height="283" aria-label="Pixel-art Gothic castle under moonlight" role="img" hidden></canvas>
+<footer class="menu-footer">ELDERRED SOFTWORKS · ORIGINAL PIXEL ART<br>Choose New Game to register one name, or Continue to reopen its saved temple.</footer>
+</main>
+<script>
+(function(){
+'use strict';
+const ART='./assets/art/menu/demon-killer-main-menu-spritesheet.png';
+const SLOTS_KEY='dkSoftworks.demonkiller.characters.v1';
+const ACTIVE_KEY='dkSoftworks.demonkiller.activeCharacter.v1';
+const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
+const $=id=>document.getElementById(id);
+const views=['home','slotsScreen','nameScreen','optionsScreen','quitScreen'];
+let mode='new',chosen=0,atlas=null;
+function show(id){for(const view of views)$(view).hidden=view!==id;$('notice').textContent='';}
+function notice(message){$('notice').textContent=message;}
+function readSlots(){
+ try{const data=JSON.parse(localStorage.getItem(SLOTS_KEY)||'null');
+ if(data&&data.version===1&&Array.isArray(data.slots))return [0,1,2].map(i=>{
+ const s=data.slots[i];return s&&s.id===i+1&&typeof s.name==='string'&&s.name.length>0?s:null;});
+ }catch(e){notice('Saved records could not be read.');}
+ return [null,null,null];
+}
+function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
+function launch(id){
+ try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html';}
+ catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
+}
+function openSlots(next){
+ mode=next;
+ $('slotsHeading').textContent=mode==='new'?'CHOOSE AN EMPTY RECORD':'CONTINUE ADVENTURE';
+ $('slotsHelp').textContent=mode==='new'?'Choose a record, then enter your name. Existing records require confirmation before replacement.':'Choose a saved name to return to the Forsaken Temple.';
+ const slots=readSlots();const root=$('slots');root.replaceChildren();
+ for(let i=0;i<3;i++){
+ const s=slots[i],b=document.createElement('button');b.type='button';b.className='slot';
+ const title=document.createElement('span');title.className='slot-name';title.textContent='0'+(i+1)+'  '+(s?s.name:'— EMPTY —');
+ const sub=document.createElement('small');sub.textContent=s?(mode==='new'?'Replace this character (confirmation required)':'Continue saved adventure'):(mode==='continue'?'No save in this record':'Create a new adventure');
+ b.append(title,sub);b.disabled=mode==='continue'&&!s;b.addEventListener('click',()=>chooseSlot(i));root.append(b);
+ }
+ show('slotsScreen');
+ if(mode==='continue'&&!slots.some(Boolean))notice('No adventures saved yet. Choose New Game to begin.');
+}
+function chooseSlot(i){
+ const slots=readSlots(),previous=slots[i];chosen=i;
+ if(mode==='continue'){
+ if(!previous)return;
+ launch(i+1);return;
+ }
+ if(previous&&!window.confirm('Replace '+previous.name+' in record '+(i+1)+'? That character will be permanently overwritten.'))return;
+ $('chosenSlot').textContent='RECORD '+(i+1);
+ $('characterName').value='';show('nameScreen');$('characterName').focus();
+}
+$('nameForm').addEventListener('submit',event=>{
+ event.preventDefault();
+ const name=$('characterName').value.trim().toUpperCase();
+ if(!/^[A-Z0-9 _-]{1,8}$/.test(name))return notice('Enter a name of 1 to 8 letters, numbers, spaces, hyphens or underscores.');
+ try{
+ const slots=readSlots();slots[chosen]={id:chosen+1,name,scene:null,updated:Date.now()};
+ writeSlots(slots);launch(chosen+1);
+ }catch(e){notice('Cannot create a save because browser storage is unavailable.');}
+});
+document.querySelectorAll('.back').forEach(el=>el.addEventListener('click',()=>show('home')));
+document.querySelector('[data-action=new]').addEventListener('click',()=>openSlots('new'));
+document.querySelector('[data-action=continue]').addEventListener('click',()=>openSlots('continue'));
+document.querySelector('[data-action=options]').addEventListener('click',()=>show('optionsScreen'));
+document.querySelector('[data-action=quit]').addEventListener('click',()=>show('quitScreen'));
+$('musicEnabled').addEventListener('change',()=>{try{localStorage.setItem(PREFS_KEY,JSON.stringify({musicEnabled:$('musicEnabled').checked}));}catch(e){notice('Audio preference could not be saved.');}});
+try{const v=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');if(v&&typeof v.musicEnabled==='boolean')$('musicEnabled').checked=v.musicEnabled;}catch(e){}
+const image=new Image();
+function artCanvas(canvas,crop){const g=canvas.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,canvas.width,canvas.height);g.drawImage(image,...crop,0,0,canvas.width,canvas.height);}
+function renderButtons(){
+ document.querySelectorAll('.art-button').forEach((button,i)=>{
+ const cv=button.querySelector('canvas'),selected=button.matches(':hover,:focus-visible');
+ artCanvas(cv,[selected?1306:841,[62,191,319,447][i],436,129]);
+ });
+}
+image.onload=()=>{
+ if(!image.naturalWidth)return;
+ atlas=image;artCanvas($('logo'),[60,0,654,555]);$('logo').hidden=false;$('logoFallback').hidden=true;
+ artCanvas($('castle'),[25,574,485,283]);$('castle').hidden=false;
+ document.body.classList.add('art-ready');renderButtons();
+};
+image.onerror=()=>notice('Menu artwork unavailable. Text controls remain usable.');
+document.querySelectorAll('.art-button').forEach(b=>{
+ b.addEventListener('mouseenter',()=>{if(atlas)renderButtons();});
+ b.addEventListener('mouseleave',()=>{if(atlas)renderButtons();});
+ b.addEventListener('focus',()=>{if(atlas)renderButtons();});
+ b.addEventListener('blur',()=>{if(atlas)renderButtons();});
+});
+image.src=ART;
+})();
+</script>
+</body>
+</html>
