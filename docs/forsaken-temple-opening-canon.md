@@ -118,6 +118,14 @@ Also reported by the owner, **not fixed by this documentation task**:
 - Existing temple, altar geometry, editor functionality and JSON import/export preserved.
 - Browser visually inspected; automated tests complement, not replace, manual checks. GitHub Actions used **sparingly** under Company Bible.
 
+## November 5, 2026 opening revision: the sacrifice is shown
+
+This later owner-approved direction supersedes the older document's initial ghost-already-awake opening. The player is initially shown **alive and immobile, bound on the altar**, surrounded by cult members. The cult leader prays, sacrifices the player, and then leaves with the others. The player's ghost appears in front of the altar after they depart. The **Devil stands to the player's right** and **Lilith to the left**. The Devil says **"You're mine"** and exits first.
+
+Lilith remains, approaches the altar, kneels facing it for roughly five seconds, rises and leaves the **previously absent gold soul crystal** at the prayer position in front of the altar. She then exits. Only then does the player regain control of the ghost and decide whether to double-click the crystal to resurrect or leave as a ghost. The Devil does **not** continue into the future courtyard. If the player follows anyone, it is Lilith. The two separate willow outcomes remain as previously specified.
+
+The cult's presence, the Devil encounter and bound player are cutscene-only actors. The current temple layout, altar and saved editor data remain authoritative. The present browser demo does not yet contain a built courtyard or the complete willow transformation gameplay.
+
 ## Authorization boundary
 
 The owner expressly requested **"don't build"** while planning, then narrowly authorized **documentation and one kneeling green-dress sprite sheet after documentation**. This instruction **does not authorize gameplay code, a courtyard, a corpse, a red-dress sheet, tree art, release/tag/deployment, or branch deletion**. Reference `COMPANY_BIBLE.md` for shared project change-control rules.
