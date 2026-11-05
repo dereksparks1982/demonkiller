@@ -16,7 +16,7 @@ Switch to **Architect Mode** to edit the room. Existing tools include placement,
 
 ### Current limitations
 
-- The four proper facing sprites, mouse-wheel rotation **before** placement, translucent sprite placement previews, intelligent connecting wall sprites, expanded Gothic asset catalog and temple decoration pass are **planned but not implemented**.
+- The approved north/east/south/west sprites are now used for characters and objects; floor and auto-connected wall PNGs render in the room. Architect placement has a translucent sprite preview, a green/red footprint, and mouse-wheel 90-degree rotation. Expanding the asset catalog, refining wall joins and broader Gothic decoration remain future work.
 - The room is currently fixed at 16 × 16; variable-sized interconnected rooms and meadows are future work.
 - The ghost and mortal paths are a working **opening choice**, not complete story routes.
 - Saving uses an isolated DK Architect prototype key and separate named-character records in browser local storage. The existing test-center layout key remains unchanged; exports are the portable backup. Special name-triggered quests are a future idea, not implemented.

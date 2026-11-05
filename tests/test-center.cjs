@@ -89,19 +89,25 @@ const click=async(x,y)=>get('room').emit('click',{clientX:x*32+16,clientY:y*32+1
   const room=get('room');
   await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:9*32+16,preventDefault:noop});
   assert.equal(get('position').textContent,'(8, 12)','Right mouse hold waits for frame tick');
-  for(const tick of frameQueue.splice(0))tick(16);
+  for(const tick of frameQueue.splice(0))tick(16*131);
   assert.equal(get('position').textContent,'(8, 11)','Right mouse hold advances toward cursor');
   await room.emit('mouseup',{button:2});
 
   await get('editMode').emit('click');
   assert.equal(get('modeLabel').textContent,'ARCHITECT MODE');
   const initial=Number(get('objectCount').textContent);
+  await get('room').emit('mousemove',{clientX:2*32+16,clientY:5*32+16});
+  await get('room').emit('wheel',{deltaY:100,preventDefault:noop});
+  assert.match(get('status').textContent,/facing east/,'Mouse wheel rotates unplaced sprite preview');
   await click(2,5);
   assert.equal(Number(get('objectCount').textContent),initial+1,'Place original sprite');
   await get('undo').emit('click');
   assert.equal(Number(get('objectCount').textContent),initial,'Undo sprite placement');
   await get('redo').emit('click');
   assert.equal(Number(get('objectCount').textContent),initial+1,'Redo sprite placement');
+  await get('save').emit('click');
+  const layout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(layout.objects.find(o=>o.x===2&&o.y===5).r,1,'Placed sprite keeps wheel rotation');
   await get('inspect').emit('click');
   assert.match(get('status').textContent,/ACCESS CHECK/);
 

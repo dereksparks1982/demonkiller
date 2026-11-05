@@ -13,7 +13,7 @@ Open [test-center.html](test-center.html), or open [index.html](index.html) to s
 - **Persistence:** Save/reload in isolated browser local storage, or Export/Import Room JSON to transfer a layout.
 - **Coordinates:** Every tile and item is addressable, with object IDs, footprint dimensions, and rotation in cardinal 90-degree steps.
 
-**Important:** The mouse wheel does not yet rotate a prospective placement; the cursor currently shows a tile outline, not the actual sprite preview. Proper north/east/south/west artwork and wall auto-tiling still need development. The existing Rotate button acts on **selected placed objects**.
+**Editor preview:** choose Place and move your pointer over the grid to see a translucent approved sprite with a green/red footprint. Mouse-wheel rotation changes only the **unplaced preview**, in 90-degree increments. Clicking places at the chosen orientation. The existing Rotate button still acts only on **selected placed objects**. Approved directional PNGs, floor tiles and basic connected wall types are loaded from `assets/art/`; missing images fall back to procedural pixel blocks.
 
 ## Opening scene
 
