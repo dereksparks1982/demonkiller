@@ -2,11 +2,13 @@
 
 **Demon Killer** is an original, top-down Gothic fantasy adventure in active development by **Elderred Softworks LLC**. The game and its **DK Architect** world editor are being developed with our own HTML, CSS, JavaScript, Canvas rendering and grid-based world data, **without Godot or another external game engine**.
 
-> **Current development milestone: v0.2.0 | Sacrificial Temple / DK Architect.** This is a development prototype, not a finished or released game.
+> **Current development milestone: v0.2.1 | Main Menu / Sacrificial Temple / DK Architect.** This is a development prototype, not a finished or released game.
 
 ## Play the current build
 
-Open **[the sacrificial temple](test-center.html)** in Firefox or another modern desktop browser. The root [index.html](index.html) is a convenience entry that opens the same temple. No installation, build step, npm dependencies, network connection, or third-party sprite pack is required.
+Open **[Demon Killer](index.html)** in Firefox or another modern desktop browser. The root is now a main menu using the approved pixel-art sheet. **New Game** offers three Zelda-I-style save records with a single character name (up to eight characters); **Continue** loads a named record. The existing **[Forsaken Temple / DK Architect](test-center.html)** screen remains intact, with all room-building tools, Save/Load, and JSON Export/Import. No installation, build step, npm dependencies, network connection, or third-party sprite pack is required.
+ 
+**Movement:** in Walk Temple mode, hold the **right mouse button** and point to travel continuously, with higher speed when the pointer is farther away. **Left-click interacts** with nearby items and never auto-walks or teleports. WASD and arrow keys are also supported. In Architect Mode, left-click retains its editing behavior. The temple can still be opened directly.
 
 The **16 × 16 temple**, at **32 × 32 pixels per tile**, begins with the player as a **ghost**. Touching the soul crystal resurrects the player; avoiding it preserves the secret ghost path. Either choice belongs to the story. The north arch is only a future connection marker and **does not yet load a courtyard**.
 
@@ -17,7 +19,7 @@ Switch to **Architect Mode** to edit the room. Existing tools include placement,
 - The four proper facing sprites, mouse-wheel rotation **before** placement, translucent sprite placement previews, intelligent connecting wall sprites, expanded Gothic asset catalog and temple decoration pass are **planned but not implemented**.
 - The room is currently fixed at 16 × 16; variable-sized interconnected rooms and meadows are future work.
 - The ghost and mortal paths are a working **opening choice**, not complete story routes.
-- Saving uses a dedicated prototype key in the browser's local storage; exports are the portable backup.
+- Saving uses an isolated DK Architect prototype key and separate named-character records in browser local storage. The existing test-center layout key remains unchanged; exports are the portable backup. Special name-triggered quests are a future idea, not implemented.
 
 ## Planned persistent world server
 
