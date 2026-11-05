@@ -33,7 +33,7 @@ assert.match(get('status').textContent,/Cult members surround/i);
 key('w');assert.equal(get('position').textContent,'(8, 12)','Player locked during opening');
 const room=get('room');
 room.emit('click',{button:0,clientX:8*32+16,clientY:9*32+16});
-assert.match(get('lifeState').textContent,/GHOST/);
+assert.match(get('lifeState').textContent,/ALIVE/,'Player remains bound until sacrificed');
 tick(1800);
 assert.match(get('status').textContent,/Double-left-click the crystal/i);
 assert.equal(get('position').textContent,'(8, 8)','Ghost appears in front of the altar after the sacrifice');
