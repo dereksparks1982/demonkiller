@@ -2,7 +2,7 @@
 
 **Demon Killer** is an original, top-down Gothic fantasy adventure in active development by **Elderred Softworks LLC**. The game and its **DK Architect** world editor are being developed with our own HTML, CSS, JavaScript, Canvas rendering and grid-based world data, **without Godot or another external game engine**.
 
-> **Current development milestone: v0.2.1 | Main Menu / Sacrificial Temple / DK Architect.** This is a development prototype, not a finished or released game.
+> **Current development milestone: v0.2.2 | Menu / Crystal Woman Intro / Forsaken Temple / DK Architect.** This is a development prototype, not a finished or released game.
 
 ## Play the current build
 
@@ -10,7 +10,7 @@ Open **[Demon Killer](index.html)** in Firefox or another modern desktop browser
  
 **Movement:** in Walk Temple mode, hold the **right mouse button** and point to travel continuously, with higher speed when the pointer is farther away. **Left-click interacts** with nearby items and never auto-walks or teleports. WASD and arrow keys are also supported. In Architect Mode, left-click retains its editing behavior. The temple can still be opened directly.
 
-The **16 × 16 temple**, at **32 × 32 pixels per tile**, begins with the player as a **ghost**. Touching the soul crystal resurrects the player; avoiding it preserves the secret ghost path. Either choice belongs to the story. The north arch is only a future connection marker and **does not yet load a courtyard**.
+The **16 × 16 temple**, at **32 × 32 pixels per tile**, begins with the player as a **ghost**. Walking onto the soul crystal does **nothing**. A nearby **left-click** starts a short ritual that reunites the ghost with its body on the altar, while passing it by preserves the secret ghost route. Either choice belongs to the story. The red-haired crystal woman enters the north arch, walks around the altar, pauses on the floor in front of it, then leaves. Ghost controls unlock afterward. The north arch remains a future connection marker and **does not yet load a courtyard**.
 
 Switch to **Architect Mode** to edit the room. Existing tools include placement, selection and moving, 90-degree rotation of *selected* objects, floor painting/fill/rectangle, walls, doors, undo/redo, JSON export/import, browser-local saves, and exact object coordinates. See [Temple Lab / controls](TEST-CENTER.md) for details.
 
@@ -37,7 +37,7 @@ Read [Architect development plan](docs/architect-plan.md), [changelog](CHANGELOG
 
 ## Verification
 
-Run `node tests/test-center.cjs` for the included contract and simulated-interaction tests. These are **not** a substitute for a visual browser test. The original temple prototype was visually tested on Ubuntu; the repository migration does not add gameplay logic.
+Run `node tests/test-center.cjs` for simulated temple mechanics. Also run `node tests/menu.cjs` for name registration and `node tests/intro.cjs` for the opening scene. These are **not** a substitute for a visual browser test. The original temple prototype was visually tested on Ubuntu; the repository migration does not add gameplay logic.
 
 ## Prior Godot project
 

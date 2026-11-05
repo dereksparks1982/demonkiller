@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.2 | 2026-11-04 | Main menu and crystal woman opening
+
+- Added the approved-sprite main menu and three Zelda-I-style named character records with New Game, Continue, Options and Quit guidance.
+- New and continued characters open the **existing** Forsaken Temple with DK Architect and all original room Save, Load, Export and Import controls.
+- Changed controls to hold right mouse for movement, move cursor farther to run, and left-click only for nearby object interactions.
+- Fixed unwanted auto-resurrection when walking over the soul crystal. No E-key interaction.
+- Added the red-haired woman NPC's timed temple entrance, route around the altar, and exit using the approved four-direction sprites. Player movement unlocks after departure.
+- Added a minimal spirit-to-body altar resurrection sequence and retained the optional ghost path. No unapproved special powers or new story areas.
+- Added simulated regression checks. The persistent-world server is a separate future milestone.
+
+
 ## v0.2.0 | 2026-11-04 | Main-repository migration
 
 - Promoted the already playable, engine-free sacrificial-temple prototype as the active direction for `main`.
