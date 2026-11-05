@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/demon-killer-verify.yml'
+      - 'index.html'
+      - 'test-center.js'
+      - 'test-center.html'
+      - 'test-center.css'
+      - 'tests/**'
   workflow_dispatch:
 permissions:
   contents: read
