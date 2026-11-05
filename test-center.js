@@ -549,7 +549,7 @@
     rightMouseHeld=false;
     resetVisual();
     mode=next;selectedId=null;corner=null;
-    draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':opening?'Opening scene is still playing.':ritual?'The resurrection ritual is still playing.':'Walk Mode active. Left-click the soul crystal or avoid it and remain a ghost.');
+    draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':opening?'Opening scene is still playing.':ritual?'The resurrection ritual is still playing.':'Walk Mode active. Single-click the soul crystal to inspect; double-left-click to resurrect, or remain a ghost.');
     canvas.focus({preventScroll:true});
   }
   function facing(dx,dy){
@@ -569,7 +569,7 @@
   }
   // Ultima Online controls: left mouse INTERACTS. Holding right mouse MOVES.
   // The render position animates continuously between logical 32px tiles.
-  function interactAt(x,y) {
+  function interactAt(x,y, doubleClick=false) {
     if (opening||ritual) {message('Wait for the current scene to finish.');return;}
     const obj=objectAt(x,y),p=scene.player;
     if (!obj) return message('There is nothing here to interact with.');
@@ -582,7 +582,8 @@
       message('Iron arch '+(obj.open?'opened':'closed')+'.');return;
     }
     if(obj.type==='crystal'&&!obj.spent&&p.form==='ghost') {
-      // Only a nearby LEFT CLICK activates the crystal, not walking across it.
+      // A normal click inspects; only a deliberate double click resurrects.
+      if (!doubleClick) {message('A glowing gold crystal.');return;}
       beginResurrection();draw();return;
     }
     message(CATALOG[obj.type].label+(obj.type==='crystal'&&obj.spent?' (spent)':'')+'.');
@@ -802,6 +803,12 @@
     if(e.button && e.button!==0)return;
     const p=mouseTile(e);if(!p)return;
     if(mode==='edit')applyEdit(p.x,p.y);else interactAt(p.x,p.y);
+    canvas.focus({preventScroll:true});
+  });
+  canvas.addEventListener('dblclick',e=>{
+    if(mode!=='walk'||e.button!==0)return;
+    const p=mouseTile(e);if(!p)return;
+    interactAt(p.x,p.y,true);
     canvas.focus({preventScroll:true});
   });
   canvas.addEventListener('contextmenu',e=>{if(mode==='walk')e.preventDefault();});

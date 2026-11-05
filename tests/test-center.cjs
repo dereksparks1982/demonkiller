@@ -17,6 +17,19 @@ for(const id of ['walkMode','editMode','room','tool','category','palette','rotat
   assert(html.includes('id="'+id+'"'),'Missing control: '+id);
 assert(html.includes('test-center.css')&&html.includes('test-center.js'));
 assert(!html.includes('project.godot')&&!html.includes('Capital & Consequence'));
+const refreshRedirect=html.match(/<script id="refresh-to-menu">([\s\S]*?)<\/script>/)?.[1];
+assert(refreshRedirect,'Temple must have an early refresh-only return-to-menu handler');
+const refreshDestination=type=>{
+  let destination=null;
+  vm.runInNewContext(refreshRedirect,{window:{
+    performance:{getEntriesByType:()=>[{type}]},
+    location:{replace:path=>{destination=path;}}
+  }});
+  return destination;
+};
+assert.equal(refreshDestination('reload'),'./index.html','Refreshing temple returns to main menu');
+assert.equal(refreshDestination('navigate'),null,'New Game / Continue may enter temple normally');
+assert.equal(refreshDestination('back_forward'),null,'History navigation is not a page refresh');
 assert(js.includes("const N = 16, TILE = 32"));
 assert(js.includes("const AREA = 'dk.temple.sacrifice.001'"));
 assert(js.includes("const STORE = 'dkSoftworks.demonkiller.testCenter.v1'"));
@@ -53,20 +66,30 @@ const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAni
 vm.runInNewContext(js,sandbox,{filename:'test-center.js',timeout:3000});
 const key=code=>{for(const fn of events.keydown??[])fn({key:code,
   ctrlKey:false,metaKey:false,target:{tagName:'BODY'},preventDefault:noop});};
-const click=async(x,y)=>get('room').emit('click',{clientX:x*32+16,clientY:y*32+16});
+const click=async(x,y)=>get('room').emit('click',{button:0,clientX:x*32+16,clientY:y*32+16});
+const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16,clientY:y*32+16});
 (async()=>{
   assert.equal(get('position').textContent,'(8, 12)');
   assert.match(get('lifeState').textContent,/GHOST/);
   assert.equal(get('objectCount').textContent,'10');
   await click(9,12);
   assert.equal(get('position').textContent,'(8, 12)','Left-clicking floor must not move');
+  await dblclick(8,9);
+  assert.match(get('status').textContent,/Move closer/,'Double-click out of reach cannot resurrect');
+  assert.match(get('lifeState').textContent,/GHOST/,'Crystal proximity is still enforced');
   key('w');key('w');key('w');
   assert.equal(get('position').textContent,'(8, 9)');
   assert.match(get('lifeState').textContent,/GHOST/,'Walking onto crystal must not resurrect');
   await click(8,9);
+  assert.match(get('status').textContent,/A glowing gold crystal/,'Single-click describes the soul crystal');
+  assert.match(get('lifeState').textContent,/GHOST/,'A single click must not resurrect');
+  await click(8,9);
+  assert.match(get('lifeState').textContent,/GHOST/,'Two independent single-clicks must not resurrect');
+  await dblclick(8,9);
+  assert.match(get('status').textContent,/The crystal answers/,'Double-click initiates resurrection');
   assert.match(get('lifeState').textContent,/GHOST/,'Resurrection is a staged animation, not instant');
   for(let i=0;i<130;i++){const tick=frameQueue.shift();assert(tick,'Animation frame missing');tick(16*(i+1));}
-  assert.match(get('lifeState').textContent,/RESURRECTED/,'Left-clicking crystal restores the body at altar');
+  assert.match(get('lifeState').textContent,/RESURRECTED/,'Double-clicking crystal restores the body at altar');
   assert.equal(get('position').textContent,'(8, 7)','Revived character emerges beside the altar');
   await get('save').emit('click');
   assert.equal(saved.size,1,'Exactly one isolated storage key');

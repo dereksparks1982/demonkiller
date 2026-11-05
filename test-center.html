@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script id="refresh-to-menu">
+(function () {
+  // On browser refresh of the temple, return to the existing main menu.
+  const navigation = window.performance?.getEntriesByType?.('navigation')?.[0];
+  if (navigation?.type === 'reload') window.location.replace('./index.html');
+}());
+</script>
 <title>Demon Killer | DK Architect: Sacrificial Temple Test Center</title>
 <meta name="description" content="Independent, engine-free Gothic temple room prototype for Demon Killer.">
 <link rel="stylesheet" href="./test-center.css">
@@ -22,7 +29,7 @@
   </header>
   <section class="storyline" aria-label="Opening premise">
     <span class="sigil">✥</span>
-    <p><strong>You were sacrificed here.</strong> You awaken without a body. A crystal was left beside the altar. Left-click it while nearby to return to life, or pass it by and continue as a ghost. Both paths remain open.</p>
+    <p><strong>You were sacrificed here.</strong> You awaken without a body. A crystal was left beside the altar. Single-click it to inspect; double-left-click it while nearby to return to life, or pass it by and continue as a ghost. Both paths remain open.</p>
   </section>
   <div class="workspace">
     <aside class="panel controls" aria-label="DK Architect tools">
@@ -64,7 +71,7 @@
         <canvas id="room" width="512" height="512" tabindex="0" role="img" aria-label="Top-down Gothic temple on a 16 by 16 tile grid. Hold right mouse to move, left-click to interact, or use W A S D and arrow keys."></canvas>
       </div>
       <div id="status" class="status" role="status" aria-live="polite">You awaken as a ghost at (8, 12). Walk to the crystal or leave it untouched.</div>
-      <div id="hint" class="hint">Hold RIGHT MOUSE to move; point farther away to run · LEFT CLICK interacts · WASD / arrows also move · Architect Mode clicks are unchanged.</div>
+      <div id="hint" class="hint">Hold RIGHT MOUSE to move; point farther away to run · LEFT CLICK inspects · DOUBLE-LEFT-CLICK crystal to resurrect · WASD / arrows also move · Architect Mode clicks are unchanged.</div>
     </section>
     <aside class="panel details" aria-label="Room data and persistence">
       <div class="panel-title"><span>02</span><h2>THE RECORD</h2></div>
@@ -87,7 +94,7 @@
       </div>
       <div class="help">
         <h3>IN THE TEMPLE</h3>
-        <p><strong>Walk:</strong> hold right mouse and point toward your destination; moving the cursor farther away makes you run. Left-click a nearby object to interact. WASD / arrow keys also move. Ghosts pass through furnishings. Left-click the nearby soul crystal to begin the resurrection ritual; walking across it does nothing.</p>
+        <p><strong>Walk:</strong> hold right mouse and point toward your destination; moving the cursor farther away makes you run. Left-click a nearby object to interact. WASD / arrow keys also move. Ghosts pass through furnishings. Single-click the nearby soul crystal to inspect; double-left-click to resurrect. Walking across it does nothing.</p>
         <p><strong>Build:</strong> choose Architect Mode, select art and click its grid coordinate. Select/Move uses two clicks. R rotates; Delete erases; Ctrl+Z undoes.</p>
         <p><strong>Exit:</strong> the northern doorway is a connection marker only. The courtyard is not yet built.</p>
       </div>

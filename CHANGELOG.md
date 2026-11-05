@@ -1,5 +1,11 @@
 # Demon Killer Changelog
 
+## Unreleased gameplay fixes | 2026-11-04
+
+- Refreshing the temple page now returns to Demon Killer's main menu; normal New Game/Continue still open the temple.
+- Soul crystal single-left-click now describes the crystal; double-left-click is required to begin the existing resurrection ritual, still subject to range and ghost-state checks.
+- Updated temple instructions and regression checks without changing DK Architect editing, save keys, room geometry or the public README.
+
 ## Unreleased design documentation | 2026-11-04 | No gameplay build
 
 - Recorded owner-approved future Forsaken Temple opening: free ghost exploration, temporary movement lock, five-second kneeling prayer, crystal placement in front of altar, barrier removal, and optional ghost exit.
