@@ -62,6 +62,11 @@ const saved=new Map();
 const localStorage={setItem:(k,v)=>saved.set(k,v),getItem:k=>saved.get(k)||null};
 const frameQueue=[];
 const requestAnimationFrame=fn=>frameQueue.push(fn);
+let frameNumber=0;
+const tickFrames=count=>{for(let i=0;i<count;i++){
+  const cb=frameQueue.shift();assert(cb,'Missing animation callback');
+  cb(++frameNumber*16);
+}};
 const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAnimationFrame};
 vm.runInNewContext(js,sandbox,{filename:'test-center.js',timeout:3000});
 const key=code=>{for(const fn of events.keydown??[])fn({key:code,
@@ -69,28 +74,35 @@ const key=code=>{for(const fn of events.keydown??[])fn({key:code,
 const click=async(x,y)=>get('room').emit('click',{button:0,clientX:x*32+16,clientY:y*32+16});
 const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16,clientY:y*32+16});
 (async()=>{
+
   assert.equal(get('position').textContent,'(8, 12)');
+  assert.match(get('lifeState').textContent,/ALIVE/);
+  assert.equal(get('objectCount').textContent,'9','Crystal must be absent before Lilith places it');
+  await click(8,7);
+  assert.match(get('status').textContent,/Wait for the current scene/,'Interactions locked during sacrifice');
+  tickFrames(1800);
+  assert.equal(get('position').textContent,'(8, 8)','Ghost appears in front of the altar');
   assert.match(get('lifeState').textContent,/GHOST/);
-  assert.equal(get('objectCount').textContent,'10');
+  assert.equal(get('objectCount').textContent,'10','Lilith leaves her crystal after prayer');
   await click(9,12);
-  assert.equal(get('position').textContent,'(8, 12)','Left-clicking floor must not move');
-  await dblclick(8,9);
-  assert.match(get('status').textContent,/Move closer/,'Double-click out of reach cannot resurrect');
-  assert.match(get('lifeState').textContent,/GHOST/,'Crystal proximity is still enforced');
-  key('w');key('w');key('w');
-  assert.equal(get('position').textContent,'(8, 9)');
-  assert.match(get('lifeState').textContent,/GHOST/,'Walking onto crystal must not resurrect');
-  await click(8,9);
-  assert.match(get('status').textContent,/A glowing gold crystal/,'Single-click describes the soul crystal');
-  assert.match(get('lifeState').textContent,/GHOST/,'A single click must not resurrect');
-  await click(8,9);
-  assert.match(get('lifeState').textContent,/GHOST/,'Two independent single-clicks must not resurrect');
-  await dblclick(8,9);
-  assert.match(get('status').textContent,/The crystal answers/,'Double-click initiates resurrection');
-  assert.match(get('lifeState').textContent,/GHOST/,'Resurrection is a staged animation, not instant');
-  for(let i=0;i<130;i++){const tick=frameQueue.shift();assert(tick,'Animation frame missing');tick(16*(i+1));}
-  assert.match(get('lifeState').textContent,/RESURRECTED/,'Double-clicking crystal restores the body at altar');
-  assert.equal(get('position').textContent,'(8, 7)','Revived character emerges beside the altar');
+  assert.equal(get('position').textContent,'(8, 8)','Left-clicking floor must not move');
+  key('s');key('s');
+  assert.equal(get('position').textContent,'(8, 10)');
+  await dblclick(8,7);
+  assert.match(get('status').textContent,/Move closer/,'Crystal requires reach');
+  key('w');key('w');
+  assert.equal(get('position').textContent,'(8, 8)');
+  await click(8,7);
+  assert.match(get('status').textContent,/A glowing gold crystal/,'Single-click only describes');
+  assert.match(get('lifeState').textContent,/GHOST/);
+  await click(8,7);await click(8,7);
+  assert.match(get('lifeState').textContent,/GHOST/,'Several single clicks never resurrect');
+  await dblclick(8,7);
+  assert.match(get('status').textContent,/The crystal answers/,'Double-click begins resurrection');
+  assert.match(get('lifeState').textContent,/GHOST/,'Resurrection is not instantaneous');
+  tickFrames(130);
+  assert.match(get('lifeState').textContent,/RESURRECTED/);
+  assert.equal(get('position').textContent,'(8, 7)','Revived character emerges beside altar');
   await get('save').emit('click');
   assert.equal(saved.size,1,'Exactly one isolated storage key');
   assert(saved.has('dkSoftworks.demonkiller.testCenter.v1'));
@@ -102,33 +114,30 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   // The secret route must remain possible: walk around the crystal, through
   // solid furniture as a ghost, and reach the future courtyard connector.
   await get('new').emit('click');
+  tickFrames(1800);
   key('a');for(let i=0;i<11;i++)key('w');
   key('d');key('w');
   assert.equal(get('position').textContent,'(8, 0)');
   assert.match(get('lifeState').textContent,/GHOST/);
   assert.match(get('status').textContent,/courtyard/i);
 
+
   await get('new').emit('click');
+  tickFrames(1800);
   const room=get('room');
-  const tickFrames=(count,start)=>{for(let i=0;i<count;i++){
-    const next=frameQueue.shift();assert(next,'Missing frame callback');next(16*(start+i));
-  }};
-  await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:9*32+16,preventDefault:noop});
-  assert.equal(get('position').textContent,'(8, 12)','Right mouse awaits its first frame');
-  tickFrames(2,131);
-  await room.emit('mouseup',{button:2});
-  tickFrames(12,133);
-  assert.equal(get('position').textContent,'(8, 12)',
-    'Quick right mouse release must halt sub-tile movement immediately');
-  await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:9*32+16,preventDefault:noop});
-  tickFrames(21,145);
-  assert.equal(get('position').textContent,'(8, 11)','Held right mouse moves smoothly over frames');
-  await room.emit('mouseup',{button:2});
-  tickFrames(12,166);
-  assert.equal(get('position').textContent,'(8, 11)','After release, no movement drifts onward');
-  await room.emit('mousedown',{button:2,clientX:10*32+16,clientY:9*32+16,preventDefault:noop});
-  tickFrames(18,178);
-  assert.equal(get('position').textContent,'(9, 10)','Diagonal cursor movement crosses both axes');
+  await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:5*32+16,preventDefault:noop});
+  assert.equal(get('position').textContent,'(8, 8)','Right mouse waits for frame');
+  tickFrames(2);
+  await room.emit('mouseup',{button:2});tickFrames(12);
+  assert.equal(get('position').textContent,'(8, 8)','Short right click stops immediately');
+  await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:5*32+16,preventDefault:noop});
+  tickFrames(21);
+  assert.equal(get('position').textContent,'(8, 7)','Held right mouse moves continuously');
+  await room.emit('mouseup',{button:2});tickFrames(12);
+  assert.equal(get('position').textContent,'(8, 7)','Releasing stops motion');
+  await room.emit('mousedown',{button:2,clientX:10*32+16,clientY:5*32+16,preventDefault:noop});
+  tickFrames(18);
+  assert.equal(get('position').textContent,'(9, 6)','Diagonal right mouse follows cursor');
   await room.emit('mouseup',{button:2});
 
   await get('editMode').emit('click');
