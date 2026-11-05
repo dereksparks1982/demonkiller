@@ -1,5 +1,17 @@
 # Demon Killer Changelog
 
+## v0.2.4 development preview | 2026-11-05 | Sacrifice-scene scale and staging corrections
+
+- Draw the approved living/dead 64×32 lying-hero art at native size, centered on the unchanged 128×64 altar.
+- Keep the cult leader at the foot of the altar facing north toward the body throughout prayer and sacrifice.
+- Start the Devil beside the altar on its east side facing west, and Lilith on its west side facing east.
+- Spawn the ghost farther down the existing center aisle at the room's configured player spawn (default 8,12).
+- Correct the Devil and cult-leader sprite-sheet frame order to south/west/east/north.
+- Render moving cult members using the four approved named directional PNGs rather than assuming an unverified sprite-sheet order.
+- Retain the established ritual, optional crystal resurrection, room geometry, props, Architect editor and save behavior.
+- Update cutscene and control regressions; visual acceptance still requires owner browser review.
+
+
 ## v0.2.3 development preview | 2026-11-05 | Main menu and sacrifice opening
 
 - Preserved the approved sword-and-pixel-art menu and scaled its dimensions to fit available viewport height at ordinary browser zoom.

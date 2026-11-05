@@ -119,8 +119,9 @@
       o.x===8&&o.y===9&&!scene.introSeen));
     opening={phase:'gather',time:0,sacrificed:false,ghostVisible:false,crystalPlaced:false,
       members:CULT_POSITIONS.map(([x,y],i)=>actor('member',x,y,i%2?'west':'east')),
-      leader:actor('leader',8,7,'north'),devil:actor('devil',11,8,'west'),
-      woman:actor('woman',5,8,'east')};
+      // The leader faces the altar from its foot; Devil and Lilith flank its sides.
+      leader:actor('leader',8,7,'north'),devil:actor('devil',10,6,'west'),
+      woman:actor('woman',5,6,'east')};
     rightMouseHeld=false;resetVisual();
     message('Cult members surround the altar. You lie bound, unable to move.');
   }
@@ -155,7 +156,9 @@
         const leaderGone=moveActor(opening.leader,dt,4.2);
         if(gone&&leaderGone){
           opening.ghostVisible=true;
-          scene.player.x=8;scene.player.y=8;scene.player.facing='north';resetVisual();
+          // Let the ghost emerge farther down the central aisle (starter spawn: 8,12).
+          scene.player.x=scene.spawn.x;scene.player.y=scene.spawn.y;
+          scene.player.facing='north';resetVisual();
           phase('ghostRise','Your ghost rises in front of the altar. Your body remains behind.');
         }break;
       }
@@ -169,7 +172,8 @@
         }break;
       case 'devilExit':
         if(moveActor(opening.devil,dt,3.8)){
-          route(opening.woman,[[6,8],[7,8],[8,7]]);
+          // Stay off the altar while approaching the prayer tile at its foot.
+          route(opening.woman,[[5,7],[7,7],[8,7]]);
           phase('approach','Lilith approaches the altar.');
         }break;
       case 'approach':
@@ -199,12 +203,14 @@
     const altar=scene.objects.find(o=>o.type==='altar');if(!altar)return;
     const stillAlive=opening&&!opening.sacrificed;
     const picture=readyImage('characters/human/human_altar_'+(stillAlive?'alive':'dead')+'.png');
-    const x=altar.x*TILE+10,y=altar.y*TILE+13;
-    if(picture){ctx.drawImage(picture,x,y,108,45);return;}
-    // Loading fallback, without the earlier stray prototype blocks.
-    pixel(ctx,'#261b24',x,y+7,105,28);
-    pixel(ctx,stillAlive?'#986771':'#694d5c',x+13,y+8,78,18);
-    pixel(ctx,'#cc9a85',x+4,y+8,17,16);
+    // Approved lying hero art is native 64 × 32, half of the 128 × 64 altar.
+    // Render at 1:1 pixel scale, centered, without resizing the approved altar.
+    const x=altar.x*TILE+(4*TILE-64)/2,y=altar.y*TILE+(2*TILE-32)/2;
+    if(picture){ctx.drawImage(picture,x,y,64,32);return;}
+    // Temporary block-art fallback matches the same small 64 × 32 footprint.
+    pixel(ctx,'#261b24',x,y+4,64,24);
+    pixel(ctx,stillAlive?'#986771':'#694d5c',x+14,y+8,38,14);
+    pixel(ctx,'#cc9a85',x+4,y+8,12,12);
   }
   function drawActor(a){
     if(a.y<0)return;
@@ -216,16 +222,24 @@
       pixel(ctx,'#ba4e2c',x+8,y+3,16,11);pixel(ctx,'#285740',x+7,y+15,18,15);
       return;
     }
-    const folder=a.kind==='devil'?'devil':a.kind==='leader'?'cult-leader':'cult-member';
-    const file=a.kind==='devil'?'devil_spritesheet.png':a.kind==='leader'?'cult_leader_spritesheet.png':'cult_member_spritesheet.png';
-    const pic=readyImage('characters/'+folder+'/'+file);
-    if(pic){
-      const cardinal={south:0,east:1,north:2,west:3};
-      ctx.drawImage(pic,(cardinal[a.facing]||0)*32,0,32,32,x,y,TILE,TILE);
+    if(a.kind==='member'){
+      // The approved member library supplies explicit cardinal files.
+      // Use the file's named direction, avoiding atlas-frame ambiguity.
+      const pic=readyImage('characters/cult-member/cult_member_'+a.facing+'.png');
+      if(pic){ctx.drawImage(pic,x,y,TILE,TILE);return;}
     }else{
-      pixel(ctx,a.kind==='devil'?'#252027':'#392a30',x+8,y+3,16,27);
-      pixel(ctx,a.kind==='devil'?'#a33e37':'#b4575b',x+12,y+9,8,9);
+      const folder=a.kind==='devil'?'devil':'cult-leader';
+      const file=a.kind==='devil'?'devil_spritesheet.png':'cult_leader_spritesheet.png';
+      const pic=readyImage('characters/'+folder+'/'+file);
+      if(pic){
+        // Both approved sheets: south (front), west (left), east (right), north (back).
+        const frame={south:0,west:1,east:2,north:3};
+        ctx.drawImage(pic,frame[a.facing]*TILE,0,TILE,TILE,x,y,TILE,TILE);
+        return;
+      }
     }
+    pixel(ctx,a.kind==='devil'?'#252027':'#392a30',x+8,y+3,16,27);
+    pixel(ctx,a.kind==='devil'?'#a33e37':'#b4575b',x+12,y+9,8,9);
   }
   function drawOpening(){
     if(!opening)return;
