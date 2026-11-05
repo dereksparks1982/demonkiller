@@ -87,13 +87,26 @@ const click=async(x,y)=>get('room').emit('click',{clientX:x*32+16,clientY:y*32+1
 
   await get('new').emit('click');
   const room=get('room');
+  const tickFrames=(count,start)=>{for(let i=0;i<count;i++){
+    const next=frameQueue.shift();assert(next,'Missing frame callback');next(16*(start+i));
+  }};
   await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:9*32+16,preventDefault:noop});
-  assert.equal(get('position').textContent,'(8, 12)','Right mouse hold waits for frame tick');
-  for(const tick of frameQueue.splice(0))tick(16*131);
-  assert.equal(get('position').textContent,'(8, 11)','Right mouse hold advances toward cursor');
+  assert.equal(get('position').textContent,'(8, 12)','Right mouse awaits its first frame');
+  tickFrames(2,131);
   await room.emit('mouseup',{button:2});
+  tickFrames(12,133);
   assert.equal(get('position').textContent,'(8, 12)',
-    'Releasing right mouse before a full tile has moved stops movement without drift');
+    'Quick right mouse release must halt sub-tile movement immediately');
+  await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:9*32+16,preventDefault:noop});
+  tickFrames(21,145);
+  assert.equal(get('position').textContent,'(8, 11)','Held right mouse moves smoothly over frames');
+  await room.emit('mouseup',{button:2});
+  tickFrames(12,166);
+  assert.equal(get('position').textContent,'(8, 11)','After release, no movement drifts onward');
+  await room.emit('mousedown',{button:2,clientX:10*32+16,clientY:9*32+16,preventDefault:noop});
+  tickFrames(18,178);
+  assert.equal(get('position').textContent,'(9, 10)','Diagonal cursor movement crosses both axes');
+  await room.emit('mouseup',{button:2});
 
   await get('editMode').emit('click');
   assert.equal(get('modeLabel').textContent,'ARCHITECT MODE');

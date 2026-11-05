@@ -552,7 +552,9 @@
     draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':opening?'Opening scene is still playing.':ritual?'The resurrection ritual is still playing.':'Walk Mode active. Left-click the soul crystal or avoid it and remain a ghost.');
     canvas.focus({preventScroll:true});
   }
-  function facing(dx,dy){return dx>0?'east':dx<0?'west':dy>0?'south':'north';}
+  function facing(dx,dy){
+    return Math.abs(dx)>=Math.abs(dy)?(dx>=0?'east':'west'):(dy>=0?'south':'north');
+  }
   function step(dx,dy) {
     if (opening||ritual) {message('Wait for the opening or resurrection sequence to finish.');return false;}
     const p=scene.player,nx=p.x+dx,ny=p.y+dy;
@@ -590,36 +592,62 @@
     if(!r.width||!r.height)return null;
     return {x:(e.clientX-r.left)/r.width*N*TILE,y:(e.clientY-r.top)/r.height*N*TILE};
   }
+  function moveTowardPointer(dt) {
+    if(!rightPointer||dt<=0)return;
+    // Unlike keyboard navigation, the held mouse directly moves the rendered
+    // character in sub-tile increments. Four static facings, no walk cycles.
+    visual.queue.length=0;
+    const dx=rightPointer.x-(visual.x+.5)*TILE;
+    const dy=rightPointer.y-(visual.y+.5)*TILE;
+    const pixels=Math.hypot(dx,dy);
+    if(pixels<=TILE*.55)return;
+    const tilesToTravel=Math.min(pixels/TILE-.35,(pixels>4*TILE?5.6:3.1)*dt);
+    if(tilesToTravel<=0)return;
+    const ax=dx/pixels*tilesToTravel,ay=dy/pixels*tilesToTravel;
+    const legal=(x,y)=>{
+      const tx=Math.round(x),ty=Math.round(y);
+      if(!canStand(tx,ty))return false;
+      const p=scene.player;
+      // Prevent diagonally cutting through the corners of two solid tiles.
+      if(tx!==p.x&&ty!==p.y&&(!canStand(tx,p.y)||!canStand(p.x,ty)))return false;
+      return true;
+    };
+    let nx=visual.x+ax,ny=visual.y+ay;
+    if(!legal(nx,ny)){
+      if(legal(nx,visual.y))ny=visual.y;
+      else if(legal(visual.x,ny))nx=visual.x;
+      else return;
+    }
+    const vx=nx-visual.x,vy=ny-visual.y;
+    if(!vx&&!vy)return;
+    visual.x=nx;visual.y=ny;
+    const p=scene.player,tx=Math.round(nx),ty=Math.round(ny);
+    p.facing=facing(vx,vy);
+    if(p.x!==tx||p.y!==ty){
+      p.x=tx;p.y=ty;dirty=true;persistCharacter();
+      if(tx===8&&ty===0)
+        message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test.');
+    }
+    draw();
+  }
   function advanceFrame(now) {
-    const dt=lastFrameTime?Math.min((now-lastFrameTime)/1000,.06):0;
+    const dt=lastFrameTime?Math.max(0,Math.min((now-lastFrameTime)/1000,.06)):0;
     lastFrameTime=now;
     if(opening){updateOpening(dt);draw();requestAnimationFrame(advanceFrame);return;}
     if(ritual){updateResurrection(dt);draw();requestAnimationFrame(advanceFrame);return;}
-    const target=visual.queue[0];
-    if(target) {
+    if(rightMouseHeld&&mode==='walk'&&rightPointer){
+      moveTowardPointer(dt);
+    }else if(visual.queue.length){
+      const target=visual.queue[0];
       const dx=target.x-visual.x,dy=target.y-visual.y;
       const distance=Math.hypot(dx,dy);
-      const playerCenter={x:(visual.x+.5)*TILE,y:(visual.y+.5)*TILE};
-      const cursorDistance=rightPointer?Math.hypot(rightPointer.x-playerCenter.x,rightPointer.y-playerCenter.y):0;
-      const speed=rightMouseHeld&&cursorDistance>4*TILE?5.6:3.1;
-      const change=Math.min(distance,speed*dt);
-      if(distance<=.001||change>=distance) {
+      const change=Math.min(distance,3.1*dt);
+      if(distance<=.001||change>=distance){
         visual.x=target.x;visual.y=target.y;visual.queue.shift();
-      } else {
+      }else if(distance>0){
         visual.x+=dx/distance*change;visual.y+=dy/distance*change;
       }
       draw();
-    } else if(rightMouseHeld&&mode==='walk'&&rightPointer) {
-      const dx=rightPointer.x-(visual.x+.5)*TILE;
-      const dy=rightPointer.y-(visual.y+.5)*TILE;
-      if(Math.hypot(dx,dy)>TILE*.55) {
-        const primary=Math.abs(dx)>=Math.abs(dy)
-          ? [Math.sign(dx),0]:[0,Math.sign(dy)];
-        const secondary=primary[0]?[0,Math.sign(dy)]:[Math.sign(dx),0];
-        let v=primary;
-        if(!canStand(scene.player.x+v[0],scene.player.y+v[1]))v=secondary;
-        if((v[0]||v[1])&&canStand(scene.player.x+v[0],scene.player.y+v[1]))step(v[0],v[1]);
-      }
     }
     requestAnimationFrame(advanceFrame);
   }
@@ -779,16 +807,23 @@
   canvas.addEventListener('contextmenu',e=>{if(mode==='walk')e.preventDefault();});
   canvas.addEventListener('mousedown',e=>{
     if(mode==='walk'&&e.button===2){
-      e.preventDefault();rightPointer=pointerPosition(e);rightMouseHeld=true;
+      e.preventDefault();rightPointer=pointerPosition(e);
+      // Keyboard tween queues must not delay held-mouse movement.
+      if(visual.queue.length){
+        visual.queue.length=0;
+        const nx=Math.round(visual.x),ny=Math.round(visual.y);
+        if(canStand(nx,ny)){scene.player.x=nx;scene.player.y=ny;}
+      }
+      rightMouseHeld=true;
       canvas.focus({preventScroll:true});
     }
   });
   function stopRightMovement() {
     if(!rightMouseHeld)return;
     rightMouseHeld=false;
-    if(mode!=='walk'||opening||ritual||!visual.queue.length)return;
-    // Release halts visible movement at the current pixel; do not finish the tile.
-    // Keep the saved simulation position on its nearest unblocked grid cell.
+    if(mode!=='walk'||opening||ritual)return;
+    // Render coordinates remain exactly where mouse was released. No queued
+    // completion step; only the persisted grid coordinate is snapped.
     visual.queue.length=0;
     const nx=Math.round(visual.x),ny=Math.round(visual.y);
     if(canStand(nx,ny)){

@@ -8,7 +8,7 @@
 
 Open [test-center.html](test-center.html), or open [index.html](index.html) to see the approved pixel-art main menu and Zelda-style name registration.
 
-- **Walk Temple:** WASD or arrow keys advance one grid tile; hold the right mouse button to move toward the cursor, faster when the cursor is farther away; **release to stop immediately**. Left-click interacts, never moves. A ghost can pass through furnishings, but not the stone boundary. Left-click the crystal while within reach to begin the altar resurrection ritual. Walking across it does nothing. Avoid it to remain a ghost.
+- **Walk Temple:** WASD or arrow keys advance one grid tile; hold the right mouse button to move toward the cursor, faster when the cursor is farther away; **release to stop immediately**. Diagonal cursor travel is smooth, while the character still faces one of four static directions and construction remains cardinal-only. Left-click interacts, never moves. A ghost can pass through furnishings, but not the stone boundary. Left-click the crystal while within reach to begin the altar resurrection ritual. Walking across it does nothing. Avoid it to remain a ghost.
 - **Architect Mode:** Place, Select/Move, Delete, Duplicate and Rotate **selected** items; floor paint/fill/rectangle, wall toggles, door states, spawn placement, eyedropper, undo/redo, and access check.
 - **Persistence:** Save/reload in isolated browser local storage, or Export/Import Room JSON to transfer a layout.
 - **Coordinates:** Every tile and item is addressable, with object IDs, footprint dimensions, and rotation in cardinal 90-degree steps.
