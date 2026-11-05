@@ -19,6 +19,14 @@ Switch to **Architect Mode** to edit the room. Existing tools include placement,
 - The ghost and mortal paths are a working **opening choice**, not complete story routes.
 - Saving uses a dedicated prototype key in the browser's local storage; exports are the portable backup.
 
+## Planned persistent world server
+
+We are designing a **server-authoritative, RunUO-style persistent world** to back the existing browser player. The client will draw the game and send player intentions; our own server will own the clock, world objects, NPCs, interactions, character state, and durable saves. A preliminary theme proposal is **six real hours of day and six real hours of night**, configurable rather than hard-wired. The first test world remains **the sacrificial temple only**.
+
+See the [world server design and prior-code audit](docs/world-server-design.md). **This server is planned, not yet implemented or deployed.** The browser prototype currently runs offline with local saves.
+
+**Website note:** Hosting the web client from GitHub `main` is independent of running an always-on game server. GitHub Pages can serve the static client when Pages is configured, but cannot host the persistent backend.
+
 ## Development focus
 
 **Only the sacrificial temple is in scope for now.** We are using it to mature DK Architect, Gothic artwork and gameplay, with original cardinal-direction sprites and **no diagonal construction**. Larger connected rooms and the courtyard come after the temple and editor meet their acceptance criteria.
