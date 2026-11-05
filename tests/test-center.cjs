@@ -92,6 +92,8 @@ const click=async(x,y)=>get('room').emit('click',{clientX:x*32+16,clientY:y*32+1
   for(const tick of frameQueue.splice(0))tick(16*131);
   assert.equal(get('position').textContent,'(8, 11)','Right mouse hold advances toward cursor');
   await room.emit('mouseup',{button:2});
+  assert.equal(get('position').textContent,'(8, 12)',
+    'Releasing right mouse before a full tile has moved stops movement without drift');
 
   await get('editMode').emit('click');
   assert.equal(get('modeLabel').textContent,'ARCHITECT MODE');

@@ -783,10 +783,24 @@
       canvas.focus({preventScroll:true});
     }
   });
-  canvas.addEventListener('mouseup',e=>{if(e.button===2)rightMouseHeld=false;});
+  function stopRightMovement() {
+    if(!rightMouseHeld)return;
+    rightMouseHeld=false;
+    if(mode!=='walk'||opening||ritual||!visual.queue.length)return;
+    // Release halts visible movement at the current pixel; do not finish the tile.
+    // Keep the saved simulation position on its nearest unblocked grid cell.
+    visual.queue.length=0;
+    const nx=Math.round(visual.x),ny=Math.round(visual.y);
+    if(canStand(nx,ny)){
+      scene.player.x=nx;scene.player.y=ny;dirty=true;
+      persistCharacter();
+    }
+    draw();
+  }
+  canvas.addEventListener('mouseup',e=>{if(e.button===2)stopRightMovement();});
   if(typeof window!=='undefined'){
-    window.addEventListener('mouseup',e=>{if(e.button===2)rightMouseHeld=false;});
-    window.addEventListener('blur',()=>{rightMouseHeld=false;});
+    window.addEventListener('mouseup',e=>{if(e.button===2)stopRightMovement();});
+    window.addEventListener('blur',stopRightMovement);
   }
   canvas.addEventListener('wheel',e=>{
     if(mode!=='edit'||tool!=='place'||!CATALOG[current])return;
@@ -799,7 +813,7 @@
     const p=mouseTile(e);if(!p)return;
     if(!hover||p.x!==hover.x||p.y!==hover.y){hover=p;draw();}
   });
-  canvas.addEventListener('mouseleave',()=>{hover=null;rightMouseHeld=false;draw();});
+  canvas.addEventListener('mouseleave',()=>{hover=null;stopRightMovement();draw();});
   document.addEventListener('keydown',e=>{
     const name=e.target?.tagName;
     if(name==='INPUT'||name==='SELECT'||name==='TEXTAREA')return;
