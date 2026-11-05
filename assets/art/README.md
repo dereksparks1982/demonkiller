@@ -38,3 +38,10 @@ The `.gitkeep` files reserve empty folders in GitHub until artwork is added. The
 - `characters/devil/devil_spritesheet.png`: transparent 128 × 32 PNG with four static 32 × 32 sprites, left to right: **south (front), west (left), east (right), north (back)**.
 - Black suit, red shirt, black hair, no tie; intentionally crude 32 × 32 character art.
 - Artwork only; the Devil has not been wired into the temple opening sequence yet.
+
+## Approved player hero (purple villager, 2026-11-05)
+
+- `characters/human/human_master_spritesheet.png` is the **unaltered, owner-approved original six-pose 1536 × 1024 PNG**: four standing cardinal views, lying alive, and lying dead with blood beneath the body. Keep this master as the sole source for future character edits.
+- `characters/human/human_south.png`, `human_north.png`, `human_west.png`, and `human_east.png` are 32 × 32 transparent, nearest-neighbor extractions of the **same approved purple-tunic villager**, replacing the previous player sprite artwork while retaining stable runtime filenames.
+- `characters/human/human_altar_alive.png` and `human_altar_dead.png` are 64 × 32 top-down horizontal extractions; the dead pose includes the blood pool. No side-view altar sprites or walking cycles.
+- The original high-resolution master is preserved unchanged. No gameplay/cutscene logic is modified in this art-only commit. A new black-shroud ghost sheet is a separate pending asset and does **not** reuse the prior ghost artwork.
