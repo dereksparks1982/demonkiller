@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## Unreleased procedural society population | 2026-11-05
+
+- Added 24 seed-generated ordinary and prominent citizens with persistent identities, occupations, personality traits, acquaintances and daily work/home/public routines.
+- Registered civilians in the existing cult simulation without exposing their secret membership, overwriting established cult discoveries or creating fixed story identities.
+- Added a public Society Register tab beside discovered cult dossiers. The register lists only names, occupations, general work hours and encounter status, never membership.
+- Added future in-scene hooks for citizen encounters, abstract schedule queries and advancing the population clock. No new playable city or changes to temple/editor geometry.
+- Added migration for saved character slots and tests for deterministic worlds, varying memberships, non-spoiler public records and persistence.
+
 ## Unreleased cult system | 2026-11-05
 
 - Added deterministic per-world cult affiliation and dynamic recruitment, exits, deaths, changing circumstances, leadership vacancies and promotions.

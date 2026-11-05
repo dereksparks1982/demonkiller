@@ -2,7 +2,7 @@
 
 **Demon Killer | Elderred Softworks LLC**
 
-**State:** The simulation, per-character save integration, player knowledge and read-only journal are implemented. Populated cities, ordinary citizen NPCs, investigative quests, cult reactions in scenes, and a permanent world server are not yet implemented.
+**State:** The cult simulation, 24-person procedural population, local time/schedule model, per-character saves and read-only dossier/public-register journal are implemented. Visible city NPCs, playable civilian locations, investigative quests, cult reactions in scenes and an authoritative world server are not yet implemented.
 
 ## Design rules
 
@@ -13,10 +13,12 @@ The player may meet a citizen without discovering their affiliation. Dossiers mu
 ## Source locations
 
 - cult-system.js: engine-free, dependency-free cult-world module.
+- citizen-population.js: generates 24 ordinary and prominent procedural citizens, their public occupations, work hours, traits and reciprocal social ties. World-relative schedule locations are abstract (home, workplace, public), not newly built map areas.
 - index.html: generates a unique world seed for every new named character slot.
 - test-center.js: restores or initializes cult state inside the existing named-character save record; persists changes without replacing the DK Architect room save/export keys.
 - test-center.html and cult-journal.css: fixed-position Cult Journal accessible in the temple.
 - tests/cult-system.cjs and tests/cult-integration.cjs: deterministic simulation and save/DOM integration tests.
+- tests/population.cjs: independent population and schedule regressions.
 
 ## World content integration
 
@@ -36,6 +38,7 @@ Proof of active membership/rank is rejected for non-members; exoneration of a cu
 
 Each character slot has a worldSeed at creation and a cultWorld state containing actual membership, political history and separate player knowledge. Continue restores that state. Older slots migrate using a stable legacy seed. Overwriting a slot creates a new seed and fresh investigation. Direct guest temple access gets a temporary session world without a separate local storage key.
 
-At present there are no authored civilian profiles beyond the hidden ritualist, so the journal correctly starts with no discovered people. The previously approved opening cinematics, temple and character sprites, creature trees, architectural courtyard, editor geometry and main-menu README are untouched.
+The world now initializes 24 named **procedural** civilian profiles, but none are automatically encountered. The Society Register tab shows public names, occupations, published work hours and whether a character is encountered. Its contents never disclose affiliation, motives, internal contacts or evidence. The Discovered Dossiers tab correctly starts empty until actual encounters or evidence. In-scene systems will use window.DemonKillerPopulationHooks.publicRegister(), publicRecord(id), schedule(id), currentTime(), advanceHours(hours), and encounter(id). The roster is a simulation and journal record, not proof that those citizens have been placed into a playable street map.
+ The previously approved opening cinematics, temple and character sprites, creature trees, architectural courtyard, editor geometry and main-menu README are untouched.
 
 This is currently a **local, browser-based simulation**. Its secret data can be inspected with browser developer tools; true secrecy for a shared persistent world will require an authoritative backend later. Never treat the current work as a completed cult quest system.

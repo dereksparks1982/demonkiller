@@ -78,7 +78,8 @@
       previewRotation = 0,
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
   const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
-  let cultWorld=null;
+  const Population=typeof DemonKillerPopulation!=='undefined'?DemonKillerPopulation:null;
+  let cultWorld=null,populationWorld=null;
   let activeSlot = 0;
   try {
     const n = Number(localStorage.getItem(ACTIVE_STORE));
@@ -215,6 +216,7 @@
     try {
       record.slot.scene = clone(scene);
       if(cultWorld)record.slot.cultWorld=clone(cultWorld);
+      if(populationWorld)record.slot.populationWorld=clone(populationWorld);
       record.slot.updated = Date.now();
       localStorage.setItem(CHARACTERS_STORE, JSON.stringify(record.data));
     } catch (error) { message('Character save unavailable: ' + error.message); }
@@ -908,6 +910,7 @@
     if(!record||!cultWorld)return;
     try{
       record.slot.cultWorld=clone(cultWorld);
+      if(populationWorld)record.slot.populationWorld=clone(populationWorld);
       localStorage.setItem(CHARACTERS_STORE,JSON.stringify(record.data));
     }catch(error){message('Cult record could not be saved: '+error.message);}
   }
@@ -937,6 +940,74 @@
       container.append(card);
     }
   }
+
+  function initializePopulation(record){
+    if(!Population||!cultWorld)return;
+    if(record&&record.slot.populationWorld&&Population.validate(record.slot.populationWorld)){
+      try{
+        if(record.slot.populationWorld.seed===cultWorld.seed)
+          populationWorld=Population.restore(record.slot.populationWorld);
+      }catch(error){populationWorld=null;}
+    }
+    if(!populationWorld)populationWorld=Population.create(cultWorld.seed);
+    // Seed only missing citizens. Never replace discovered or existing cult state.
+    for(const profile of Population.profiles(populationWorld))
+      Cult.addCitizen(cultWorld,profile);
+    saveCultWorld();
+  }
+  function renderSocietyRegister(){
+    if(!Population||!populationWorld)return;
+    const root=$('cultRegistryCards');if(!root)return;
+    const publicPeople=Population.publicRegister(populationWorld);
+    root.replaceChildren();
+    $('cultRegistryStatus').textContent=publicPeople.length+
+      ' public records · occupations and published work hours only. No hidden allegiances are listed.';
+    for(const person of publicPeople){
+      const card=document.createElement('article');card.className='cult-registry-card';
+      const name=document.createElement('h3');name.textContent=person.name;
+      const work=document.createElement('p');work.textContent=person.occupation+
+        (person.prominent?' · Public office / established trade':'');
+      const shift=document.createElement('p');shift.textContent='Listed hours: '+person.listedHours;
+      const encountered=document.createElement('p');
+      encountered.textContent=cultWorld.knowledge[person.id]?.met
+        ?'Known contact · See discovered dossiers':'Not yet encountered';
+      card.append(name,work,shift,encountered);
+      root.append(card);
+    }
+  }
+  function mountSocietyHooks(){
+    if(!Population||!populationWorld||!cultWorld)return;
+    const dossierTab=$('cultDossierTab'),registryTab=$('cultRegistryTab');
+    const dossierPane=$('cultDossierPane'),registryPane=$('cultRegistryPane');
+    if(dossierTab&&registryTab&&dossierPane&&registryPane){
+      const selectRegistry=registry=>{
+        dossierPane.hidden=registry;registryPane.hidden=!registry;
+        dossierTab.setAttribute('aria-pressed',String(!registry));
+        registryTab.setAttribute('aria-pressed',String(registry));
+        if(registry)renderSocietyRegister();else renderCultJournal();
+      };
+      dossierTab.addEventListener('click',()=>selectRegistry(false));
+      registryTab.addEventListener('click',()=>selectRegistry(true));
+    }
+    if(typeof window!=='undefined')window.DemonKillerPopulationHooks=Object.freeze({
+      publicRegister:()=>Population.publicRegister(populationWorld),
+      publicRecord:id=>Population.publicRecord(populationWorld,id),
+      schedule:id=>Population.whereabouts(populationWorld,id),
+      currentTime:()=>({day:populationWorld.day,hour:populationWorld.hour}),
+      advanceHours:hours=>{
+        const time=Population.advanceHours(populationWorld,hours);
+        saveCultWorld();renderSocietyRegister();return time;
+      },
+      encounter:id=>{
+        // A scene must explicitly report that the NPC has been encountered.
+        Population.publicRecord(populationWorld,id);
+        const dossier=Cult.meet(cultWorld,id);
+        saveCultWorld();renderCultJournal();renderSocietyRegister();
+        return dossier;
+      }
+    });
+    renderSocietyRegister();
+  }
   function mountCultJournal(){
     if(!Cult)return;
     const record=characterRecord();
@@ -951,6 +1022,7 @@
         occupation:'Unknown',fixed:true}]);
       saveCultWorld();
     }
+    initializePopulation(record);
     const panel=$('cultJournal'),toggle=$('cultJournalToggle'),close=$('cultJournalClose');
     if(!panel||!toggle||!close)return;
     const show=open=>{
@@ -963,7 +1035,7 @@
     // Future NPC and scene scripts may report discoveries and political events.
     if(typeof window!=='undefined')window.DemonKillerCultHooks=Object.freeze({
       registerCitizen:profile=>{const c=Cult.addCitizen(cultWorld,profile);saveCultWorld();return c.id;},
-      meet:id=>{const d=Cult.meet(cultWorld,id);saveCultWorld();renderCultJournal();return d;},
+      meet:id=>{const d=Cult.meet(cultWorld,id);saveCultWorld();renderCultJournal();renderSocietyRegister();return d;},
       evidence:(id,clue)=>{const d=Cult.recordEvidence(cultWorld,id,clue);saveCultWorld();renderCultJournal();return d;},
       recruit:(id,opts)=>{const r=Cult.recruit(cultWorld,id,opts);saveCultWorld();return r;},
       depart:id=>{const r=Cult.depart(cultWorld,id);saveCultWorld();return r;},
@@ -973,6 +1045,7 @@
       dossier:id=>Cult.dossier(cultWorld,id),
       board:()=>Cult.board(cultWorld)
     });
+    mountSocietyHooks();
     renderCultJournal();
   }
   restoreCharacter();

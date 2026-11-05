@@ -6,6 +6,13 @@
 .cult-journal-head h2{font:700 18px monospace;color:#eac27b;margin:2px 0}
 .cult-journal-head button{background:#432a32;border:1px solid #ad875b;color:#f4e0d0;padding:7px 10px;cursor:pointer}
 .cult-journal-cards{display:grid;gap:10px}
+.cult-journal-tabs{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.cult-journal-tabs button{background:#332938;border:1px solid #79604e;color:#ecddbf;padding:8px;cursor:pointer;font:700 11px monospace;flex:1}
+.cult-journal-tabs button[aria-pressed="true"]{background:#675037;border-color:#e2ba79}
+.cult-registry-card{background:#22202a;border:1px solid #5f5768;padding:9px;text-align:left}
+.cult-registry-card h3{color:#eecb8b;margin:0 0 6px}
+.cult-registry-card p{margin:3px 0;color:#d3c8b6}
+.cult-journal [hidden]{display:none!important}
 .cult-dossier-card{background:#24202c;border:1px solid #6f5868;padding:10px;text-align:left}
 .cult-dossier-card h3{margin:0 0 6px;color:#f1ce8d}
 .cult-dossier-card p{margin:4px 0}

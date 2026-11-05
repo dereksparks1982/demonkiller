@@ -22,8 +22,18 @@
   <h2>CHARACTER DOSSIERS</h2>
   <button id="cultJournalClose" type="button" aria-label="Close cult journal">CLOSE</button>
  </header>
- <p id="cultJournalStatus" role="status">No discoveries recorded yet.</p>
- <div id="cultJournalCards" class="cult-journal-cards"></div>
+ <nav class="cult-journal-tabs" aria-label="Journal sections">
+  <button id="cultDossierTab" type="button" aria-pressed="true">DISCOVERED DOSSIERS</button>
+  <button id="cultRegistryTab" type="button" aria-pressed="false">SOCIETY REGISTER</button>
+ </nav>
+ <section id="cultDossierPane">
+  <p id="cultJournalStatus" role="status">No discoveries recorded yet.</p>
+  <div id="cultJournalCards" class="cult-journal-cards"></div>
+ </section>
+ <section id="cultRegistryPane" hidden>
+  <p id="cultRegistryStatus" role="status">Publicly listed citizens.</p>
+  <div id="cultRegistryCards" class="cult-journal-cards"></div>
+ </section>
 </aside>
 <main class="lab">
   <header class="masthead">
@@ -113,6 +123,7 @@
   <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.2</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
 <script src="./cult-system.js" defer></script>
+<script src="./citizen-population.js" defer></script>
 <script src="./test-center.js" defer></script>
 </body>
 </html>

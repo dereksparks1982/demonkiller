@@ -4,8 +4,11 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const html=read('test-center.html');
 assert(html.includes('cult-system.js')&&html.includes('cult-journal.css'),'Cult files must load in temple');
+assert(html.includes('citizen-population.js')&&html.includes('id="cultRegistryCards"'),
+ 'Population simulation and public register must load in the temple');
 assert(html.includes('id="cultJournalToggle"')&&html.includes('id="cultJournalCards"'));
-const moduleCode=read('cult-system.js'),gameCode=read('test-center.js');
+const moduleCode=read('cult-system.js'),populationCode=read('citizen-population.js'),
+ gameCode=read('test-center.js');
 const noop=()=>{};
 const graphics={fillRect:noop,strokeRect:noop,clearRect:noop,beginPath:noop,
   moveTo:noop,lineTo:noop,stroke:noop,save:noop,restore:noop,
@@ -35,6 +38,7 @@ function load(){
   const env={document,localStorage,window,Blob,URL,Date,setTimeout,console};
   const context=vm.createContext(env);
   vm.runInContext(moduleCode,context,{filename:'cult-system.js',timeout:3000});
+  vm.runInContext(populationCode,context,{filename:'citizen-population.js',timeout:3000});
   vm.runInContext(gameCode,context,{filename:'test-center.js',timeout:3000});
   return {get,window,context};
 }
@@ -42,6 +46,9 @@ const first=load();
 let saved=JSON.parse(store.get('dkSoftworks.demonkiller.characters.v1'));
 assert.equal(saved.slots[0].cultWorld.seed,'fixed-test-seed');
 assert.equal(saved.slots[0].cultWorld.citizens.temple_ritualist.active,true);
+assert.equal(saved.slots[0].populationWorld.order.length,24,'New world must include 24 civilians');
+assert.equal(Object.keys(saved.slots[0].cultWorld.citizens).length,25,
+ 'Population registered in cult system without replacing the ritualist');
 assert.equal(first.get('cultJournalCards').children.length,0,'Hidden cult truth must not create cards');
 assert.equal(store.has('dkSoftworks.demonkiller.testCenter.v1'),false,'Cult init must not overwrite DK Architect save');
 first.get('cultJournalToggle').emit('click');
@@ -73,4 +80,37 @@ assert.equal(second.window.DemonKillerCultHooks.dossier('temple_ritualist'),null
   'The cult ritualist must not be revealed automatically');
 const original=second.window.DemonKillerCultHooks.dossier('doctor');
 assert.equal(original.evidence.length,2);
-console.log('PASS: named saves, hidden ritualist, journal UI, suspicion/exoneration, scene hooks, Continue restore, unaffected Architect save.');
+const population=second.window.DemonKillerPopulationHooks;
+assert(population,'Population event bridge must be available to future NPC scenes');
+const register=population.publicRegister();
+assert.equal(register.length,24);
+assert(register.every(person=>!Object.hasOwn(person,'active')&&!Object.hasOwn(person,'traits')),
+ 'Public register must never reveal private character or cult attributes');
+assert.equal(population.currentTime().hour,9,'Initial population clock should have a deterministic start');
+second.get('cultRegistryTab').emit('click');
+assert.equal(second.get('cultRegistryPane').hidden,false,'Society Register tab must open');
+assert.equal(second.get('cultDossierPane').hidden,true,'Register hides dossiers without changing them');
+assert.equal(second.get('cultRegistryCards').children.length,24,'All 24 civilian public records appear');
+second.get('cultDossierTab').emit('click');
+assert.equal(second.get('cultDossierPane').hidden,false,'Can return to discovered dossiers');
+assert.equal(population.publicRecord('citizen_magistrate').occupation,'Magistrate');
+assert.equal(population.schedule('citizen_magistrate').activity,'working');
+assert.equal(population.encounter('citizen_magistrate').affiliation,'unknown',
+ 'Meeting prominent citizen does not reveal cult membership');
+assert.equal(second.get('cultJournalCards').children.length,2,
+ 'Encountered citizen joins existing public dossiers');
+assert.equal(population.advanceHours(12).hour,21);
+assert.notEqual(population.schedule('citizen_magistrate').activity,'working',
+ 'Citizen schedule responds to population time');
+const third=load();
+assert.equal(third.window.DemonKillerPopulationHooks.currentTime().hour,21,
+ 'Continue preserves the population clock and work shifts');
+assert.equal(third.window.DemonKillerPopulationHooks.publicRegister().length,24,
+ 'Continue preserves the society roster');
+assert.equal(third.window.DemonKillerCultHooks.dossier('citizen_magistrate').affiliation,'unknown',
+ 'Continue does not reveal hidden citizen allegiances');
+assert.equal(third.window.DemonKillerCultHooks.dossier('doctor').affiliation,'cleared',
+ 'Continuing must preserve all prior investigation history');
+assert.equal(store.has('dkSoftworks.demonkiller.testCenter.v1'),false,
+ 'No population work may overwrite DK Architect layout storage');
+console.log('PASS: named saves, 24 hidden citizens, public register, time, encounters, clues, Continue, unaffected Architect save.');
