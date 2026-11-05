@@ -17,6 +17,10 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 - `characters/devil/`: approved Devil sheet with four cardinal views.
 - `shared/`: images reusable across areas.
 
+## Future soul-crystal colour variants (not yet built)
+
+The owner requests one consistent multi-colour **soul crystal sprite sheet**, preserving the approved Gothic pixel style and 32 × 32 tile convention. Different crystal colours will signify different things in gameplay, but the exact colour meanings are not approved yet. This is a documented art request, **not permission to generate or integrate assets**. See [Soul colours, death shrouds, and soul crystals](../../docs/soul-colours-death-shrouds-and-crystals.md).
+
 ## Artwork conventions
 
 - Use the existing deliberately minimal, blocky DK Architect pixel-art style.

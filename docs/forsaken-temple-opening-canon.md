@@ -126,6 +126,10 @@ Lilith remains, approaches the altar, kneels facing it for roughly five seconds,
 
 The cult's presence, the Devil encounter and bound player are cutscene-only actors. The current temple layout, altar and saved editor data remain authoritative. The present browser demo does not yet contain a built courtyard or the complete willow transformation gameplay.
 
+## Soul colours, shrouds, and crystals (future gameplay direction)
+
+A later owner direction establishes that the protagonist's **black death shroud** means the soul begins stained by sins and selfishness. Brown is an adjacent threshold, and white represents a good or cleansed soul. Player choices can cleanse the soul or deepen its darkness. Souls of other characters can also be coloured; black wandering souls may seek soul crystals for a second chance at life. A matching family of **different-coloured versions of the same crystal** is requested for future artwork, but exact additional colours, their functions and resurrection compatibility remain undecided. See [Soul colours, death shrouds, and soul crystals](soul-colours-death-shrouds-and-crystals.md). **Documentation only; no art or implementation authorized here.**
+
 ## Authorization boundary
 
 The owner expressly requested **"don't build"** while planning, then narrowly authorized **documentation and one kneeling green-dress sprite sheet after documentation**. This instruction **does not authorize gameplay code, a courtyard, a corpse, a red-dress sheet, tree art, release/tag/deployment, or branch deletion**. Reference `COMPANY_BIBLE.md` for shared project change-control rules.
