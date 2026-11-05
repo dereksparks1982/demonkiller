@@ -130,6 +130,10 @@ The cult's presence, the Devil encounter and bound player are cutscene-only acto
 
 A later owner direction establishes that the protagonist's **black death shroud** means the soul begins stained by sins and selfishness. Brown is an adjacent threshold, and white represents a good or cleansed soul. Player choices can cleanse the soul or deepen its darkness. Souls of other characters can also be coloured; black wandering souls may seek soul crystals for a second chance at life. A matching family of **different-coloured versions of the same crystal** is requested for future artwork, but exact additional colours, their functions and resurrection compatibility remain undecided. See [Soul colours, death shrouds, and soul crystals](soul-colours-death-shrouds-and-crystals.md). **Documentation only; no art or implementation authorized here.**
 
+## Later door, Devil, and soundtrack decisions | 2026-11-05
+
+The owner later specified a physical door-state sequence and a soundtrack. The north door starts **closed**. Cultists open it to leave, with the final member closing it behind them. The Devil **faces the ghost and disappears in place**, not by walking through the door. Lilith prays, leaves the crystal, then **opens the door and departs without closing it**. The open door then permits passage as a **ghost or living person**. The requested music should loop across the sacrifice **and continue through its aftermath**. The exact track has not been selected. These latest decisions override the earlier generic description that the Devil "exits first." See [Sacrifice music, door choreography, and disappearance](sacrifice-audio-and-temple-door-sequence.md). **No gameplay or audio implementation is authorized by this documentation entry.**
+
 ## Authorization boundary
 
 The owner expressly requested **"don't build"** while planning, then narrowly authorized **documentation and one kneeling green-dress sprite sheet after documentation**. This instruction **does not authorize gameplay code, a courtyard, a corpse, a red-dress sheet, tree art, release/tag/deployment, or branch deletion**. Reference `COMPANY_BIBLE.md` for shared project change-control rules.
