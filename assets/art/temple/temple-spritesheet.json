@@ -1,0 +1,840 @@
+{
+  "schema": "dk.architect.spriteAtlas.v1",
+  "name": "Demon Killer | Existing DK Architect sprites",
+  "pixel_art": true,
+  "tile_size": 32,
+  "canvas_width": 576,
+  "canvas_height": 2112,
+  "background": "transparent",
+  "directions": [
+    "north",
+    "east",
+    "south",
+    "west"
+  ],
+  "entries": {
+    "altar": {
+      "label": "Sacrificial Altar",
+      "folder": "assets/art/temple/ritual",
+      "variants": {
+        "north": {
+          "x": 8,
+          "y": 9,
+          "width": 128,
+          "height": 64,
+          "frames": 1
+        },
+        "east": {
+          "x": 184,
+          "y": -23,
+          "width": 64,
+          "height": 128,
+          "frames": 1
+        },
+        "south": {
+          "x": 296,
+          "y": 9,
+          "width": 128,
+          "height": 64,
+          "frames": 1
+        },
+        "west": {
+          "x": 472,
+          "y": -23,
+          "width": 64,
+          "height": 128,
+          "frames": 1
+        }
+      }
+    },
+    "crystal_active": {
+      "label": "Soul Crystal: charged",
+      "folder": "assets/art/temple/ritual",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 113,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 113,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 113,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 113,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "crystal_spent": {
+      "label": "Soul Crystal: spent",
+      "folder": "assets/art/temple/ritual",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 201,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 201,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 201,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 201,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "braziers": {
+      "label": "Crimson Brazier",
+      "folder": "assets/art/temple/ritual",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 289,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 289,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 289,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 289,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "runestone": {
+      "label": "Runestone",
+      "folder": "assets/art/temple/ritual",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 377,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 377,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 377,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 377,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "pillar": {
+      "label": "Ruined Pillar",
+      "folder": "assets/art/temple/structure",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 465,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 465,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 465,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 465,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "door_open": {
+      "label": "Iron Arch Door: open",
+      "folder": "assets/art/temple/doors",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 553,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 553,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 553,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 553,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "door_closed": {
+      "label": "Iron Arch Door: closed",
+      "folder": "assets/art/temple/doors",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 641,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 641,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 641,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 641,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "statue": {
+      "label": "Veiled Statue",
+      "folder": "assets/art/temple/structure",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 713,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 713,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 713,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 713,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        }
+      }
+    },
+    "pew": {
+      "label": "Temple Pew",
+      "folder": "assets/art/temple/furniture",
+      "variants": {
+        "north": {
+          "x": 40,
+          "y": 817,
+          "width": 64,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 801,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        },
+        "south": {
+          "x": 328,
+          "y": 817,
+          "width": 64,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 801,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        }
+      }
+    },
+    "coffin": {
+      "label": "Stone Sarcophagus",
+      "folder": "assets/art/temple/furniture",
+      "variants": {
+        "north": {
+          "x": 40,
+          "y": 905,
+          "width": 64,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 889,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        },
+        "south": {
+          "x": 328,
+          "y": 905,
+          "width": 64,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 889,
+          "width": 32,
+          "height": 64,
+          "frames": 1
+        }
+      }
+    },
+    "candle": {
+      "label": "Candle Cluster",
+      "folder": "assets/art/temple/furniture",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 993,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 993,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 993,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 993,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "chest": {
+      "label": "Reliquary Chest",
+      "folder": "assets/art/temple/furniture",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1081,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1081,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1081,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1081,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "wall_straight": {
+      "label": "Stone Wall: straight",
+      "folder": "assets/art/temple/walls",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1169,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1169,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1169,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1169,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "wall_corner": {
+      "label": "Stone Wall: corner",
+      "folder": "assets/art/temple/walls",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1257,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1257,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1257,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1257,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "wall_t": {
+      "label": "Stone Wall: T junction",
+      "folder": "assets/art/temple/walls",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1345,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1345,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1345,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1345,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "wall_end": {
+      "label": "Stone Wall: end",
+      "folder": "assets/art/temple/walls",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1433,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1433,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1433,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1433,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "wall_cross": {
+      "label": "Stone Wall: cross",
+      "folder": "assets/art/temple/walls",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1521,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1521,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1521,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1521,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "floor_stone": {
+      "label": "Ashen Flagstone",
+      "folder": "assets/art/temple/floors",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1609,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1609,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1609,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1609,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "floor_dark": {
+      "label": "Obsidian Slab",
+      "folder": "assets/art/temple/floors",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1697,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1697,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1697,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1697,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "floor_sigil": {
+      "label": "Blood-Rune Tile",
+      "folder": "assets/art/temple/floors",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1785,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1785,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1785,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1785,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "floor_cracked": {
+      "label": "Cracked Stone",
+      "folder": "assets/art/temple/floors",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1873,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1873,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1873,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1873,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "ghost": {
+      "label": "Ghost player",
+      "folder": "assets/art/characters/ghost",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 1961,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 1961,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 1961,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 1961,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    },
+    "human": {
+      "label": "Living player",
+      "folder": "assets/art/characters/human",
+      "variants": {
+        "north": {
+          "x": 56,
+          "y": 2049,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "east": {
+          "x": 200,
+          "y": 2049,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "south": {
+          "x": 344,
+          "y": 2049,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        },
+        "west": {
+          "x": 488,
+          "y": 2049,
+          "width": 32,
+          "height": 32,
+          "frames": 1
+        }
+      }
+    }
+  },
+  "notes": [
+    "Rows are organized by asset; columns are N,E,S,W.",
+    "Altar, wall, character and prop art is based on code-drawn test-center.js graphics.",
+    "Furnishings and doors rotate their original top-down artwork; upright objects (flames, crystal, pillars and statues) keep their vertical posture. Characters have minimal cardinal facing views, with no walking animations.",
+    "Wall corner/T/end/cross pieces are additional matching-color concepts for future connectivity tools. They are not in the current editor.",
+    "Floor tiles are visually identical in each orientation, since rotating a floor is not necessary."
+  ]
+}
