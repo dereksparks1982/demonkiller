@@ -51,3 +51,10 @@ The `.gitkeep` files reserve empty folders in GitHub until artwork is added. The
 - `characters/ghost/ghost_spritesheet.png`: 128 × 32 transparent PNG, exactly four 32 × 32 views in **south, west, east, north** order. The four matching individual files use existing stable names `ghost_south.png`, `ghost_west.png`, `ghost_east.png`, `ghost_north.png`.
 - Extracted and scaled from the **owner-approved black-shroud four-direction design**, with low-color pixel quantization for the 32 × 32 game grid. Slim black/charcoal figure with a pitch-black, featureless hood opening; no visible face and no animation frames.
 - Replaces only the previous ghost artwork; does not change gameplay, scripts or scene geometry. The original approved high-resolution source remains outside this repository; the game-sized sheet is provided here.
+
+## Approved sacrificial altar (steps-right default, 2026-11-05)
+
+- Replaced `temple/ritual/altar_north.png`, `altar_east.png`, `altar_south.png`, and `altar_west.png` with clean four-orientation game-sized PNGs from the **approved newly generated stone altar sheet** (not the user's screenshot). Additional composite: `temple/ritual/altar_spritesheet.png` (256 × 256, 2 × 2 cells, north/east/south/west).
+- **Default `north` / rotation 0** is deliberately the **horizontal steps-on-the-RIGHT version**, to match the already approved scene object at grid (6, 5) with rotation 0, 4 × 2 tiles. Rotated variants: east steps down (2 × 4 tiles), south steps left (4 × 2), west steps up (2 × 4).
+- The unoccupied slab is **128 × 64**, leaving room for the separately layered approved **64 × 32 top-down lying hero**. Four brass/iron-colored rings may remain, although the character begins unconscious and unrestrained. No blood or bowl is embedded in the altar art; blood remains a separate body/effect asset.
+- Source was re-rendered to a tiny reproducible fixed nine-color palette, transparent pixels and nearest-neighbor hard edges. The in-game Canvas art loader already points at the four replaced filenames. This commit changes art and the art guide only; no temple layout, gameplay, saves or scene code.
