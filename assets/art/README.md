@@ -45,3 +45,9 @@ The `.gitkeep` files reserve empty folders in GitHub until artwork is added. The
 - `characters/human/human_south.png`, `human_north.png`, `human_west.png`, and `human_east.png` are 32 × 32 transparent, nearest-neighbor extractions of the **same approved purple-tunic villager**, replacing the previous player sprite artwork while retaining stable runtime filenames.
 - `characters/human/human_altar_alive.png` and `human_altar_dead.png` are 64 × 32 top-down horizontal extractions; the dead pose includes the blood pool. No side-view altar sprites or walking cycles.
 - The original high-resolution master is preserved unchanged. No gameplay/cutscene logic is modified in this art-only commit. A new black-shroud ghost sheet is a separate pending asset and does **not** reuse the prior ghost artwork.
+
+## Approved black-shroud player ghost (2026-11-05)
+
+- `characters/ghost/ghost_spritesheet.png`: 128 × 32 transparent PNG, exactly four 32 × 32 views in **south, west, east, north** order. The four matching individual files use existing stable names `ghost_south.png`, `ghost_west.png`, `ghost_east.png`, `ghost_north.png`.
+- Extracted and scaled from the **owner-approved black-shroud four-direction design**, with low-color pixel quantization for the 32 × 32 game grid. Slim black/charcoal figure with a pitch-black, featureless hood opening; no visible face and no animation frames.
+- Replaces only the previous ghost artwork; does not change gameplay, scripts or scene geometry. The original approved high-resolution source remains outside this repository; the game-sized sheet is provided here.
