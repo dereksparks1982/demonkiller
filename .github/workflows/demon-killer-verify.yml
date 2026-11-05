@@ -1,0 +1,21 @@
+name: Demon Killer verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/demon-killer-verify.yml'
+  workflow_dispatch:
+jobs:
+  regression:
+    name: Node contract and simulated gameplay
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Parse runtime JavaScript
+        run: node --check test-center.js
+      - name: Validate regression suite
+        run: node --test tests/test-center.cjs tests/menu.cjs tests/intro.cjs
