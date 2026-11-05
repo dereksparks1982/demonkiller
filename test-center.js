@@ -864,7 +864,7 @@
   document.addEventListener('keydown',e=>{
     const name=e.target?.tagName;
     if(name==='INPUT'||name==='SELECT'||name==='TEXTAREA')return;
-    if(!$('cultJournal').hidden)return; // Cult overlay holds keyboard focus.
+    if($('cultJournal').hidden===false)return; // Ignore gameplay keys only while the cult overlay is visibly open.
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();return;}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();return;}
     if(mode==='edit'){
