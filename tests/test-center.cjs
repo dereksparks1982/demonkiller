@@ -67,7 +67,8 @@ const tickFrames=count=>{for(let i=0;i<count;i++){
   const cb=frameQueue.shift();assert(cb,'Missing animation callback');
   cb(++frameNumber*16);
 }};
-const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAnimationFrame};
+const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAnimationFrame,
+  window:{addEventListener:noop}};
 vm.runInNewContext(js,sandbox,{filename:'test-center.js',timeout:3000});
 const key=code=>{for(const fn of events.keydown??[])fn({key:code,
   ctrlKey:false,metaKey:false,target:{tagName:'BODY'},preventDefault:noop});};
