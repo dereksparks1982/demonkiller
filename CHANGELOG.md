@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## Unreleased design documentation | 2026-11-04 | No gameplay build
+
+- Recorded owner-approved future Forsaken Temple opening: free ghost exploration, temporary movement lock, five-second kneeling prayer, crystal placement in front of altar, barrier removal, and optional ghost exit.
+- Specified single left-click crystal inspection versus deliberate double left-click resurrection, with ghost object messages and two worldview-dependent willow transformations.
+- Documented the missing corpse artwork, planned kneeling/alternate-dress/willow artwork, and known main-menu and Architect defects without claiming they are fixed.
+- Adopted the shared Capital & Consequence Company Bible development rules for Demon Killer, including **sparingly used GitHub Actions**.
+- **Documentation only:** current game code, release version, and existing sprite assets unchanged.
+
 ## v0.2.2 | 2026-11-04 | Main menu and crystal woman opening
 
 - Added the approved-sprite main menu and three Zelda-I-style named character records with New Game, Continue, Options and Quit guidance.
