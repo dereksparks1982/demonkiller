@@ -11,6 +11,12 @@ assert(!html.includes('id="castle"')&&!html.includes("artCanvas($('castle')")&&!
  'The discarded haunted-house decoration must not appear in the main menu');
 assert(html.includes('DK SOFTWORKS · HOUSE OF CULTURE'),'Correct studio branding must be visible');
 assert(html.includes('assets/art/menu/demon-killer-main-menu-spritesheet.png'));
+assert(html.includes('class="art-loading"')&&html.includes('.art-loading #home{visibility:hidden}'),
+ 'An unfinished text menu must not flash while the sprite sheet loads');
+assert(html.includes("classList.remove('art-loading')"),
+ 'Artwork loading gate must open on success or failure');
+assert(html.includes('min(265px,75vw,41svh)')&&html.includes('min(252px,78vw,38svh)'),
+ 'Approved menu art must scale with viewport height at 100% zoom');
 assert(fs.existsSync(path.join(root,'assets/art/menu/demon-killer-main-menu-spritesheet.png')));
 assert(html.includes('id="menuMusic"')&&html.includes('assets/audio/music/creepyloop-v2.ogg'),
  'Main menu must load the local OGG track');
