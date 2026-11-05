@@ -75,6 +75,7 @@
   }
   let scene = fresh(), mode = 'walk', tool = 'place', category = 'relics',
       current = 'crystal', selectedId = null, corner = null, hover = null,
+      previewRotation = 0,
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
   let activeSlot = 0;
   try {
@@ -282,7 +283,69 @@
     message('Restored the last room change.');
   }
   function pixel(g,color,x,y,w,h) { g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
+  // Sprite sources are exclusively the already approved DK Architect art pack.
+  // Missing or slow-loading images use the existing primitive Canvas fallback.
+  const spriteCache=new Map();
+  let spriteRefreshScheduled=false;
+  function sprite(path) {
+    if(typeof Image==='undefined')return null;
+    if(spriteCache.has(path))return spriteCache.get(path);
+    const img=new Image();
+    spriteCache.set(path,img);
+    img.onload=()=>{
+      if(!spriteRefreshScheduled){
+        spriteRefreshScheduled=true;
+        setTimeout(()=>{spriteRefreshScheduled=false;palette();draw();},0);
+      }
+    };
+    img.onerror=()=>{spriteCache.set(path,null);};
+    img.src='./assets/art/'+path;
+    return img;
+  }
+  function readyImage(path) {
+    const img=sprite(path);
+    return img&&img.complete&&img.naturalWidth>0?img:null;
+  }
+  const direction=['north','east','south','west'];
+  const categoryPath={
+    altar:'temple/ritual',crystal:'temple/ritual',braziers:'temple/ritual',
+    runestone:'temple/ritual',pillar:'temple/structure',statue:'temple/structure',
+    door:'temple/doors',pew:'temple/furniture',coffin:'temple/furniture',
+    candle:'temple/furniture',chest:'temple/furniture'
+  };
+  function objectImage(o) {
+    const group=categoryPath[o.type];
+    if(!group)return null;
+    const suffix=direction[o.r||0]||'north';
+    const name=o.type==='crystal'?'crystal_'+(o.spent?'spent':'active')
+      :o.type==='door'?'door_'+(o.open?'open':'closed'):o.type;
+    return readyImage(group+'/'+name+'_'+suffix+'.png');
+  }
+  function wallImage(x,y) {
+    const on=(a,b)=>inside(a,b)&&!!scene.walls[index(a,b)];
+    const n=on(x,y-1),e=on(x+1,y),s=on(x,y+1),w=on(x-1,y);
+    const count=Number(n)+Number(e)+Number(s)+Number(w);
+    let name='wall_cross',face='north';
+    if(count<=1) {
+      name='wall_end';face=n?'east':e?'north':s?'west':w?'south':'north';
+    }else if(count===2){
+      if(n&&s){name='wall_straight';face='east';}
+      else if(e&&w){name='wall_straight';face='north';}
+      else{
+        name='wall_corner';
+        face=n&&e?'south':e&&s?'north':s&&w?'east':'west';
+      }
+    }else if(count===3){
+      name='wall_t';face=!n?'north':!e?'east':!s?'south':'west';
+    }
+    return readyImage('temple/walls/'+name+'_'+face+'.png');
+  }
   function art(g,o) {
+    const picture=objectImage(o),size=dims(o);
+    if(picture && !(o.type==='statue' && size[0]!==1)){
+      g.drawImage(picture,o.x*TILE,o.y*TILE,size[0]*TILE,size[1]*TILE);
+      return;
+    }
     const a=baseSize(o.type), d=dims(o);
     g.save();
     g.translate((o.x+d[0]/2)*TILE,(o.y+d[1]/2)*TILE);
@@ -359,6 +422,8 @@
     g.restore();
   }
   function floorTile(x,y,type) {
+    const picture=readyImage('temple/floors/floor_'+type+'_north.png');
+    if(picture){ctx.drawImage(picture,x*TILE,y*TILE,TILE,TILE);return;}
     const col=FLOOR[type]?.color || FLOOR.stone.color, ox=x*TILE,oy=y*TILE;
     pixel(ctx,col,ox,oy,TILE,TILE);
     const seed=(x*17+y*41+x*y*13)%11;
@@ -372,6 +437,8 @@
     }
   }
   function wallTile(x,y) {
+    const picture=wallImage(x,y);
+    if(picture){ctx.drawImage(picture,x*TILE,y*TILE,TILE,TILE);return;}
     const ox=x*TILE,oy=y*TILE;pixel(ctx,'#100f15',ox,oy,32,32);
     pixel(ctx,'#625963',ox+1,oy+1,30,9);pixel(ctx,'#a08a94',ox+2,oy+2,28,2);
     pixel(ctx,'#38343e',ox+1,oy+11,30,20);
@@ -382,6 +449,12 @@
     const p=scene.player,position=ritual?ritual.visual:visual,
       x=position.x*TILE,y=position.y*TILE,
       ghost=ritual?ritual.phase==='spirit':p.form==='ghost';
+    const spriteGroup=ghost?'ghost':'human';
+    const image=readyImage('characters/'+spriteGroup+'/'+spriteGroup+'_'+p.facing+'.png');
+    if(image){
+      ctx.drawImage(image,Math.round(x),Math.round(y),TILE,TILE);
+      return;
+    }
     ctx.save();ctx.translate(x,y);
     if(ghost){
       ctx.globalAlpha=.86;ctx.shadowColor='#a3b8ec';ctx.shadowBlur=9;
@@ -423,7 +496,19 @@
       if(corner){ctx.strokeStyle='#e5bfd8';ctx.lineWidth=3;ctx.strokeRect(corner.x*TILE+2,corner.y*TILE+2,TILE-4,TILE-4);}
     }
     if(hover&&mode==='edit'){
-      ctx.strokeStyle='#c0b9dc';ctx.lineWidth=1;ctx.strokeRect(hover.x*TILE+1,hover.y*TILE+1,TILE-2,TILE-2);
+      if(tool==='place'&&CATALOG[current]){
+        const preview={id:'__architect_preview__',type:current,x:hover.x,y:hover.y,
+          r:previewRotation,open:true,spent:false};
+        const [pw,ph]=dims(preview);
+        const allowed=canPlace(preview);
+        ctx.save();ctx.globalAlpha=allowed?.58:.32;
+        art(ctx,preview);ctx.restore();
+        ctx.lineWidth=2;ctx.strokeStyle=allowed?'#7bcb88':'#f18585';
+        ctx.strokeRect(preview.x*TILE+1,preview.y*TILE+1,pw*TILE-2,ph*TILE-2);
+      }else{
+        ctx.strokeStyle='#c0b9dc';ctx.lineWidth=1;
+        ctx.strokeRect(hover.x*TILE+1,hover.y*TILE+1,TILE-2,TILE-2);
+      }
     }
     $('position').textContent='('+scene.player.x+', '+scene.player.y+')';
     $('lifeState').textContent=scene.player.form==='ghost'?'GHOST · secret path':'RESURRECTED · mortal path';
@@ -454,7 +539,7 @@
       }
       const span=document.createElement('span');span.textContent=entry.label;
       b.append(mini,span);b.addEventListener('click',()=>{
-        current=key;if(category==='floors'&&tool==='place')$('tool').value=tool='floor';
+        current=key;previewRotation=0;if(category==='floors'&&tool==='place')$('tool').value=tool='floor';
         if(category!=='floors'&&tool==='floor')$('tool').value=tool='place';
         palette();draw();message('Selected '+entry.label+'. Click a grid coordinate in Architect Mode.');
       });list.append(b);
@@ -603,7 +688,7 @@
     }
     if(tool==='place'){
       if(!CATALOG[current])return message('Choose a relic, structure or prop from the palette.');
-      const obj={id:idFor(current),type:current,x,y,r:0};
+      const obj={id:idFor(current),type:current,x,y,r:previewRotation};
       if(current==='door')obj.open=true;
       if(current==='crystal')obj.spent=false;
       transact(()=>{if(canPlace(obj))scene.objects.push(obj);},'Placed '+CATALOG[current].label+' at ('+x+', '+y+').');return;
@@ -703,6 +788,12 @@
     window.addEventListener('mouseup',e=>{if(e.button===2)rightMouseHeld=false;});
     window.addEventListener('blur',()=>{rightMouseHeld=false;});
   }
+  canvas.addEventListener('wheel',e=>{
+    if(mode!=='edit'||tool!=='place'||!CATALOG[current])return;
+    e.preventDefault();
+    previewRotation=(previewRotation+(e.deltaY>0?1:3))%4;
+    draw();message('Unplaced '+CATALOG[current].label+' facing '+direction[previewRotation]+'.');
+  },{passive:false});
   canvas.addEventListener('mousemove',e=>{
     if(mode==='walk'){rightPointer=pointerPosition(e);return;}
     const p=mouseTile(e);if(!p)return;
@@ -727,7 +818,7 @@
   $('editMode').addEventListener('click',()=>setMode('edit'));
   $('tool').addEventListener('change',e=>{tool=e.target.value;corner=null;selectedId=null;draw();message('Architect tool: '+e.target.selectedOptions[0].textContent+'.');});
   $('category').addEventListener('change',e=>{
-    category=e.target.value;current=category==='floors'?'stone':Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
+    category=e.target.value;previewRotation=0;current=category==='floors'?'stone':Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
     if(category==='floors'){tool='floor';$('tool').value=tool;}
     else if(['floor','fill','rectangle'].includes(tool)){tool='place';$('tool').value=tool;}
     palette();draw();
