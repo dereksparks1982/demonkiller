@@ -61,10 +61,10 @@
     <section class="stage" aria-label="Playable sacrificial temple">
       <div class="stage-head"><span>AREA · DK.TEMPLE.SACRIFICE.001</span><strong id="modeLabel">WALK MODE</strong><span id="coordTop">16 × 16 · 32 PX</span></div>
       <div class="stage-body">
-        <canvas id="room" width="512" height="512" tabindex="0" role="img" aria-label="Top-down Gothic temple on a 16 by 16 tile grid. Use W A S D or arrow keys to move."></canvas>
+        <canvas id="room" width="512" height="512" tabindex="0" role="img" aria-label="Top-down Gothic temple on a 16 by 16 tile grid. Hold right mouse to move, left-click to interact, or use W A S D and arrow keys."></canvas>
       </div>
       <div id="status" class="status" role="status" aria-live="polite">You awaken as a ghost at (8, 12). Walk to the crystal or leave it untouched.</div>
-      <div id="hint" class="hint">WASD / arrows: move a tile · Click a reachable tile: walk there · The northern arch leads toward the future courtyard.</div>
+      <div id="hint" class="hint">Hold RIGHT MOUSE to move; point farther away to run · LEFT CLICK interacts · WASD / arrows also move · Architect Mode clicks are unchanged.</div>
     </section>
     <aside class="panel details" aria-label="Room data and persistence">
       <div class="panel-title"><span>02</span><h2>THE RECORD</h2></div>
@@ -87,13 +87,13 @@
       </div>
       <div class="help">
         <h3>IN THE TEMPLE</h3>
-        <p><strong>Walk:</strong> move with WASD or arrow keys. Click a destination to navigate around solid obstacles. A ghost can pass through furnishings. Enter the crystal tile to resurrect.</p>
+        <p><strong>Walk:</strong> hold right mouse and point toward your destination; moving the cursor farther away makes you run. Left-click a nearby object to interact. WASD / arrow keys also move. Ghosts pass through furnishings. Touch or interact with the soul crystal to resurrect.</p>
         <p><strong>Build:</strong> choose Architect Mode, select art and click its grid coordinate. Select/Move uses two clicks. R rotates; Delete erases; Ctrl+Z undoes.</p>
         <p><strong>Exit:</strong> the northern doorway is a connection marker only. The courtyard is not yet built.</p>
       </div>
     </aside>
   </div>
-  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.0</span><span>Original code-drawn sprites. Isolated browser save. No game-engine dependencies.</span></footer>
+  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.1</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
 <script src="./test-center.js" defer></script>
 </body>
