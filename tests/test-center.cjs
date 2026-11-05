@@ -47,7 +47,9 @@ const document={getElementById:get,createElement:name=>new Element(name),
   addEventListener:(name,fn)=>{(events[name]??=[]).push(fn);},body:new Element('body')};
 const saved=new Map();
 const localStorage={setItem:(k,v)=>saved.set(k,v),getItem:k=>saved.get(k)||null};
-const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console};
+const frameQueue=[];
+const requestAnimationFrame=fn=>frameQueue.push(fn);
+const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAnimationFrame};
 vm.runInNewContext(js,sandbox,{filename:'test-center.js',timeout:3000});
 const key=code=>{for(const fn of events.keydown??[])fn({key:code,
   ctrlKey:false,metaKey:false,target:{tagName:'BODY'},preventDefault:noop});};
@@ -56,9 +58,13 @@ const click=async(x,y)=>get('room').emit('click',{clientX:x*32+16,clientY:y*32+1
   assert.equal(get('position').textContent,'(8, 12)');
   assert.match(get('lifeState').textContent,/GHOST/);
   assert.equal(get('objectCount').textContent,'10');
+  await click(9,12);
+  assert.equal(get('position').textContent,'(8, 12)','Left-clicking floor must not move');
   key('w');key('w');key('w');
   assert.equal(get('position').textContent,'(8, 9)');
-  assert.match(get('lifeState').textContent,/RESURRECTED/);
+  assert.match(get('lifeState').textContent,/GHOST/,'Walking onto crystal must not resurrect');
+  await click(8,9);
+  assert.match(get('lifeState').textContent,/RESURRECTED/,'Left-clicking crystal resurrects');
   await get('save').emit('click');
   assert.equal(saved.size,1,'Exactly one isolated storage key');
   assert(saved.has('dkSoftworks.demonkiller.testCenter.v1'));
@@ -75,6 +81,14 @@ const click=async(x,y)=>get('room').emit('click',{clientX:x*32+16,clientY:y*32+1
   assert.equal(get('position').textContent,'(8, 0)');
   assert.match(get('lifeState').textContent,/GHOST/);
   assert.match(get('status').textContent,/courtyard/i);
+
+  await get('new').emit('click');
+  const room=get('room');
+  await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:9*32+16,preventDefault:noop});
+  assert.equal(get('position').textContent,'(8, 12)','Right mouse hold waits for frame tick');
+  for(const tick of frameQueue.splice(0))tick(16);
+  assert.equal(get('position').textContent,'(8, 11)','Right mouse hold advances toward cursor');
+  await room.emit('mouseup',{button:2});
 
   await get('editMode').emit('click');
   assert.equal(get('modeLabel').textContent,'ARCHITECT MODE');

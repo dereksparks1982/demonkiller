@@ -353,24 +353,15 @@
     canvas.focus({preventScroll:true});
   }
   function facing(dx,dy){return dx>0?'east':dx<0?'west':dy>0?'south':'north';}
-  function touchCrystal() {
-    const p=scene.player, crystal=scene.objects.find(o=>o.type==='crystal'&&o.x===p.x&&o.y===p.y&&!o.spent);
-    if(p.form!=='ghost'||!crystal)return false;
-    p.form='living';crystal.spent=true;dirty=true;
-    message('THE CRYSTAL ANSWERS. Your body returns. You have chosen the mortal path.');
-    return true;
-  }
   function step(dx,dy) {
     const p=scene.player,nx=p.x+dx,ny=p.y+dy;
     p.facing=facing(dx,dy);
     if(!canStand(nx,ny)){draw();message('Blocked at ('+nx+', '+ny+'). The '+(p.form==='ghost'?'stone boundary':'wall or solid object')+' bars your way.');return false;}
     p.x=nx;p.y=ny;dirty=true;
     visual.queue.push({x:nx,y:ny});
-    const changed=touchCrystal();draw();persistCharacter();
-    if(!changed){
-      if(nx===8&&ny===0)message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test. You remain in '+AREA+'.');
-      else message((p.form==='ghost'?'Ghost':'Living')+' at '+AREA+' ('+nx+', '+ny+').');
-    }
+    draw();persistCharacter();
+    if(nx===8&&ny===0)message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test. You remain in '+AREA+'.');
+    else message((p.form==='ghost'?'Ghost':'Living')+' at '+AREA+' ('+nx+', '+ny+').');
     return true;
   }
   // Ultima Online controls: left mouse INTERACTS. Holding right mouse MOVES.
@@ -387,8 +378,10 @@
       message('Iron arch '+(obj.open?'opened':'closed')+'.');return;
     }
     if(obj.type==='crystal'&&!obj.spent&&p.form==='ghost') {
+      // Only a nearby LEFT CLICK activates the crystal, not walking across it.
+      rightMouseHeld=false;resetVisual();
       p.form='living';obj.spent=true;dirty=true;draw();persistCharacter();
-      message('THE CRYSTAL ANSWERS. Your body returns. You have chosen the mortal path.');return;
+      message('THE CRYSTAL ANSWERS. You have chosen resurrection.');return;
     }
     message(CATALOG[obj.type].label+(obj.type==='crystal'&&obj.spent?' (spent)':'')+'.');
   }
