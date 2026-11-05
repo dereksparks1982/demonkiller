@@ -29,14 +29,16 @@ function tick(n){for(let i=0;i<n;i++){const fn=frames.shift();
  assert(fn,'Animation frame missing');time+=16;fn(time);}}
 function key(k){for(const fn of events.keydown||[])fn({key:k,ctrlKey:false,metaKey:false,
  target:{tagName:'BODY'},preventDefault:no});}
-assert.match(get('status').textContent,/red-haired woman/i);
+assert.match(get('status').textContent,/Cult members surround/i);
 key('w');assert.equal(get('position').textContent,'(8, 12)','Player locked during opening');
 const room=get('room');
 room.emit('click',{button:0,clientX:8*32+16,clientY:9*32+16});
 assert.match(get('lifeState').textContent,/GHOST/);
-tick(700);
-assert.match(get('status').textContent,/woman is gone/i);
-key('w');assert.equal(get('position').textContent,'(8, 11)','Ghost control unlocked afterward');
+tick(1800);
+assert.match(get('status').textContent,/Double-left-click the crystal/i);
+assert.equal(get('position').textContent,'(8, 8)','Ghost appears in front of the altar after the sacrifice');
+assert.equal(Number(get('objectCount').textContent),10,'Crystal appears only after Lilith prays');
+key('w');assert.equal(get('position').textContent,'(8, 7)','Ghost control unlocked afterward');
 get('save').emit('click');
 const saved=JSON.parse(stored.get('dkSoftworks.demonkiller.testCenter.v1'));
 assert.equal(saved.introSeen,true,'Completed intro persists to save');
@@ -44,4 +46,4 @@ get('new').emit('click');
 key('w');assert.equal(get('position').textContent,'(8, 12)','Reset replays locked opening');
 get('editMode').emit('click');
 assert.equal(get('modeLabel').textContent,'ARCHITECT MODE','Existing Architect still available');
-console.log('PASS: crystal woman opening path, player lock, leave event, saved completion, replay and Architect.');
+console.log('PASS: cult sacrifice, Devil encounter, Lilith prayer, timed crystal, save and Architect.');
