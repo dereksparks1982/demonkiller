@@ -5,17 +5,21 @@ on:
     paths:
       - '.github/workflows/demon-killer-verify.yml'
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   regression:
     name: Node contract and simulated gameplay
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Parse runtime JavaScript
-        run: node --check test-center.js
-      - name: Validate regression suite
-        run: node --test tests/test-center.cjs tests/menu.cjs tests/intro.cjs
+      - name: Default new repositories to main
+        run: git config --global init.defaultBranch main
+      - uses: actions/checkout@v5
+      - name: Parse and verify game
+        env:
+          NODE_OPTIONS: --throw-deprecation
+        run: |
+          node --version
+          node --check test-center.js
+          node --test tests/test-center.cjs tests/menu.cjs tests/intro.cjs
