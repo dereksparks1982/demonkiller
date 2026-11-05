@@ -1,44 +1,47 @@
-# Demon Killer · Sacrificial Temple Test Center
+# Sacrificial Temple | DK Architect Development Lab
 
-**Branch:** `test-center` (experimental, separate from `main`)  
-**Prototype:** DK Architect Temple Lab v0.1.0  
-**Runtime:** Plain HTML, CSS and JavaScript; no Godot, Electron, npm, network calls or third-party assets.
+**Current active branch:** `main`  
+**Development milestone:** v0.2.0  
+**Engine:** Original Canvas renderer and plain HTML/CSS/JavaScript; no Godot dependency.
 
-## Launch
+## Launch and controls
 
-Open `test-center.html` from a checkout of this branch in Firefox or Chromium. The page works directly as a local file and has no external dependencies. Do **not** open `project.godot` for this experiment: that belongs to the recovered Godot-era game on `main`.
+Open [test-center.html](test-center.html), or open [index.html](index.html) to be forwarded to it.
 
-## What you can test
+- **Walk Temple:** WASD or arrow keys advance one grid tile; click a reachable floor tile to follow a calculated four-direction route. A ghost can pass through furnishings, but not the stone boundary. Touch the soul crystal to resurrect. Avoid it to remain a ghost.
+- **Architect Mode:** Place, Select/Move, Delete, Duplicate and Rotate **selected** items; floor paint/fill/rectangle, wall toggles, door states, spawn placement, eyedropper, undo/redo, and access check.
+- **Persistence:** Save/reload in isolated browser local storage, or Export/Import Room JSON to transfer a layout.
+- **Coordinates:** Every tile and item is addressable, with object IDs, footprint dimensions, and rotation in cardinal 90-degree steps.
 
-The opening temple is **16 × 16 tiles at 32 × 32 pixels per tile**. The player begins as a **ghost at (8,12)**. The sacrificial altar is at **(6,5)** and occupies **4 × 2 tiles**. The soul crystal starts at **(8,9)**; stepping onto the crystal resurrects the player. Avoiding it preserves the secret ghost route. As a ghost, the player can walk through furniture and the altar, but not through stone boundary walls. Resurrected characters collide with solid furniture. The **north exit at (8,0)** marks a future connection to the courtyard, but does not load another area yet.
+**Important:** The mouse wheel does not yet rotate a prospective placement; the cursor currently shows a tile outline, not the actual sprite preview. Proper north/east/south/west artwork and wall auto-tiling still need development. The existing Rotate button acts on **selected placed objects**.
 
-The test editor uses the same general conventions as Capital & Consequence's standalone `test-center`, but **all Demon Killer art is original code-drawn Gothic pixel art**. No code or artwork was copied from third-party sprite packs, and the separate Godot code is not executed.
+## Opening scene
 
-- **Walk Temple:** WASD or arrow keys move one tile. Clicking a floor tile pathfinds to it without animation. An adjacent door can be clicked to open/close.
-- **Architect Mode:** Place/Move/Rotate/Duplicate/Delete. Paint floors, flood-fill connected regions, paint rectangular areas, toggle walls and doors, move the spawn, eyedropper, undo/redo and access check.
-- **Coordinates:** Every area, player, object, floor and wall is grid-addressed. Object identity survives moves and rotation.
-- **Persistence:** Save and reload in isolated browser storage using `dkSoftworks.demonkiller.testCenter.v1`. Export and import JSON; imports check area identity, 256 grid cells, valid object types and coordinates. Reset never overwrites a saved layout until Save is pressed.
-- **Art:** Original top-down stone, relic, altar, crystal, pillar, coffin, statue, brazier, ghost and living-character sprites drawn with Canvas shapes and a Gothic color palette. Fixed directional characters, no sprite animation.
+| Component | Grid coordinates |
+| --- | --- |
+| Area ID | `dk.temple.sacrifice.001` |
+| Room | 16 × 16 tiles, 32 px per tile |
+| Ghost player spawn | (8, 12) |
+| Sacrificial altar | (6, 5), footprint 4 × 2 |
+| Soul crystal | (8, 9) |
+| North doorway marker | (8, 0) |
+
+The crystal changes the character from ghost to living and becomes spent. The arch **does not** currently connect to another playable area. The future courtyard, the woman who becomes a weeping willow, and full ghost-route progression are not in this build.
 
 ## Test
-
-From the checkout, run:
 
 ```bash
 node tests/test-center.cjs
 ```
 
-The regression test checks the 16 × 16 layout, first resurrection, secret ghost passage to the northern arch, editor placement, undo/redo, isolated save/reload and rejection of foreign-area JSON imports. A visual browser check on a Linux desktop is still needed before treating the experimental prototype as accepted.
+The test covers the grid, resurrection, ability to reach the north arch without resurrecting, editor placement and undo/redo, local save/reload, and import guards. It is a simulated-interaction test, **not** a full browser visual test.
 
-## Files
+## Current source files
 
-- `test-center.html`: standalone page and tools.
-- `test-center.css`: Gothic layout and responsive styling.
-- `test-center.js`: self-contained room grid, rendering, character branches, editor, pathfinding and save logic.
-- `tests/test-center.cjs`: Node.js interaction/contract regression.
+- `test-center.html`: playable editor and game UI.
+- `test-center.css`: Gothic interface and pixel-grid presentation.
+- `test-center.js`: grid model, Canvas art, player logic, tools and saves.
+- `tests/test-center.cjs`: behavior contract checks.
+- `index.html`: small, stable landing page forwarding to the above.
 
-## Scope and next connections
-
-This is **only the first room** of the proposed spider-web world. It does not implement the courtyard, the nearby woman, the weeping willow, a persistent world server, quests or the complete ghost ending. Later areas will have their own `area_id` and coordinates, joined by declared doorway or path connections. For now, the north arch is an intentional stub rather than a fake transition.
-
-**Existing Demon Killer `main`, Godot source, recovery files, and accepted versions remain unchanged.** This test center is not an approved game release and has not been tagged.
+We will improve the **existing** sacrificial temple instead of opening new areas until DK Architect is ready.

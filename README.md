@@ -1,41 +1,36 @@
-# Demon Killer · Experimental Temple Test Center
-
-**This is the `test-center` branch, not the approved `main` game.** Launch [test-center.html](test-center.html) to try the engine-free, grid-based sacrificial temple with a ghost/resurrection choice and DK Architect tools. See [TEST-CENTER.md](TEST-CENTER.md) for controls, coordinate design and regression checks. The historical Godot project remains intact below.
-
----
-
 # Demon Killer
 
-## DK Softworks · House of Culture
+**Demon Killer** is an original, top-down Gothic fantasy adventure in active development by **Elderred Softworks LLC**. The game and its **DK Architect** world editor are being developed with our own HTML, CSS, JavaScript, Canvas rendering and grid-based world data, **without Godot or another external game engine**.
 
-**DK Softworks** is the studio and project identity. **DK** draws on the Russian abbreviation **ДК** for **Дом культуры** (*Dom kultury*), meaning **“House of Culture.”** Traditionally, a *dom kultury* is a community center for the arts, creativity, performance, and learning.
+> **Current development milestone: v0.2.0 | Sacrificial Temple / DK Architect.** This is a development prototype, not a finished or released game.
 
-This identifies the present project or its stewardship; it does not change existing licenses, copyright holders, original creators, or historical credits.
+## Play the current build
 
+Open **[the sacrificial temple](test-center.html)** in Firefox or another modern desktop browser. The root [index.html](index.html) is a convenience entry that opens the same temple. No installation, build step, npm dependencies, network connection, or third-party sprite pack is required.
 
-Recovered Godot project repository for continued **Demon Killer** development.
+The **16 × 16 temple**, at **32 × 32 pixels per tile**, begins with the player as a **ghost**. Touching the soul crystal resurrects the player; avoiding it preserves the secret ghost path. Either choice belongs to the story. The north arch is only a future connection marker and **does not yet load a courtyard**.
 
-## Recovered baseline
+Switch to **Architect Mode** to edit the room. Existing tools include placement, selection and moving, 90-degree rotation of *selected* objects, floor painting/fill/rectangle, walls, doors, undo/redo, JSON export/import, browser-local saves, and exact object coordinates. See [Temple Lab / controls](TEST-CENTER.md) for details.
 
-The recovered Git history identifies the accepted baseline as **DK Godot v0.5.03 — Streaming Spatial Bucket Index Foundation**, commit `36aa9f3`.
+### Current limitations
 
-Recovered historical tags:
+- The four proper facing sprites, mouse-wheel rotation **before** placement, translucent sprite placement previews, intelligent connecting wall sprites, expanded Gothic asset catalog and temple decoration pass are **planned but not implemented**.
+- The room is currently fixed at 16 × 16; variable-sized interconnected rooms and meadows are future work.
+- The ghost and mortal paths are a working **opening choice**, not complete story routes.
+- Saving uses a dedicated prototype key in the browser's local storage; exports are the portable backup.
 
-- `v0.4.69`
-- `v0.4.71`
-- `v0.4.72`
-- `v0.5.00`
-- `v0.5.02`
-- `v0.5.03`
+## Development focus
 
-A later recovered script snapshot identifies **v0.5.05 — Third Party MIT Full Source Intake**. That material should remain separate from the accepted v0.5.03 baseline until the later build is fully validated.
+**Only the sacrificial temple is in scope for now.** We are using it to mature DK Architect, Gothic artwork and gameplay, with original cardinal-direction sprites and **no diagonal construction**. Larger connected rooms and the courtyard come after the temple and editor meet their acceptance criteria.
 
-## Project contents
+Read [Architect development plan](docs/architect-plan.md), [changelog](CHANGELOG.md) and [legacy review](docs/legacy-review.md).
 
-The recovered project includes the Godot project configuration, scenes, GDScript source, editor add-ons, art, audio, minigames, tests, development tools, documentation, and recovered Git history required to continue development.
+## Verification
 
-## Recovery notes
+Run `node tests/test-center.cjs` for the included contract and simulated-interaction tests. These are **not** a substitute for a visual browser test. The original temple prototype was visually tested on Ubuntu; the repository migration does not add gameplay logic.
 
-The complete recovered v0.5.03 working tree contains **4,920 tracked files**. The original history was recovered rather than recreated from scratch, including the accepted v0.5.03 commit and its earlier development tags.
+## Prior Godot project
 
-The repository is intended to be the continuation point for future Demon Killer work.
+The former Godot working-tree snapshot was preserved **before cleanup** at [archive/godot-recovery-2026-11-04](https://github.com/dereksparks1982/demonkiller/tree/archive/godot-recovery-2026-11-04), commit `3f6cc95a237e45b9d71c9403b7757332672f2fbe`. Historical Git commits and tags are separate historical references. The active `main` no longer carries Godot runtime/editor files. See the [migration notes](docs/legacy-review.md) for a precise inventory, gaps and systems worth reimplementing.
+
+Copyright and licensing remain subject to each component's actual rights and attribution. Historical files are **not** automatically licensed as original new-game assets. Contact: [CONTACT.md](CONTACT.md).
