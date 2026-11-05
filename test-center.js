@@ -60,14 +60,13 @@
       objects: [
         { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:true },
         { id:'sacrifice_altar', type:'altar', x:6, y:5, r:0 },
-        { id:'soul_crystal', type:'crystal', x:8, y:9, r:0, spent:false },
         { id:'brazier_west', type:'braziers', x:4, y:4, r:0 },
         { id:'brazier_east', type:'braziers', x:11, y:4, r:0 },
         { id:'pillar_west', type:'pillar', x:3, y:2, r:0 },
         { id:'pillar_east', type:'pillar', x:12, y:2, r:0 },
         { id:'pew_west', type:'pew', x:3, y:10, r:0 },
         { id:'pew_east', type:'pew', x:11, y:10, r:0 },
-        { id:'candle_near_altar', type:'candle', x:10, y:7, r:0 }
+        { id:'candle_near_altar', type:'candle', x:13, y:9, r:0 }
       ],
       spawn: { x:8, y:12 },
       player: { x:8, y:12, facing:'north', form:'ghost' }
@@ -88,82 +87,156 @@
   const visual = { x:scene.player.x, y:scene.player.y, queue:[] };
   let rightMouseHeld = false, rightPointer = null, lastFrameTime = 0;
   let opening = null, ritual = null;
-  const openingRoute = [
-    [8,0],[8,1],[8,2],[8,3],[9,3],[10,3],[10,4],[10,5],[10,6],
-    [10,7],[9,7],[8,7]
-  ];
-  const womanImages = {};
-  if (typeof Image !== 'undefined') {
-    for (const direction of ['north','east','south','west']) {
-      const img = new Image();
-      img.onload = () => draw();
-      img.onerror = () => { /* Retain an original block-art fallback if unavailable. */ };
-      img.src = './assets/art/characters/crystal-woman/crystal_woman_' + direction + '.png';
-      womanImages[direction] = img;
+
+  // All cutscene actors are ephemeral; room geometry and saved editor objects stay separate.
+  const CULT_POSITIONS=[[2,4],[13,4],[2,8],[13,8],[4,12],[11,12],[5,3],[10,3]];
+  const womanImages={};
+  if(typeof Image!=='undefined'){
+    for(const d of ['north','east','south','west','kneeling']){
+      const img=new Image();
+      img.onload=()=>draw();img.onerror=()=>{};
+      img.src='./assets/art/characters/crystal-woman/crystal_woman_'+(d==='kneeling'?'kneeling_north':d)+'.png';
+      womanImages[d]=img;
     }
   }
-  function startOpening() {
-    opening = {
-      x:8, y:-1, facing:'south', route:openingRoute.slice(), index:0,
-      phase:'enter', pause:0
-    };
+  function actor(kind,x,y,facing='south'){return{kind,x,y,facing,route:[],index:0};}
+  function route(a,points){a.route=points;a.index=0;}
+  function moveActor(a,dt,speed=3.8){
+    let travel=dt*speed;
+    while(travel>0&&a.index<a.route.length){
+      const p=a.route[a.index],dx=p[0]-a.x,dy=p[1]-a.y,d=Math.hypot(dx,dy);
+      if(d<.001){a.x=p[0];a.y=p[1];a.index++;continue;}
+      a.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'east':'west'):(dy>0?'south':'north');
+      const z=Math.min(d,travel);a.x+=dx/d*z;a.y+=dy/d*z;travel-=z;
+      if(z>=d-.001){a.x=p[0];a.y=p[1];a.index++;}
+    }
+    return a.index===a.route.length;
+  }
+  function phase(name,line){opening.phase=name;opening.time=0;message(line);}
+  function startOpening(){
+    // Remove the obsolete prototype starter crystal only before its introductory ritual.
+    scene.objects=scene.objects.filter(o=>!(o.id==='soul_crystal'&&o.type==='crystal'&&
+      o.x===8&&o.y===9&&!scene.introSeen));
+    opening={phase:'gather',time:0,sacrificed:false,ghostVisible:false,crystalPlaced:false,
+      members:CULT_POSITIONS.map(([x,y],i)=>actor('member',x,y,i%2?'west':'east')),
+      leader:actor('leader',8,7,'north'),devil:actor('devil',11,8,'west'),
+      woman:actor('woman',5,8,'east')};
     rightMouseHeld=false;resetVisual();
-    message('A red-haired woman enters the Forsaken Temple. Wait until she leaves.');
+    message('Cult members surround the altar. You lie bound, unable to move.');
   }
-  function updateOpening(dt) {
-    if (!opening) return;
-    if (opening.phase === 'wait') {
-      opening.pause-=dt;
-      if (opening.pause<=0) {
-        opening.phase='leave';
-        opening.route=openingRoute.slice(0,-1).reverse().concat([[8,-1]]);
-        opening.index=0;
+  function placeOpeningCrystal(){
+    if(opening.crystalPlaced)return;
+    opening.crystalPlaced=true;
+    if(!scene.objects.some(o=>o.type==='crystal')){
+      const crystal={id:'soul_crystal',type:'crystal',x:8,y:7,r:0,spent:false};
+      if(canPlace(crystal))scene.objects.push(crystal);
+    }
+    dirty=true;
+  }
+  function updateOpening(dt){
+    if(!opening)return;opening.time+=dt;
+    switch(opening.phase){
+      case 'gather':
+        if(opening.time>=2)phase('prayer','The cult leader prays over your bound body.');break;
+      case 'prayer':
+        if(opening.time>=2.5)phase('sacrifice','The cult leader sacrifices you upon the altar.');break;
+      case 'sacrifice':
+        if(opening.time>=.45)opening.sacrificed=true;
+        if(opening.time>=1.5){
+          for(const m of opening.members){
+            const edge=m.x<8?5:11;
+            route(m,[[edge,m.y],[edge,2],[8,2],[8,-1]]);
+          }
+          route(opening.leader,[[10,7],[10,3],[8,3],[8,-1]]);
+          phase('cultExit','The cult leader and the others leave through the north arch.');
+        }break;
+      case 'cultExit':{
+        const gone=opening.members.map(m=>moveActor(m,dt,4.8)).every(Boolean);
+        const leaderGone=moveActor(opening.leader,dt,4.2);
+        if(gone&&leaderGone){
+          opening.ghostVisible=true;
+          scene.player.x=8;scene.player.y=8;scene.player.facing='north';resetVisual();
+          phase('ghostRise','Your ghost rises in front of the altar. Your body remains behind.');
+        }break;
       }
+      case 'ghostRise':
+        if(opening.time>=1.8)phase('devilSpeaks','The Devil stands on your right, Lilith on your left. Devil: "You\u2019re mine."');
+        break;
+      case 'devilSpeaks':
+        if(opening.time>=3){
+          route(opening.devil,[[11,3],[8,3],[8,-1]]);
+          phase('devilExit','The Devil leaves first. Lilith stays behind.');
+        }break;
+      case 'devilExit':
+        if(moveActor(opening.devil,dt,3.8)){
+          route(opening.woman,[[6,8],[7,8],[8,7]]);
+          phase('approach','Lilith approaches the altar.');
+        }break;
+      case 'approach':
+        if(moveActor(opening.woman,dt,2.8)){
+          opening.woman.facing='north';
+          phase('kneel','Lilith kneels and prays toward the altar.');
+        }break;
+      case 'kneel':
+        if(opening.time>=5)phase('place','Lilith rises to place a soul crystal.');
+        break;
+      case 'place':
+        if(opening.time>=.5){
+          opening.woman.x=9;opening.woman.y=7;
+          placeOpeningCrystal();
+          route(opening.woman,[[10,7],[10,3],[8,3],[8,-1]]);
+          phase('lilithExit','The golden soul crystal remains. Lilith leaves.');
+        }break;
+      case 'lilithExit':
+        if(moveActor(opening.woman,dt,3.8)){
+          opening=null;scene.introSeen=true;dirty=true;resetVisual();persistCharacter();
+          message('Double-left-click the crystal to resurrect, or leave as a ghost.');
+        }break;
+    }
+  }
+  function drawCorpse(){
+    if(scene.player.form!=='ghost')return;
+    const altar=scene.objects.find(o=>o.type==='altar');if(!altar)return;
+    const stillAlive=opening&&!opening.sacrificed;
+    const picture=readyImage('characters/human/human_altar_'+(stillAlive?'alive':'dead')+'.png');
+    const x=altar.x*TILE+10,y=altar.y*TILE+13;
+    if(picture){ctx.drawImage(picture,x,y,108,45);return;}
+    // Loading fallback, without the earlier stray prototype blocks.
+    pixel(ctx,'#261b24',x,y+7,105,28);
+    pixel(ctx,stillAlive?'#986771':'#694d5c',x+13,y+8,78,18);
+    pixel(ctx,'#cc9a85',x+4,y+8,17,16);
+  }
+  function drawActor(a){
+    if(a.y<0)return;
+    const x=Math.round(a.x*TILE),y=Math.round(a.y*TILE);
+    if(a.kind==='woman'){
+      const frame=opening.phase==='kneel'?'kneeling':a.facing;
+      const pic=womanImages[frame];
+      if(pic&&pic.complete&&pic.naturalWidth>0){ctx.drawImage(pic,x,y,TILE,TILE);return;}
+      pixel(ctx,'#ba4e2c',x+8,y+3,16,11);pixel(ctx,'#285740',x+7,y+15,18,15);
       return;
     }
-    const point=opening.route[opening.index];
-    if (!point) {
-      if (opening.phase==='enter') {
-        opening.phase='wait'; opening.pause=.95;opening.facing='north';
-      } else {
-        opening=null;scene.introSeen=true;dirty=true;persistCharacter();
-        message('The woman is gone. You are alone with your body and the soul crystal.');
-      }
-      return;
+    const folder=a.kind==='devil'?'devil':a.kind==='leader'?'cult-leader':'cult-member';
+    const file=a.kind==='devil'?'devil_spritesheet.png':a.kind==='leader'?'cult_leader_spritesheet.png':'cult_member_spritesheet.png';
+    const pic=readyImage('characters/'+folder+'/'+file);
+    if(pic){
+      const cardinal={south:0,east:1,north:2,west:3};
+      ctx.drawImage(pic,(cardinal[a.facing]||0)*32,0,32,32,x,y,TILE,TILE);
+    }else{
+      pixel(ctx,a.kind==='devil'?'#252027':'#392a30',x+8,y+3,16,27);
+      pixel(ctx,a.kind==='devil'?'#a33e37':'#b4575b',x+12,y+9,8,9);
     }
-    const dx=point[0]-opening.x,dy=point[1]-opening.y,dist=Math.hypot(dx,dy);
-    if (dist<.008) { opening.x=point[0];opening.y=point[1];opening.index++;return; }
-    opening.facing=Math.abs(dx)>Math.abs(dy)?(dx>0?'east':'west'):(dy>0?'south':'north');
-    const distance=Math.min(dist,3.5*dt);
-    opening.x+=dx/dist*distance;opening.y+=dy/dist*distance;
   }
-  function drawCorpse() {
-    if (scene.player.form!=='ghost' || !scene.objects.some(o=>o.type==='altar')) return;
-    const a=scene.objects.find(o=>o.type==='altar');
-    if (!a) return;
-    const xx=a.x*TILE,yy=a.y*TILE;
-    // Primitive horizontal body, kept on the altar until resurrection.
-    pixel(ctx,'#2c2228',xx+18,yy+25,92,14);
-    pixel(ctx,'#d4aea0',xx+20,yy+25,13,13);
-    pixel(ctx,'#3b2930',xx+19,yy+24,14,4);
-    pixel(ctx,'#61404e',xx+34,yy+24,41,16);
-    pixel(ctx,'#987781',xx+74,yy+27,28,5);
-    pixel(ctx,'#3c323d',xx+101,yy+27,9,6);
-  }
-  function drawWoman() {
-    if (!opening) return;
-    const x=Math.round(opening.x*TILE),y=Math.round(opening.y*TILE);
-    const img=womanImages[opening.facing];
-    if (img && img.complete && img.naturalWidth>0) {
-      ctx.drawImage(img,x,y,TILE,TILE);
-    } else {
-      // Same deliberately crude 32x32 color-block style as DK Architect.
-      pixel(ctx,'#6a2727',x+8,y+2,16,11);
-      pixel(ctx,'#ba4e2c',x+9,y+3,14,8);
-      pixel(ctx,'#d4ac91',x+12,y+9,8,7);
-      pixel(ctx,'#285740',x+9,y+16,14,12);
-      pixel(ctx,'#1b3e2d',x+7,y+26,18,4);
+  function drawOpening(){
+    if(!opening)return;
+    const p=opening.phase;
+    if(['gather','prayer','sacrifice','cultExit'].includes(p)){
+      for(const m of opening.members)drawActor(m);
+      drawActor(opening.leader);
     }
+    if(['ghostRise','devilSpeaks','devilExit'].includes(p))drawActor(opening.devil);
+    if(['ghostRise','devilSpeaks','devilExit','approach','kneel','place','lilithExit'].includes(p))
+      drawActor(opening.woman);
   }
   function beginResurrection() {
     const p=scene.player;
@@ -347,6 +420,11 @@
   }
   function art(g,o) {
     const picture=objectImage(o),size=dims(o);
+    // Approved newer torch-and-flame artwork from the original temple asset sheet.
+    if(o.type==='braziers'){
+      const sheet=readyImage('temple/Demon Killer Pixel Art Tile Sheet.png');
+      if(sheet){g.drawImage(sheet,331,590,147,143,o.x*TILE,o.y*TILE,TILE,TILE);return;}
+    }
     if(picture && !(o.type==='statue' && size[0]!==1)){
       g.drawImage(picture,o.x*TILE,o.y*TILE,size[0]*TILE,size[1]*TILE);
       return;
@@ -487,7 +565,7 @@
     for(let y=0;y<N;y++)for(let x=0;x<N;x++)floorTile(x,y,scene.floor[index(x,y)]);
     for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(scene.walls[index(x,y)])wallTile(x,y);
     scene.objects.forEach(o=>art(ctx,o));
-    drawCorpse();drawWoman();playerSprite();
+    drawCorpse();drawOpening();if(!opening||opening.ghostVisible)playerSprite();
     if(mode==='edit'){
       ctx.strokeStyle='rgba(190,150,174,.24)';ctx.lineWidth=1;ctx.beginPath();
       for(let i=0;i<=N;i++){
@@ -516,7 +594,7 @@
       }
     }
     $('position').textContent='('+scene.player.x+', '+scene.player.y+')';
-    $('lifeState').textContent=scene.player.form==='ghost'?'GHOST · secret path':'RESURRECTED · mortal path';
+    $('lifeState').textContent=opening&&!opening.sacrificed?'ALIVE · sacrifice':scene.player.form==='ghost'?'GHOST · secret path':'RESURRECTED · mortal path';
     $('lifeState').style.color=scene.player.form==='ghost'?'#b9c6f4':'#f5b7bb';
     $('objectCount').textContent=String(scene.objects.length);
     const o=objectAtId(selectedId);
@@ -564,6 +642,7 @@
     if (opening||ritual) {message('Wait for the opening or resurrection sequence to finish.');return false;}
     const p=scene.player,nx=p.x+dx,ny=p.y+dy;
     p.facing=facing(dx,dy);
+    if(nx===8&&ny===0&&!scene.introSeen){message('I cannot leave.');return false;}
     if(!canStand(nx,ny)){draw();message('Blocked at ('+nx+', '+ny+'). The '+(p.form==='ghost'?'stone boundary':'wall or solid object')+' bars your way.');return false;}
     p.x=nx;p.y=ny;dirty=true;
     visual.queue.push({x:nx,y:ny});
@@ -582,6 +661,9 @@
     const distanceX=Math.max(obj.x-p.x,0,p.x-(obj.x+w-1));
     const distanceY=Math.max(obj.y-p.y,0,p.y-(obj.y+h-1));
     if(distanceX+distanceY>1)return message('Move closer to the '+CATALOG[obj.type].label+' to interact.');
+    if(obj.type==='door'&&!scene.introSeen){message('I cannot leave.');return;}
+    if(obj.type==='braziers'&&p.form==='ghost'){message("The fire doesn't affect me.");return;}
+    if(obj.type==='pew'&&p.form==='ghost'){message('Ghosts need no rest.');return;}
     if(obj.type==='door') {
       obj.open=!obj.open;dirty=true;draw();persistCharacter();
       message('Iron arch '+(obj.open?'opened':'closed')+'.');return;
@@ -612,7 +694,7 @@
     const ax=dx/pixels*tilesToTravel,ay=dy/pixels*tilesToTravel;
     const legal=(x,y)=>{
       const tx=Math.round(x),ty=Math.round(y);
-      if(!canStand(tx,ty))return false;
+      if(!canStand(tx,ty)||(tx===8&&ty===0&&!scene.introSeen))return false;
       const p=scene.player;
       // Prevent diagonally cutting through the corners of two solid tiles.
       if(tx!==p.x&&ty!==p.y&&(!canStand(tx,p.y)||!canStand(p.x,ty)))return false;
