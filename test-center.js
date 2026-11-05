@@ -132,10 +132,10 @@
   function art(g,o) {
     const a=baseSize(o.type), d=dims(o);
     g.save();
-    g.translate((o.x+d[0]/2)*T,(o.y+d[1]/2)*T);
+    g.translate((o.x+d[0]/2)*TILE,(o.y+d[1]/2)*TILE);
     g.rotate((o.r||0)*Math.PI/2);
-    g.translate(-a.w*T/2,-a.h*T/2);
-    const w=a.w*T,h=a.h*T;
+    g.translate(-a.w*TILE/2,-a.h*TILE/2);
+    const w=a.w*TILE,h=a.h*TILE;
     if (o.type !== 'candle' && o.type !== 'crystal' && o.type !== 'door')
       pixel(g,'#14131a',3,h-4,w-3,5);
     switch(o.type) {
@@ -206,8 +206,8 @@
     g.restore();
   }
   function floorTile(x,y,type) {
-    const col=FLOOR[type]?.color || FLOOR.stone.color, ox=x*T,oy=y*T;
-    pixel(ctx,col,ox,oy,T,T);
+    const col=FLOOR[type]?.color || FLOOR.stone.color, ox=x*TILE,oy=y*TILE;
+    pixel(ctx,col,ox,oy,TILE,TILE);
     const seed=(x*17+y*41+x*y*13)%11;
     pixel(ctx,'#4d4650',ox+1,oy+2,28,1);
     pixel(ctx,'#211e27',ox+30,oy+3,2,28);
@@ -219,14 +219,14 @@
     }
   }
   function wallTile(x,y) {
-    const ox=x*T,oy=y*T;pixel(ctx,'#100f15',ox,oy,32,32);
+    const ox=x*TILE,oy=y*TILE;pixel(ctx,'#100f15',ox,oy,32,32);
     pixel(ctx,'#625963',ox+1,oy+1,30,9);pixel(ctx,'#a08a94',ox+2,oy+2,28,2);
     pixel(ctx,'#38343e',ox+1,oy+11,30,20);
     pixel(ctx,'#594650',ox+3,oy+13,23,2);
     pixel(ctx,'#201c24',ox+14,oy+14,2,17);
   }
   function playerSprite() {
-    const p=scene.player,x=p.x*T,y=p.y*T, ghost=p.form==='ghost';
+    const p=scene.player,x=p.x*TILE,y=p.y*TILE, ghost=p.form==='ghost';
     ctx.save();ctx.translate(x,y);
     if(ghost){
       ctx.globalAlpha=.86;ctx.shadowColor='#a3b8ec';ctx.shadowBlur=9;
@@ -258,17 +258,17 @@
     if(mode==='edit'){
       ctx.strokeStyle='rgba(190,150,174,.24)';ctx.lineWidth=1;ctx.beginPath();
       for(let i=0;i<=N;i++){
-        ctx.moveTo(i*T+.5,0);ctx.lineTo(i*T+.5,N*T);
-        ctx.moveTo(0,i*T+.5);ctx.lineTo(N*T,i*T+.5);
+        ctx.moveTo(i*TILE+.5,0);ctx.lineTo(i*TILE+.5,N*TILE);
+        ctx.moveTo(0,i*TILE+.5);ctx.lineTo(N*TILE,i*TILE+.5);
       }ctx.stroke();
       if(selectedId){const o=objectAtId(selectedId);if(o){
         const [w,h]=dims(o);ctx.strokeStyle='#f2c58b';ctx.lineWidth=3;
-        ctx.strokeRect(o.x*T+2,o.y*T+2,w*T-4,h*T-4);
+        ctx.strokeRect(o.x*TILE+2,o.y*TILE+2,w*TILE-4,h*TILE-4);
       }}
-      if(corner){ctx.strokeStyle='#e5bfd8';ctx.lineWidth=3;ctx.strokeRect(corner.x*T+2,corner.y*T+2,T-4,T-4);}
+      if(corner){ctx.strokeStyle='#e5bfd8';ctx.lineWidth=3;ctx.strokeRect(corner.x*TILE+2,corner.y*TILE+2,TILE-4,TILE-4);}
     }
     if(hover&&mode==='edit'){
-      ctx.strokeStyle='#c0b9dc';ctx.lineWidth=1;ctx.strokeRect(hover.x*T+1,hover.y*T+1,T-2,T-2);
+      ctx.strokeStyle='#c0b9dc';ctx.lineWidth=1;ctx.strokeRect(hover.x*TILE+1,hover.y*TILE+1,TILE-2,TILE-2);
     }
     $('position').textContent='('+scene.player.x+', '+scene.player.y+')';
     $('lifeState').textContent=scene.player.form==='ghost'?'GHOST · secret path':'RESURRECTED · mortal path';
