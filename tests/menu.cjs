@@ -7,6 +7,9 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const code=html.match(/<script>([\s\S]*?)<\/script>/);
 assert(code,'Menu script not found');
 assert(!html.includes('http-equiv="refresh"'));
+assert(!html.includes('id="castle"')&&!html.includes("artCanvas($('castle')")&&!html.includes('.castle{'),
+ 'The discarded haunted-house decoration must not appear in the main menu');
+assert(html.includes('DK SOFTWORKS · HOUSE OF CULTURE'),'Correct studio branding must be visible');
 assert(html.includes('assets/art/menu/demon-killer-main-menu-spritesheet.png'));
 assert(fs.existsSync(path.join(root,'assets/art/menu/demon-killer-main-menu-spritesheet.png')));
 assert(html.includes('id="menuMusic"')&&html.includes('assets/audio/music/creepyloop-v2.ogg'),

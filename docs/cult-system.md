@@ -1,8 +1,8 @@
 # Cult System: Implemented Foundation
 
-**Demon Killer | Elderred Softworks LLC**
+**Demon Killer | DK Softworks (House of Culture)**
 
-**State:** The cult simulation, 24-person procedural population, local time/schedule model, per-character saves and read-only dossier/public-register journal are implemented. Visible city NPCs, playable civilian locations, investigative quests, cult reactions in scenes and an authoritative world server are not yet implemented.
+**State:** The cult simulation, 24-person procedural population, local time/schedule model, per-character saves and Cult of Kosmos-inspired full-screen investigation board are implemented. Playable city NPCs, physical cult tracking, elimination missions, authored clues and an authoritative world server are not yet implemented.
 
 ## Design rules
 
@@ -16,7 +16,8 @@ The player may meet a citizen without discovering their affiliation. Dossiers mu
 - citizen-population.js: generates 24 ordinary and prominent procedural citizens, their public occupations, work hours, traits and reciprocal social ties. World-relative schedule locations are abstract (home, workplace, public), not newly built map areas.
 - index.html: generates a unique world seed for every new named character slot.
 - test-center.js: restores or initializes cult state inside the existing named-character save record; persists changes without replacing the DK Architect room save/export keys.
-- test-center.html and cult-journal.css: fixed-position Cult Journal accessible in the temple.
+- test-center.html and cult-journal.css: full-screen cult hierarchy over the temple, arranged as four connected branches surrounding a locked central leader.
+- cult-network.js: maps actual world cultists to masked nodes; only proven membership reveals names, occupations and collected evidence.
 - tests/cult-system.cjs and tests/cult-integration.cjs: deterministic simulation and save/DOM integration tests.
 - tests/population.cjs: independent population and schedule regressions.
 
@@ -38,7 +39,7 @@ Proof of active membership/rank is rejected for non-members; exoneration of a cu
 
 Each character slot has a worldSeed at creation and a cultWorld state containing actual membership, political history and separate player knowledge. Continue restores that state. Older slots migrate using a stable legacy seed. Overwriting a slot creates a new seed and fresh investigation. Direct guest temple access gets a temporary session world without a separate local storage key.
 
-The world now initializes 24 named **procedural** civilian profiles, but none are automatically encountered. The Society Register tab shows public names, occupations, published work hours and whether a character is encountered. Its contents never disclose affiliation, motives, internal contacts or evidence. The Discovered Dossiers tab correctly starts empty until actual encounters or evidence. In-scene systems will use window.DemonKillerPopulationHooks.publicRegister(), publicRecord(id), schedule(id), currentTime(), advanceHours(hours), and encounter(id). The roster is a simulation and journal record, not proof that those citizens have been placed into a playable street map.
+The world initializes 24 named **procedural** civilian profiles, but none are automatically encountered. Their public directory is no longer shown inside the Cult interface. The Cult menu now displays masked silhouettes for actual members, grouped under four functional headings (Faith, Wealth, Law, Shadows). These headings are organizational placeholders, not final lore names. The central leader is intentionally unidentified until the player-facing story and evidence are authored. An unknown silhouette has no citizen ID in the DOM and never shows a name merely because the player met that citizen. An unconfirmed suspicion appears in the separate UNVERIFIED LEADS area, not as a confirmed cultist's portrait. A proven member's card reveals name, known profession and actual discovered clues. A known eliminated member stays visible in the network. Tracking currently sets a saved investigation marker only; it does not fake a map destination. Future scenes use window.DemonKillerPopulationHooks.publicRegister(), publicRecord(id), schedule(id), currentTime(), advanceHours(hours), and encounter(id). The population remains a simulation and is not yet visible in playable streets.
  The previously approved opening cinematics, temple and character sprites, creature trees, architectural courtyard, editor geometry and main-menu README are untouched.
 
-This is currently a **local, browser-based simulation**. Its secret data can be inspected with browser developer tools; true secrecy for a shared persistent world will require an authoritative backend later. Never treat the current work as a completed cult quest system.
+This is currently a **local, browser-based simulation**. Its secret data can be inspected with browser developer tools; true secrecy for a shared persistent world will require an authoritative backend later. Never treat the current work as a completed cult quest system. The menu structure is a gameplay-inspired implementation, not copied artwork or exact Odyssey code. Browser-playable visual acceptance remains the owner's decision.

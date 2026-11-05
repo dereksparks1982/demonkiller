@@ -1,5 +1,20 @@
 # Demon Killer Changelog
 
+## Main menu visual and studio credit corrections | 2026-11-05
+
+- Removed the haunted-house/castle decoration beneath the menu, leaving the approved logo and game-control buttons intact.
+- Corrected the game menu and short player-facing README to credit DK Softworks, whose DK represents Дом культуры (House of Culture), while preserving historical/legal references where appropriate.
+- Added a regression assertion that the castle cannot be silently reintroduced into the menu.
+
+## Unreleased Cult of Kosmos-style investigation board | 2026-11-05
+
+- Replaced the public Society Register in the Cult menu with a fullscreen, radial, four-branch cult hierarchy around a locked central leader.
+- Actual members display masked 8-bit-style silhouettes until confirmed evidence unlocks their identities and discovered clues on a selectable cult card.
+- False or premature suspicions remain separate unverified leads instead of falsely appearing as confirmed positions in the cult network.
+- Confirmed members can be marked for tracking; saved tracking, previously revealed identities and eliminated members persist across Continue.
+- Kept the population and daily schedules behind the scenes; no playable city map or cultist elimination missions are implied.
+- Preserved character records, cult truth, existing architecture, movement and story.
+
 ## Unreleased procedural society population | 2026-11-05
 
 - Added 24 seed-generated ordinary and prominent citizens with persistent identities, occupations, personality traits, acquaintances and daily work/home/public routines.

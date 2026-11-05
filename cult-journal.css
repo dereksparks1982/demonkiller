@@ -1,19 +1,52 @@
-/* Optional cult journal overlay. No changes to temple/editor geometry. */
-.cult-journal-toggle{position:fixed;right:12px;bottom:12px;z-index:25;padding:9px 12px;background:#2a202b;border:2px solid #b39256;color:#f2dda7;font:700 12px monospace;cursor:pointer;box-shadow:0 2px 14px #000b}
-.cult-journal[hidden]{display:none!important}
-.cult-journal{position:fixed;z-index:26;right:12px;bottom:53px;width:min(430px,calc(100vw - 24px));max-height:min(72vh,680px);overflow:auto;background:#16131e;border:3px solid #8f7546;color:#e6d9c8;box-shadow:0 8px 38px #000e;padding:14px;font:13px/1.45 monospace}
-.cult-journal-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.cult-journal-head h2{font:700 18px monospace;color:#eac27b;margin:2px 0}
-.cult-journal-head button{background:#432a32;border:1px solid #ad875b;color:#f4e0d0;padding:7px 10px;cursor:pointer}
-.cult-journal-cards{display:grid;gap:10px}
-.cult-journal-tabs{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
-.cult-journal-tabs button{background:#332938;border:1px solid #79604e;color:#ecddbf;padding:8px;cursor:pointer;font:700 11px monospace;flex:1}
-.cult-journal-tabs button[aria-pressed="true"]{background:#675037;border-color:#e2ba79}
-.cult-registry-card{background:#22202a;border:1px solid #5f5768;padding:9px;text-align:left}
-.cult-registry-card h3{color:#eecb8b;margin:0 0 6px}
-.cult-registry-card p{margin:3px 0;color:#d3c8b6}
-.cult-journal [hidden]{display:none!important}
-.cult-dossier-card{background:#24202c;border:1px solid #6f5868;padding:10px;text-align:left}
-.cult-dossier-card h3{margin:0 0 6px;color:#f1ce8d}
-.cult-dossier-card p{margin:4px 0}
-.cult-evidence-line{color:#bfad9a;padding-left:10px}
+/* Demon Killer cult hierarchy. Overlay only; approved temple and DK Architect stay in place. */
+.cult-journal-toggle{position:fixed;right:12px;bottom:12px;z-index:55;padding:11px 16px;background:#24191a;border:3px solid #ba9362;color:#f3d7a2;font:bold 14px monospace;cursor:pointer;box-shadow:0 3px 16px #000b}
+.cult-journal-toggle:focus-visible,.cult-board-shell button:focus-visible{outline:3px solid #f5d081;outline-offset:3px}
+.cult-board-shell[hidden]{display:none!important}
+.cult-board-shell{position:fixed;inset:0;z-index:56;overflow:auto;background:radial-gradient(ellipse at center,#29202d 0,#0f0c13 68%,#050407 100%);color:#e6d6bb;padding:14px 22px 22px;font:13px/1.45 monospace;box-shadow:inset 0 0 0 5px #745335}
+.cult-board-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin:0 auto 14px;max-width:1480px;border-bottom:2px solid #8b6b4c;padding:8px 8px 14px}
+.cult-board-head small{color:#b69a6f;font-weight:bold;letter-spacing:.12em}
+.cult-board-head h2{margin:0;color:#e9bc77;font:900 clamp(30px,4vw,48px) Georgia,serif;letter-spacing:.13em;text-shadow:3px 3px #000}
+.cult-board-head p{margin:3px 0 0;color:#b4a1a3}
+.cult-board-actions{text-align:right;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+.cult-board-actions strong{font-size:12px;color:#bd9b73}
+.cult-close{cursor:pointer;color:#f8e3bb;background:#492630;border:2px solid #c3a06a;padding:11px;font:bold 13px monospace}
+.cult-board-layout{max-width:1480px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px}
+.cult-network-viewport{overflow:auto;border:2px solid #65503c;background:radial-gradient(ellipse at center,#261e25 0%,#171219 58%,#0a090f 100%);}
+.cult-network{position:relative;width:100%;min-width:750px;height:690px;overflow:hidden}
+.cult-link-lines{position:absolute;inset:0;width:100%;height:100%;opacity:.65;pointer-events:none}
+.cult-link-lines line{stroke:#9d7851;stroke-width:2;stroke-dasharray:5 3}
+.cult-master{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;height:164px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#f4d5a7;background:radial-gradient(#36282a,#120d15);border:4px double #bb895d;box-shadow:0 0 24px #6a292661;cursor:pointer;font:900 14px monospace}
+.cult-master-icon{display:flex;align-items:center;justify-content:center;width:72px;height:80px;background:#08070c;border:3px solid #6c4e4e;color:#c1aba5;font:900 54px monospace}
+.cult-master small{color:#af8172;font-size:10px}
+.cult-branch{position:absolute;width:30%;min-height:228px;max-height:265px;overflow:auto;background:#1a151bdc;border:2px solid #735442;box-shadow:0 0 0 3px #060609,0 7px 18px #0007;padding:8px}
+.cult-branch h3{color:#dbb57d;margin:0 0 8px;text-align:center;font:bold 15px Georgia,serif;letter-spacing:.18em;border-bottom:1px solid #6e4e3b;padding-bottom:5px}
+.cult-position-faith{top:16px;left:8%}
+.cult-position-wealth{top:16px;right:8%}
+.cult-position-law{bottom:16px;left:8%}
+.cult-position-shadows{bottom:16px;right:8%}
+.cult-branch-members{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
+.cult-member{width:68px;min-height:92px;padding:5px 2px;background:#0b0b11;border:2px solid #5d4b4d;color:#c2b4ac;font:bold 10px monospace;cursor:pointer;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:flex-start}
+.cult-member:hover,.cult-selected{border-color:#e8b46b;box-shadow:0 0 10px #cba26b60}
+.cult-member-face{display:flex;align-items:center;justify-content:center;position:relative;width:43px;height:53px;background:linear-gradient(#17141d,#07060a);border:2px solid #4c4145;color:#ad9a96;font:bold 28px monospace}
+.cult-member-name{font-size:9px;text-align:center;overflow-wrap:anywhere;max-width:64px}
+.cult-member.cult-known{border-color:#9c8056;color:#f6d7a7}
+.cult-member.cult-known .cult-member-face{background:#4b3338;color:#f1cf91}
+.cult-member.cult-eliminated{opacity:.56;filter:grayscale(1)}
+.cult-member.cult-tracked{outline:2px solid #ce4942}
+.cult-branch-empty{color:#7d6c70;text-align:center;font-size:11px;margin:12px}
+.cult-node-details{background:#161018;border:2px solid #80644c;padding:16px;min-height:300px}
+.cult-node-details h3{margin:0 0 16px;font:900 21px Georgia,serif;color:#e3be84}
+.cult-node-details h4{color:#d7b185;border-bottom:1px solid #5e4541;margin:22px 0 8px}
+.cult-detail-portrait{background:#0b080e;border:3px solid #735c51;color:#a89aa5;width:100px;height:115px;display:grid;place-items:center;font:900 60px monospace;margin:14px auto}
+.cult-detail-revealed{background:#4a2a2c;color:#f1d5ad}
+.cult-detail-status{color:#bc8e78;font-weight:bold}
+.cult-clue{padding:8px;border-left:3px solid #87613f;background:#272029;font-size:12px}
+.cult-track{background:#4b282f;border:2px solid #caa06c;color:#f4d8b4;padding:10px;cursor:pointer;font:bold 12px monospace}
+.cult-detail-foot{font-size:11px;color:#9d8c91}
+.cult-leads-panel{max-width:1480px;margin:12px auto 0;border:1px solid #584238;background:#160f16;padding:12px}
+.cult-leads-panel h3{color:#dcb982;margin:0 0 8px;font:bold 15px monospace;letter-spacing:.1em}
+.cult-lead{padding:8px;border-top:1px solid #4d3d3e;display:grid;gap:4px}
+.cult-lead strong{color:#ead0a1}.cult-lead span,.cult-leads-empty{color:#ac8891}
+.cult-lead p{margin:0;color:#aa9b99}
+@media(max-width:1100px){.cult-board-layout{grid-template-columns:1fr}.cult-network{min-width:750px}.cult-node-details{min-height:180px}.cult-board-head{flex-direction:column}.cult-board-actions{text-align:left;justify-content:flex-start}}
+@media(max-width:570px){.cult-board-shell{padding:10px}.cult-board-head h2{font-size:29px}.cult-board-head p{font-size:11px}.cult-journal-toggle{bottom:8px;right:8px}}

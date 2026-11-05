@@ -16,24 +16,52 @@
 <link rel="stylesheet" href="./cult-journal.css">
 </head>
 <body>
-<button id="cultJournalToggle" class="cult-journal-toggle" type="button" aria-controls="cultJournal" aria-expanded="false">CULT JOURNAL</button>
-<aside id="cultJournal" class="cult-journal" hidden role="dialog" aria-label="Character dossiers and cult investigation">
- <header class="cult-journal-head">
-  <h2>CHARACTER DOSSIERS</h2>
-  <button id="cultJournalClose" type="button" aria-label="Close cult journal">CLOSE</button>
- </header>
- <nav class="cult-journal-tabs" aria-label="Journal sections">
-  <button id="cultDossierTab" type="button" aria-pressed="true">DISCOVERED DOSSIERS</button>
-  <button id="cultRegistryTab" type="button" aria-pressed="false">SOCIETY REGISTER</button>
- </nav>
- <section id="cultDossierPane">
-  <p id="cultJournalStatus" role="status">No discoveries recorded yet.</p>
-  <div id="cultJournalCards" class="cult-journal-cards"></div>
- </section>
- <section id="cultRegistryPane" hidden>
-  <p id="cultRegistryStatus" role="status">Publicly listed citizens.</p>
-  <div id="cultRegistryCards" class="cult-journal-cards"></div>
- </section>
+<button id="cultJournalToggle" class="cult-journal-toggle" type="button" aria-controls="cultJournal" aria-expanded="false">THE CULT</button>
+<aside id="cultJournal" class="cult-board-shell" hidden role="dialog" aria-modal="true" aria-label="The Cult investigation">
+  <header class="cult-board-head">
+    <div>
+      <small>DEMON KILLER · INVESTIGATION</small>
+      <h2>THE CULT</h2>
+      <p>Uncover their identities. Follow the branches to the center.</p>
+    </div>
+    <div class="cult-board-actions">
+      <strong id="cultNetworkStatus">0 IDENTIFIED · 0 UNVERIFIED LEADS</strong>
+      <button id="cultJournalClose" class="cult-close" type="button" aria-label="Close cult hierarchy">× CLOSE</button>
+    </div>
+  </header>
+  <div class="cult-board-layout">
+    <div class="cult-network-viewport" aria-label="Cult member network">
+      <div id="cultNetwork" class="cult-network">
+        <svg class="cult-link-lines" viewBox="0 0 1000 720" preserveAspectRatio="none" aria-hidden="true">
+          <line x1="500" y1="360" x2="243" y2="168"/>
+          <line x1="500" y1="360" x2="757" y2="168"/>
+          <line x1="500" y1="360" x2="243" y2="552"/>
+          <line x1="500" y1="360" x2="757" y2="552"/>
+        </svg>
+        <section class="cult-branch cult-position-faith" aria-label="Faith branch">
+          <h3>FAITH</h3><div id="cultBranch_faith" class="cult-branch-members"></div>
+        </section>
+        <section class="cult-branch cult-position-wealth" aria-label="Wealth branch">
+          <h3>WEALTH</h3><div id="cultBranch_wealth" class="cult-branch-members"></div>
+        </section>
+        <section class="cult-branch cult-position-law" aria-label="Law branch">
+          <h3>LAW</h3><div id="cultBranch_law" class="cult-branch-members"></div>
+        </section>
+        <section class="cult-branch cult-position-shadows" aria-label="Shadows branch">
+          <h3>SHADOWS</h3><div id="cultBranch_shadows" class="cult-branch-members"></div>
+        </section>
+        <button id="cultMasterCard" class="cult-master" type="button" aria-label="Unknown central cult leader">
+          <span class="cult-master-icon" aria-hidden="true">?</span>
+          <span>THE UNKNOWN</span><small>LEADER</small>
+        </button>
+      </div>
+    </div>
+    <section id="cultNodeDetails" class="cult-node-details" aria-label="Selected cultist evidence"></section>
+  </div>
+  <section class="cult-leads-panel" aria-label="Unverified suspects">
+    <h3>UNVERIFIED LEADS</h3>
+    <div id="cultLooseLeads"></div>
+  </section>
 </aside>
 <main class="lab">
   <header class="masthead">
@@ -124,6 +152,7 @@
 </main>
 <script src="./cult-system.js" defer></script>
 <script src="./citizen-population.js" defer></script>
+<script src="./cult-network.js" defer></script>
 <script src="./test-center.js" defer></script>
 </body>
 </html>

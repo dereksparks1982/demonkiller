@@ -15,7 +15,6 @@ body{margin:0;min-height:100vh;color:var(--paper);background:radial-gradient(ell
 [hidden]{display:none!important}
 .logo{display:block;width:min(660px,88vw);max-height:280px;height:auto;object-fit:contain;margin:0 auto 6px;image-rendering:pixelated}
 .logo-fallback{font:900 clamp(38px,8vw,70px) Georgia,serif;color:#da4043;text-shadow:4px 4px #000;margin:20px 0}
-.castle{display:block;width:min(285px,55vw);height:auto;margin:8px auto;image-rendering:pixelated}
 .menu-buttons{display:grid;gap:4px;justify-items:center;margin:4px auto 0}
 .art-button{display:block;position:relative;border:0;padding:0;width:min(315px,83vw);background:transparent;color:var(--paper);cursor:pointer}
 .art-button canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
@@ -41,7 +40,7 @@ input[type=text]{width:min(100%,260px);padding:13px;margin:10px auto 15px;backgr
 fieldset{border:1px solid #795864;text-align:left;margin:12px 0;padding:16px}
 legend{color:#efd58b}
 label{cursor:pointer}
-@media(max-width:530px){.menu{padding:14px 8px 25px}.panel{padding:18px 12px}.logo{max-height:225px}.castle{width:min(225px,55vw)}.slot{font-size:14px}}
+@media(max-width:530px){.menu{padding:14px 8px 25px}.panel{padding:18px 12px}.logo{max-height:225px}.slot{font-size:14px}}
 </style>
 </head>
 <body>
@@ -84,8 +83,7 @@ label{cursor:pointer}
 <button class="action secondary back" type="button">BACK TO MENU</button>
 </section>
 <p id="notice" class="notice" role="status" aria-live="polite"></p>
-<canvas class="castle" id="castle" width="485" height="283" aria-label="Pixel-art Gothic castle under moonlight" role="img" hidden></canvas>
-<footer class="menu-footer">ELDERRED SOFTWORKS · ORIGINAL PIXEL ART<br>Choose New Game to register one name, or Continue to reopen its saved temple.</footer>
+<footer class="menu-footer">DK SOFTWORKS · HOUSE OF CULTURE · ORIGINAL PIXEL ART<br>Choose New Game to register one name, or Continue to reopen its saved temple.</footer>
 </main>
 <script>
 (function(){
@@ -186,7 +184,6 @@ function renderButtons(){
 image.onload=()=>{
  if(!image.naturalWidth)return;
  atlas=image;artCanvas($('logo'),[60,0,654,555]);$('logo').hidden=false;$('logoFallback').hidden=true;
- artCanvas($('castle'),[25,574,485,283]);$('castle').hidden=false;
  document.body.classList.add('art-ready');renderButtons();
 };
 image.onerror=()=>notice('Menu artwork unavailable. Text controls remain usable.');

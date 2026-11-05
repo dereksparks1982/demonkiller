@@ -1,7 +1,7 @@
 # DEMON KILLER
 # COMPANY BIBLE
 
-**Studio:** Elderred Softworks LLC / DKLab (respect existing attribution; see source record for any DK Softworks branding)
+**Studio:** DK Softworks, whose DK represents Russian `ДК` (`Дом культуры`, Dom kultury), meaning **House of Culture**. DKLab is an internal lab/division. Preserve Elderred Softworks LLC where historically or legally relevant.
 **Project:** Demon Killer
 **Authority:** The owner and creator
 **Adopted:** 2026-11-04

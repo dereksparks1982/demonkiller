@@ -79,7 +79,7 @@
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
   const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
   const Population=typeof DemonKillerPopulation!=='undefined'?DemonKillerPopulation:null;
-  let cultWorld=null,populationWorld=null;
+  let cultWorld=null,populationWorld=null,cultNetworkView=null;
   let activeSlot = 0;
   try {
     const n = Number(localStorage.getItem(ACTIVE_STORE));
@@ -864,6 +864,7 @@
   document.addEventListener('keydown',e=>{
     const name=e.target?.tagName;
     if(name==='INPUT'||name==='SELECT'||name==='TEXTAREA')return;
+    if(!$('cultJournal').hidden)return; // Cult overlay holds keyboard focus.
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();return;}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();return;}
     if(mode==='edit'){
@@ -915,32 +916,8 @@
     }catch(error){message('Cult record could not be saved: '+error.message);}
   }
   function renderCultJournal(){
-    if(!Cult||!cultWorld)return;
-    const container=$('cultJournalCards'),people=Object.keys(cultWorld.knowledge)
-      .map(id=>Cult.dossier(cultWorld,id)).filter(Boolean);
-    container.replaceChildren();
-    $('cultJournalStatus').textContent=people.length
-      ?people.length+' known people · '+Cult.board(cultWorld).length+' leads or confirmed connections.'
-      :'No people or cult connections discovered yet. Investigate citizens and evidence.';
-    for(const person of people.sort((a,b)=>a.name.localeCompare(b.name))){
-      const card=document.createElement('article');card.className='cult-dossier-card';
-      const name=document.createElement('h3');name.textContent=person.name;
-      const occupation=document.createElement('p');occupation.textContent='Occupation: '+person.occupation;
-      const status=document.createElement('p');status.textContent='Cult affiliation: '+person.affiliation.toUpperCase();
-      card.append(name,occupation,status);
-      if(person.affiliation==='confirmed'&&person.rank!=='unknown'){
-        const role=document.createElement('p');role.textContent='Last confirmed position: '+person.rank;
-        card.append(role);
-      }
-      for(const evidence of person.evidence){
-        const clue=document.createElement('p');clue.className='cult-evidence-line';
-        clue.textContent=evidence.kind+': '+evidence.title;
-        card.append(clue);
-      }
-      container.append(card);
-    }
+    if(cultNetworkView)cultNetworkView.refresh();
   }
-
   function initializePopulation(record){
     if(!Population||!cultWorld)return;
     if(record&&record.slot.populationWorld&&Population.validate(record.slot.populationWorld)){
@@ -955,40 +932,10 @@
       Cult.addCitizen(cultWorld,profile);
     saveCultWorld();
   }
-  function renderSocietyRegister(){
-    if(!Population||!populationWorld)return;
-    const root=$('cultRegistryCards');if(!root)return;
-    const publicPeople=Population.publicRegister(populationWorld);
-    root.replaceChildren();
-    $('cultRegistryStatus').textContent=publicPeople.length+
-      ' public records · occupations and published work hours only. No hidden allegiances are listed.';
-    for(const person of publicPeople){
-      const card=document.createElement('article');card.className='cult-registry-card';
-      const name=document.createElement('h3');name.textContent=person.name;
-      const work=document.createElement('p');work.textContent=person.occupation+
-        (person.prominent?' · Public office / established trade':'');
-      const shift=document.createElement('p');shift.textContent='Listed hours: '+person.listedHours;
-      const encountered=document.createElement('p');
-      encountered.textContent=cultWorld.knowledge[person.id]?.met
-        ?'Known contact · See discovered dossiers':'Not yet encountered';
-      card.append(name,work,shift,encountered);
-      root.append(card);
-    }
-  }
   function mountSocietyHooks(){
     if(!Population||!populationWorld||!cultWorld)return;
-    const dossierTab=$('cultDossierTab'),registryTab=$('cultRegistryTab');
-    const dossierPane=$('cultDossierPane'),registryPane=$('cultRegistryPane');
-    if(dossierTab&&registryTab&&dossierPane&&registryPane){
-      const selectRegistry=registry=>{
-        dossierPane.hidden=registry;registryPane.hidden=!registry;
-        dossierTab.setAttribute('aria-pressed',String(!registry));
-        registryTab.setAttribute('aria-pressed',String(registry));
-        if(registry)renderSocietyRegister();else renderCultJournal();
-      };
-      dossierTab.addEventListener('click',()=>selectRegistry(false));
-      registryTab.addEventListener('click',()=>selectRegistry(true));
-    }
+    // Population remains simulated under the cult board; no public registry
+    // appears in the cult menu, and no citizen is encountered automatically.
     if(typeof window!=='undefined')window.DemonKillerPopulationHooks=Object.freeze({
       publicRegister:()=>Population.publicRegister(populationWorld),
       publicRecord:id=>Population.publicRecord(populationWorld,id),
@@ -996,17 +943,15 @@
       currentTime:()=>({day:populationWorld.day,hour:populationWorld.hour}),
       advanceHours:hours=>{
         const time=Population.advanceHours(populationWorld,hours);
-        saveCultWorld();renderSocietyRegister();return time;
+        saveCultWorld();return time;
       },
       encounter:id=>{
-        // A scene must explicitly report that the NPC has been encountered.
         Population.publicRecord(populationWorld,id);
         const dossier=Cult.meet(cultWorld,id);
-        saveCultWorld();renderCultJournal();renderSocietyRegister();
+        saveCultWorld();renderCultJournal();
         return dossier;
       }
     });
-    renderSocietyRegister();
   }
   function mountCultJournal(){
     if(!Cult)return;
@@ -1027,7 +972,7 @@
     if(!panel||!toggle||!close)return;
     const show=open=>{
       panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
-      if(open)renderCultJournal();
+      if(open){stopRightMovement();renderCultJournal();}
     };
     toggle.addEventListener('click',()=>show(panel.hidden));
     close.addEventListener('click',()=>show(false));
@@ -1035,17 +980,23 @@
     // Future NPC and scene scripts may report discoveries and political events.
     if(typeof window!=='undefined')window.DemonKillerCultHooks=Object.freeze({
       registerCitizen:profile=>{const c=Cult.addCitizen(cultWorld,profile);saveCultWorld();return c.id;},
-      meet:id=>{const d=Cult.meet(cultWorld,id);saveCultWorld();renderCultJournal();renderSocietyRegister();return d;},
+      meet:id=>{const d=Cult.meet(cultWorld,id);saveCultWorld();renderCultJournal();return d;},
       evidence:(id,clue)=>{const d=Cult.recordEvidence(cultWorld,id,clue);saveCultWorld();renderCultJournal();return d;},
-      recruit:(id,opts)=>{const r=Cult.recruit(cultWorld,id,opts);saveCultWorld();return r;},
-      depart:id=>{const r=Cult.depart(cultWorld,id);saveCultWorld();return r;},
-      kill:id=>{const r=Cult.kill(cultWorld,id);saveCultWorld();return r;},
-      promote:(id,branch)=>{const r=Cult.promote(cultWorld,id,branch);saveCultWorld();return r;},
-      circumstances:(id,traits)=>{Cult.changeCircumstances(cultWorld,id,traits);saveCultWorld();},
+      recruit:(id,opts)=>{const r=Cult.recruit(cultWorld,id,opts);saveCultWorld();renderCultJournal();return r;},
+      depart:id=>{const r=Cult.depart(cultWorld,id);saveCultWorld();renderCultJournal();return r;},
+      kill:id=>{const r=Cult.kill(cultWorld,id);
+        if(r&&cultWorld.trackedCultistId===id)cultWorld.trackedCultistId=null;
+        saveCultWorld();renderCultJournal();return r;},
+      promote:(id,branch)=>{const r=Cult.promote(cultWorld,id,branch);saveCultWorld();renderCultJournal();return r;},
+      circumstances:(id,traits)=>{Cult.changeCircumstances(cultWorld,id,traits);saveCultWorld();renderCultJournal();},
       dossier:id=>Cult.dossier(cultWorld,id),
       board:()=>Cult.board(cultWorld)
     });
     mountSocietyHooks();
+    if(typeof DemonKillerCultNetwork!=='undefined')
+      cultNetworkView=DemonKillerCultNetwork.mount({
+        document,cult:Cult,getWorld:()=>cultWorld,save:saveCultWorld
+      });
     renderCultJournal();
   }
   restoreCharacter();
