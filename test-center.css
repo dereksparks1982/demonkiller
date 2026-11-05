@@ -45,3 +45,6 @@ footer{margin-top:13px;display:flex;justify-content:space-between;gap:12px;flex-
 footer span:first-child{color:#bb8a9d}
 @media(max-width:1200px){.workspace{grid-template-columns:minmax(220px,1fr) minmax(480px,2fr)}.details{grid-column:1 / -1}.details .stack{grid-template-columns:repeat(5,1fr)}}
 @media(max-width:760px){.lab{padding:9px}.masthead{padding:14px;display:block}.masthead h1{font-size:28px}.mode-buttons{margin-top:15px}.storyline{padding:12px}.workspace{display:flex;flex-direction:column}.stage{order:0}.controls{order:1}.details{order:2}.stage-body{min-height:0;padding:10px}#room{height:auto}.details .stack{grid-template-columns:1fr 1fr}.stage-head{font-size:8px}.palette{max-height:200px}}
+
+.menu-link{color:#e8c183;font-weight:bold;text-decoration:underline;text-underline-offset:3px}.menu-link:hover,.menu-link:focus-visible{color:#fff0bc}
+#room{touch-action:none}
