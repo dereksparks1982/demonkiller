@@ -7,6 +7,9 @@
   const N = 16, TILE = 32, COUNT = N * N;
   const AREA = 'dk.temple.sacrifice.001';
   const STORE = 'dkSoftworks.demonkiller.testCenter.v1';
+  // Named character records never replace the independent DK Architect room-save key.
+  const CHARACTERS_STORE = 'dkSoftworks.demonkiller.characters.v1';
+  const ACTIVE_STORE = 'dkSoftworks.demonkiller.activeCharacter.v1';
   const $ = id => document.getElementById(id);
   const canvas = $('room'), ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -72,6 +75,43 @@
   let scene = fresh(), mode = 'walk', tool = 'place', category = 'relics',
       current = 'crystal', selectedId = null, corner = null, hover = null,
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
+  let activeSlot = 0;
+  try {
+    const n = Number(localStorage.getItem(ACTIVE_STORE));
+    if (Number.isInteger(n) && n >= 1 && n <= 3) activeSlot = n;
+  } catch (error) { /* Allow direct offline temple use without storage. */ }
+  const visual = { x:scene.player.x, y:scene.player.y, queue:[] };
+  let rightMouseHeld = false, rightPointer = null, lastFrameTime = 0;
+  const resetVisual = () => {
+    visual.x = scene.player.x; visual.y = scene.player.y; visual.queue.length = 0;
+  };
+  function characterRecord() {
+    if (!activeSlot) return null;
+    try {
+      const data = JSON.parse(localStorage.getItem(CHARACTERS_STORE) || 'null');
+      if (!data || data.version !== 1 || !Array.isArray(data.slots)) return null;
+      const slot = data.slots[activeSlot-1];
+      return slot && slot.id === activeSlot ? {data, slot} : null;
+    } catch (error) { return null; }
+  }
+  function persistCharacter() {
+    const record = characterRecord();
+    if (!record) return;
+    try {
+      record.slot.scene = clone(scene);
+      record.slot.updated = Date.now();
+      localStorage.setItem(CHARACTERS_STORE, JSON.stringify(record.data));
+    } catch (error) { message('Character save unavailable: ' + error.message); }
+  }
+  function restoreCharacter() {
+    const record = characterRecord();
+    if (!record || !record.slot.scene) return;
+    try {
+      scene = validate(record.slot.scene);
+      dirty = false; loaded = true; resetVisual();
+      message('Welcome back, ' + record.slot.name + '. The Forsaken Temple is ready.');
+    } catch (error) { message('Character record is invalid; starting in the original temple.'); }
+  }
   function objectAt(x, y) {
     for (let i = scene.objects.length - 1; i >= 0; i--) {
       const o = scene.objects[i], d = dims(o);
@@ -116,16 +156,16 @@
     fn();
     if (JSON.stringify(scene) === old) { message('No change: the selected coordinate is blocked or already has that value.'); return false; }
     undoStack.push(before); if (undoStack.length > 70) undoStack.shift();
-    redoStack.length=0; dirty=true; repairPlayer(); draw(); message(success); return true;
+    redoStack.length=0; dirty=true; repairPlayer(); resetVisual(); draw(); message(success); return true;
   }
   function undo() {
     if (!undoStack.length) return message('Nothing to undo.');
-    redoStack.push(clone(scene)); scene=undoStack.pop();selectedId=null;corner=null;dirty=true;draw();
+    redoStack.push(clone(scene)); scene=undoStack.pop();selectedId=null;corner=null;dirty=true;resetVisual();draw();
     message('Undid the last room change.');
   }
   function redo() {
     if (!redoStack.length) return message('Nothing to redo.');
-    undoStack.push(clone(scene));scene=redoStack.pop();selectedId=null;corner=null;dirty=true;draw();
+    undoStack.push(clone(scene));scene=redoStack.pop();selectedId=null;corner=null;dirty=true;resetVisual();draw();
     message('Restored the last room change.');
   }
   function pixel(g,color,x,y,w,h) { g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
@@ -226,7 +266,7 @@
     pixel(ctx,'#201c24',ox+14,oy+14,2,17);
   }
   function playerSprite() {
-    const p=scene.player,x=p.x*TILE,y=p.y*TILE, ghost=p.form==='ghost';
+    const p=scene.player,x=visual.x*TILE,y=visual.y*TILE, ghost=p.form==='ghost';
     ctx.save();ctx.translate(x,y);
     if(ghost){
       ctx.globalAlpha=.86;ctx.shadowColor='#a3b8ec';ctx.shadowBlur=9;
@@ -306,6 +346,8 @@
     }
   }
   function setMode(next) {
+    rightMouseHeld=false;
+    resetVisual();
     mode=next;selectedId=null;corner=null;
     draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':'Walk Mode active. Find the soul crystal or avoid it and remain a ghost.');
     canvas.focus({preventScroll:true});
@@ -323,40 +365,68 @@
     p.facing=facing(dx,dy);
     if(!canStand(nx,ny)){draw();message('Blocked at ('+nx+', '+ny+'). The '+(p.form==='ghost'?'stone boundary':'wall or solid object')+' bars your way.');return false;}
     p.x=nx;p.y=ny;dirty=true;
-    const changed=touchCrystal();draw();
+    visual.queue.push({x:nx,y:ny});
+    const changed=touchCrystal();draw();persistCharacter();
     if(!changed){
       if(nx===8&&ny===0)message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test. You remain in '+AREA+'.');
       else message((p.form==='ghost'?'Ghost':'Living')+' at '+AREA+' ('+nx+', '+ny+').');
     }
     return true;
   }
-  function pathTo(targetX,targetY) {
-    if(!canStand(targetX,targetY))return null;
-    const start=index(scene.player.x,scene.player.y),goal=index(targetX,targetY),queue=[start],seen=new Set([start]),prev=new Map();
-    const dirs=[[0,-1],[-1,0],[1,0],[0,1]];
-    for(let i=0;i<queue.length;i++){
-      const cur=queue[i];if(cur===goal)break;
-      const x=cur%N,y=Math.floor(cur/N);
-      for(const [dx,dy] of dirs){const nx=x+dx,ny=y+dy,k=index(nx,ny);
-        if(!seen.has(k)&&canStand(nx,ny)){seen.add(k);prev.set(k,cur);queue.push(k);}
+  // Ultima Online controls: left mouse INTERACTS. Holding right mouse MOVES.
+  // The render position animates continuously between logical 32px tiles.
+  function interactAt(x,y) {
+    const obj=objectAt(x,y),p=scene.player;
+    if (!obj) return message('There is nothing here to interact with.');
+    const [w,h]=dims(obj);
+    const distanceX=Math.max(obj.x-p.x,0,p.x-(obj.x+w-1));
+    const distanceY=Math.max(obj.y-p.y,0,p.y-(obj.y+h-1));
+    if(distanceX+distanceY>1)return message('Move closer to the '+CATALOG[obj.type].label+' to interact.');
+    if(obj.type==='door') {
+      obj.open=!obj.open;dirty=true;draw();persistCharacter();
+      message('Iron arch '+(obj.open?'opened':'closed')+'.');return;
+    }
+    if(obj.type==='crystal'&&!obj.spent&&p.form==='ghost') {
+      p.form='living';obj.spent=true;dirty=true;draw();persistCharacter();
+      message('THE CRYSTAL ANSWERS. Your body returns. You have chosen the mortal path.');return;
+    }
+    message(CATALOG[obj.type].label+(obj.type==='crystal'&&obj.spent?' (spent)':'')+'.');
+  }
+  function pointerPosition(e) {
+    const r=canvas.getBoundingClientRect();
+    if(!r.width||!r.height)return null;
+    return {x:(e.clientX-r.left)/r.width*N*TILE,y:(e.clientY-r.top)/r.height*N*TILE};
+  }
+  function advanceFrame(now) {
+    const dt=lastFrameTime?Math.min((now-lastFrameTime)/1000,.06):0;
+    lastFrameTime=now;
+    const target=visual.queue[0];
+    if(target) {
+      const dx=target.x-visual.x,dy=target.y-visual.y;
+      const distance=Math.hypot(dx,dy);
+      const playerCenter={x:(visual.x+.5)*TILE,y:(visual.y+.5)*TILE};
+      const cursorDistance=rightPointer?Math.hypot(rightPointer.x-playerCenter.x,rightPointer.y-playerCenter.y):0;
+      const speed=rightMouseHeld&&cursorDistance>4*TILE?5.6:3.1;
+      const change=Math.min(distance,speed*dt);
+      if(distance<=.001||change>=distance) {
+        visual.x=target.x;visual.y=target.y;visual.queue.shift();
+      } else {
+        visual.x+=dx/distance*change;visual.y+=dy/distance*change;
+      }
+      draw();
+    } else if(rightMouseHeld&&mode==='walk'&&rightPointer) {
+      const dx=rightPointer.x-(visual.x+.5)*TILE;
+      const dy=rightPointer.y-(visual.y+.5)*TILE;
+      if(Math.hypot(dx,dy)>TILE*.55) {
+        const primary=Math.abs(dx)>=Math.abs(dy)
+          ? [Math.sign(dx),0]:[0,Math.sign(dy)];
+        const secondary=primary[0]?[0,Math.sign(dy)]:[Math.sign(dx),0];
+        let v=primary;
+        if(!canStand(scene.player.x+v[0],scene.player.y+v[1]))v=secondary;
+        if((v[0]||v[1])&&canStand(scene.player.x+v[0],scene.player.y+v[1]))step(v[0],v[1]);
       }
     }
-    if(!seen.has(goal))return null;
-    const path=[];for(let q=goal;q!==start;q=prev.get(q))path.push([q%N,Math.floor(q/N)]);
-    return path.reverse();
-  }
-  function clickWalk(x,y) {
-    const obj=objectAt(x,y),p=scene.player;
-    if(obj&&obj.type==='door'&&Math.abs(p.x-x)+Math.abs(p.y-y)===1){
-      obj.open=!obj.open;dirty=true;draw();message('Iron arch '+(obj.open?'opened':'closed')+' at ('+x+', '+y+').');return;
-    }
-    const path=pathTo(x,y);
-    if(!path){message('No walkable route to ('+x+', '+y+').');return;}
-    if(!path.length){message('Already at ('+x+', '+y+').');return;}
-    for(const [px,py] of path){
-      const dx=px-scene.player.x,dy=py-scene.player.y,form=scene.player.form;
-      if(!step(dx,dy)||form!==scene.player.form)break;
-    }
+    requestAnimationFrame(advanceFrame);
   }
   function idFor(type){serial+=1;return type+'_'+Date.now().toString(36)+'_'+serial.toString(36);}
   function applyEdit(x,y){
@@ -480,12 +550,12 @@
     return clone(data);
   }
   function save() {
-    try{localStorage.setItem(STORE,JSON.stringify(scene));dirty=false;loaded=true;draw();message('Temple layout saved under its own Demon Killer test-center key.');}
+    try{localStorage.setItem(STORE,JSON.stringify(scene));persistCharacter();dirty=false;loaded=true;draw();message('Temple layout saved under its own Demon Killer test-center key'+(activeSlot?' and named character record':'')+'.');}
     catch(err){message('Browser storage unavailable: '+err.message+'. Use Export Room JSON instead.');}
   }
   function load() {
     try{const raw=localStorage.getItem(STORE);if(!raw)return message('No saved test-center room found.');
-      const next=validate(JSON.parse(raw));scene=next;undoStack=[];redoStack=[];selectedId=null;corner=null;dirty=false;loaded=true;draw();message('Saved temple room loaded.');}
+      const next=validate(JSON.parse(raw));scene=next;undoStack=[];redoStack=[];selectedId=null;corner=null;dirty=false;loaded=true;resetVisual();draw();message('Saved temple room loaded.');}
     catch(err){message('Could not load room: '+err.message);}
   }
   function exportRoom() {
@@ -496,7 +566,7 @@
   }
   function reset() {
     undoStack.push(clone(scene));if(undoStack.length>70)undoStack.shift();
-    redoStack=[];scene=fresh();mode='walk';selectedId=null;corner=null;dirty=true;draw();
+    redoStack=[];scene=fresh();mode='walk';selectedId=null;corner=null;dirty=true;resetVisual();draw();
     message('Sacrificial temple reset. You awaken as a ghost once more. Saved browser layout remains intact until you press Save.');
   }
   function mouseTile(e) {
@@ -504,14 +574,29 @@
     return inside(x,y)?{x,y}:null;
   }
   canvas.addEventListener('click',e=>{
+    if(e.button && e.button!==0)return;
     const p=mouseTile(e);if(!p)return;
-    if(mode==='edit')applyEdit(p.x,p.y);else clickWalk(p.x,p.y);
+    if(mode==='edit')applyEdit(p.x,p.y);else interactAt(p.x,p.y);
     canvas.focus({preventScroll:true});
   });
-  canvas.addEventListener('mousemove',e=>{const p=mouseTile(e);if(!p)return;
+  canvas.addEventListener('contextmenu',e=>{if(mode==='walk')e.preventDefault();});
+  canvas.addEventListener('mousedown',e=>{
+    if(mode==='walk'&&e.button===2){
+      e.preventDefault();rightPointer=pointerPosition(e);rightMouseHeld=true;
+      canvas.focus({preventScroll:true});
+    }
+  });
+  canvas.addEventListener('mouseup',e=>{if(e.button===2)rightMouseHeld=false;});
+  if(typeof window!=='undefined'){
+    window.addEventListener('mouseup',e=>{if(e.button===2)rightMouseHeld=false;});
+    window.addEventListener('blur',()=>{rightMouseHeld=false;});
+  }
+  canvas.addEventListener('mousemove',e=>{
+    if(mode==='walk'){rightPointer=pointerPosition(e);return;}
+    const p=mouseTile(e);if(!p)return;
     if(!hover||p.x!==hover.x||p.y!==hover.y){hover=p;draw();}
   });
-  canvas.addEventListener('mouseleave',()=>{hover=null;draw();});
+  canvas.addEventListener('mouseleave',()=>{hover=null;rightMouseHeld=false;draw();});
   document.addEventListener('keydown',e=>{
     const name=e.target?.tagName;
     if(name==='INPUT'||name==='SELECT'||name==='TEXTAREA')return;
@@ -554,5 +639,7 @@
     }catch(err){message('Import rejected: '+err.message);}
     finally{e.target.value='';}
   });
+  restoreCharacter();
   palette();draw();
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);
 })();
