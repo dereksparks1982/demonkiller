@@ -4,6 +4,8 @@
 **Development milestone:** v0.2.2  
 **Engine:** Original Canvas renderer and plain HTML/CSS/JavaScript; no Godot dependency.
 
+> **Planning note (2026-11-04):** The owner approved a revised opening, documented in [Forsaken Temple opening canon](docs/forsaken-temple-opening-canon.md). This lab currently describes **implemented prototype behavior**, including old single-click resurrection and a pre-existing crystal. The **planned** interaction is *single left-click = inspect, double left-click = resurrect*. No gameplay implementation is authorized by this documentation update.
+
 ## Launch and controls
 
 Open [test-center.html](test-center.html), or open [index.html](index.html) to see the approved pixel-art main menu and Zelda-style name registration.
