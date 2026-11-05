@@ -14,6 +14,7 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 - `characters/human/`: player human sprites.
 - `characters/crystal-woman/`: red-haired woman in green dress.
 - `characters/cult-leader/`: approved cult leader sheet with four cardinal views.
+- `characters/devil/`: approved Devil sheet with four cardinal views.
 - `shared/`: images reusable across areas.
 
 ## Artwork conventions
@@ -31,3 +32,9 @@ The `.gitkeep` files reserve empty folders in GitHub until artwork is added. The
 - `characters/cult-leader/cult_leader_spritesheet.png`: transparent 128 × 32 PNG with exactly four 32 × 32 static poses, from left to right: **south (front), west (left), east (right), north (back)**.
 - Dark hooded robe, crimson ceremonial mantle, bone-white mask. No duplicate directions or animation frames.
 - Asset-library addition only. The sprite is not yet connected to the opening cutscene or in-game renderer.
+
+## Approved Devil sheet
+
+- `characters/devil/devil_spritesheet.png`: transparent 128 × 32 PNG with four static 32 × 32 sprites, left to right: **south (front), west (left), east (right), north (back)**.
+- Black suit, red shirt, black hair, no tie; intentionally crude 32 × 32 character art.
+- Artwork only; the Devil has not been wired into the temple opening sequence yet.
