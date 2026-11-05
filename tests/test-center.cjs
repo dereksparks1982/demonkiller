@@ -108,7 +108,7 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(saved.size,1,'Exactly one isolated storage key');
   assert(saved.has('dkSoftworks.demonkiller.testCenter.v1'));
   await get('new').emit('click');
-  assert.match(get('lifeState').textContent,/GHOST/);
+  assert.match(get('lifeState').textContent,/ALIVE/,'Reset begins with player bound on altar');
   await get('load').emit('click');
   assert.match(get('lifeState').textContent,/RESURRECTED/,'Reload preserves resurrection');
 
