@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demon Killer | DK Architect: Sacrificial Temple Test Center</title>
+<meta name="description" content="Independent, engine-free Gothic temple room prototype for Demon Killer.">
+<link rel="stylesheet" href="./test-center.css">
+</head>
+<body>
+<main class="lab">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">DK SOFTWORKS · DEMON KILLER · EXPERIMENTAL LAB</div>
+      <h1>THE FORSAKEN <em>TEMPLE</em></h1>
+      <p>DK Architect Test Center · original Gothic pixel art · precise grid coordinates · no Godot runtime</p>
+    </div>
+    <div class="mode-buttons" role="group" aria-label="Room modes">
+      <button class="primary active" id="walkMode" type="button" aria-pressed="true">☽ Walk Temple</button>
+      <button id="editMode" type="button" aria-pressed="false">✥ Architect Mode</button>
+    </div>
+  </header>
+  <section class="storyline" aria-label="Opening premise">
+    <span class="sigil">✥</span>
+    <p><strong>You were sacrificed here.</strong> You awaken without a body. A crystal was left beside the altar. Touch it to return to life, or pass it by and continue as a ghost. Both paths remain open.</p>
+  </section>
+  <div class="workspace">
+    <aside class="panel controls" aria-label="DK Architect tools">
+      <div class="panel-title"><span>01</span><h2>THE ARCHITECT</h2></div>
+      <label for="tool">Editing action</label>
+      <select id="tool">
+        <option value="place">Place object</option>
+        <option value="select">Select / Move</option>
+        <option value="erase">Erase object / wall</option>
+        <option value="floor">Paint floor</option>
+        <option value="fill">Fill floor region</option>
+        <option value="rectangle">Floor rectangle (two corners)</option>
+        <option value="wall">Place / Remove wall</option>
+        <option value="door">Toggle door</option>
+        <option value="spawn">Set player spawn</option>
+        <option value="pick">Eyedropper</option>
+      </select>
+      <label for="category">Asset category</label>
+      <select id="category">
+        <option value="relics">Relics &amp; Ritual</option>
+        <option value="structure">Gothic Structure</option>
+        <option value="furniture">Furniture &amp; Props</option>
+        <option value="floors">Stone Floors</option>
+      </select>
+      <div class="palette-head"><strong id="paletteTitle">Relics &amp; Ritual</strong><small id="selectedTool">PLACE</small></div>
+      <div class="palette" id="palette" aria-label="Original Demon Killer art palette"></div>
+      <div class="button-grid">
+        <button id="rotate" type="button" title="Rotate selected object (R)">Rotate ↻</button>
+        <button id="duplicate" type="button">Duplicate</button>
+        <button id="remove" type="button">Delete</button>
+        <button id="inspect" type="button">Check Access</button>
+        <button id="undo" type="button">Undo</button>
+        <button id="redo" type="button">Redo</button>
+      </div>
+    </aside>
+    <section class="stage" aria-label="Playable sacrificial temple">
+      <div class="stage-head"><span>AREA · DK.TEMPLE.SACRIFICE.001</span><strong id="modeLabel">WALK MODE</strong><span id="coordTop">16 × 16 · 32 PX</span></div>
+      <div class="stage-body">
+        <canvas id="room" width="512" height="512" tabindex="0" role="img" aria-label="Top-down Gothic temple on a 16 by 16 tile grid. Use W A S D or arrow keys to move."></canvas>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite">You awaken as a ghost at (8, 12). Walk to the crystal or leave it untouched.</div>
+      <div id="hint" class="hint">WASD / arrows: move a tile · Click a reachable tile: walk there · The northern arch leads toward the future courtyard.</div>
+    </section>
+    <aside class="panel details" aria-label="Room data and persistence">
+      <div class="panel-title"><span>02</span><h2>THE RECORD</h2></div>
+      <dl class="data">
+        <dt>Area</dt><dd>dk.temple.sacrifice.001</dd>
+        <dt>Grid</dt><dd>16 × 16 / 32px tiles</dd>
+        <dt>Player</dt><dd id="position">(8, 12)</dd>
+        <dt>Existence</dt><dd id="lifeState">Ghost</dd>
+        <dt>Objects</dt><dd id="objectCount">0</dd>
+        <dt>Selected</dt><dd id="itemInfo">None</dd>
+        <dt>Save</dt><dd id="saveState">New draft</dd>
+      </dl>
+      <div class="separator"></div>
+      <div class="stack">
+        <button id="save" type="button" class="primary">Save Test Layout</button>
+        <button id="load" type="button">Reload Saved Layout</button>
+        <button id="new" type="button">Reset Opening Scene</button>
+        <button id="export" type="button">Export Room JSON</button>
+        <label class="import-btn" for="import">Import Room JSON<input id="import" type="file" accept=".json,application/json"></label>
+      </div>
+      <div class="help">
+        <h3>IN THE TEMPLE</h3>
+        <p><strong>Walk:</strong> move with WASD or arrow keys. Click a destination to navigate around solid obstacles. A ghost can pass through furnishings. Enter the crystal tile to resurrect.</p>
+        <p><strong>Build:</strong> choose Architect Mode, select art and click its grid coordinate. Select/Move uses two clicks. R rotates; Delete erases; Ctrl+Z undoes.</p>
+        <p><strong>Exit:</strong> the northern doorway is a connection marker only. The courtyard is not yet built.</p>
+      </div>
+    </aside>
+  </div>
+  <footer><span>DEMON KILLER · TEST-CENTER BRANCH ONLY</span><span>Original code-drawn sprites. Isolated browser save. No game-engine dependencies. Main untouched.</span></footer>
+</main>
+<script src="./test-center.js" defer></script>
+</body>
+</html>
