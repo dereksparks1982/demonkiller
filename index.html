@@ -42,6 +42,11 @@ input[type=text]{width:min(100%,260px);padding:13px;margin:10px auto 15px;backgr
 fieldset{border:1px solid #795864;text-align:left;margin:12px 0;padding:16px}
 legend{color:#efd58b}
 label{cursor:pointer}
+.music-volume-control{display:block;margin:14px 0 4px}
+.music-volume-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#musicVolume{display:block;width:100%;accent-color:var(--gold);cursor:pointer}
+#musicVolume:disabled{opacity:.45;cursor:not-allowed}
+.music-volume-hint{display:block;margin-top:7px;color:#c8bbc1;font-size:12px;line-height:1.5}
 @media(max-width:530px){.menu{padding:8px 8px 10px}.panel{padding:18px 12px}.slot{font-size:14px}}
 </style>
 <noscript><style>.art-loading #home{visibility:visible}</style></noscript>
@@ -76,8 +81,13 @@ label{cursor:pointer}
 </section>
 <section class="screen panel" id="optionsScreen" hidden aria-label="Game options">
 <h2>OPTIONS</h2>
-<p>Atmospheric menu music plays when enabled. Your browser may wait for your first click or key press before starting audio.</p>
-<fieldset><legend>Audio preference</legend><label><input id="musicEnabled" type="checkbox" checked> Play music when available</label></fieldset>
+<p>Adjust the main menu soundtrack. Your browser may require a click before music starts.</p>
+<fieldset><legend>Music</legend>
+<label><input id="musicEnabled" type="checkbox" checked> Play main menu music</label>
+<label class="music-volume-control" for="musicVolume"><span class="music-volume-heading"><span>Main menu volume</span><output id="musicVolumeValue" for="musicVolume">200%</output></span></label>
+<input id="musicVolume" type="range" min="0" max="200" step="5" value="200" aria-label="Main menu volume">
+<small id="musicVolumeHint" class="music-volume-hint">100% is the original level. Above 100% boosts the music, with peak limiting.</small>
+</fieldset>
 <button class="action secondary back" type="button">BACK</button>
 </section>
 <section class="screen panel" id="quitScreen" hidden>
@@ -97,18 +107,60 @@ const ACTIVE_KEY='dkSoftworks.demonkiller.activeCharacter.v1';
 const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
 const $=id=>document.getElementById(id);
 const menuMusic=$('menuMusic');
-menuMusic.volume=1.0;
+const DEFAULT_MENU_VOLUME=200;
+let audioContext=null,menuGain=null;
+$('musicVolume').value=String(DEFAULT_MENU_VOLUME);
+function ensureMenuAudio(){
+ if(menuGain)return true;
+ const Context=window.AudioContext||window.webkitAudioContext;
+ if(typeof Context!=='function'){
+  $('musicVolumeHint').textContent='Amplification above 100% is unavailable in this browser.';
+  return false;
+ }
+ try{
+  const ctx=new Context(),source=ctx.createMediaElementSource(menuMusic);
+  const gain=ctx.createGain(),limiter=ctx.createDynamicsCompressor();
+  limiter.threshold.value=-3;limiter.knee.value=0;limiter.ratio.value=20;
+  limiter.attack.value=0.003;limiter.release.value=0.18;
+  source.connect(gain);gain.connect(limiter);limiter.connect(ctx.destination);
+  audioContext=ctx;menuGain=gain;
+  menuMusic.volume=1.0;
+  return true;
+ }catch(e){
+  $('musicVolumeHint').textContent='Amplification is unavailable; browser volume is used.';
+  return false;
+ }
+}
+function applyMenuVolume(){
+ const n=Number($('musicVolume').value);
+ const level=Number.isFinite(n)?Math.max(0,Math.min(200,Math.round(n))):DEFAULT_MENU_VOLUME;
+ $('musicVolume').value=String(level);
+ $('musicVolumeValue').textContent=level+'%';
+ $('musicVolume').setAttribute('aria-valuetext',level+' percent'+(level>100?', amplified':''));
+ if(menuGain)menuGain.gain.value=level/100;
+ else menuMusic.volume=Math.min(1,level/100);
+ $('musicVolume').disabled=!$('musicEnabled').checked;
+}
+function saveMenuPrefs(){
+ try{localStorage.setItem(PREFS_KEY,JSON.stringify({
+  musicEnabled:$('musicEnabled').checked,volumePercent:Number($('musicVolume').value)
+ }));}catch(e){notice('Music settings could not be saved.');}
+}
 function syncMenuMusic(){
  if(!$('musicEnabled').checked){
-  menuMusic.pause();
-  menuMusic.currentTime=0;
+  menuMusic.pause();menuMusic.currentTime=0;applyMenuVolume();
   return;
  }
+ ensureMenuAudio();applyMenuVolume();
+ if(audioContext&&audioContext.state==='suspended'){
+  try{const resuming=audioContext.resume();
+   if(resuming&&typeof resuming.catch==='function')resuming.catch(()=>{});}
+  catch(e){/* A click may be required for audio. */}
+ }
  if(!menuMusic.paused)return;
- try{
-  const pending=menuMusic.play();
-  if(pending&&typeof pending.catch==='function')pending.catch(()=>{});
- }catch(e){/* Browsers may require a genuine user gesture to play audio. */}
+ try{const pending=menuMusic.play();
+  if(pending&&typeof pending.catch==='function')pending.catch(()=>{});}
+ catch(e){/* A click may be required for audio. */}
 }
 const views=['home','slotsScreen','nameScreen','optionsScreen','quitScreen'];
 let mode='new',chosen=0,atlas=null;
@@ -166,12 +218,16 @@ document.querySelector('[data-action=new]').addEventListener('click',()=>openSlo
 document.querySelector('[data-action=continue]').addEventListener('click',()=>openSlots('continue'));
 document.querySelector('[data-action=options]').addEventListener('click',()=>show('optionsScreen'));
 document.querySelector('[data-action=quit]').addEventListener('click',()=>show('quitScreen'));
-$('musicEnabled').addEventListener('change',()=>{
- try{localStorage.setItem(PREFS_KEY,JSON.stringify({musicEnabled:$('musicEnabled').checked}));}
- catch(e){notice('Audio preference could not be saved.');}
- syncMenuMusic();
-});
-try{const v=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');if(v&&typeof v.musicEnabled==='boolean')$('musicEnabled').checked=v.musicEnabled;}catch(e){}
+$('musicEnabled').addEventListener('change',()=>{saveMenuPrefs();syncMenuMusic();});
+$('musicVolume').addEventListener('input',()=>{applyMenuVolume();saveMenuPrefs();});
+$('musicVolume').addEventListener('change',()=>{applyMenuVolume();saveMenuPrefs();});
+try{
+ const prefs=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');
+ if(prefs&&typeof prefs.musicEnabled==='boolean')$('musicEnabled').checked=prefs.musicEnabled;
+ if(prefs&&typeof prefs.volumePercent==='number'&&Number.isFinite(prefs.volumePercent))
+  $('musicVolume').value=String(Math.max(0,Math.min(200,Math.round(prefs.volumePercent))));
+}catch(e){}
+applyMenuVolume();
 // If autoplay was blocked, the next keyboard or pointer gesture retries.
 document.addEventListener('pointerdown',syncMenuMusic,{passive:true});
 document.addEventListener('keydown',syncMenuMusic);

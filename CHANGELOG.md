@@ -2,6 +2,8 @@
 
 ## v0.2.22 development preview | 2026-11-06 | Architect editing and character-only skill rust
 
+- Main menu music: clear music toggle, persistent 0–200% volume slider (100% = unamplified track), Web Audio amplification with peak-reducing dynamics processing, and graceful unamplified fallback. Default 200% honors the louder-menu request. Older on/off preferences remain valid; tests updated. Temple audio unchanged.
+
 - Repaired DK Architect's bottom row to six compact individually framed controls, matching the upper category buttons instead of using a large decorative gold strip. Left tools are centered, hidden overlapping DK pennant removed, and right-rail icons are scaled to fit fully inside their borders. Approved game room geometry unchanged.
 - Split **Select** from **Move**. Move now operates click object → click destination. Rotate and Copy are tool-first: choose the tool, then click an existing placed object. Esc clears targeting and returns to Select, including when a text field was focused. Keyboard R arms Rotate; Delete arms Erase.
 - Individually selected wall sprites can rotate 90 degrees in place and save their facing in optional `wallRotations`. Automatic wall faces still choose corners by neighbors. Old temple saves without the new field load with default zero rotations; undo/redo includes wall orientation.
