@@ -868,10 +868,9 @@
         }else{
           current=category==='library'?'scenery':key;
           if(category==='library')selectedSprite=key;
-          if(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle','paste'].includes(tool))
-            tool='place';
+          tool='place';
         }
-        previewRotation=0;corner=null;$('tool').value=tool;
+        previewRotation=0;corner=null;selectedId=null;$('tool').value=tool;
         palette();draw();message('Selected '+nameOf(entry)+'. Click a tile in Architect Mode.');
       });
       list.append(b);
@@ -1058,12 +1057,16 @@
         message('Eyedropper: '+WALL_FINISHES[wallFinish].label+' wall.');return;
       }
       if(here){
-        current=here.type;category=CATALOG[here.type].category;tool='place';
+        current=here.type;
+        category=here.type==='imported'
+          ?VENDOR[here.assetId]?.category||'library':CATALOG[here.type].category;
+        tool='place';selectedId=null;
         if(here.type==='scenery')selectedSprite=here.spriteId;
         if(here.type==='imported')selectedImportedId=here.assetId;
         $('category').value=category;$('tool').value=tool;
         palette();draw();message('Eyedropper: '+(here.type==='scenery'?
-          ARCHITECT_SPRITES[here.spriteId].label:CATALOG[here.type].label));
+          ARCHITECT_SPRITES[here.spriteId].label:
+          here.type==='imported'?nameOf(VENDOR[here.assetId]):CATALOG[here.type].label));
       }
       else{
         current=scene.floor[i];selectedFloorAsset=scene.floorArt?.[i]||null;
@@ -1157,14 +1160,16 @@
               scene.floor[index(xx,yy)]=floor;scene.floorArt[index(xx,yy)]=floorAsset;
             }
         }else{
-          const old=scene.floor[i];if(old===floor)return;
+          const old=scene.floor[i],previousArt=scene.floorArt[i];
+          if(old===floor&&previousArt===floorAsset)return;
           const queue=[[x,y]],seen=new Set([i]);
           for(let q=0;q<queue.length;q++){
             const [px,py]=queue[q];scene.floor[index(px,py)]=floor;
             scene.floorArt[index(px,py)]=floorAsset;
             for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
               const nx=px+dx,ny=py+dy,k=index(nx,ny);
-              if(inside(nx,ny)&&!seen.has(k)&&scene.floor[k]===old){seen.add(k);queue.push([nx,ny]);}
+              if(inside(nx,ny)&&!seen.has(k)&&scene.floor[k]===old&&
+                scene.floorArt[k]===previousArt){seen.add(k);queue.push([nx,ny]);}
             }
           }
         }
@@ -1563,17 +1568,16 @@
     draw();message('Architect tool: '+e.target.selectedOptions[0].textContent+'.');
   });
   $('category').addEventListener('change',e=>{
-    category=e.target.value;previewRotation=0;$('assetSearch').value='';
+    category=e.target.value;previewRotation=0;selectedId=null;corner=null;
+    $('assetSearch').value='';
     if(category==='walls')selectedWallAsset=null;
     if(category==='floors')selectedFloorAsset=null;
     if(category==='floors'){current='stone';tool='floor';$('tool').value=tool;}
     else if(category==='walls'){tool='wall';$('tool').value=tool;}
     else if(category==='library'){current='scenery';tool='place';$('tool').value=tool;}
     else {
-      current=Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
-      if(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle','paste'].includes(tool)){
-        tool='place';$('tool').value=tool;
-      }
+      current=Object.keys(CATALOG).find(k=>CATALOG[k].category===category)||'imported';
+      tool='place';$('tool').value=tool;
     }
     palette();draw();
   });
