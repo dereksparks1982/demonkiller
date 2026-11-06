@@ -1,0 +1,36 @@
+{
+  "project": "DK Godot",
+  "version": "0.5.05",
+  "display_version": "v0.5.05",
+  "build_title": "DK Godot v0.5.05 - THIRD PARTY MIT FULL SOURCE INTAKE BUILD",
+  "package_type": "changed-files-only",
+  "purpose": "Import complete uploaded MIT source systems into DK, with Godot ASCII ToolKit available as addon and full third-party sources quarantined for reference/future integration.",
+  "base_expected": "DK Godot v0.5.04 - GLYPH SANCTUARY 6X12 FNT AND VERSION REPAIR BUILD",
+  "no_deletes": true,
+  "no_images_generated": true,
+  "main_scene_touched": false,
+  "streaming_scene_touched": false,
+  "third_party_sources": [
+    {
+      "name": "Godot Roguelike Example",
+      "path": "third_party/mit_sources/godot-roguelike-example-main",
+      "license": "MIT"
+    },
+    {
+      "name": "Godot ASCII ToolKit full source",
+      "path": "third_party/mit_sources/godot_ascii_toolkit-78bd95ac5f2a6e60d734410e34edf5054cab0a28",
+      "license": "MIT"
+    },
+    {
+      "name": "Dungeon Template Library Godot wrapper",
+      "path": "third_party/mit_sources/DungeonTemplateLibrary-Godot-99a7313c12eee8ec45c46dc9ff54f04fd0777a20",
+      "license": "MIT-style"
+    },
+    {
+      "name": "Godot ASCII ToolKit addon copy",
+      "path": "addons/GodotASCIIToolKit",
+      "license": "MIT",
+      "enabled": false
+    }
+  ]
+}
