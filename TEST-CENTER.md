@@ -52,3 +52,7 @@ We will improve the **existing** sacrificial temple instead of opening new areas
 ### Exact pointer and rebuilt masonry (v0.2.18)
 
 The held right mouse steers to the **exact pointer coordinate** (no 17.6px dead zone or .35-tile standoff); releasing still stops immediately. Left-click remains interaction only. Collision and blocked north door are unchanged. In Architect Mode, the 32px orthographic wall palette contains five automatic textures and 220 individually selectable transparent modular pieces. Corners, straights, T joins and ends use identical 12px edge connectors; do not reintroduce angled/isometric wall art or hidden opaque tile backgrounds.
+
+### v0.2.19 Right-click travel
+
+A quick right-click now commands pixel-accurate point-to-point walking even after release; holding right mouse continues to steer manually, and releasing a hold stops immediately. Keyboard input cancels destination travel. Left-click remains interact-only. Movement still obeys collision tiles and does not provide obstacle-routing pathfinding.

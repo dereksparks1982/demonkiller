@@ -145,6 +145,7 @@
   } catch (error) { /* Allow direct offline temple use without storage. */ }
   const visual = { x:scene.player.x, y:scene.player.y, queue:[] };
   let rightMouseHeld = false, rightPointer = null, lastFrameTime = 0;
+  let clickDestination = null, rightPressFrame = 0;
   let opening = null, ritual = null;
   // Slow, irregular flicker uses the two approved gold crystal frames.
   // This is only presentation state; unused soul crystals stay full.
@@ -431,6 +432,7 @@
   }
   const resetVisual = () => {
     visual.x = scene.player.x; visual.y = scene.player.y; visual.queue.length = 0;
+    clickDestination = null;
   };
   function characterRecord() {
     if (!activeSlot) return null;
@@ -903,6 +905,8 @@
   }
   function step(dx,dy) {
     if (opening||ritual) {message('Wait for the opening or resurrection sequence to finish.');return false;}
+    // Manual keyboard navigation overrides one-shot pointer travel.
+    clickDestination=null;
     const p=scene.player,nx=p.x+dx,ny=p.y+dy;
     p.facing=facing(dx,dy);
     if(nx===8&&ny===0&&!scene.introSeen){message('I cannot leave.');return false;}
@@ -943,16 +947,19 @@
     if(!r.width||!r.height)return null;
     return {x:(e.clientX-r.left)/r.width*N*TILE,y:(e.clientY-r.top)/r.height*N*TILE};
   }
-  function moveTowardPointer(dt) {
-    if(!rightPointer||dt<=0)return;
+  function moveTowardPointer(dt,target=rightPointer) {
+    if(!target||dt<=0)return;
     // A held right-mouse pointer is an EXACT pixel-space target of the
     // character's ground position. No UO-style radius or .35-tile standoff.
     // Preserves the existing hold-to-steer / release-to-stop controls.
     visual.queue.length=0;
-    const dx=rightPointer.x-(visual.x+.5)*TILE;
-    const dy=rightPointer.y-(visual.y+.5)*TILE;
+    const dx=target.x-(visual.x+.5)*TILE;
+    const dy=target.y-(visual.y+.5)*TILE;
     const pixels=Math.hypot(dx,dy);
-    if(pixels<=0.01)return;
+    if(pixels<=0.01){
+      if(!rightMouseHeld)clickDestination=null;
+      return;
+    }
     const tilesToTravel=Math.min(pixels/TILE,(pixels>4*TILE?5.6:3.1)*dt);
     if(tilesToTravel<=0)return;
     const ax=dx/pixels*tilesToTravel,ay=dy/pixels*tilesToTravel;
@@ -968,7 +975,10 @@
     if(!legal(nx,ny)){
       if(legal(nx,visual.y))ny=visual.y;
       else if(legal(visual.x,ny))nx=visual.x;
-      else return;
+      else {
+        if(!rightMouseHeld)clickDestination=null;
+        return;
+      }
     }
     const vx=nx-visual.x,vy=ny-visual.y;
     if(!vx&&!vy)return;
@@ -980,6 +990,13 @@
       if(tx===8&&ty===0)
         message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test.');
     }
+    // Pixel-perfect arrival, without the former standing-distance shortcut.
+    if(!rightMouseHeld&&clickDestination&&
+      Math.hypot(clickDestination.x-(visual.x+.5)*TILE,
+        clickDestination.y-(visual.y+.5)*TILE)<=0.01){
+      clickDestination=null;
+      persistCharacter();
+    }
     draw();
   }
   function advanceFrame(now) {
@@ -988,8 +1005,8 @@
     const crystalChanged=updateCrystalFlicker(dt);
     if(opening){updateOpening(dt);draw();requestAnimationFrame(advanceFrame);return;}
     if(ritual){updateResurrection(dt);draw();requestAnimationFrame(advanceFrame);return;}
-    if(rightMouseHeld&&mode==='walk'&&rightPointer){
-      moveTowardPointer(dt);
+    if(mode==='walk'&&((rightMouseHeld&&rightPointer)||clickDestination)){
+      moveTowardPointer(dt,rightMouseHeld?rightPointer:clickDestination);
     }else if(visual.queue.length){
       const target=visual.queue[0];
       const dx=target.x-visual.x,dy=target.y-visual.y;
@@ -1299,16 +1316,29 @@
         const nx=Math.round(visual.x),ny=Math.round(visual.y);
         if(canStand(nx,ny)){scene.player.x=nx;scene.player.y=ny;}
       }
+      clickDestination=null;
+      rightPressFrame=lastFrameTime;
       rightMouseHeld=true;
       canvas.focus({preventScroll:true});
     }
   });
-  function stopRightMovement() {
-    if(!rightMouseHeld)return;
+  function stopRightMovement(interrupted=false) {
+    if(!rightMouseHeld){
+      if(interrupted)clickDestination=null;
+      return;
+    }
+    // Short tap = travel to the exact clicked destination. A held press still
+    // steers continuously and releasing it stops immediately as before.
+    const quickClick=!interrupted&&lastFrameTime-rightPressFrame<=180;
     rightMouseHeld=false;
-    if(mode!=='walk'||opening||ritual)return;
-    // Render coordinates remain exactly where mouse was released. No queued
-    // completion step; only the persisted grid coordinate is snapped.
+    if(mode!=='walk'||opening||ritual){clickDestination=null;return;}
+    if(quickClick&&rightPointer){
+      clickDestination={x:rightPointer.x,y:rightPointer.y};
+      visual.queue.length=0;
+      message('Moving to clicked destination.');
+      return;
+    }
+    clickDestination=null;
     visual.queue.length=0;
     const nx=Math.round(visual.x),ny=Math.round(visual.y);
     if(canStand(nx,ny)){
@@ -1332,7 +1362,7 @@
       if(e.button===2)stopRightMovement();
       if(e.button===0)completeWallStroke();
     });
-    window.addEventListener('blur',()=>{stopRightMovement();wallStroke=null;skipWallClick=false;});
+    window.addEventListener('blur',()=>{stopRightMovement(true);wallStroke=null;skipWallClick=false;});
   }
   canvas.addEventListener('wheel',e=>{
     if(mode!=='edit'||tool!=='place'||!CATALOG[current])return;
@@ -1348,7 +1378,7 @@
     }
     if(!hover||p.x!==hover.x||p.y!==hover.y){hover=p;draw();}
   });
-  canvas.addEventListener('mouseleave',()=>{hover=null;stopRightMovement();draw();});
+  canvas.addEventListener('mouseleave',()=>{hover=null;stopRightMovement(true);draw();});
   document.addEventListener('keydown',e=>{
     const name=e.target?.tagName;
     if(name==='INPUT'||name==='SELECT'||name==='TEXTAREA')return;

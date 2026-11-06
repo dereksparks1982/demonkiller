@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.19 development preview | 2026-11-06 | One-click precise destination walking
+
+- A short right mouse click now sets a fixed pixel-accurate destination; the ghost/living character continues travelling after mouse release and stops once the pointer coordinate is reached.
+- Holding right mouse still steers continuously and stops immediately on release. Keyboard walking cancels one-click travel; losing focus cancels it. The existing left-click crystal/door interaction is unchanged.
+- No navigation through solid walls, no new pathfinding, no fabricated server movement; this fixes how the destination is chosen and when movement stops. Dynamic regression checks cover a quick click across the room and a target less than 18px away.
+- The orthographic, transparent 220-piece wall collection added in v0.2.18 remains unchanged. Pending owner browser visual approval.
+
+
 ## v0.2.18 development preview | 2026-11-06 | Exact cursor and seamless orthographic wall artwork
 
 - Replaced the intentionally short-stopping mouse steering movement (17.6px dead zone plus another 0.35-tile standoff) with exact pixel-space clamped movement. The player no longer halts within a halo around the held right-mouse pointer. Existing left-click-to-interact, hold-to-steer and release-to-stop controls remain unchanged. Blocked destinations remain blocked.

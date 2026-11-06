@@ -217,7 +217,14 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(get('position').textContent,'(8, 12)','Right mouse waits for frame');
   tickFrames(2);
   await room.emit('mouseup',{button:2});tickFrames(12);
-  assert.equal(get('position').textContent,'(8, 12)','Short right click stops immediately');
+  assert.notEqual(get('position').textContent,'(8, 12)',
+    'Short right-click must keep walking toward its selected destination');
+  tickFrames(155);
+  assert.equal(get('position').textContent,'(8, 5)',
+    'Quick right-click arrives at the exact requested tile without holding mouse');
+  const arrived=get('position').textContent;tickFrames(30);
+  assert.equal(get('position').textContent,arrived,'One-click travel stops on its target');
+  await get('new').emit('click');tickFrames(1800);
   await room.emit('mousedown',{button:2,clientX:8*32+16,clientY:5*32+16,preventDefault:noop});
   tickFrames(21);
   assert.notEqual(get('position').textContent,'(8, 12)','Held right mouse moves continuously');
