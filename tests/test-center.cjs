@@ -286,6 +286,7 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(targeted.objects.find(o=>o.id==='pillar_west').r,1,
     'Escape prevents a stale Rotate operation on the next click');
   await get('undo').emit('click'); // Leave canonical temple prop orientation unchanged.
+  await get('uoPlace').emit('click'); // Explicit tool choice: Esc correctly left Select active.
 
   const initial=Number(get('objectCount').textContent);
   await get('room').emit('mousemove',{clientX:2*32+16,clientY:5*32+16});
