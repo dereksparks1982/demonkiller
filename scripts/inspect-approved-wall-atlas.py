@@ -7,6 +7,15 @@ p=Path('assets/art/temple/walls/Dungeon Temple Wall Tile Atlas(1).png')
 im=Image.open(p).convert('RGBA')
 w,h=im.size
 print('APPROVED-WALL-ATLAS SIZE',w,h)
+import base64, io
+# Emit a compact indexed-colour thumbnail of the original atlas for inspection.
+# This is encoded in job logs only and does not alter the approved source.
+preview=im.resize((768,512),Image.Resampling.NEAREST).convert('RGB').quantize(colors=96)
+buf=io.BytesIO()
+preview.save(buf,format='PNG',optimize=True)
+print('ATLAS_PREVIEW_BASE64_BEGIN')
+print(base64.b64encode(buf.getvalue()).decode())
+print('ATLAS_PREVIEW_BASE64_END')
 print('MODE',im.mode)
 colors=Counter(im.getdata())
 print('TOP COLORS',colors.most_common(16))
