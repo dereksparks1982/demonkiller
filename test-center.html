@@ -94,12 +94,12 @@
         <div class="uo-upper">
           <div class="uo-left-tools">
             <div class="uo-tool-grid" role="toolbar" aria-label="Construction tools">
-              <button id="uoSelect" class="uo-art-button" type="button" title="Select / Move" aria-label="Select or move object" data-uo-art="cursor"></button>
+              <button id="uoSelect" class="uo-art-button" type="button" title="Select object" aria-label="Select object" data-uo-art="cursor"></button>
               <button id="uoPlace" class="uo-art-button" type="button" title="Place selected asset" aria-label="Place asset" data-uo-art="cube"></button>
-              <button id="uoMove" class="uo-art-button" type="button" title="Select / Move object" aria-label="Move selected object" data-uo-art="move"></button>
-              <button id="uoRotate" class="uo-art-button" type="button" title="Rotate selected object" aria-label="Rotate object" data-uo-art="rotate"></button>
+              <button id="uoMove" class="uo-art-button" type="button" title="Move: click object, then destination" aria-label="Move object" data-uo-art="move"></button>
+              <button id="uoRotate" class="uo-art-button" type="button" title="Rotate: click an existing object" aria-label="Rotate object" data-uo-art="rotate"></button>
               <button id="uoWallBrush" class="uo-art-button" type="button" title="Paint connected wall tiles" aria-label="Wall brush" data-uo-art="paint"></button>
-              <button id="uoCopy" class="uo-art-button" type="button" title="Copy selected object" aria-label="Copy object" data-uo-art="copy"></button>
+              <button id="uoCopy" class="uo-art-button" type="button" title="Copy: click an existing object" aria-label="Copy object" data-uo-art="copy"></button>
               <button id="uoDelete" class="uo-art-button" type="button" title="Erase object or wall" aria-label="Erase object or wall" data-uo-art="delete"></button>
               <button id="uoPick" class="uo-art-button" type="button" title="Eyedropper" aria-label="Pick existing asset" data-uo-art="search"></button>
               <button id="uoRoom" class="uo-art-button" type="button" title="Outline room walls" aria-label="Build room outline" data-uo-art="house"></button>
@@ -167,7 +167,10 @@
       <select id="tool">
         <option value="place">Place object</option>
         <option value="paste">Paste copied object</option>
-        <option value="select">Select / Move</option>
+        <option value="select">Select object</option>
+        <option value="move">Move object</option>
+        <option value="rotate">Rotate on click</option>
+        <option value="copy">Copy on click</option>
         <option value="erase">Erase object / wall</option>
         <option value="floor">Paint floor</option>
         <option value="fill">Fill floor region</option>

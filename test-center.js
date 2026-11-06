@@ -1054,17 +1054,31 @@
       return;
     }
     if(tool==='select'){
-      if(selectedId&&(!here||here.id!==selectedId)){
-        const obj=objectAtId(selectedId);
-        if(!obj){selectedId=null;draw();return;}
-        const result=transact(()=>{
-          const candidate={...obj,x,y};if(canPlace(candidate,obj.id)){obj.x=x;obj.y=y;}
-        },'Moved '+CATALOG[obj.type].label+' to ('+x+', '+y+').');
-        if(result)selectedId=null;draw();return;
-      }
       selectedId=here?.id||null;draw();
-      message(here?'Selected '+CATALOG[here.type].label+' #'+here.id+' at ('+here.x+', '+here.y+'). Click destination to move.':'No object occupies ('+x+', '+y+').');
-      return;
+      return message(here?'Selected '+CATALOG[here.type].label+' #'+here.id+'.':'Selection cleared.');
+    }
+    if(tool==='move'){
+      if(!selectedId){
+        if(!here)return message('Choose an object to move first.');
+        selectedId=here.id;draw();return message('Choose the new position for '+CATALOG[here.type].label+'.');
+      }
+      const target=objectAtId(selectedId);
+      if(!target){selectedId=null;return message('Object no longer exists.');}
+      if(target.x===x&&target.y===y){selectedId=null;draw();return message('Move cancelled.');}
+      if(!canPlace({...target,x,y},target.id))return message('Move blocked. Choose a clear location or press Esc.');
+      if(transact(()=>{target.x=x;target.y=y;},'Moved '+CATALOG[target.type].label+'.'))selectedId=null;
+      draw();return;
+    }
+    if(tool==='rotate'){
+      if(!here)return message('Choose an existing object to rotate.');
+      const candidate={...here,r:((here.r||0)+1)%4};
+      if(!canPlace(candidate,here.id))return message('Cannot rotate into an occupied space.');
+      transact(()=>{here.r=candidate.r;},'Rotated '+CATALOG[here.type].label+'.');
+      selectedId=null;draw();return;
+    }
+    if(tool==='copy'){
+      if(!here)return message('Choose an existing object to copy.');
+      selectedId=here.id;copySelected();selectedId=null;draw();return;
     }
     if(tool==='erase'){
       transact(()=>{
@@ -1388,14 +1402,20 @@
   });
   canvas.addEventListener('mouseleave',()=>{hover=null;stopRightMovement(true);draw();});
   document.addEventListener('keydown',e=>{
+    if(mode==='edit'&&e.key==='Escape'){
+      e.preventDefault();
+      selectedId=null;corner=null;wallStroke=null;skipWallClick=false;
+      tool='select';$('tool').value=tool;draw();
+      message('Selection and targeting cleared.');return;
+    }
     const name=e.target?.tagName;
     if(name==='INPUT'||name==='SELECT'||name==='TEXTAREA')return;
     if($('cultJournal').hidden===false)return; // Ignore gameplay keys only while the cult overlay is visibly open.
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();return;}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();return;}
     if(mode==='edit'){
-      if(e.key.toLowerCase()==='r'){e.preventDefault();rotateSelected();}
-      if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();deleteSelected();}
+      if(e.key.toLowerCase()==='r'){e.preventDefault();activateArchitectTool('rotate');}
+      if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();activateArchitectTool('erase');}
       return;
     }
     const directions={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
@@ -1602,30 +1622,27 @@
   }
 
   function updateUoButtonState(){
-    const map={uoSelect:'select',uoMove:'select',uoPlace:'place',
-      uoWallBrush:'wall',uoRoom:'wallRectangle',uoFloor:'floor',
-      uoDelete:'erase',uoPick:'pick'};
+    const map={uoSelect:'select',uoMove:'move',uoRotate:'rotate',uoCopy:'copy',
+      uoPlace:'place',uoWallBrush:'wall',uoRoom:'wallRectangle',
+      uoFloor:'floor',uoDelete:'erase',uoPick:'pick'};
     for(const [id,state] of Object.entries(map))
       $(id).classList.toggle('active',mode==='edit'&&tool===state);
   }
-  function uoTool(id,next){
-    $(id).addEventListener('click',()=>{
-      if(next==='wall'||next==='wallRectangle'){
-        selectedWallAsset=null;
-        category='walls';$('category').value=category;palette();
-      }else if(next==='floor'){
-        category='floors';current='stone';$('category').value=category;palette();
-      }
-      tool=next;$('tool').value=next;corner=null;selectedId=null;
-      draw();message('Architect '+next+' tool ready. Click a tile in the room.');
-    });
+  function activateArchitectTool(next){
+    if(next==='wall'||next==='wallRectangle'){
+      selectedWallAsset=null;category='walls';$('category').value=category;palette();
+    }else if(next==='floor'){
+      category='floors';current='stone';$('category').value=category;palette();
+    }
+    tool=next;$('tool').value=tool;corner=null;selectedId=null;
+    wallStroke=null;draw();message('Architect '+next+' ready. Click a target in the room.');
   }
-  for(const [id,toolName] of [
-    ['uoSelect','select'],['uoMove','select'],['uoPlace','place'],
-    ['uoWallBrush','wall'],['uoRoom','wallRectangle'],['uoFloor','floor'],
-    ['uoDelete','erase'],['uoPick','pick']])uoTool(id,toolName);
-  $('uoRotate').addEventListener('click',rotateSelected);
-  $('uoCopy').addEventListener('click',copySelected);
+  for(const [id,name] of [
+    ['uoSelect','select'],['uoMove','move'],['uoPlace','place'],
+    ['uoRotate','rotate'],['uoCopy','copy'],
+    ['uoWallBrush','wall'],['uoRoom','wallRectangle'],
+    ['uoFloor','floor'],['uoDelete','erase'],['uoPick','pick']
+  ])$(id).addEventListener('click',()=>activateArchitectTool(name));
   $('uoUndo').addEventListener('click',undo);
   $('uoRedo').addEventListener('click',redo);
   $('uoInspect').addEventListener('click',checkAccess);
