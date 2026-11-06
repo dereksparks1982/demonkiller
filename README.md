@@ -1,5 +1,8 @@
 # Demon Killer
 
+> **Recovery status, November 2026:** The original full six-commit Git repository with the 4,920-file v0.5.03 tree was successfully recovered from the owner's `4.zip`. This GitHub archive branch is **not yet that complete tree**; it currently holds a partial historical sample plus verified recovery indexes and original audio documentation. See [recovery/2026-11-06/README.md](recovery/2026-11-06/README.md) and [AUDIO_PROVENANCE_INDEX.md](recovery/2026-11-06/AUDIO_PROVENANCE_INDEX.md). The full curated source/audio package is prepared but not yet uploaded to GitHub. The current playable JavaScript game lives on `main`.
+
+
 ## DK Softworks · House of Culture
 
 **DK Softworks** is the studio and project identity. **DK** draws on the Russian abbreviation **ДК** for **Дом культуры** (*Dom kultury*), meaning **“House of Culture.”** Traditionally, a *dom kultury* is a community center for the arts, creativity, performance, and learning.
