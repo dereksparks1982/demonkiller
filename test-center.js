@@ -778,6 +778,7 @@
     $('modeLabel').textContent=mode==='walk'?'WALK MODE':'ARCHITECT MODE';
     $('coordTop').textContent=hover?'X '+hover.x+' · Y '+hover.y:'16 × 16 · 32 PX';
     $('selectedTool').textContent=tool.toUpperCase();
+    if(typeof updateUoButtonState==='function')updateUoButtonState();
     if(wallStroke&&mode==='edit'){
       ctx.save();ctx.globalAlpha=.32;ctx.fillStyle='#efc68c';
       for(const tile of wallStroke.cells)ctx.fillRect((tile%N)*TILE,(Math.floor(tile/N))*TILE,TILE,TILE);
@@ -848,6 +849,7 @@
       });list.append(b);
     }
     $('wallFinishLabel').textContent='WALL FINISH · '+WALL_FINISHES[wallFinish].label.toUpperCase();
+    $('uoAssetCount').textContent=entries.length+' TILES';
   }
   function setMode(next) {
     rightMouseHeld=false;
@@ -1299,14 +1301,15 @@
   // Layout preferences are local UI state, never part of the room or player save.
   const architectWindow=$('architectWindow'),architectBody=$('architectBody'),
     architectTitle=$('architectDrag');
-  const ARCHITECT_WINDOW_KEY='dkSoftworks.demonkiller.architectWindow.v1';
+  // New UI preference key: the owner rejected the former tall sidebar dimensions.
+  const ARCHITECT_WINDOW_KEY='dkSoftworks.demonkiller.uoHouseToolbar.v2';
   let architectDragging=null,architectView='assets';
   function saveArchitectWindow(){
     try {
       const rect=architectWindow.getBoundingClientRect();
       localStorage.setItem(ARCHITECT_WINDOW_KEY,JSON.stringify({
-        left:parseInt(architectWindow.style.left||'18',10),
-        top:parseInt(architectWindow.style.top||'110',10),
+        left:parseInt(architectWindow.style.left||'15',10),
+        top:parseInt(architectWindow.style.top||'103',10),
         width:Math.max(300,Math.round(rect.width)),
         height:Math.max(100,Math.round(rect.height)),
         minimized:architectBody.hidden
@@ -1373,8 +1376,8 @@
   architectTitle.addEventListener('pointerdown',e=>{
     if(e.button!==0||e.target?.closest?.('button'))return;
     architectDragging={x:e.clientX,y:e.clientY,
-      left:parseFloat(architectWindow.style.left)||18,
-      top:parseFloat(architectWindow.style.top)||110};
+      left:parseFloat(architectWindow.style.left)||15,
+      top:parseFloat(architectWindow.style.top)||103};
     e.preventDefault?.();
   });
   document.addEventListener('pointermove',e=>{
@@ -1428,6 +1431,105 @@
   });
   $('inspectorFront').addEventListener('click',()=>bringSelected(true));
   $('inspectorBack').addEventListener('click',()=>bringSelected(false));
+
+  // Approved master UI atlas, sampled as exact CSS sprites. No invented assets.
+  const UI_ATLAS='./assets/art/dkarchitect/ui/Medieval%20Architect%20UI%20Sprite%20Sheet.png';
+  const UI_RECTS={
+    banner:[68,65,104,162,.43],title:[1785,404,368,81,.32],
+    help:[1870,12,57,52,.48],minimize:[1935,13,57,51,.48],
+    close:[2066,12,56,52,.48],
+    cursor:[18,487,67,58,.57],cube:[90,486,66,60,.57],
+    move:[160,486,68,59,.57],rotate:[229,486,69,60,.57],
+    paint:[301,487,67,58,.57],copy:[374,487,67,59,.57],
+    delete:[449,487,66,58,.57],search:[521,487,65,58,.57],
+    house:[593,487,66,58,.57],stairs:[664,487,67,58,.57],
+    levels:[736,487,68,58,.57],settings:[808,487,69,58,.57],
+    eye:[18,553,66,58,.48],add:[90,553,65,58,.48],
+    undo:[301,553,66,58,.57],redo:[373,553,67,58,.57],
+    lock:[593,554,65,58,.48],
+    leftArrow:[900,490,39,97,.47],rightArrow:[981,490,40,97,.47]
+  };
+  // Rendering the supplied sprite sheet as CSS backgrounds avoids copying
+  // questionable auto-crops from the prior generated cut-out bundle.
+  for(const artNode of document.querySelectorAll?.('[data-uo-art]')||[]){
+    const dimensions=UI_RECTS[artNode.dataset.uoArt];if(!dimensions)continue;
+    const [x,y,w,h,scale]=dimensions;
+    artNode.style.backgroundImage='url("'+UI_ATLAS+'")';
+    artNode.style.backgroundSize=(2172*scale)+'px '+(724*scale)+'px';
+    artNode.style.backgroundPosition=(-x*scale)+'px '+(-y*scale)+'px';
+    artNode.style.backgroundRepeat='no-repeat';
+    artNode.style.width=Math.ceil(w*scale)+'px';
+    artNode.style.height=Math.ceil(h*scale)+'px';
+  }
+  function updateUoButtonState(){
+    const map={uoSelect:'select',uoMove:'select',uoPlace:'place',
+      uoWallBrush:'wall',uoRoom:'wallRectangle',uoFloor:'floor',
+      uoDelete:'erase',uoPick:'pick'};
+    for(const [id,state] of Object.entries(map))
+      $(id).classList.toggle('active',mode==='edit'&&tool===state);
+  }
+  function uoTool(id,next){
+    $(id).addEventListener('click',()=>{
+      if(next==='wall'||next==='wallRectangle'){
+        category='walls';$('category').value=category;palette();
+      }else if(next==='floor'){
+        category='floors';current='stone';$('category').value=category;palette();
+      }
+      tool=next;$('tool').value=next;corner=null;selectedId=null;
+      draw();message('Architect '+next+' tool ready. Click a tile in the room.');
+    });
+  }
+  for(const [id,toolName] of [
+    ['uoSelect','select'],['uoMove','select'],['uoPlace','place'],
+    ['uoWallBrush','wall'],['uoRoom','wallRectangle'],['uoFloor','floor'],
+    ['uoDelete','erase'],['uoPick','pick']])uoTool(id,toolName);
+  $('uoRotate').addEventListener('click',rotateSelected);
+  $('uoCopy').addEventListener('click',copySelected);
+  $('uoUndo').addEventListener('click',undo);
+  $('uoRedo').addEventListener('click',redo);
+  $('uoInspect').addEventListener('click',checkAccess);
+  const paletteViewport=$('uoPaletteViewport');
+  $('uoPrev').addEventListener('click',()=>{
+    paletteViewport.scrollBy?.({left:-365,behavior:'smooth'});
+  });
+  $('uoNext').addEventListener('click',()=>{
+    paletteViewport.scrollBy?.({left:365,behavior:'smooth'});
+  });
+  function showUoDetails(view='assets'){
+    architectBody.hidden=false;architectWindow.classList.remove('minimized');
+    $('uoAdvanced').hidden=false;
+    architectScreen(view);
+    $('architectMinimize').setAttribute('aria-expanded','true');
+  }
+  $('uoSettings').addEventListener('click',()=>showUoDetails('assets'));
+  $('uoHelp').addEventListener('click',()=>showUoDetails('assets'));
+  $('uoAdmin').addEventListener('click',()=>showUoDetails('admin'));
+  $('uoQuest').addEventListener('click',()=>showUoDetails('quests'));
+  $('uoHideAdvanced').addEventListener('click',()=>{
+    $('uoAdvanced').hidden=true;architectScreen('assets');
+  });
+  const DESIGN_BACKUP_KEY='dkSoftworks.demonkiller.architectLocalBackup.v1';
+  $('uoBackup').addEventListener('click',()=>{
+    try{localStorage.setItem(DESIGN_BACKUP_KEY,JSON.stringify(scene));
+      message('Local design backup stored. This is not a server backup.');}
+    catch(error){message('Local backup failed: '+error.message);}
+  });
+  $('uoRestore').addEventListener('click',()=>{
+    try{
+      const saved=localStorage.getItem(DESIGN_BACKUP_KEY);
+      if(!saved)return message('No local Architect backup exists.');
+      const draft=validate(JSON.parse(saved));
+      transact(()=>{scene=draft;selectedId=null;corner=null;},
+        'Restored local Architect backup; press COMMIT to save the restored layout.');
+    }catch(error){message('Backup restore rejected: '+error.message);}
+  });
+  $('uoCommit').addEventListener('click',()=>{
+    save();message('Committed locally in this browser. World-server commit is not implemented yet.');
+  });
+  $('uoRevert').addEventListener('click',()=>{
+    load();message('Reverted to the last locally saved room, if one was available.');
+  });
+  
   $('rotate').addEventListener('click',rotateSelected);
   $('duplicate').addEventListener('click',duplicateSelected);
   $('remove').addEventListener('click',deleteSelected);

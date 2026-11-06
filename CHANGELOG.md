@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.15 development preview | 2026-11-05 | Real approved-image UO house toolbar
+
+- Owner rejected the previous dark, tall, tabbed floating sidebar (v0.2.12–0.2.14). Rebuilt the default DK Architect interface as a compact HORIZONTAL Ultima Online house-construction toolbar instead of restyling that sidebar.
+- The UI directly renders exact regions of the owner-uploaded transparent 2172×724 `assets/art/dkarchitect/ui/Medieval Architect UI Sprite Sheet.png`: DK banner, selectable pixel-art tool buttons, minimize/close, arrows and decorative controls. The original source sheet remains intact.
+- Working construction controls include visual horizontal tile browsing, Walls/Floors/Doors/Items/Ritual/Sprites categories, per-tile preview and selection, sprite sheet scroll arrows, placement/selection/rotation, wall brush, room outline, floor paint, undo/redo, object copy, erase and access inspection. Dragging moves the toolbar over the game.
+- Backup/Restore use an isolated local draft snapshot, COMMIT saves the current room to local browser storage, and REVERT reloads the last local save. SYNC and CLEAR are deliberately disabled until a real persistent server and safe clear workflow exist. Building-level buttons remain disabled because this temple is currently one level.
+- Detailed tools, X/Y object inspector and existing JSON room export/import live in an OPTIONAL expandable details drawer, never the default builder. The former rejected window dimensions are not loaded.
+- No new art, altered story, temple geometry, collision, RPG gameplay or fictitious NPC/quest/server permissions. Browser visual acceptance remains pending.
+
+
 ## v0.2.14 development preview | 2026-11-05 | Coordinate inspector + copy/paste, build 3
 
 - Added an object inspector inside the floating Pandora-inspired builder with exact X/Y position, north/east/south/west facing and optional solid/passable collision on non-door objects.

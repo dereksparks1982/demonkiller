@@ -16,6 +16,24 @@ for(const id of ['walkMode','editMode','room','tool','category','palette','rotat
   'position','lifeState','objectCount','itemInfo','saveState','status'])
   assert(html.includes('id="'+id+'"'),'Missing control: '+id);
 assert(html.includes('test-center.css')&&html.includes('test-center.js'));
+assert(html.includes('class="architect-window uo-architect"'),
+  'Old tall pane must be replaced with UO horizontal builder');
+assert(html.includes('id="uoPaletteViewport"')&&html.includes('id="uoPrev"')&&
+  html.includes('id="uoNext"'),'Tile browser needs left/right horizontal scrolling');
+for(const id of ['uoSelect','uoPlace','uoMove','uoRotate','uoWallBrush','uoRoom',
+  'uoFloor','uoUndo','uoRedo','uoBackup','uoRestore','uoSync',
+  'uoClear','uoCommit','uoRevert','uoSettings','uoAdvanced','uoLevel'])
+  assert(html.includes('id="'+id+'"'),'Missing UO tool control: '+id);
+assert(html.includes('id="uoSync" type="button" disabled')&&
+  html.includes('id="uoClear" type="button" disabled'),
+  'Incomplete world-server operations cannot pretend to be active');
+assert(html.includes('id="uoLevelUp" disabled')||html.includes('id="uoLevelUp" type="button" disabled'),
+  'Unimplemented multiple building levels must remain disabled');
+assert(css.includes('Medieval%20Architect%20UI%20Sprite%20Sheet.png'),
+  'UO toolbar must use the approved owner-uploaded artwork, not plain dark UI');
+assert(js.includes('UI_ATLAS=')&&js.includes('data-uo-art')&&
+  js.includes('uoHouseToolbar.v2'),'Approved sprite atlas and new layout preference key required');
+
 assert(!html.includes('project.godot')&&!html.includes('Capital & Consequence'));
 const refreshRedirect=html.match(/<script id="refresh-to-menu">([\s\S]*?)<\/script>/)?.[1];
 assert(refreshRedirect,'Temple must have an early refresh-only return-to-menu handler');

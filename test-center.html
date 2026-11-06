@@ -81,27 +81,85 @@
     <p><strong>The sacrifice begins here.</strong> You lie bound upon the altar while the cult gathers. Its leader prays and takes your life. Your ghost rises, the Devil claims you, and Lilith kneels to leave a soul crystal. Only after she leaves can you double-left-click the crystal to resurrect, or walk away and remain a ghost.</p>
   </section>
   <div class="workspace">
-    <aside id="architectWindow" class="architect-window" hidden aria-label="Movable DK Architect construction window">
-      <header id="architectDrag" class="architect-titlebar">
-        <div class="architect-identity"><strong>✥ PANDORA // DK ARCHITECT</strong><small>WORLD CONSTRUCTION · DEVELOPER</small></div>
-        <div class="architect-window-actions">
-          <button id="architectMinimize" type="button" aria-label="Minimize Architect" aria-expanded="true">▁</button>
-          <button id="architectClose" type="button" aria-label="Close Architect">×</button>
-        </div>
+    <aside id="architectWindow" class="architect-window uo-architect" hidden aria-label="DK Architect Ultima Online-style floating house builder">
+      <header id="architectDrag" class="uo-title-grip" title="Drag to move the house-building toolbar">
+        <span class="uo-title-symbol" data-uo-art="title"></span>
+        <strong>DK ARCHITECT</strong><small>HOUSE & WORLD CONSTRUCTION</small>
+        <span class="uo-title-spacer"></span>
+        <button id="uoHelp" class="uo-art-button" type="button" aria-label="Builder help" title="Open construction controls" data-uo-art="help"></button>
+        <button id="architectMinimize" class="uo-art-button" type="button" aria-label="Minimize builder" aria-expanded="true" data-uo-art="minimize"></button>
+        <button id="architectClose" class="uo-art-button" type="button" aria-label="Close builder and return to Walk Mode" data-uo-art="close"></button>
       </header>
-      <div id="architectBody" class="architect-window-body">
-        <nav class="architect-tabs" aria-label="Builder asset categories">
-          <button type="button" data-architect-category="walls">Walls</button>
-          <button type="button" data-architect-category="floors">Floors</button>
-          <button type="button" data-architect-category="structure">Structure</button>
-          <button type="button" data-architect-category="furniture">Items</button>
-          <button type="button" data-architect-category="relics">Ritual</button>
-          <button type="button" data-architect-category="library">Sprites</button>
-          <button type="button" data-architect-view="admin">Admin</button>
-          <button type="button" data-architect-view="quests">Quests</button>
-        </nav>
-        <div id="architectAssetTools" class="architect-asset-tools">
-
+      <div id="architectBody" class="architect-window-body uo-body">
+        <div class="uo-upper">
+          <div class="uo-left-tools">
+            <span class="uo-dk-banner" data-uo-art="banner" aria-label="Demon Killer"></span>
+            <div class="uo-tool-grid" role="toolbar" aria-label="Construction tools">
+              <button id="uoSelect" class="uo-art-button" type="button" title="Select / Move" aria-label="Select or move object" data-uo-art="cursor"></button>
+              <button id="uoPlace" class="uo-art-button" type="button" title="Place selected asset" aria-label="Place asset" data-uo-art="cube"></button>
+              <button id="uoMove" class="uo-art-button" type="button" title="Select / Move object" aria-label="Move selected object" data-uo-art="move"></button>
+              <button id="uoRotate" class="uo-art-button" type="button" title="Rotate selected object" aria-label="Rotate object" data-uo-art="rotate"></button>
+              <button id="uoWallBrush" class="uo-art-button" type="button" title="Paint connected wall tiles" aria-label="Wall brush" data-uo-art="paint"></button>
+              <button id="uoCopy" class="uo-art-button" type="button" title="Copy selected object" aria-label="Copy object" data-uo-art="copy"></button>
+              <button id="uoDelete" class="uo-art-button" type="button" title="Erase object or wall" aria-label="Erase object or wall" data-uo-art="delete"></button>
+              <button id="uoPick" class="uo-art-button" type="button" title="Eyedropper" aria-label="Pick existing asset" data-uo-art="search"></button>
+              <button id="uoRoom" class="uo-art-button" type="button" title="Outline room walls" aria-label="Build room outline" data-uo-art="house"></button>
+              <button id="uoFloor" class="uo-art-button" type="button" title="Paint floor tile" aria-label="Paint floors" data-uo-art="levels"></button>
+              <button id="uoUndo" class="uo-art-button" type="button" title="Undo" aria-label="Undo" data-uo-art="undo"></button>
+              <button id="uoRedo" class="uo-art-button" type="button" title="Redo" aria-label="Redo" data-uo-art="redo"></button>
+            </div>
+          </div>
+          <div class="uo-browser">
+            <div class="uo-browser-header">
+              <div class="uo-category-strip" role="group" aria-label="Building asset categories">
+                <button type="button" data-architect-category="walls">WALLS</button>
+                <button type="button" data-architect-category="floors">FLOORS</button>
+                <button type="button" data-architect-category="structure">DOORS &amp; STRUCTURE</button>
+                <button type="button" data-architect-category="furniture">FURNITURE</button>
+                <button type="button" data-architect-category="relics">RITUAL</button>
+                <button type="button" data-architect-category="library">SPRITES</button>
+              </div>
+              <input id="assetSearch" type="search" aria-label="Search building tiles" placeholder="Find tiles…" autocomplete="off">
+            </div>
+            <div class="uo-sprite-frame" aria-label="Horizontal art tile browser">
+              <button id="uoPrev" class="uo-scroll" type="button" title="Previous tiles" aria-label="Scroll tiles left"><span data-uo-art="leftArrow"></span></button>
+              <div id="uoPaletteViewport" class="uo-palette-viewport">
+                <div id="palette" class="palette" aria-label="Approved Demon Killer construction tiles"></div>
+              </div>
+              <button id="uoNext" class="uo-scroll" type="button" title="Next tiles" aria-label="Scroll tiles right"><span data-uo-art="rightArrow"></span></button>
+            </div>
+            <div class="uo-statusbar">
+              <span class="uo-category-name" id="paletteTitle">Relics &amp; Ritual</span>
+              <span class="uo-level-control">LEVEL <button type="button" id="uoLevelDown" disabled title="Multiple stories are not enabled in this room">◀</button>
+              <output id="uoLevel" aria-label="Current building level">1</output>
+              <button type="button" id="uoLevelUp" disabled title="Multiple stories are not enabled in this room">▶</button></span>
+              <span class="uo-tile-set">TILE SET: <strong>DEMON KILLER</strong></span>
+              <span id="uoAssetCount" title="Tiles in this category">0 TILES</span>
+              <small id="selectedTool">PLACE</small>
+            </div>
+          </div>
+          <div class="uo-right-controls">
+            <span class="uo-rail-caption">TOOLS</span>
+            <button id="uoSettings" class="uo-art-button" type="button" title="Open detailed editor / inspector" aria-label="Detailed construction options" data-uo-art="settings"></button>
+            <button id="uoInspect" class="uo-art-button" type="button" title="Inspect room access" aria-label="Check room access" data-uo-art="eye"></button>
+            <button id="uoAdmin" class="uo-art-button" type="button" title="World administration" aria-label="Administrator controls" data-uo-art="lock"></button>
+            <button id="uoQuest" class="uo-art-button" type="button" title="Future mission designer" aria-label="Mission designer planning" data-uo-art="cube"></button>
+          </div>
+        </div>
+        <div class="uo-command-frame">
+          <div class="uo-command-bar" role="toolbar" aria-label="Design backup and save controls">
+            <button id="uoBackup" type="button" title="Store a local draft backup">BACKUP</button>
+            <button id="uoRestore" type="button" title="Restore the locally backed up draft">RESTORE</button>
+            <button id="uoSync" type="button" disabled title="Server synchronization requires the future persistent server">SYNC</button>
+            <button id="uoClear" type="button" disabled title="Full house-clear command is not enabled for the temple">CLEAR</button>
+            <button id="uoCommit" type="button" title="Save the current room locally; server commit is not implemented">COMMIT</button>
+            <button id="uoRevert" type="button" title="Reload the last locally saved room">REVERT</button>
+          </div>
+        </div>
+        <div id="uoAdvanced" class="uo-advanced" hidden>
+          <div class="uo-detail-top"><strong>DETAILED CONSTRUCTION</strong>
+            <button id="uoHideAdvanced" type="button">CLOSE DETAILS ×</button></div>
+          <div id="architectAssetTools" class="uo-detail-options">
       <div class="panel-title"><span>01</span><h2>THE ARCHITECT</h2></div>
       <label for="tool">Editing action</label>
       <select id="tool">
@@ -136,10 +194,6 @@
         <button id="wallEraseButton" type="button">Erase Walls</button>
       </div>
       <small class="wall-finish-label" id="wallFinishLabel">WALL FINISH · CLEAN STONE</small>
-      <label for="assetSearch">Find art or finish</label>
-      <input id="assetSearch" type="search" placeholder="Search original assets…" autocomplete="off">
-      <div class="palette-head"><strong id="paletteTitle">Relics &amp; Ritual</strong><small id="selectedTool">PLACE</small></div>
-      <div class="palette" id="palette" aria-label="Original Demon Killer art palette"></div>
       <div class="button-grid">
         <button id="rotate" type="button" title="Rotate selected object (R)">Rotate ↻</button>
         <button id="duplicate" type="button">Duplicate</button>
@@ -148,7 +202,8 @@
         <button id="undo" type="button">Undo</button>
         <button id="redo" type="button">Redo</button>
       </div>
-        </div>
+
+          </div>
         <section id="architectObjectInspector" class="architect-object-inspector" aria-label="Object inspector">
           <div class="palette-head"><strong>OBJECT INSPECTOR</strong><small>COORDINATE EDITOR</small></div>
           <small id="inspectorObjectLabel">Select an object in the scene to edit its position.</small>
@@ -177,6 +232,7 @@
             <button id="inspectorBack" type="button">Send to Back</button>
           </div>
         </section>
+
         <div id="architectAdminInfo" class="architect-info" hidden role="note">
           <strong>WORLD ADMIN · DEVELOPMENT</strong>
           <p>Spawn placement, room export/import and access checks are available below. Persistent server permissions, NPC management and live world controls are later builds.</p>
@@ -185,6 +241,7 @@
           <strong>QUEST DESIGN · PLANNED</strong>
           <p>The visual quest-chain editor will follow the world-building and server-authority work. No mission authoring is enabled in this build.</p>
         </div>
+
         <section class="architect-record" aria-label="Room information and actions">
 
       <div class="panel-title"><span>02</span><h2>THE RECORD</h2></div>
@@ -213,10 +270,12 @@
       </div>
 
         </section>
-        <small class="architect-permission-note">STAGED CHARACTERS ARE VISUAL ONLY · OTHER CRYSTAL COLORS HAVE NO ASSIGNED POWERS · NO SERVER PERMISSIONS YET</small>
+
+          <small class="architect-permission-note">LOCAL DEVELOPMENT TOOL · STAGED NPCS ARE VISUAL ONLY · NO SERVER ADMIN AUTHORITY YET</small>
+        </div>
       </div>
     </aside>
-    <section class="stage" aria-label="Playable sacrificial temple">
+        <section class="stage" aria-label="Playable sacrificial temple">
       <div class="stage-head"><span>AREA · DK.TEMPLE.SACRIFICE.001</span><strong id="modeLabel">WALK MODE</strong><span id="coordTop">16 × 16 · 32 PX</span></div>
       <div class="stage-body">
         <canvas id="room" width="512" height="512" tabindex="0" role="img" aria-label="Top-down Gothic temple on a 16 by 16 tile grid. Hold right mouse to move, left-click to interact, or use W A S D and arrow keys."></canvas>
@@ -225,12 +284,12 @@
       <div id="hint" class="hint">After the sacrifice and Lilith's departure: hold RIGHT MOUSE to move · LEFT CLICK inspects · DOUBLE-LEFT-CLICK the crystal to resurrect · WASD / arrows move · Architect Mode editing is unchanged.</div>
     </section>
   </div>
-  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.14</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
+  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.15</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
 <script src="./cult-system.js" defer></script>
 <script src="./citizen-population.js" defer></script>
 <script src="./cult-network.js" defer></script>
-<script src="./temple-music.js?v=0.2.14" defer></script>
-<script src="./test-center.js?v=0.2.14" defer></script>
+<script src="./temple-music.js?v=0.2.15" defer></script>
+<script src="./test-center.js?v=0.2.15" defer></script>
 </body>
 </html>
