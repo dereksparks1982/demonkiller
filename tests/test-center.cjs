@@ -42,8 +42,8 @@ assert.match(js,/\{ id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 \}/,'Start
 assert.match(js,/const bodyWidth=40,bodyHeight=20/,'Lying body must match NPC scale');
 assert.match(js,/ctx\.drawImage\(picture,x,y,bodyWidth,bodyHeight\)/,'Lying body must use its reduced dimensions');
 const events={}, noop=()=>{};
-const previewOutlines=[];
-const graphics={fillRect:noop,strokeRect:(...args)=>previewOutlines.push(args),clearRect:noop,beginPath:noop,
+const previewOutlines=[],spokenLines=[];
+const graphics={fillRect:noop,strokeRect:(...args)=>previewOutlines.push(args),fillText:(text,x,y)=>spokenLines.push({text,x,y}),clearRect:noop,beginPath:noop,
   moveTo:noop,lineTo:noop,stroke:noop,save:noop,restore:noop,
   translate:noop,rotate:noop,scale:noop};
 class Element {
@@ -87,7 +87,11 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(get('objectCount').textContent,'9','Crystal must be absent before Lilith places it');
   await click(8,7);
   assert.match(get('status').textContent,/Wait for the current scene/,'Interactions locked during sacrifice');
-  tickFrames(1800);
+  tickFrames(175);
+  assert(spokenLines.length>0,'Cult leader dialogue should render during the opening prayer');
+  assert(Math.max(...spokenLines.map(line=>line.y))<=160,
+    'Speech must render above the bound player on the altar, not across the body');
+  tickFrames(1625);
   assert.equal(get('position').textContent,'(8, 12)','Ghost emerges farther back on the central aisle');
   assert.match(get('lifeState').textContent,/GHOST/);
   assert.equal(get('objectCount').textContent,'10','Lilith leaves her crystal after prayer');
