@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.7 development preview | 2026-11-05 | Altar and bound player scaling
+
+- Shrunk the sacrificial altar footprint from 4×2 to 3×2 tiles (96×64 pixels), recentering its starter-room placement on the north aisle at (7,5).
+- Scaled the lying human/corpse from 64×32 to 40×20 pixels, centered on the altar, with a matching fallback.
+- Updated DK Architect's altar palette footprint, translucent placement preview, 2×3 rotated preview, collision and placement behavior through its shared catalog.
+- Left the temple walls, NPCs, altar sequence, crystal placement, and editor controls intact.
+- Development saves are disposable per owner direction; no old-save migration or compatibility workaround was added.
+- Updated menu/temple cache versions and added altar-preview placement regression checks. Live browser visuals still require review.
+
+
 ## v0.2.5 development preview | 2026-11-05 | Sacrifice dialogue and cache refresh
 
 - Added on-screen pixel speech bubbles above the cult leader, Devil, and Lilith, timed to prayer, sacrifice, confrontation, and kneeling.
