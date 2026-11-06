@@ -194,9 +194,13 @@ function readSlots(){
  return [null];
 }
 function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
-function launch(id){
- if(SERVER){location.href='./test-center.html?dkSlot='+id;return;}
- try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.24';}
+async function launch(id){
+ if(SERVER){
+   await SERVER.startWorld();
+   location.href='./test-center.html?dkSlot='+id;
+   return;
+ }
+ try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.25';}
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }
 async function openSlots(next){
@@ -227,7 +231,7 @@ function chooseSlot(i){
  const slots=SERVER?serverSlots:readSlots(),previous=slots[i];chosen=i;
  if(mode==='continue'){
  if(!previous)return;
- launch(i+1);return;
+ launch(i+1).catch(error=>notice('DK Server: '+error.message));return;
  }
  if(previous){notice('One life already exists. Choose Continue to resume it.');return;}
  $('chosenSlot').textContent='RECORD '+(i+1);
@@ -238,7 +242,7 @@ $('nameForm').addEventListener('submit',async event=>{
  const name=$('characterName').value.trim().toUpperCase();
  if(!/^[A-Z0-9 _-]{1,8}$/.test(name))return notice('Enter a name of 1 to 8 letters, numbers, spaces, hyphens or underscores.');
  if(SERVER){
-   try{await SERVER.createCharacter(chosen+1,name);launch(chosen+1);}
+   try{await SERVER.startWorld();await SERVER.createCharacter(chosen+1,name);await launch(chosen+1);}
    catch(e){notice('DK Server: '+e.message);}
    return;
  }

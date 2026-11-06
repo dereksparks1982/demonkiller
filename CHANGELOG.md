@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.25 / DK Server M4 | 2026-11-06 | Persistent run/pause state and one server-owned life
+
+- Added durable server-owned world runtime with **START / STOP** control endpoints. Stop freezes the six-real-hour day/night cycle, and Start resumes from the saved instant. No time is counted while DK Server is off or deliberately paused.
+- World clock checkpoints run through the single-writer queue even without an attached browser. Full process shutdown now pauses the clock before closing. Existing M3 worlds without a runtime are accepted.
+- Enforced a **single character slot** at the backend, not just in the menu; attempts to create slots 2 and 3 are rejected.
+- The integrated menu's Start/Stop buttons now call genuine endpoints on a connected local DK Server; New Game and Continue automatically resume the paused server world. Browser-only GitHub Pages continues to report **Not Connected** because there is still no hosted world process.
+- Added four M4 regression tests for pause/resume, no offline catch-up, one-life enforcement, API control, restart persistence and legacy save reading. Updated the previous server tests and launcher for M4. **No internet-facing service deployed**; secure HTTPS hosting and autonomous NPC simulation remain pending.
+
 ## v0.2.24 | 2026-11-06 | Visible Persistent World options on the public webpage
 
 - Fixed the public GitHub Pages menu hiding the entire Persistent World section; it now always appears under Options alongside Music.

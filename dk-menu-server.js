@@ -35,6 +35,17 @@
       return (await post('/api/v1/characters/' + slot + '/actions', {action, ...fields})).character;
     },
     async health() { return request('/api/v1/health'); },
+    async serverState() { return request('/api/v1/server/state'); },
+    async startWorld() {
+      return request('/api/v1/server/start', {
+        method:'POST', headers:{'X-DK-Control':'start'}
+      });
+    },
+    async stopWorld() {
+      return request('/api/v1/server/stop', {
+        method:'POST', headers:{'X-DK-Control':'stop'}
+      });
+    },
     async clock() { return request('/api/v1/clock'); },
     async world() { return request('/api/v1/world'); },
     async shutdown() {
@@ -66,15 +77,17 @@
     }
     try {
       const [health, worldClock] = await Promise.all([client.health(), client.clock()]);
-      if (health.build !== 'local-m3') throw Error('Incompatible DK Server version');
-      status.textContent = 'RUNNING · DK Server is connected';
+      if (health.build !== 'local-m4') throw Error('DK Server needs the latest M4 build');
+      status.textContent = worldClock.running
+        ? 'RUNNING · DK Server is connected and world time is advancing'
+        : 'PAUSED · DK Server is connected; the world is frozen';
       clock.textContent = 'World time: ' + worldClock.phase.toUpperCase() +
         ' · ' + Math.ceil(worldClock.seconds_until_transition / 60) +
         ' minutes until ' + (worldClock.phase === 'day' ? 'night' : 'day');
-      help.textContent = 'Closing the browser leaves the world running. ' +
-        'Stop Server saves pending changes and ends the local world process.';
-      start.disabled = true;
-      stop.disabled = false;
+      help.textContent = 'Closing the browser leaves an active world running. ' +
+        'Stop Server saves and pauses its clock; Start Server resumes the world.';
+      start.disabled = !!worldClock.running;
+      stop.disabled = !worldClock.running;
     } catch (error) {
       showOffline('NOT CONNECTED · ' + error.message);
       help.textContent = 'DK Server is unavailable at this game address.';
@@ -87,21 +100,24 @@
         'A hosted DK Server and a secure control service are required.';
       return;
     }
-    await refresh();
-    if (!stop.disabled) status.textContent = 'RUNNING · DK Server is already started';
-    else status.textContent = 'CANNOT START · The server host must start the process';
+    start.disabled = true;
+    try {
+      await client.startWorld();
+      await refresh();
+    } catch(error) {
+      status.textContent = 'CANNOT START · ' + error.message;
+      start.disabled = false;
+    }
   });
   stop.addEventListener('click', async () => {
     if (!client || stop.disabled) return;
-    if (!window.confirm('Stop DK Server and pause the persistent world?')) return;
+    if (!window.confirm('Pause the world and save its current state?')) return;
     stop.disabled = true;
     try {
-      await client.shutdown();
-      status.textContent = 'STOPPING · DK Server is saving pending world writes';
-      clock.textContent = 'World time: stopping';
-      start.disabled = false;
+      await client.stopWorld();
+      await refresh();
     } catch (error) {
-      status.textContent = 'STOP FAILED · ' + error.message;
+      status.textContent = 'PAUSE FAILED · ' + error.message;
       stop.disabled = false;
     }
   });

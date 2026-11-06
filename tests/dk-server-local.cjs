@@ -5,9 +5,8 @@ const {createDKServer}=require('../server/dk-server.cjs');
 const {createCharacter,makeWorld,applyCharacterAction}=require('../server/world.cjs');
 async function fixture(t){
  const dataDir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-local-m3-'));
- t.after(()=>fs.rm(dataDir,{recursive:true,force:true}));
  const app=await createDKServer({dataDir,port:0});
- t.after(()=>app.server.listening?app.close():Promise.resolve());
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dataDir,{recursive:true,force:true});});
  return {app,dataDir,base:'http://127.0.0.1:'+app.address.port};
 }
 const post=(base,route,body,headers={})=>fetch(base+route,{
@@ -23,7 +22,7 @@ test('one local Demon Killer game, no password, no external dashboard or exposed
  assert.match(html,/SHUT DOWN SERVER/);
  assert.equal((await fetch(base+'/dk-menu-server.js')).status,200);
  const health=await (await fetch(base+'/api/v1/health')).json();
- assert.equal(health.build,'local-m3');
+ assert.equal(health.build,'local-m4');
  assert.equal(health.background_world,true);
  assert.equal((await fetch(base+'/player',{redirect:'manual'})).status,302);
  assert.equal((await fetch(base+'/api/v1/auth/status')).status,404);

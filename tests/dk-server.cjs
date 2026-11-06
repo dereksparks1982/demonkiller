@@ -72,12 +72,13 @@ test('new server-owned characters persist after restart; world clock never reset
   const second = await createDKServer({ dataDir: dir, port: 0, now: () => advanced });
   t.after(() => second.server.listening ? second.close() : Promise.resolve());
   assert.equal(second.world.clock_anchor_utc, new Date(origin).toISOString());
-  assert.equal(second.snapshot().clock.phase, 'night');
-  assert.equal(second.snapshot().clock.elapsed_in_phase_seconds, 19);
+  assert.equal(second.snapshot().clock.phase, 'day', 'A stopped server does not advance world time');
+  assert.equal(second.snapshot().clock.elapsed_in_phase_seconds, 0);
+  assert.equal(second.snapshot().clock.running, false);
   assert.equal(second.snapshot().area.objects.length, 9);
   const saved = JSON.parse(await fs.readFile(path.join(dir, 'world.json'), 'utf8'));
   assert.equal(saved.world_id, 'dk.world.001');
-  assert.equal(saved.revision, 1);
+  assert.equal(saved.revision, 2);
   assert.equal(saved.characters['1'].name, 'DEREK');
   assert.equal((await (await fetch('http://127.0.0.1:' + second.address.port + '/api/v1/characters/1', )).json()).character.name, 'DEREK');
   await second.close();
@@ -131,13 +132,13 @@ test('single-player server-owned slot creation rejects forged saves and unsafe r
   assert.equal(app.world.revision, 0, 'Failed writes cannot mutate world state');
   assert.equal((await post(base, { slot: 1, name: 'Elias' })).status, 201);
   assert.equal((await post(base, { slot: 1, name: 'Another' })).status, 409);
-  assert.equal((await post(base, { slot: 2, name: 'Mary' })).status, 201);
-  assert.equal(app.world.revision, 2);
+  assert.equal((await post(base, { slot: 2, name: 'Mary' })).status, 422);
+  assert.equal(app.world.revision, 1);
   const chars = await (await fetch(base + '/api/v1/characters', )).json();
   assert.equal(chars.characters['1'].name, 'ELIAS');
-  assert.equal(chars.characters['2'].name, 'MARY');
+  assert.equal(chars.characters['2'], undefined, 'Only one life may exist');
   assert.equal((await fetch(base + '/api/v1/characters/3', )).status, 404);
-  assert.equal(JSON.parse(await fs.readFile(path.join(dir, 'world.json'), 'utf8')).revision, 2);
+  assert.equal(JSON.parse(await fs.readFile(path.join(dir, 'world.json'), 'utf8')).revision, 1);
   await app.close();
 });
 
@@ -147,7 +148,7 @@ test('parallel requests cannot overwrite an occupied slot', async t => {
   t.after(() => app.server.listening ? app.close() : Promise.resolve());
   const base = 'http://127.0.0.1:' + app.address.port;
   const codes = (await Promise.all([
-    post(base, { slot: 3, name: 'One' }), post(base, { slot: 3, name: 'Two' })
+    post(base, { slot: 1, name: 'One' }), post(base, { slot: 1, name: 'Two' })
   ])).map(r => r.status).sort();
   assert.deepEqual(codes, [201, 409]);
   assert.equal(app.world.revision, 1);

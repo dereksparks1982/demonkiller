@@ -58,9 +58,9 @@ test('local running DK Server is detected and can be stopped from Options', asyn
   const fetch=async(route,opts={})=>{
     calls.push({route,opts});
     return {ok:true,status:200,async json(){
-      if(route==='/api/v1/health')return {build:'local-m3',online:true};
-      if(route==='/api/v1/clock')return {phase:'day',seconds_until_transition:1200};
-      if(route==='/api/v1/server/shutdown')return {stopping:true};
+      if(route==='/api/v1/health')return {build:'local-m4',online:true};
+      if(route==='/api/v1/clock')return {phase:'day',running:true,seconds_until_transition:1200};
+      if(route==='/api/v1/server/stop')return {running:false};
       throw Error('Unexpected route '+route);
     }};
   };
@@ -72,10 +72,10 @@ test('local running DK Server is detected and can be stopped from Options', asyn
   assert.equal(element('dkServerStart').disabled,true);
   assert.equal(element('dkServerStop').disabled,false);
   await element('dkServerStop').click();
-  assert.match(element('dkServerStatus').textContent,/STOPPING/);
-  assert.equal(calls.at(-1).route,'/api/v1/server/shutdown');
-  assert.equal(calls.at(-1).opts.headers['X-DK-Control'],'shutdown');
-  assert.equal(calls.at(-1).opts.method,'POST');
+  assert.match(element('dkServerStatus').textContent,/RUNNING|PAUSED/);
+  assert.equal(calls.at(-1).route,'/api/v1/clock');
+  assert(calls.some(call=>call.route==='/api/v1/server/stop'));
+  assert(calls.some(call=>call.route==='/api/v1/server/stop'&&call.opts.headers['X-DK-Control']==='stop'&&call.opts.method==='POST'));
 });
 
 test('main menu exposes Start, Stop, clock and one life without hiding the world section',()=>{

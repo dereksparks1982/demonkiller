@@ -2,23 +2,17 @@
 
 **Demon Killer** is DK Softworks' original engine-free, top-down Gothic adventure with a local single-player persistent world, an Ultima Online-inspired control scheme, and the DK Architect construction tool. The playable Forsaken Temple, sacrifice, ghost, and resurrection story remain intact.
 
-## Play on Linux: one integrated game
+## Persistent world progress: DK Server M4 (v0.2.25)
 
-Requires Node.js 20+ and a desktop browser. From the project directory run:
+The **public Demon Killer webpage** is published on GitHub Pages, but its **always-on world server is not deployed**. The website's Options → Persistent World panel reports **Not Connected** rather than inventing a server. The Start Server button cannot turn GitHub Pages into a backend.
 
-```bash
-./start-demon-killer.sh
-```
+The server code in this repository now supports **one authoritative character slot**, server-validated temple actions, durable world-state writes, and **Start / Stop world simulation** endpoints. Stop pauses the server-owned six-hour day / six-hour night clock and writes its state to disk. Start resumes from that exact game time without counting the paused interval. If DK Server stays running, closing the browser does not stop that clock. The integrated menu automatically sends Start when creating or continuing the server-owned character.
 
-The launcher starts **DK Server in the background** (if it is not already running) and opens the **regular Demon Killer main menu** at http://127.0.0.1:8766/. No password, login, separate dashboard, or second player page is required. Closing the browser leaves the process and world clock running. **Options → Persistent World → SHUT DOWN SERVER** saves pending changes and stops the process. Restart by running the launcher again.
+**This is not yet an autonomous NPC world:** NPC schedules, businesses, monster territory, and server-authoritative Architect edits still need implementation. A genuine always-on Linux host with persistent storage and owner-only HTTPS access must be supplied before the public website can connect to a real world. We deliberately have not exposed the current unauthenticated loopback-only prototype to the internet. Standard short-lived serverless functions are not suitable substitutes.
 
-If an older server is still running on port 8766, stop that old process with Ctrl+C first. The launcher refuses to replace or kill a running older server behind your back.
+## Local development only
 
-**Character saves and the basic temple gameplay actions are now server-owned:** creating/reopening the first of the existing server records, completing the opening ritual, cardinal-direction movement, operating the north door, and double-click resurrection are validated and persisted by DK Server. No old browser character saves are imported. The temple's approved layout and its assets have not been replaced.
-
-**Still in development:** comprehensive server-owned Architect edit transactions, cult/NPC persistence, active background NPC behavior, territory simulation, true multiplayer, and full production-grade crash recovery. The persistent six-real-hour day/night clock runs even while Firefox is closed. The **GitHub Pages Options menu now always shows Persistent World** with Start Server, Stop Server, world-clock status and Refresh. On the public website, it reports **Not Connected** until a real hosted DK Server exists. It does not simulate an online server or secretly start a browser-only fake world. GitHub Pages itself cannot run a background Node.js world process.
-
-The character picker displays **one life / one character slot**; no previously stored slot is overwritten by New Game. The public GitHub Pages build still uses isolated browser-preview saves until hosted server infrastructure is connected, and **is not** the persistent world.
+The repository includes a Linux-only detached launcher, `start-demon-killer.sh`, for developers to test the integrated local server without installing a game engine. That local development workflow is **not** a requirement for playing the eventual website. It runs DK Server at `127.0.0.1:8766`, uses one-character server-side saves, and can be paused/resumed through the game menu. The older process shutdown endpoint remains available to the launcher; the new normal Options Stop button **pauses the world without terminating its host process**.
 
 ## Playable public preview
 

@@ -1,3 +1,9 @@
+## DK Server M4: pause/resume world runtime (v0.2.25)
+
+The loopback game service has durable `runtime.running`, `runtime.elapsed_ms` and `runtime.resumed_at_utc` fields. `POST /api/v1/server/start` resumes the world clock; `POST /api/v1/server/stop` saves and freezes it, without killing the process. The process-restart path does not simulate elapsed time while the service was off. World writes are serialized and checkpoints continue with no browser connected. The server now enforces **one character slot**. Local New Game/Continue automatically resumes world time.
+
+This **does not constitute hosted deployment** or an NPC simulation. The public page reports Not Connected until a secure always-on process and durable storage are deployed. The current loopback-only API must not be bound publicly without owner/device authorization. UI controls exist, but remote connectivity and true autonomous NPC/business schedules remain to be built.
+
 ## Public website UI status (v0.2.24, 2026-11-06)
 
 The GitHub Pages Options screen always exposes **Persistent World** with Start Server, Stop Server, Refresh, world status and day/night status. Without a genuine hosted backend, the public page must show **Not Connected** and must not invent state changes or pretend browser localStorage can simulate a continuous server. The existing loopback process can be stopped through the actual menu control. Cloud hosting, secure single-player administration, hosted start/stop supervision and full NPC simulation are **not deployed yet**. The public preview's browser saves remain separate. The menu offers one character slot and no overwrite.

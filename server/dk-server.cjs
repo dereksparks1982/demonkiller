@@ -6,7 +6,7 @@ const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { makeWorld, validateWorld, createCharacter, playableCharacter, applyCharacterAction, worldClock, AREA_ID } = require('./world.cjs');
+const { makeWorld, validateWorld, createCharacter, playableCharacter, applyCharacterAction, worldClock, AREA_ID, setWorldRunning, checkpointWorldTime } = require('./world.cjs');
 const { localRequestAllowed, serveGame } = require('./local-game.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
@@ -118,6 +118,12 @@ async function createDKServer({
   try {
     world = await loadWorld(dataDir, now());
   } catch (error) { await releaseLock(); throw error; }
+  // A process restart never advances the clock for the time DK Server was down.
+  // A running world resumes automatically; a deliberately stopped one stays paused.
+  if (world.runtime?.running) {
+    world.runtime.resumed_at_utc = new Date(now()).toISOString();
+    await durableWrite(path.join(dataDir, 'world.json'), JSON.stringify(world, null, 2) + '\n');
+  }
   const streams = new Set();
   let server, writeQueue = Promise.resolve(), stopping = false;
   function snapshot() {
@@ -126,10 +132,23 @@ async function createDKServer({
       revision: world.revision, clock: worldClock(world, now()), area: world.areas[AREA_ID]
     };
   }
+  async function saveRuntimeChange(running) {
+    const pending = writeQueue.then(async () => {
+      if (Boolean(world.runtime?.running ?? true) === running)
+        return { world, changed: false };
+      const next = setWorldRunning(world, running, now());
+      await durableWrite(path.join(dataDir,'world.json'), JSON.stringify(next,null,2)+'\n');
+      world = next;
+      for (const viewer of streams) push(viewer,'world.state', {running, clock: worldClock(world,now())});
+      return {world,changed:true};
+    });
+    writeQueue = pending.catch(()=>{});
+    return pending;
+  }
   async function saveCreatedCharacter(slot, name) {
     // Serialize concurrent requests, then write and sync BEFORE acknowledging.
     const pending = writeQueue.then(async () => {
-      const result = createCharacter(world, slot, name, now());
+      const result = createCharacter(checkpointWorldTime(world, now()), slot, name, now());
       await durableWrite(path.join(dataDir, 'world.json'), JSON.stringify(result.world, null, 2) + '\n');
       world = result.world;
       return result;
@@ -139,7 +158,8 @@ async function createDKServer({
   }
   async function saveAction(slot, command) {
     const pending = writeQueue.then(async () => {
-      const result = applyCharacterAction(world, slot, command);
+      if (!worldClock(world, now()).running) throw new Error('World is paused; press Start Server');
+      const result = applyCharacterAction(checkpointWorldTime(world, now()), slot, command);
       await durableWrite(path.join(dataDir, 'world.json'), JSON.stringify(result.world, null, 2) + '\n');
       world = result.world;
       return result;
@@ -157,17 +177,33 @@ async function createDKServer({
     const write = method !== 'GET' && method !== 'HEAD';
     if (!localRequestAllowed(req, server.address().port))
       return sendJSON(res, 403, { error: 'DK Server is local-only; use this game origin' });
+    if (url.pathname === '/api/v1/server/state' && !write)
+      return sendJSON(res, 200, { running: worldClock(world,now()).running, clock: worldClock(world,now()), revision: world.revision }, method);
+    if (['/api/v1/server/start','/api/v1/server/stop'].includes(url.pathname) && method === 'POST') {
+      const starting = url.pathname.endsWith('/start');
+      if (req.headers['x-dk-control'] !== (starting?'start':'stop'))
+        return sendJSON(res,403,{error:'Use Demon Killer Options to control the world'});
+      try {
+        const changed = await saveRuntimeChange(starting);
+        return sendJSON(res,200,{running:starting, changed:changed.changed,clock:worldClock(world,now())});
+      } catch(error) {
+        console.error('DK Server start/stop failed:',error);
+        return sendJSON(res,500,{error:'World state could not be saved'});
+      }
+    }
     if (url.pathname === '/api/v1/server/shutdown' && method === 'POST') {
       if (req.headers['x-dk-control'] !== 'shutdown')
         return sendJSON(res, 403, { error: 'Use Demon Killer Options to stop the world' });
       if (stopping) return sendJSON(res, 409, { error: 'Server is already stopping' });
+      try { await saveRuntimeChange(false); }
+      catch(e) { return sendJSON(res,500,{error:'World pause could not be saved'}); }
       stopping = true;
-      sendJSON(res, 202, { stopping: true, message: 'Saving and stopping DK Server' });
+      sendJSON(res, 202, { stopping: true, message: 'World paused and DK Server stopping' });
       setImmediate(() => server.emit('dk:shutdown'));
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m3', online: true, background_world: true }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m4', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if (url.pathname === '/api/v1/characters' && (method === 'GET' || method === 'HEAD' || method === 'POST')) {
@@ -190,13 +226,13 @@ async function createDKServer({
       }
       return sendJSON(res, 200, { characters: Object.fromEntries(Object.entries(world.characters).map(([k,v])=>[k,playableCharacter(v)])), world_revision: world.revision }, method);
     }
-    const match = url.pathname.match(/^\/api\/v1\/characters\/([123])$/);
+    const match = url.pathname.match(/^\/api\/v1\/characters\/(1)$/);
     if (match && !write) {
       const character = world.characters[match[1]];
       return character ? sendJSON(res, 200, { character: playableCharacter(character), world_revision: world.revision }, method)
         : sendJSON(res, 404, { error: 'Empty character slot' }, method);
     }
-    const actionMatch = url.pathname.match(/^\/api\/v1\/characters\/([123])\/actions$/);
+    const actionMatch = url.pathname.match(/^\/api\/v1\/characters\/(1)\/actions$/);
     if (actionMatch && method === 'POST') {
       let body;
       try { body = await readJSON(req); }
@@ -206,7 +242,7 @@ async function createDKServer({
         return sendJSON(res, 200, { character: saved.character, world_revision: saved.world.revision });
       } catch (e) {
         if (/Invalid|Only valid/.test(e.message)) return sendJSON(res, 422, { error: e.message });
-        if (/already|blocked|not complete|not available|beside/.test(e.message)) return sendJSON(res, 409, { error: e.message });
+        if (/already|blocked|not complete|not available|beside|paused/.test(e.message)) return sendJSON(res, 409, { error: e.message });
         if (/Empty character slot/.test(e.message)) return sendJSON(res, 404, { error: e.message });
         console.error('DK Server action failed:', e);
         return sendJSON(res, 500, { error: 'World action was not saved' });
@@ -236,7 +272,19 @@ async function createDKServer({
     if (!res.headersSent) sendJSON(res, 500, { error: 'Internal DK Server error' });
     else res.destroy();
   }); });
+  // Checkpoint the authoritative clock periodically even with no browser connected;
+  // the pending write queue prevents an older snapshot overwriting gameplay.
+  let lastCheckpoint = now();
   const ticker = setInterval(() => {
+    if (world.runtime?.running && now()-lastCheckpoint >= 30_000) {
+      lastCheckpoint = now();
+      const task = writeQueue.then(async()=>{
+        const next = checkpointWorldTime(world, now());
+        await durableWrite(path.join(dataDir,'world.json'), JSON.stringify(next,null,2)+'\n');
+        world=next;
+      });
+      writeQueue=task.catch(e=>console.error('World clock checkpoint failed:',e));
+    }
     const clock = worldClock(world, now());
     for (const res of streams) {
       if (res.destroyed || res.writableEnded) streams.delete(res);
@@ -256,6 +304,11 @@ async function createDKServer({
     async close() {
       clearInterval(ticker);
       await writeQueue;
+      if (world.runtime?.running) {
+        const next = setWorldRunning(world,false,now());
+        await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(next,null,2)+'\n');
+        world=next;
+      }
       for (const res of streams) res.end();
       streams.clear();
       try { await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve())); }

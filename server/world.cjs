@@ -58,7 +58,8 @@ function makeWorld(now = Date.now()) {
     clock_anchor_utc: new Date(now).toISOString(),
     revision: 0,
     areas: { [AREA_ID]: templeTemplate() },
-    characters: {}
+    characters: {},
+    runtime: { running: true, elapsed_ms: 0, resumed_at_utc: new Date(now).toISOString() }
   };
 }
 
@@ -82,6 +83,13 @@ function validateWorld(world) {
         !Number.isSafeInteger(character.revision) || character.revision < 1 ||
         !Number.isFinite(Date.parse(character.created_at_utc)))
       throw new Error('Invalid character record in DK Server data');
+  }
+  if (world.runtime !== undefined) {
+    const r = world.runtime;
+    if (!r || typeof r.running !== 'boolean' || !Number.isSafeInteger(r.elapsed_ms) ||
+        r.elapsed_ms < 0 || !Number.isFinite(Date.parse(r.resumed_at_utc)) ||
+        new Date(Date.parse(r.resumed_at_utc)).toISOString() !== r.resumed_at_utc)
+      throw new Error('Invalid persistent world runtime');
   }
   const anchor = Date.parse(world.clock_anchor_utc);
   if (!Number.isFinite(anchor) || new Date(anchor).toISOString() !== world.clock_anchor_utc)
@@ -107,7 +115,7 @@ function validateWorld(world) {
 }
 
 function createCharacter(world, slot, name, now = Date.now()) {
-  if (!Number.isInteger(slot) || slot < 1 || slot > 3) throw new Error('Invalid character slot');
+  if (!Number.isInteger(slot) || slot !== 1) throw new Error('Invalid character slot');
   if (typeof name !== 'string' || !/^[A-Za-z0-9 _-]{1,8}$/.test(name.trim()))
     throw new Error('Character name must be 1 to 8 letters, numbers, spaces, underscores or hyphens');
   if (Object.hasOwn(world.characters, String(slot))) throw new Error('Character slot is already occupied');
@@ -128,7 +136,7 @@ function playableCharacter(character) {
 }
 
 function applyCharacterAction(world, slot, command) {
-  if (![1,2,3].includes(slot)) throw new Error('Invalid character slot');
+  if (slot !== 1) throw new Error('Invalid character slot');
   if (!command || typeof command !== 'object' || Array.isArray(command) ||
       !['move','finish_opening','resurrect','toggle_door'].includes(command.action))
     throw new Error('Invalid character action');
@@ -186,14 +194,16 @@ function applyCharacterAction(world, slot, command) {
 }
 
 function worldClock(world, now = Date.now()) {
-  const elapsed = Math.max(0, now - Date.parse(world.clock_anchor_utc));
+  const r = world.runtime;
+  const elapsed = r ? r.elapsed_ms + (r.running ? Math.max(0, now - Date.parse(r.resumed_at_utc)) : 0)
+    : Math.max(0, now - Date.parse(world.clock_anchor_utc));
   const position = elapsed % CYCLE_MS;
   const phase = position < DAY_MS ? 'day' : 'night';
   const phaseElapsed = position % DAY_MS;
   return {
     utc_now: new Date(now).toISOString(),
     clock_anchor_utc: world.clock_anchor_utc,
-    phase,
+    phase, running: r?.running ?? true,
     cycle: Math.floor(elapsed / CYCLE_MS),
     elapsed_in_phase_seconds: Math.floor(phaseElapsed / 1000),
     seconds_until_transition: Math.ceil((DAY_MS - phaseElapsed) / 1000),
@@ -202,4 +212,30 @@ function worldClock(world, now = Date.now()) {
   };
 }
 
-module.exports = { playableCharacter, applyCharacterAction, AREA_ID, GRID_SIZE, TILE_SIZE, DAY_MS, CYCLE_MS, templeTemplate, makeWorld, validateWorld, createCharacter, worldClock };
+// Freeze world time when Stop is pressed, then continue from exactly that point
+// when Start is pressed again. Old M3 saves without a runtime are accepted.
+function setWorldRunning(world, running, now = Date.now()) {
+  if (typeof running !== 'boolean' || !Number.isFinite(now) || now < 0)
+    throw new Error('Invalid world run state');
+  const next = structuredClone(world);
+  const previous = next.runtime ?? {
+    running: true, elapsed_ms: 0, resumed_at_utc: next.clock_anchor_utc
+  };
+  const elapsed = previous.elapsed_ms + (previous.running ?
+    Math.max(0, now - Date.parse(previous.resumed_at_utc)) : 0);
+  next.runtime = { running, elapsed_ms: Math.floor(elapsed), resumed_at_utc: new Date(now).toISOString() };
+  next.revision++;
+  validateWorld(next);
+  return next;
+}
+
+function checkpointWorldTime(world, now = Date.now()) {
+  if (!world.runtime?.running) return world;
+  const next = structuredClone(world), r = next.runtime;
+  r.elapsed_ms += Math.max(0, now - Date.parse(r.resumed_at_utc));
+  r.resumed_at_utc = new Date(now).toISOString();
+  validateWorld(next);
+  return next;
+}
+
+module.exports = { setWorldRunning, checkpointWorldTime, playableCharacter, applyCharacterAction, AREA_ID, GRID_SIZE, TILE_SIZE, DAY_MS, CYCLE_MS, templeTemplate, makeWorld, validateWorld, createCharacter, worldClock };
