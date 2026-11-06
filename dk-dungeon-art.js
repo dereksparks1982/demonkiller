@@ -69,6 +69,7 @@
     if(!s&&!e)draw(g,'ox72i_wall_outer_se',px,py,32,32,time,0);
     if(!s&&!w)draw(g,'ox72i_wall_front_left',px,py,32,32,time,0);
     if(!s&&!e)draw(g,'ox72i_wall_front_right',px,py,32,32,time,0);
+    return true;
   }
   function drawAutoSecond(g,px,py,{n,e,s,w},time){
     let id='ox72_wall_mid';
