@@ -252,7 +252,8 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   // Pandora-inspired wall texture palette, one-step wall lines and saved styles.
   const wallCategory=get('category');wallCategory.value='walls';
   await wallCategory.emit('change',{target:wallCategory});
-  assert.equal(get('palette').children.length,4,'Four approved masonry finishes in asset browser');
+  assert.equal(get('palette').children.length,84,
+    'Four auto-joining wall finishes plus all 80 approved exact wall tiles');
   await get('palette').children[1].emit('click'); // Moss from the original wall atlas.
   await click(1,6);
   const wallTool=get('tool');wallTool.value='wallLine';
@@ -267,6 +268,20 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
     assert.equal(wallLayout.walls[8*16+x],1,'Straight-run wall is complete');
     assert.equal(wallLayout.wallStyles[8*16+x],'moss','Straight-run retains palette finish');
   }
+  // Hand-selected art remains exact even when adjacent walls connect differently.
+  const exactEntry=get('palette').children[4]; // first individually picked straight tile
+  await exactEntry.emit('click');
+  await click(5,8);
+  await get('save').emit('click');
+  let manual=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(manual.wallVariants[8*16+5],'wall_straight_north',
+    'Specific wall art is saved rather than replaced by auto-connected geometry');
+  const invalidWall=structuredClone(manual);
+  invalidWall.wallVariants[8*16+5]='secret-wall-without-approval';
+  get('import').files=[{size:8000,text:async()=>JSON.stringify(invalidWall)}];
+  await get('import').emit('change',{target:get('import')});
+  assert.match(get('status').textContent,/Import rejected/,
+    'Unknown manually selected wall art must be rejected on import');
   wallTool.value='wallErase';await wallTool.emit('change',{target:wallTool});
   await click(1,8);await get('save').emit('click');
   const erasedLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));

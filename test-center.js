@@ -25,6 +25,18 @@
     cracked:{label:'Cracked masonry',color:'#67545f'},
     broken:{label:'Broken masonry',color:'#483b42'}
   };
+  const WALL_TILE_PIECES=(()=>{
+    const pieces={};
+    const shapes=['straight','corner','t','cross','end'];
+    const faces=['north','east','south','west'];
+    const finishes=['clean','moss','cracked','broken'];
+    for(const shape of shapes)for(const face of faces)for(const finish of finishes){
+      const key='wall_'+shape+'_'+face+(finish==='clean'?'':'_'+finish);
+      const label=shape==='t'?'T-junction':shape==='cross'?'Cross/post':shape[0].toUpperCase()+shape.slice(1);
+      pieces[key]={label:label+' · '+face+' · '+finish,shape,face,finish};
+    }
+    return Object.freeze(pieces);
+  })();
   const CATALOG = {
     altar: { label: 'Sacrificial Altar', category: 'relics', w: 3, h: 2, solid: true },
     crystal: { label: 'Soul Crystal', category: 'relics', w: 1, h: 1, solid: false },
@@ -80,6 +92,7 @@
     const walls = Array(COUNT).fill(0);
     const floor = Array(COUNT).fill('stone');
     const wallStyles = Array(COUNT).fill('clean');
+    const wallVariants = Array(COUNT).fill(null);
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       if (x === 0 || y === 0 || x === N-1 || y === N-1) {
         walls[index(x,y)] = 1;
@@ -94,7 +107,7 @@
     return {
       schema: 1, area_id: AREA, tile_size: TILE, width: N, height: N,
       introSeen: false,
-      floor, walls, wallStyles,
+      floor, walls, wallStyles, wallVariants,
       objects: [
         { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:false },
         { id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 },
@@ -115,7 +128,8 @@
       previewRotation = 0,
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
   // Pandora-style architect wall brush state. Wall types do not change tile geometry.
-  let wallFinish='clean',wallStroke=null,skipWallClick=false,selectedSprite='crystal_gold_bright';
+  let wallFinish='clean',wallStroke=null,skipWallClick=false,
+      selectedSprite='crystal_gold_bright',selectedWallTile=null;
   let architectClipboard=null;
   const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
   const Population=typeof DemonKillerPopulation!=='undefined'?DemonKillerPopulation:null;
@@ -543,6 +557,13 @@
     return readyImage(group+'/'+name+'_'+suffix+'.png');
   }
   function wallImage(x,y) {
+    // Hand-selected wall geometry takes precedence. Untouched cells keep
+    // automatic cardinal joins, so existing temple walls remain unchanged.
+    const exact=scene.wallVariants?.[index(x,y)];
+    if(exact&&Object.hasOwn(WALL_TILE_PIECES,exact)){
+      const image=readyImage('temple/walls/'+exact+'.png');
+      if(image)return image;
+    }
     const on=(a,b)=>inside(a,b)&&!!scene.walls[index(a,b)];
     const n=on(x,y-1),e=on(x+1,y),s=on(x,y+1),w=on(x-1,y);
     const count=Number(n)+Number(e)+Number(s)+Number(w);
@@ -807,7 +828,8 @@
   }
   function palette() {
     const list=$('palette');list.replaceChildren();$('paletteTitle').textContent=GROUPS[category];
-    const all=category==='walls'?Object.entries(WALL_FINISHES)
+    const all=category==='walls'?
+        [...Object.entries(WALL_FINISHES),...Object.entries(WALL_TILE_PIECES)]
       :category==='floors'?Object.entries(FLOOR)
       :category==='library'?Object.entries(ARCHITECT_SPRITES)
       :Object.entries(CATALOG).filter(([,a])=>a.category===category);
@@ -815,7 +837,8 @@
     const entries=all.filter(([name,entry])=>(name+' '+entry.label).toLowerCase().includes(query));
     for(const [key,entry] of entries){
       const b=document.createElement('button');b.type='button';
-      b.className=(category==='walls'?wallFinish===key
+      b.className=(category==='walls'?
+          (selectedWallTile?selectedWallTile===key:wallFinish===key)
         :category==='library'?selectedSprite===key:current===key)?'active':'';
       const mini=document.createElement('canvas');mini.width=32;mini.height=32;mini.setAttribute('aria-hidden','true');
       const c=mini.getContext('2d');c.imageSmoothingEnabled=false;
@@ -824,7 +847,9 @@
         c.strokeStyle='#8e6676';c.strokeRect(2,2,28,28);
         if(key==='sigil'){c.fillStyle='#bf748e';c.fillRect(15,8,3,16);c.fillRect(9,15,16,2);}
       }else if(category==='walls'){
-        const name='temple/walls/wall_straight_north'+(key==='clean'?'':'_'+key)+'.png';
+        const name=Object.hasOwn(WALL_TILE_PIECES,key)
+          ?'temple/walls/'+key+'.png'
+          :'temple/walls/wall_straight_north'+(key==='clean'?'':'_'+key)+'.png';
         const image=readyImage(name);
         if(image&&typeof c.drawImage==='function')c.drawImage(image,0,0,32,32);
         else{c.fillStyle=entry.color;c.fillRect(3,7,26,18);c.strokeStyle='#201921';c.strokeRect(3,7,26,18);}
@@ -836,7 +861,10 @@
       const span=document.createElement('span');span.textContent=entry.label;
       b.append(mini,span);b.addEventListener('click',()=>{
         if(category==='walls'){
-          wallFinish=key;tool='wall';$('tool').value=tool;
+          if(Object.hasOwn(WALL_TILE_PIECES,key)){
+            selectedWallTile=key;wallFinish=WALL_TILE_PIECES[key].finish;
+          }else{selectedWallTile=null;wallFinish=key;}
+          tool='wall';$('tool').value=tool;
         }else{
           current=category==='library'?'scenery':key;
           if(category==='library')selectedSprite=key;
@@ -848,7 +876,9 @@
         palette();draw();message('Selected '+entry.label+'. Click a grid coordinate in Architect Mode.');
       });list.append(b);
     }
-    $('wallFinishLabel').textContent='WALL FINISH · '+WALL_FINISHES[wallFinish].label.toUpperCase();
+    $('wallFinishLabel').textContent=selectedWallTile
+      ?'EXACT WALL · '+WALL_TILE_PIECES[selectedWallTile].label.toUpperCase()
+      :'AUTO JOIN · '+WALL_FINISHES[wallFinish].label.toUpperCase();
     $('uoAssetCount').textContent=entries.length+' TILES';
   }
   function setMode(next) {
@@ -969,13 +999,17 @@
   function paintWallCells(cells,erase=false){
     return transact(()=>{
       if(!scene.wallStyles)scene.wallStyles=Array(COUNT).fill('clean');
+      if(!scene.wallVariants)scene.wallVariants=Array(COUNT).fill(null);
       for(const [x,y] of cells){
         if(!inside(x,y))continue;
         const i=index(x,y);
         if(erase){
-          if(scene.walls[i]){scene.walls[i]=0;scene.wallStyles[i]='clean';}
+          if(scene.walls[i]){
+            scene.walls[i]=0;scene.wallStyles[i]='clean';scene.wallVariants[i]=null;
+          }
         }else if(!objectAt(x,y)){
           scene.walls[i]=1;scene.wallStyles[i]=wallFinish;
+          scene.wallVariants[i]=selectedWallTile;
         }
       }
     },(erase?'Removed':'Painted '+WALL_FINISHES[wallFinish].label)+' wall tiles ('+cells.length+' selected).');
@@ -984,7 +1018,9 @@
     const here=objectAt(x,y),i=index(x,y);
     if(tool==='pick'){
       if(scene.walls[i]&&!here){
-        wallFinish=scene.wallStyles?.[i]||'clean';category='walls';tool='wall';
+        wallFinish=scene.wallStyles?.[i]||'clean';
+        selectedWallTile=scene.wallVariants?.[i]||null;
+        category='walls';tool='wall';
         $('category').value=category;$('tool').value=tool;palette();draw();
         message('Eyedropper: '+WALL_FINISHES[wallFinish].label+' wall.');return;
       }
@@ -1014,7 +1050,11 @@
     if(tool==='erase'){
       transact(()=>{
         if(here)scene.objects=scene.objects.filter(o=>o.id!==here.id);
-        else if(scene.walls[i]){scene.walls[i]=0;if(scene.wallStyles)scene.wallStyles[i]='clean';}
+        else if(scene.walls[i]){
+          scene.walls[i]=0;
+          if(scene.wallStyles)scene.wallStyles[i]='clean';
+          if(scene.wallVariants)scene.wallVariants[i]=null;
+        }
       },'Removed '+(here?CATALOG[here.type].label:'wall')+' at ('+x+', '+y+').');selectedId=null;return;
     }
     if(tool==='wall'||tool==='wallErase'){
@@ -1120,7 +1160,20 @@
     },front?'Object moved to front.':'Object sent to back.');
   }
   function rotateSelected() {
-    const obj=objectAtId(selectedId);if(!obj)return message('Select an object before rotating.');
+    const obj=objectAtId(selectedId);
+    // A hand-placed corner, end or other wall art can rotate cardinally too.
+    if(!obj&&hover&&scene.walls[index(hover.x,hover.y)]){
+      const i=index(hover.x,hover.y),key=scene.wallVariants?.[i];
+      if(key&&Object.hasOwn(WALL_TILE_PIECES,key)){
+        const item=WALL_TILE_PIECES[key],faces=['north','east','south','west'];
+        const next='wall_'+item.shape+'_'+faces[(faces.indexOf(item.face)+1)%4]+
+          (item.finish==='clean'?'':'_'+item.finish);
+        transact(()=>{scene.wallVariants[i]=next;},'Rotated wall art to '+faces[(faces.indexOf(item.face)+1)%4]+'.');
+        selectedWallTile=next;return;
+      }
+      return message('Select an exact wall piece to rotate; automatic joints follow their neighbors.');
+    }
+    if(!obj)return message('Select an object or hover over a hand-placed wall to rotate.');
     transact(()=>{const next={...obj,r:(obj.r+1)%4};if(canPlace(next,obj.id))obj.r=next.r;},'Rotated '+CATALOG[obj.type].label+'.');
   }
   function duplicateSelected() {
@@ -1175,8 +1228,12 @@
     if('wallStyles' in data && (!Array.isArray(data.wallStyles)||data.wallStyles.length!==COUNT||
       !data.wallStyles.every(v=>Object.hasOwn(WALL_FINISHES,v))))
       throw Error('Invalid wall finish records.');
+    if('wallVariants' in data&&(!Array.isArray(data.wallVariants)||data.wallVariants.length!==COUNT||
+      !data.wallVariants.every(v=>v===null||Object.hasOwn(WALL_TILE_PIECES,v))))
+      throw Error('Invalid manually selected wall art.');
     const restored=clone(data);
     if(!restored.wallStyles)restored.wallStyles=Array(COUNT).fill('clean');
+    if(!restored.wallVariants)restored.wallVariants=Array(COUNT).fill(null);
     return restored;
   }
   function save() {

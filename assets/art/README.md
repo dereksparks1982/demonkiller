@@ -4,7 +4,7 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 
 ## Directory layout
 
-- `temple/walls/`: owner-approved stone wall master atlas, 80 extracted directional/wear tiles for straight walls, corners, T joins, crossing/post nodes and ends (clean, moss, cracked, broken).
+- `temple/walls/`: owner-approved stone wall master atlas, 80 extracted directional/wear tiles for straight walls, corners, T joins, crossing/post nodes and ends (clean, moss, cracked, broken). All 80 can now be selected individually from the floating DK Architect's horizontal wall palette; four auto-join variants remain available.
 - `temple/floors/`: floor tile styles and floor variations.
 - `temple/doors/`: door graphics and states.
 - `temple/furniture/`: furnishings and movable objects.

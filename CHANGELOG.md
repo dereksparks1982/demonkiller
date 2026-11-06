@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.16 development preview | 2026-11-05 | Full approved wall-parts browser
+
+- Expanded the horizontal Ultima Online-style wall tile browser from four automatic-join finish buttons to 84 art choices: four auto-join finishes plus all 80 original approved wall piece variants (straight, corner, T, post/cross, end × four facings × four finishes).
+- A hand-picked piece is preserved in `scene.wallVariants` by tile coordinate. Automatic wall joining remains the default for all existing walls and for the four finish options. The original approved temple layout, north doorway and collision remain unchanged.
+- Placing, line painting, room outlining and erasing now preserve or clear exact wall choices. Eyedropper selects a wall's current exact or auto style.
+- Hover a hand-placed wall and use the Rotate action to cycle its four art directions; existing object rotation is unchanged.
+- Import rejects unknown wall asset IDs; room saves created before the new optional wall-array field still load with auto-joining. Undo/redo and room export include manual selections. Browser visual review pending.
+
+
 ## v0.2.15 development preview | 2026-11-05 | Real approved-image UO house toolbar
 
 - Owner rejected the previous dark, tall, tabbed floating sidebar (v0.2.12–0.2.14). Rebuilt the default DK Architect interface as a compact HORIZONTAL Ultima Online house-construction toolbar instead of restyling that sidebar.
