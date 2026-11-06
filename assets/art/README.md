@@ -4,7 +4,7 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 
 ## Directory layout
 
-- `temple/walls/`: historical source atlas preserved; the live transparent orthographic atlas `Demon_Killer_Orthographic_Seamless_Wall_Atlas.png` and its 220 individual 32×32 PNG components replace the 80 mismatched cropped pieces. 11 shapes × 4 directions × 5 finishes, exact 12px joining edge profiles, with 5 automatic finish choices in DK Architect. Regenerate and verify using `scripts/build-dk-topdown-walls.py`; source JSON in `wall-ortho-manifest.json`.
+- `dkarchitect/walls/`: current 106 independent transparent architectural objects plus 5 seam-verified grid masonry tiles. The earlier 220 rejected variants were retired from runtime and repository.
 - `temple/floors/`: floor tile styles and floor variations.
 - `temple/doors/`: door graphics and states.
 - `temple/furniture/`: furnishings and movable objects.
@@ -17,13 +17,12 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 - `characters/devil/`: approved Devil sheet with four cardinal views.
 - `shared/`: images reusable across areas.
 
-## Approved temple masonry and Architect wall tools (2026-11-05)
+## Current DK Architect stone library (2026-11-06)
 
-- Keep `temple/walls/Dungeon Temple Wall Tile Atlas(1).png` unmodified as the authoritative approved wall set. It includes straight runs, corners, junctions, posts, arches, windows, cracks, moss and rubble.
-- `scripts/split-approved-walls.py` extracts 80 static transparent 32×32 game-sized sprites from this atlas without inventing new artwork. For each of five connected wall shapes (straight, corner, T, cross/post, end), there are four facing directions and four wear levels (clean, moss, cracked, broken).
-- Original clean runtime filenames `wall_{shape}_{direction}.png` are replaced by approved pixels. Wear variants append `_moss`, `_cracked` or `_broken` before `.png`.
-- DK Architect presents the wall finishes in a searchable asset palette and provides paint/drag, straight-run, room-outline and erase tools. Wall styles are optional per-cell scene data; wall geometry, collision and the temple's northern doorway remain unchanged. Arches and window artwork remain in the original atlas for a future separately authorized placement pass.
-- Matching damaged/clean/dirty floor artwork is planned next, not included in this wall change.
+- `assets/art/temple/Demon Killer Stone Wall Tileset.png`: owner-uploaded current source image. Do not overwrite or regenerate it.
+- `assets/art/dkarchitect/walls/`: 106 individually cropped, transparent sections with a manifest and catalog, plus five verified 32px seamless masonry swatches for grid walls. No obsolete wall shape variants are selectable.
+- `assets/art/temple/walls/Dungeon Temple Wall Tile Atlas(1).png`: historical approved source, kept for reference only and no longer driving the runtime.
+- Procedural wall atlas and outdated 220 directional sprites were removed from active use by owner instruction. See `docs/architect-wall-recovery-and-reuse.md`.
 
 ## Pandora-style staged sprite library (2026-11-05)
 

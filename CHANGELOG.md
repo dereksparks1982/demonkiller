@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.20 development preview | 2026-11-06 | Original wall sheet extraction, Architect scrolling and clean README
+
+- Split the owner-uploaded `Demon Killer Stone Wall Tileset.png` into 106 individual original-pixel transparent PNG sprites, categorized into structures, corners, straight runs, mossy stone, ruins, curves, pillars and fortified sections; source sha256 and source rectangles recorded in the generated manifest.
+- Each piece is placeable, rotatable, movable, removable and persistable in DK Architect with a true multi-tile footprint and no fake automatic joining. Save validation rejects unknown piece IDs.
+- Removed 220 procedurally generated faux wall pieces from the active assets and all old 32px direction-specific artwork from the active wall palette. Existing room wall cells remain, now displaying one of five seam-tested 32px stone material tiles extracted/adapted from the owner's uploaded sheet, without pretending these are structural corner images. Old saved manual wall variants are safely normalized to grid masonry while retaining wall cells.
+- Mouse-wheel events over the horizontal Architect sprite browser now scroll the sprite strip; existing arrows still work. Mouse-wheel events over the game canvas continue rotating an unplaced sprite.
+- Kept the UO-inspired Architect toolbar geometry, original approved UI art, temple story and current saves. Removed obsolete wall-generation workflows and scripts so stale assets are not regenerated.
+- Public README now contains only the game's description, current gameplay and player URL; the previous technical README moved verbatim into docs. Third-party CC0 asset research and compatibility guidance live in docs.
+- No third-party art has been imported into the game or silently treated as a matching construction set. In-browser visual approval pending.
+
+
 ## v0.2.19 development preview | 2026-11-06 | One-click precise destination walking
 
 - A short right mouse click now sets a fixed pixel-accurate destination; the ghost/living character continues travelling after mouse release and stops once the pointer coordinate is reached.

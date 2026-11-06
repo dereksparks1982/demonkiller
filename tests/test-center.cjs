@@ -37,6 +37,10 @@ assert(css.includes('background-position:-16.8px -318.4px'),
   'Gold six-command bar must be cropped from approved owner sheet');
 assert(js.includes('UI_ATLAS=')&&js.includes('data-uo-art')&&
   js.includes('uoHouseToolbar.v2'),'Approved sprite atlas and new layout preference key required');
+assert(html.includes('assets/art/dkarchitect/walls/catalog.js'),
+  'Actual cropped wall-piece catalog must load before Architect game script');
+assert(js.includes("paletteViewport.addEventListener('wheel'"),
+  'A mouse wheel must scroll the horizontal tile palette');
 
 assert(!html.includes('project.godot')&&!html.includes('Capital & Consequence'));
 const refreshRedirect=html.match(/<script id="refresh-to-menu">([\s\S]*?)<\/script>/)?.[1];
@@ -75,25 +79,33 @@ for(const file of crystalFiles){
   assert.equal(buffer.readUInt32BE(16),32,'Crystal sprite must use 32px tile width');
   assert.equal(buffer.readUInt32BE(20),32,'Crystal sprite must use 32px tile height');
 }
-const wallsFolder=path.join(root,'assets/art/temple/walls');
-const wallShapes=['straight','corner','t','cross','end','pillar','arch','window','buttress','ruin','curve'];
-const wallNames=fs.readdirSync(wallsFolder).filter(f=>/^wall_.*\.png$/.test(f));
-assert.equal(wallNames.length,220,'Eleven seam-fit wall shapes in four directions and five finishes');
-for(const shape of wallShapes)for(const facing of ['north','east','south','west'])
-  for(const suffix of ['','_dirty','_moss','_cracked','_broken']){
-    const file='wall_'+shape+'_'+facing+suffix+'.png';
-    const data=fs.readFileSync(path.join(wallsFolder,file));
-    assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','Wall PNG signature');
-    assert.equal(data.readUInt32BE(16),32,'Wall tile width');
-    assert.equal(data.readUInt32BE(20),32,'Wall tile height');
-    assert.equal(data[25],6,'Every replacement wall sprite uses transparent RGBA PNG format');
-  }
-const wallAtlas=fs.readFileSync(path.join(wallsFolder,'Demon_Killer_Orthographic_Seamless_Wall_Atlas.png'));
-assert.equal(wallAtlas.readUInt32BE(16),640,'Transparent master atlas width');
-assert.equal(wallAtlas.readUInt32BE(20),352,'Transparent master atlas height');
-const wallManifest=JSON.parse(fs.readFileSync(path.join(wallsFolder,'wall-ortho-manifest.json'),'utf8'));
-assert.equal(wallManifest.tile_count,220,'Master atlas and individual tiles remain in sync');
-assert.deepEqual([...wallManifest.finishes],['clean','dirty','moss','cracked','broken']);
+const wallPartsFolder=path.join(root,'assets/art/dkarchitect/walls');
+const wallSource=path.join(root,'assets/art/temple/Demon Killer Stone Wall Tileset.png');
+assert(fs.existsSync(wallSource),'Retain the owner-uploaded wall art master');
+const wallPartFiles=fs.readdirSync(wallPartsFolder).filter(f=>/^dk_wall_.*\.png$/.test(f));
+assert.equal(wallPartFiles.length,106,'All 106 user-provided wall shapes split into individual transparent sprites');
+const wallManifest=JSON.parse(fs.readFileSync(path.join(wallPartsFolder,'manifest.json'),'utf8'));
+assert.equal(wallManifest.piece_count,106,'Generated crop manifest must describe every piece');
+assert.deepEqual([...wallManifest.grid_finishes],['clean','dirty','moss','cracked','broken']);
+assert.equal(Object.keys(wallManifest.pieces).length,106,'No missing or phantom wall-piece labels');
+for(const [id,part] of Object.entries(wallManifest.pieces)){
+  assert.equal(part.safeToAutotile,false,'Unverified corners cannot masquerade as seamless 32px autotiles');
+  const data=fs.readFileSync(path.join(wallPartsFolder,part.filename));
+  assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','Wall-piece PNG signature');
+  assert.equal(data.readUInt32BE(16),part.width,'Preserve exact original cropped width');
+  assert.equal(data.readUInt32BE(20),part.height,'Preserve exact original cropped height');
+  assert.equal(data[25],6,'All original wall cutouts must have transparent RGBA format');
+  assert(part.w>=1&&part.h>=1,'Every individual piece has a buildable tile footprint');
+}
+for(const finish of wallManifest.grid_finishes){
+  const data=fs.readFileSync(path.join(wallPartsFolder,'grid_wall_'+finish+'.png'));
+  assert.equal(data.readUInt32BE(16),32,'Grid masonry must be 32x32');
+  assert.equal(data.readUInt32BE(20),32,'Grid masonry must be 32x32');
+}
+assert(!fs.existsSync(path.join(root,'assets/art/temple/walls/wall_straight_north.png')),
+  'Rejected synthetic wall pieces must not remain selectable or active');
+assert(!fs.existsSync(path.join(root,'.github/workflows/build-dk-topdown-walls.yml')),
+  'Obsolete wall generator Actions must not run again');
 assert(html.includes('id="wallBrush"')&&html.includes('id="wallLineButton"')&&
   html.includes('id="wallOutlineButton"')&&html.includes('id="assetSearch"'),
   'Pandora-style construction controls must be in the Architect panel');
@@ -145,6 +157,7 @@ const tickFrames=count=>{for(let i=0;i<count;i++){
 }};
 const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAnimationFrame,
   window:{addEventListener:noop}};
+vm.runInNewContext(read('assets/art/dkarchitect/walls/catalog.js'),sandbox,{filename:'catalog.js',timeout:3000});
 vm.runInNewContext(js,sandbox,{filename:'test-center.js',timeout:3000});
 const key=code=>{for(const fn of events.keydown??[])fn({key:code,
   ctrlKey:false,metaKey:false,target:{tagName:'BODY'},preventDefault:noop});};
@@ -283,8 +296,13 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   // Pandora-inspired wall texture palette, one-step wall lines and saved styles.
   const wallCategory=get('category');wallCategory.value='walls';
   await wallCategory.emit('change',{target:wallCategory});
-  assert.equal(get('palette').children.length,225,
-    'Five auto-join finishes and 220 exact-fit top-down wall tiles');
+  assert.equal(get('palette').children.length,111,
+    'Five verified masonry swatches and 106 original wall cutouts');
+  const strip=get('uoPaletteViewport');strip.scrollLeft=0;
+  await strip.emit('wheel',{deltaY:120,deltaX:0,deltaMode:0,cancelable:true,preventDefault:noop});
+  assert.equal(strip.scrollLeft,120,'Wheel over art browser moves the horizontal scroll position');
+  await strip.emit('wheel',{deltaY:-40,deltaX:0,deltaMode:0,cancelable:true,preventDefault:noop});
+  assert.equal(strip.scrollLeft,80,'Reverse wheel returns toward earlier sprites');
   await get('palette').children[2].emit('click'); // Moss from the new wall set.
   await click(1,6);
   const wallTool=get('tool');wallTool.value='wallLine';
@@ -299,20 +317,22 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
     assert.equal(wallLayout.walls[8*16+x],1,'Straight-run wall is complete');
     assert.equal(wallLayout.wallStyles[8*16+x],'moss','Straight-run retains palette finish');
   }
-  // Hand-selected art remains exact even when adjacent walls connect differently.
-  const exactEntry=get('palette').children[5]; // first individual straight tile
+  // Independent authored wall pieces are placeable and persist without
+  // pretending to be automatic tile connectors.
+  const exactEntry=get('palette').children[5];
   await exactEntry.emit('click');
   await click(5,8);
   await get('save').emit('click');
-  let manual=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
-  assert.equal(manual.wallVariants[8*16+5],'wall_straight_north',
-    'Specific wall art is saved rather than replaced by auto-connected geometry');
+  const manual=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  const authored=manual.objects.find(o=>o.type==='wallPiece'&&o.x===5&&o.y===8);
+  assert(authored&&authored.wallPieceId==='dk_wall_structures_01',
+    'Approved wall section must retain its original crop ID in the room save');
   const invalidWall=structuredClone(manual);
-  invalidWall.wallVariants[8*16+5]='secret-wall-without-approval';
+  invalidWall.objects.find(o=>o.type==='wallPiece').wallPieceId='secret-wall-without-approval';
   get('import').files=[{size:8000,text:async()=>JSON.stringify(invalidWall)}];
   await get('import').emit('change',{target:get('import')});
   assert.match(get('status').textContent,/Import rejected/,
-    'Unknown manually selected wall art must be rejected on import');
+    'Unknown individual wall-part ID must be rejected on import');
   wallTool.value='wallErase';await wallTool.emit('change',{target:wallTool});
   await click(1,8);await get('save').emit('click');
   const erasedLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
