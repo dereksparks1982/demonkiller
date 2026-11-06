@@ -1,0 +1,10556 @@
+{
+  "schema": 1,
+  "atlas": "./assets/art/dkarchitect/imported/dk-imported-game-atlas.png",
+  "entries": {
+    "ox72_angel_idle_anim": {
+      "name": "Angel Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          0,
+          0,
+          16,
+          16
+        ],
+        [
+          17,
+          0,
+          16,
+          16
+        ],
+        [
+          34,
+          0,
+          16,
+          16
+        ],
+        [
+          51,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_angel_run_anim": {
+      "name": "Angel Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          68,
+          0,
+          16,
+          16
+        ],
+        [
+          85,
+          0,
+          16,
+          16
+        ],
+        [
+          102,
+          0,
+          16,
+          16
+        ],
+        [
+          119,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_big_demon_idle_anim": {
+      "name": "Big Demon Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          136,
+          0,
+          32,
+          36
+        ],
+        [
+          169,
+          0,
+          32,
+          36
+        ],
+        [
+          202,
+          0,
+          32,
+          36
+        ],
+        [
+          235,
+          0,
+          32,
+          36
+        ]
+      ],
+      "fps": 7,
+      "width": 64,
+      "height": 72,
+      "footprint": [
+        2,
+        3
+      ]
+    },
+    "ox72_big_demon_run_anim": {
+      "name": "Big Demon Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          268,
+          0,
+          32,
+          36
+        ],
+        [
+          301,
+          0,
+          32,
+          36
+        ],
+        [
+          334,
+          0,
+          32,
+          36
+        ],
+        [
+          367,
+          0,
+          32,
+          36
+        ]
+      ],
+      "fps": 7,
+      "width": 64,
+      "height": 72,
+      "footprint": [
+        2,
+        3
+      ]
+    },
+    "ox72_big_zombie_idle_anim": {
+      "name": "Big Zombie Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          400,
+          0,
+          32,
+          36
+        ],
+        [
+          433,
+          0,
+          32,
+          36
+        ],
+        [
+          466,
+          0,
+          32,
+          36
+        ],
+        [
+          499,
+          0,
+          32,
+          36
+        ]
+      ],
+      "fps": 7,
+      "width": 64,
+      "height": 72,
+      "footprint": [
+        2,
+        3
+      ]
+    },
+    "ox72_big_zombie_run_anim": {
+      "name": "Big Zombie Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          532,
+          0,
+          32,
+          36
+        ],
+        [
+          565,
+          0,
+          32,
+          36
+        ],
+        [
+          598,
+          0,
+          32,
+          36
+        ],
+        [
+          631,
+          0,
+          32,
+          36
+        ]
+      ],
+      "fps": 7,
+      "width": 64,
+      "height": 72,
+      "footprint": [
+        2,
+        3
+      ]
+    },
+    "ox72_bomb_f0": {
+      "name": "Bomb F0",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          664,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_bomb_f1": {
+      "name": "Bomb F1",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          681,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_bomb_f2": {
+      "name": "Bomb F2",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          698,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_button_blue_down": {
+      "name": "Button Blue Down",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          715,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_button_blue_up": {
+      "name": "Button Blue Up",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          732,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_button_red_down": {
+      "name": "Button Red Down",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          749,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_button_red_up": {
+      "name": "Button Red Up",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          766,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_chest_empty_open_anim": {
+      "name": "Chest Empty Open Anim F2",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          783,
+          0,
+          16,
+          16
+        ],
+        [
+          800,
+          0,
+          16,
+          16
+        ],
+        [
+          817,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_chest_full_open_anim": {
+      "name": "Chest Full Open Anim F2",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          834,
+          0,
+          16,
+          16
+        ],
+        [
+          851,
+          0,
+          16,
+          16
+        ],
+        [
+          868,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_chest_mimic_open_anim": {
+      "name": "Chest Mimic Open Anim F2",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          885,
+          0,
+          16,
+          16
+        ],
+        [
+          902,
+          0,
+          16,
+          16
+        ],
+        [
+          919,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_chort_idle_anim": {
+      "name": "Chort Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          936,
+          0,
+          16,
+          23
+        ],
+        [
+          953,
+          0,
+          16,
+          23
+        ],
+        [
+          970,
+          0,
+          16,
+          23
+        ],
+        [
+          987,
+          0,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_chort_run_anim": {
+      "name": "Chort Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          1004,
+          0,
+          16,
+          23
+        ],
+        [
+          0,
+          37,
+          16,
+          23
+        ],
+        [
+          17,
+          37,
+          16,
+          23
+        ],
+        [
+          34,
+          37,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_coin_anim": {
+      "name": "Coin Anim F3",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          51,
+          37,
+          6,
+          7
+        ],
+        [
+          58,
+          37,
+          6,
+          7
+        ],
+        [
+          65,
+          37,
+          6,
+          7
+        ],
+        [
+          72,
+          37,
+          6,
+          7
+        ]
+      ],
+      "fps": 7,
+      "width": 12,
+      "height": 14,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_column": {
+      "name": "Column",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          79,
+          37,
+          16,
+          48
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 96,
+      "footprint": [
+        1,
+        3
+      ]
+    },
+    "ox72_column_wall": {
+      "name": "Column Wall",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          96,
+          37,
+          16,
+          48
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 96,
+      "footprint": [
+        1,
+        3
+      ]
+    },
+    "ox72_crate": {
+      "name": "Crate",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          113,
+          37,
+          16,
+          24
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 48,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_doc": {
+      "name": "Ox72 Doc",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          130,
+          37,
+          32,
+          32
+        ],
+        [
+          163,
+          37,
+          32,
+          32
+        ],
+        [
+          196,
+          37,
+          32,
+          32
+        ],
+        [
+          229,
+          37,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_doc_idle_anim": {
+      "name": "Doc Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          262,
+          37,
+          16,
+          23
+        ],
+        [
+          279,
+          37,
+          16,
+          23
+        ],
+        [
+          296,
+          37,
+          16,
+          23
+        ],
+        [
+          313,
+          37,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 16,
+      "height": 23,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_doc_run_anim": {
+      "name": "Doc Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          330,
+          37,
+          16,
+          23
+        ],
+        [
+          347,
+          37,
+          16,
+          23
+        ],
+        [
+          364,
+          37,
+          16,
+          23
+        ],
+        [
+          381,
+          37,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 16,
+      "height": 23,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_doors_frame_left": {
+      "name": "Doors Frame Left",
+      "pack": "ox72",
+      "category": "structure",
+      "frames": [
+        [
+          398,
+          37,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_doors_frame_right": {
+      "name": "Doors Frame Right",
+      "pack": "ox72",
+      "category": "structure",
+      "frames": [
+        [
+          415,
+          37,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_doors_frame_top": {
+      "name": "Doors Frame Top",
+      "pack": "ox72",
+      "category": "structure",
+      "frames": [
+        [
+          432,
+          37,
+          32,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 32,
+      "footprint": [
+        2,
+        1
+      ]
+    },
+    "ox72_doors_leaf_closed": {
+      "name": "Doors Leaf Closed",
+      "pack": "ox72",
+      "category": "structure",
+      "frames": [
+        [
+          465,
+          37,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72_doors_leaf_open": {
+      "name": "Doors Leaf Open",
+      "pack": "ox72",
+      "category": "structure",
+      "frames": [
+        [
+          498,
+          37,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72_dwarf_f_hit_anim": {
+      "name": "Dwarf F Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          531,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_dwarf_f_idle_anim": {
+      "name": "Dwarf F Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          548,
+          37,
+          16,
+          28
+        ],
+        [
+          565,
+          37,
+          16,
+          28
+        ],
+        [
+          582,
+          37,
+          16,
+          28
+        ],
+        [
+          599,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_dwarf_f_run_anim": {
+      "name": "Dwarf F Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          616,
+          37,
+          16,
+          28
+        ],
+        [
+          633,
+          37,
+          16,
+          28
+        ],
+        [
+          650,
+          37,
+          16,
+          28
+        ],
+        [
+          667,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_dwarf_m_hit_anim": {
+      "name": "Dwarf M Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          684,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_dwarf_m_idle_anim": {
+      "name": "Dwarf M Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          701,
+          37,
+          16,
+          28
+        ],
+        [
+          718,
+          37,
+          16,
+          28
+        ],
+        [
+          735,
+          37,
+          16,
+          28
+        ],
+        [
+          752,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_dwarf_m_run_anim": {
+      "name": "Dwarf M Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          769,
+          37,
+          16,
+          28
+        ],
+        [
+          786,
+          37,
+          16,
+          28
+        ],
+        [
+          803,
+          37,
+          16,
+          28
+        ],
+        [
+          820,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_edge_down": {
+      "name": "Edge Down",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          837,
+          37,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_elf_f_hit_anim": {
+      "name": "Elf F Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          854,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_elf_f_idle_anim": {
+      "name": "Elf F Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          871,
+          37,
+          16,
+          28
+        ],
+        [
+          888,
+          37,
+          16,
+          28
+        ],
+        [
+          905,
+          37,
+          16,
+          28
+        ],
+        [
+          922,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_elf_f_run_anim": {
+      "name": "Elf F Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          939,
+          37,
+          16,
+          28
+        ],
+        [
+          956,
+          37,
+          16,
+          28
+        ],
+        [
+          973,
+          37,
+          16,
+          28
+        ],
+        [
+          990,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_elf_m_hit_anim": {
+      "name": "Elf M Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          1007,
+          37,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_elf_m_idle_anim": {
+      "name": "Elf M Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          0,
+          86,
+          16,
+          28
+        ],
+        [
+          17,
+          86,
+          16,
+          28
+        ],
+        [
+          34,
+          86,
+          16,
+          28
+        ],
+        [
+          51,
+          86,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_elf_m_run_anim": {
+      "name": "Elf M Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          68,
+          86,
+          16,
+          28
+        ],
+        [
+          85,
+          86,
+          16,
+          28
+        ],
+        [
+          102,
+          86,
+          16,
+          28
+        ],
+        [
+          119,
+          86,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_flask_big_blue": {
+      "name": "Flask Big Blue",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          136,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_flask_big_green": {
+      "name": "Flask Big Green",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          153,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_flask_big_red": {
+      "name": "Flask Big Red",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          170,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_flask_big_yellow": {
+      "name": "Flask Big Yellow",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          187,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_flask_blue": {
+      "name": "Flask Blue",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          204,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_flask_green": {
+      "name": "Flask Green",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          221,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_flask_red": {
+      "name": "Flask Red",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          238,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_flask_yellow": {
+      "name": "Flask Yellow",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          255,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_1": {
+      "name": "Floor 1",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          272,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_2": {
+      "name": "Floor 2",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          289,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_3": {
+      "name": "Floor 3",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          306,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_4": {
+      "name": "Floor 4",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          323,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_5": {
+      "name": "Floor 5",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          340,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_6": {
+      "name": "Floor 6",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          357,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_7": {
+      "name": "Floor 7",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          374,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_8": {
+      "name": "Floor 8",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          391,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_ladder": {
+      "name": "Floor Ladder",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          408,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_spikes_anim": {
+      "name": "Floor Spikes Anim F3",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          425,
+          86,
+          16,
+          16
+        ],
+        [
+          442,
+          86,
+          16,
+          16
+        ],
+        [
+          459,
+          86,
+          16,
+          16
+        ],
+        [
+          476,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_floor_stairs": {
+      "name": "Floor Stairs",
+      "pack": "ox72",
+      "category": "floor",
+      "frames": [
+        [
+          493,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_goblin_idle_anim": {
+      "name": "Goblin Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          510,
+          86,
+          16,
+          16
+        ],
+        [
+          527,
+          86,
+          16,
+          16
+        ],
+        [
+          544,
+          86,
+          16,
+          16
+        ],
+        [
+          561,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_goblin_run_anim": {
+      "name": "Goblin Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          578,
+          86,
+          16,
+          16
+        ],
+        [
+          595,
+          86,
+          16,
+          16
+        ],
+        [
+          612,
+          86,
+          16,
+          16
+        ],
+        [
+          629,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_hole": {
+      "name": "Hole",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          646,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_ice_zombie_anim": {
+      "name": "Ice Zombie Anim F3",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          663,
+          86,
+          16,
+          16
+        ],
+        [
+          680,
+          86,
+          16,
+          16
+        ],
+        [
+          697,
+          86,
+          16,
+          16
+        ],
+        [
+          714,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_imp_idle_anim": {
+      "name": "Imp Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          731,
+          86,
+          16,
+          16
+        ],
+        [
+          748,
+          86,
+          16,
+          16
+        ],
+        [
+          765,
+          86,
+          16,
+          16
+        ],
+        [
+          782,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_imp_run_anim": {
+      "name": "Imp Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          799,
+          86,
+          16,
+          16
+        ],
+        [
+          816,
+          86,
+          16,
+          16
+        ],
+        [
+          833,
+          86,
+          16,
+          16
+        ],
+        [
+          850,
+          86,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_knight_f_hit_anim": {
+      "name": "Knight F Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          867,
+          86,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_knight_f_idle_anim": {
+      "name": "Knight F Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          884,
+          86,
+          16,
+          28
+        ],
+        [
+          901,
+          86,
+          16,
+          28
+        ],
+        [
+          918,
+          86,
+          16,
+          28
+        ],
+        [
+          935,
+          86,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_knight_f_run_anim": {
+      "name": "Knight F Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          952,
+          86,
+          16,
+          28
+        ],
+        [
+          969,
+          86,
+          16,
+          28
+        ],
+        [
+          986,
+          86,
+          16,
+          28
+        ],
+        [
+          1003,
+          86,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_knight_m_hit_anim": {
+      "name": "Knight M Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          0,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_knight_m_idle_anim": {
+      "name": "Knight M Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          17,
+          115,
+          16,
+          28
+        ],
+        [
+          34,
+          115,
+          16,
+          28
+        ],
+        [
+          51,
+          115,
+          16,
+          28
+        ],
+        [
+          68,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_knight_m_run_anim": {
+      "name": "Knight M Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          85,
+          115,
+          16,
+          28
+        ],
+        [
+          102,
+          115,
+          16,
+          28
+        ],
+        [
+          119,
+          115,
+          16,
+          28
+        ],
+        [
+          136,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_lever_left": {
+      "name": "Lever Left",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          153,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_lever_right": {
+      "name": "Lever Right",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          170,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_lizard_f_hit_anim": {
+      "name": "Lizard F Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          187,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_lizard_f_idle_anim": {
+      "name": "Lizard F Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          204,
+          115,
+          16,
+          28
+        ],
+        [
+          221,
+          115,
+          16,
+          28
+        ],
+        [
+          238,
+          115,
+          16,
+          28
+        ],
+        [
+          255,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_lizard_f_run_anim": {
+      "name": "Lizard F Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          272,
+          115,
+          16,
+          28
+        ],
+        [
+          289,
+          115,
+          16,
+          28
+        ],
+        [
+          306,
+          115,
+          16,
+          28
+        ],
+        [
+          323,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_lizard_m_hit_anim": {
+      "name": "Lizard M Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          340,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_lizard_m_idle_anim": {
+      "name": "Lizard M Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          357,
+          115,
+          16,
+          28
+        ],
+        [
+          374,
+          115,
+          16,
+          28
+        ],
+        [
+          391,
+          115,
+          16,
+          28
+        ],
+        [
+          408,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_lizard_m_run_anim": {
+      "name": "Lizard M Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          425,
+          115,
+          16,
+          28
+        ],
+        [
+          442,
+          115,
+          16,
+          28
+        ],
+        [
+          459,
+          115,
+          16,
+          28
+        ],
+        [
+          476,
+          115,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_masked_orc_idle_anim": {
+      "name": "Masked Orc Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          493,
+          115,
+          16,
+          23
+        ],
+        [
+          510,
+          115,
+          16,
+          23
+        ],
+        [
+          527,
+          115,
+          16,
+          23
+        ],
+        [
+          544,
+          115,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_masked_orc_run_anim": {
+      "name": "Masked Orc Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          561,
+          115,
+          16,
+          23
+        ],
+        [
+          578,
+          115,
+          16,
+          23
+        ],
+        [
+          595,
+          115,
+          16,
+          23
+        ],
+        [
+          612,
+          115,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_muddy_anim": {
+      "name": "Muddy Anim F3",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          629,
+          115,
+          16,
+          16
+        ],
+        [
+          646,
+          115,
+          16,
+          16
+        ],
+        [
+          663,
+          115,
+          16,
+          16
+        ],
+        [
+          680,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_necromancer_anim": {
+      "name": "Necromancer Anim F3",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          697,
+          115,
+          16,
+          23
+        ],
+        [
+          714,
+          115,
+          16,
+          23
+        ],
+        [
+          731,
+          115,
+          16,
+          23
+        ],
+        [
+          748,
+          115,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_ogre_idle_anim": {
+      "name": "Ogre Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          765,
+          115,
+          32,
+          36
+        ],
+        [
+          798,
+          115,
+          32,
+          36
+        ],
+        [
+          831,
+          115,
+          32,
+          36
+        ],
+        [
+          864,
+          115,
+          32,
+          36
+        ]
+      ],
+      "fps": 7,
+      "width": 64,
+      "height": 72,
+      "footprint": [
+        2,
+        3
+      ]
+    },
+    "ox72_ogre_run_anim": {
+      "name": "Ogre Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          897,
+          115,
+          32,
+          36
+        ],
+        [
+          930,
+          115,
+          32,
+          36
+        ],
+        [
+          963,
+          115,
+          32,
+          36
+        ],
+        [
+          0,
+          152,
+          32,
+          36
+        ]
+      ],
+      "fps": 7,
+      "width": 64,
+      "height": 72,
+      "footprint": [
+        2,
+        3
+      ]
+    },
+    "ox72_orc_shaman_idle_anim": {
+      "name": "Orc Shaman Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          33,
+          152,
+          16,
+          23
+        ],
+        [
+          50,
+          152,
+          16,
+          23
+        ],
+        [
+          67,
+          152,
+          16,
+          23
+        ],
+        [
+          84,
+          152,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_orc_shaman_run_anim": {
+      "name": "Orc Shaman Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          101,
+          152,
+          16,
+          23
+        ],
+        [
+          118,
+          152,
+          16,
+          23
+        ],
+        [
+          135,
+          152,
+          16,
+          23
+        ],
+        [
+          152,
+          152,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_orc_warrior_idle_anim": {
+      "name": "Orc Warrior Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          169,
+          152,
+          16,
+          23
+        ],
+        [
+          186,
+          152,
+          16,
+          23
+        ],
+        [
+          203,
+          152,
+          16,
+          23
+        ],
+        [
+          220,
+          152,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_orc_warrior_run_anim": {
+      "name": "Orc Warrior Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          237,
+          152,
+          16,
+          23
+        ],
+        [
+          254,
+          152,
+          16,
+          23
+        ],
+        [
+          271,
+          152,
+          16,
+          23
+        ],
+        [
+          288,
+          152,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_pumpkin_dude": {
+      "name": "Ox72 Pumpkin Dude",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          305,
+          152,
+          32,
+          32
+        ],
+        [
+          338,
+          152,
+          32,
+          32
+        ],
+        [
+          371,
+          152,
+          32,
+          32
+        ],
+        [
+          404,
+          152,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_pumpkin_dude_idle_anim": {
+      "name": "Pumpkin Dude Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          437,
+          152,
+          16,
+          23
+        ],
+        [
+          454,
+          152,
+          16,
+          23
+        ],
+        [
+          471,
+          152,
+          16,
+          23
+        ],
+        [
+          488,
+          152,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 16,
+      "height": 23,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_pumpkin_dude_run_anim": {
+      "name": "Pumpkin Dude Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          505,
+          152,
+          16,
+          23
+        ],
+        [
+          522,
+          152,
+          16,
+          23
+        ],
+        [
+          539,
+          152,
+          16,
+          23
+        ],
+        [
+          556,
+          152,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 16,
+      "height": 23,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_skelet_idle_anim": {
+      "name": "Skelet Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          573,
+          152,
+          16,
+          16
+        ],
+        [
+          590,
+          152,
+          16,
+          16
+        ],
+        [
+          607,
+          152,
+          16,
+          16
+        ],
+        [
+          624,
+          152,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_skelet_run_anim": {
+      "name": "Skelet Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          641,
+          152,
+          16,
+          16
+        ],
+        [
+          658,
+          152,
+          16,
+          16
+        ],
+        [
+          675,
+          152,
+          16,
+          16
+        ],
+        [
+          692,
+          152,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_skull": {
+      "name": "Skull",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          709,
+          152,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_slug_anim": {
+      "name": "Slug Anim F3",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          726,
+          152,
+          16,
+          23
+        ],
+        [
+          743,
+          152,
+          16,
+          23
+        ],
+        [
+          760,
+          152,
+          16,
+          23
+        ],
+        [
+          777,
+          152,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_swampy_anim": {
+      "name": "Swampy Anim F3",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          794,
+          152,
+          16,
+          16
+        ],
+        [
+          811,
+          152,
+          16,
+          16
+        ],
+        [
+          828,
+          152,
+          16,
+          16
+        ],
+        [
+          845,
+          152,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_tiny_slug_anim": {
+      "name": "Tiny Slug Anim F3",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          862,
+          152,
+          16,
+          16
+        ],
+        [
+          879,
+          152,
+          16,
+          16
+        ],
+        [
+          896,
+          152,
+          16,
+          16
+        ],
+        [
+          913,
+          152,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_tiny_zombie_idle_anim": {
+      "name": "Tiny Zombie Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          930,
+          152,
+          16,
+          16
+        ],
+        [
+          947,
+          152,
+          16,
+          16
+        ],
+        [
+          964,
+          152,
+          16,
+          16
+        ],
+        [
+          981,
+          152,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_tiny_zombie_run_anim": {
+      "name": "Tiny Zombie Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          998,
+          152,
+          16,
+          16
+        ],
+        [
+          0,
+          189,
+          16,
+          16
+        ],
+        [
+          17,
+          189,
+          16,
+          16
+        ],
+        [
+          34,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_ui_heart_empty": {
+      "name": "Ui Heart Empty",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          51,
+          189,
+          13,
+          12
+        ]
+      ],
+      "fps": 0,
+      "width": 26,
+      "height": 24,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_ui_heart_full": {
+      "name": "Ui Heart Full",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          65,
+          189,
+          13,
+          12
+        ]
+      ],
+      "fps": 0,
+      "width": 26,
+      "height": 24,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_ui_heart_half": {
+      "name": "Ui Heart Half",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          79,
+          189,
+          13,
+          12
+        ]
+      ],
+      "fps": 0,
+      "width": 26,
+      "height": 24,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_banner_blue": {
+      "name": "Wall Banner Blue",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          93,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_banner_green": {
+      "name": "Wall Banner Green",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          110,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_banner_red": {
+      "name": "Wall Banner Red",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          127,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_banner_yellow": {
+      "name": "Wall Banner Yellow",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          144,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_bottom_left": {
+      "name": "Wall Edge Bottom Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          161,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_bottom_right": {
+      "name": "Wall Edge Bottom Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          178,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_left": {
+      "name": "Wall Edge Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          195,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_mid_left": {
+      "name": "Wall Edge Mid Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          212,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_mid_right": {
+      "name": "Wall Edge Mid Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          229,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_right": {
+      "name": "Wall Edge Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          246,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_top_left": {
+      "name": "Wall Edge Top Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          263,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_top_right": {
+      "name": "Wall Edge Top Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          280,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_tshape_bottom_left": {
+      "name": "Wall Edge Tshape Bottom Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          297,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_tshape_bottom_right": {
+      "name": "Wall Edge Tshape Bottom Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          314,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_tshape_left": {
+      "name": "Wall Edge Tshape Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          331,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_edge_tshape_right": {
+      "name": "Wall Edge Tshape Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          348,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_fountain_basin_blue_anim": {
+      "name": "Wall Fountain Basin Blue Anim F2",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          365,
+          189,
+          16,
+          16
+        ],
+        [
+          382,
+          189,
+          16,
+          16
+        ],
+        [
+          399,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_fountain_basin_red_anim": {
+      "name": "Wall Fountain Basin Red Anim F2",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          416,
+          189,
+          16,
+          16
+        ],
+        [
+          433,
+          189,
+          16,
+          16
+        ],
+        [
+          450,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_fountain_mid_blue_anim": {
+      "name": "Wall Fountain Mid Blue Anim F2",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          467,
+          189,
+          16,
+          16
+        ],
+        [
+          484,
+          189,
+          16,
+          16
+        ],
+        [
+          501,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_fountain_mid_red_anim": {
+      "name": "Wall Fountain Mid Red Anim F2",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          518,
+          189,
+          16,
+          16
+        ],
+        [
+          535,
+          189,
+          16,
+          16
+        ],
+        [
+          552,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_fountain_top_1": {
+      "name": "Wall Fountain Top 1",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          569,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_fountain_top_2": {
+      "name": "Wall Fountain Top 2",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          586,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_fountain_top_3": {
+      "name": "Wall Fountain Top 3",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          603,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_goo": {
+      "name": "Wall Goo",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          620,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_goo_base": {
+      "name": "Wall Goo Base",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          637,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_hole_1": {
+      "name": "Wall Hole 1",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          654,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_hole_2": {
+      "name": "Wall Hole 2",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          671,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_left": {
+      "name": "Wall Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          688,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_mid": {
+      "name": "Wall Mid",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          705,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_outer_front_left": {
+      "name": "Wall Outer Front Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          722,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_outer_front_right": {
+      "name": "Wall Outer Front Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          739,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_outer_mid_left": {
+      "name": "Wall Outer Mid Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          756,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_outer_mid_right": {
+      "name": "Wall Outer Mid Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          773,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_outer_top_left": {
+      "name": "Wall Outer Top Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          790,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_outer_top_right": {
+      "name": "Wall Outer Top Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          807,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_right": {
+      "name": "Wall Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          824,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_top_left": {
+      "name": "Wall Top Left",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          841,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_top_mid": {
+      "name": "Wall Top Mid",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          858,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_wall_top_right": {
+      "name": "Wall Top Right",
+      "pack": "ox72",
+      "category": "wall",
+      "frames": [
+        [
+          875,
+          189,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_weapon_anime_sword": {
+      "name": "Weapon Anime Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          892,
+          189,
+          12,
+          30
+        ]
+      ],
+      "fps": 0,
+      "width": 24,
+      "height": 60,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_arrow": {
+      "name": "Weapon Arrow",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          905,
+          189,
+          7,
+          21
+        ]
+      ],
+      "fps": 0,
+      "width": 14,
+      "height": 42,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_axe": {
+      "name": "Weapon Axe",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          913,
+          189,
+          9,
+          21
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 42,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_baton_with_spikes": {
+      "name": "Weapon Baton With Spikes",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          923,
+          189,
+          10,
+          22
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 44,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_big_hammer": {
+      "name": "Weapon Big Hammer",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          934,
+          189,
+          10,
+          37
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 74,
+      "footprint": [
+        1,
+        3
+      ]
+    },
+    "ox72_weapon_bow": {
+      "name": "Weapon Bow",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          945,
+          189,
+          14,
+          26
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 52,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_bow_2": {
+      "name": "Weapon Bow 2",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          960,
+          189,
+          14,
+          26
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 52,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_cleaver": {
+      "name": "Weapon Cleaver",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          975,
+          189,
+          9,
+          19
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 38,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_double_axe": {
+      "name": "Weapon Double Axe",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          985,
+          189,
+          16,
+          24
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 48,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_duel_sword": {
+      "name": "Weapon Duel Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          1002,
+          189,
+          9,
+          30
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 60,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_golden_sword": {
+      "name": "Weapon Golden Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          1012,
+          189,
+          10,
+          22
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 44,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_green_magic_staff": {
+      "name": "Weapon Green Magic Staff",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          0,
+          227,
+          8,
+          30
+        ]
+      ],
+      "fps": 0,
+      "width": 16,
+      "height": 60,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_hammer": {
+      "name": "Weapon Hammer",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          9,
+          227,
+          10,
+          24
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 48,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_katana": {
+      "name": "Weapon Katana",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          20,
+          227,
+          6,
+          29
+        ]
+      ],
+      "fps": 0,
+      "width": 12,
+      "height": 58,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_knife": {
+      "name": "Weapon Knife",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          27,
+          227,
+          6,
+          13
+        ]
+      ],
+      "fps": 0,
+      "width": 12,
+      "height": 26,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_weapon_knight_sword": {
+      "name": "Weapon Knight Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          34,
+          227,
+          10,
+          29
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 58,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_lavish_sword": {
+      "name": "Weapon Lavish Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          45,
+          227,
+          10,
+          30
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 60,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_mace": {
+      "name": "Weapon Mace",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          56,
+          227,
+          10,
+          24
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 48,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_machete": {
+      "name": "Weapon Machete",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          67,
+          227,
+          5,
+          22
+        ]
+      ],
+      "fps": 0,
+      "width": 10,
+      "height": 44,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_red_gem_sword": {
+      "name": "Weapon Red Gem Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          73,
+          227,
+          10,
+          21
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 42,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_red_magic_staff": {
+      "name": "Weapon Red Magic Staff",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          84,
+          227,
+          8,
+          30
+        ]
+      ],
+      "fps": 0,
+      "width": 16,
+      "height": 60,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_regular_sword": {
+      "name": "Weapon Regular Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          93,
+          227,
+          10,
+          21
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 42,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_rusty_sword": {
+      "name": "Weapon Rusty Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          104,
+          227,
+          10,
+          21
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 42,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_saw_sword": {
+      "name": "Weapon Saw Sword",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          115,
+          227,
+          10,
+          25
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 50,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_spear": {
+      "name": "Weapon Spear",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          126,
+          227,
+          6,
+          30
+        ]
+      ],
+      "fps": 0,
+      "width": 12,
+      "height": 60,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_weapon_throwing_axe": {
+      "name": "Weapon Throwing Axe",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          133,
+          227,
+          10,
+          14
+        ]
+      ],
+      "fps": 0,
+      "width": 20,
+      "height": 28,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72_weapon_waraxe": {
+      "name": "Weapon Waraxe",
+      "pack": "ox72",
+      "category": "items",
+      "frames": [
+        [
+          144,
+          227,
+          12,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 24,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wizzard_f_hit_anim": {
+      "name": "Wizzard F Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          157,
+          227,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wizzard_f_idle_anim": {
+      "name": "Wizzard F Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          174,
+          227,
+          16,
+          28
+        ],
+        [
+          191,
+          227,
+          16,
+          28
+        ],
+        [
+          208,
+          227,
+          16,
+          28
+        ],
+        [
+          225,
+          227,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wizzard_f_run_anim": {
+      "name": "Wizzard F Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          242,
+          227,
+          16,
+          28
+        ],
+        [
+          259,
+          227,
+          16,
+          28
+        ],
+        [
+          276,
+          227,
+          16,
+          28
+        ],
+        [
+          293,
+          227,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wizzard_m_hit_anim": {
+      "name": "Wizzard M Hit Anim F0",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          310,
+          227,
+          16,
+          28
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wizzard_m_idle_anim": {
+      "name": "Wizzard M Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          327,
+          227,
+          16,
+          28
+        ],
+        [
+          344,
+          227,
+          16,
+          28
+        ],
+        [
+          361,
+          227,
+          16,
+          28
+        ],
+        [
+          378,
+          227,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wizzard_m_run_anim": {
+      "name": "Wizzard M Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          395,
+          227,
+          16,
+          28
+        ],
+        [
+          412,
+          227,
+          16,
+          28
+        ],
+        [
+          429,
+          227,
+          16,
+          28
+        ],
+        [
+          446,
+          227,
+          16,
+          28
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 56,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wogol_idle_anim": {
+      "name": "Wogol Idle Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          463,
+          227,
+          16,
+          23
+        ],
+        [
+          480,
+          227,
+          16,
+          23
+        ],
+        [
+          497,
+          227,
+          16,
+          23
+        ],
+        [
+          514,
+          227,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_wogol_run_anim": {
+      "name": "Wogol Run Anim F3",
+      "pack": "ox72",
+      "category": "npcs",
+      "frames": [
+        [
+          531,
+          227,
+          16,
+          23
+        ],
+        [
+          548,
+          227,
+          16,
+          23
+        ],
+        [
+          565,
+          227,
+          16,
+          23
+        ],
+        [
+          582,
+          227,
+          16,
+          23
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72_zombie_anim": {
+      "name": "Zombie Anim F10",
+      "pack": "ox72",
+      "category": "furniture",
+      "frames": [
+        [
+          599,
+          227,
+          16,
+          16
+        ],
+        [
+          616,
+          227,
+          16,
+          16
+        ],
+        [
+          633,
+          227,
+          16,
+          16
+        ],
+        [
+          650,
+          227,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_skeleton1_v1_skeleton_v1": {
+      "name": "Skeleton V1 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          667,
+          227,
+          16,
+          16
+        ],
+        [
+          684,
+          227,
+          16,
+          16
+        ],
+        [
+          701,
+          227,
+          16,
+          16
+        ],
+        [
+          718,
+          227,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_skeleton1_v2_skeleton_v2": {
+      "name": "Skeleton V2 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          735,
+          227,
+          16,
+          16
+        ],
+        [
+          752,
+          227,
+          16,
+          16
+        ],
+        [
+          769,
+          227,
+          16,
+          16
+        ],
+        [
+          786,
+          227,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_skeleton2_v1_skeleton2_v1": {
+      "name": "Skeleton2 V1 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          803,
+          227,
+          16,
+          16
+        ],
+        [
+          820,
+          227,
+          16,
+          16
+        ],
+        [
+          837,
+          227,
+          16,
+          16
+        ],
+        [
+          854,
+          227,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_skeleton2_v2_skeleton2_v2": {
+      "name": "Skeleton2 V2 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          871,
+          227,
+          16,
+          16
+        ],
+        [
+          888,
+          227,
+          16,
+          16
+        ],
+        [
+          905,
+          227,
+          16,
+          16
+        ],
+        [
+          922,
+          227,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_skull_v1_skull_v1": {
+      "name": "Skull V1 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          939,
+          227,
+          16,
+          16
+        ],
+        [
+          956,
+          227,
+          16,
+          16
+        ],
+        [
+          973,
+          227,
+          16,
+          16
+        ],
+        [
+          990,
+          227,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_skull_v2_skull_v2": {
+      "name": "Skull V2 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          1007,
+          227,
+          16,
+          16
+        ],
+        [
+          0,
+          258,
+          16,
+          16
+        ],
+        [
+          17,
+          258,
+          16,
+          16
+        ],
+        [
+          34,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_vampire_v1_vampire_v1": {
+      "name": "Vampire V1 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          51,
+          258,
+          16,
+          16
+        ],
+        [
+          68,
+          258,
+          16,
+          16
+        ],
+        [
+          85,
+          258,
+          16,
+          16
+        ],
+        [
+          102,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_monsters_idle_vampire_v2_vampire_v2": {
+      "name": "Vampire V2 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          119,
+          258,
+          16,
+          16
+        ],
+        [
+          136,
+          258,
+          16,
+          16
+        ],
+        [
+          153,
+          258,
+          16,
+          16
+        ],
+        [
+          170,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_priests_idle_priest1_v1_priest1_v1": {
+      "name": "Priest1 V1 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          187,
+          258,
+          16,
+          16
+        ],
+        [
+          204,
+          258,
+          16,
+          16
+        ],
+        [
+          221,
+          258,
+          16,
+          16
+        ],
+        [
+          238,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_priests_idle_priest1_v2_priest1_v2": {
+      "name": "Priest1 V2 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          255,
+          258,
+          16,
+          16
+        ],
+        [
+          272,
+          258,
+          16,
+          16
+        ],
+        [
+          289,
+          258,
+          16,
+          16
+        ],
+        [
+          306,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_priests_idle_priest2_v1_priest2_v1": {
+      "name": "Priest2 V1 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          323,
+          258,
+          16,
+          16
+        ],
+        [
+          340,
+          258,
+          16,
+          16
+        ],
+        [
+          357,
+          258,
+          16,
+          16
+        ],
+        [
+          374,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_priests_idle_priest2_v2_priest2_v2": {
+      "name": "Priest2 V2 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          391,
+          258,
+          16,
+          16
+        ],
+        [
+          408,
+          258,
+          16,
+          16
+        ],
+        [
+          425,
+          258,
+          16,
+          16
+        ],
+        [
+          442,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_priests_idle_priest3_v1_priest3_v1": {
+      "name": "Priest3 V1 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          459,
+          258,
+          16,
+          16
+        ],
+        [
+          476,
+          258,
+          16,
+          16
+        ],
+        [
+          493,
+          258,
+          16,
+          16
+        ],
+        [
+          510,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_character_animation_priests_idle_priest3_v2_priest3_v2": {
+      "name": "Priest3 V2 4",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          527,
+          258,
+          16,
+          16
+        ],
+        [
+          544,
+          258,
+          16,
+          16
+        ],
+        [
+          561,
+          258,
+          16,
+          16
+        ],
+        [
+          578,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_0_0": {
+      "name": "Pixelpoem Dungeon Character 0 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          595,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_0_1": {
+      "name": "Pixelpoem Dungeon Character 0 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          612,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_0_2": {
+      "name": "Pixelpoem Dungeon Character 0 2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          629,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_0_3": {
+      "name": "Pixelpoem Dungeon Character 0 3",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          646,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_1_0": {
+      "name": "Pixelpoem Dungeon Character 1 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          663,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_1_1": {
+      "name": "Pixelpoem Dungeon Character 1 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          680,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_1_2": {
+      "name": "Pixelpoem Dungeon Character 1 2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          697,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_1_3": {
+      "name": "Pixelpoem Dungeon Character 1 3",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          714,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_0": {
+      "name": "Pixelpoem Dungeon Character 2 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          731,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_0_0": {
+      "name": "Pixelpoem Dungeon Character 2 0 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          748,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_0_1": {
+      "name": "Pixelpoem Dungeon Character 2 0 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          765,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_1": {
+      "name": "Pixelpoem Dungeon Character 2 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          782,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_1_0": {
+      "name": "Pixelpoem Dungeon Character 2 1 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          799,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_1_1": {
+      "name": "Pixelpoem Dungeon Character 2 1 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          816,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_2": {
+      "name": "Pixelpoem Dungeon Character 2 2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          833,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_2_0": {
+      "name": "Pixelpoem Dungeon Character 2 2 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          850,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_2_1": {
+      "name": "Pixelpoem Dungeon Character 2 2 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          867,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_3": {
+      "name": "Pixelpoem Dungeon Character 2 3",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          884,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_3_0": {
+      "name": "Pixelpoem Dungeon Character 2 3 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          901,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_3_1": {
+      "name": "Pixelpoem Dungeon Character 2 3 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          918,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_4_0": {
+      "name": "Pixelpoem Dungeon Character 2 4 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          935,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_4_1": {
+      "name": "Pixelpoem Dungeon Character 2 4 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          952,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_5_0": {
+      "name": "Pixelpoem Dungeon Character 2 5 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          969,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_5_1": {
+      "name": "Pixelpoem Dungeon Character 2 5 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          986,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_6_0": {
+      "name": "Pixelpoem Dungeon Character 2 6 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          1003,
+          258,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_2_6_1": {
+      "name": "Pixelpoem Dungeon Character 2 6 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          0,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_3_0": {
+      "name": "Pixelpoem Dungeon Character 3 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          17,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_3_1": {
+      "name": "Pixelpoem Dungeon Character 3 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          34,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_3_2": {
+      "name": "Pixelpoem Dungeon Character 3 2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          51,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_3_3": {
+      "name": "Pixelpoem Dungeon Character 3 3",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          68,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_4_0": {
+      "name": "Pixelpoem Dungeon Character 4 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          85,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_4_1": {
+      "name": "Pixelpoem Dungeon Character 4 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          102,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_4_2": {
+      "name": "Pixelpoem Dungeon Character 4 2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          119,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_4_3": {
+      "name": "Pixelpoem Dungeon Character 4 3",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          136,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_5_0": {
+      "name": "Pixelpoem Dungeon Character 5 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          153,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_5_1": {
+      "name": "Pixelpoem Dungeon Character 5 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          170,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_5_2": {
+      "name": "Pixelpoem Dungeon Character 5 2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          187,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_5_3": {
+      "name": "Pixelpoem Dungeon Character 5 3",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          204,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_6_0": {
+      "name": "Pixelpoem Dungeon Character 6 0",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          221,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_6_1": {
+      "name": "Pixelpoem Dungeon Character 6 1",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          238,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_6_2": {
+      "name": "Pixelpoem Dungeon Character 6 2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          255,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_6_3": {
+      "name": "Pixelpoem Dungeon Character 6 3",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          272,
+          275,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_dungeon_character_at": {
+      "name": "Dungeon Character At",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          289,
+          275,
+          512,
+          512
+        ]
+      ],
+      "fps": 0,
+      "width": 1024,
+      "height": 1024,
+      "footprint": [
+        32,
+        32
+      ]
+    },
+    "pixelpoem_enemies-skeleton1_attack": {
+      "name": "Enemies Skeleton1 Attack",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          802,
+          275,
+          32,
+          32
+        ],
+        [
+          835,
+          275,
+          32,
+          32
+        ],
+        [
+          868,
+          275,
+          32,
+          32
+        ],
+        [
+          901,
+          275,
+          32,
+          32
+        ],
+        [
+          934,
+          275,
+          32,
+          32
+        ],
+        [
+          967,
+          275,
+          32,
+          32
+        ],
+        [
+          0,
+          788,
+          32,
+          32
+        ],
+        [
+          33,
+          788,
+          32,
+          32
+        ],
+        [
+          66,
+          788,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton1_death": {
+      "name": "Enemies Skeleton1 Death",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          99,
+          788,
+          32,
+          32
+        ],
+        [
+          132,
+          788,
+          32,
+          32
+        ],
+        [
+          165,
+          788,
+          32,
+          32
+        ],
+        [
+          198,
+          788,
+          32,
+          32
+        ],
+        [
+          231,
+          788,
+          32,
+          32
+        ],
+        [
+          264,
+          788,
+          32,
+          32
+        ],
+        [
+          297,
+          788,
+          32,
+          32
+        ],
+        [
+          330,
+          788,
+          32,
+          32
+        ],
+        [
+          363,
+          788,
+          32,
+          32
+        ],
+        [
+          396,
+          788,
+          32,
+          32
+        ],
+        [
+          429,
+          788,
+          32,
+          32
+        ],
+        [
+          462,
+          788,
+          32,
+          32
+        ],
+        [
+          495,
+          788,
+          32,
+          32
+        ],
+        [
+          528,
+          788,
+          32,
+          32
+        ],
+        [
+          561,
+          788,
+          32,
+          32
+        ],
+        [
+          594,
+          788,
+          32,
+          32
+        ],
+        [
+          627,
+          788,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton1_idle": {
+      "name": "Enemies Skeleton1 Idle",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          660,
+          788,
+          32,
+          32
+        ],
+        [
+          693,
+          788,
+          32,
+          32
+        ],
+        [
+          726,
+          788,
+          32,
+          32
+        ],
+        [
+          759,
+          788,
+          32,
+          32
+        ],
+        [
+          792,
+          788,
+          32,
+          32
+        ],
+        [
+          825,
+          788,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton1_movement": {
+      "name": "Enemies Skeleton1 Movement",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          858,
+          788,
+          32,
+          32
+        ],
+        [
+          891,
+          788,
+          32,
+          32
+        ],
+        [
+          924,
+          788,
+          32,
+          32
+        ],
+        [
+          957,
+          788,
+          32,
+          32
+        ],
+        [
+          990,
+          788,
+          32,
+          32
+        ],
+        [
+          0,
+          821,
+          32,
+          32
+        ],
+        [
+          33,
+          821,
+          32,
+          32
+        ],
+        [
+          66,
+          821,
+          32,
+          32
+        ],
+        [
+          99,
+          821,
+          32,
+          32
+        ],
+        [
+          132,
+          821,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton1_take_damage": {
+      "name": "Enemies Skeleton1 Take Damage",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          165,
+          821,
+          32,
+          32
+        ],
+        [
+          198,
+          821,
+          32,
+          32
+        ],
+        [
+          231,
+          821,
+          32,
+          32
+        ],
+        [
+          264,
+          821,
+          32,
+          32
+        ],
+        [
+          297,
+          821,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton2_attack": {
+      "name": "Enemies Skeleton2 Attack",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          330,
+          821,
+          32,
+          32
+        ],
+        [
+          363,
+          821,
+          32,
+          32
+        ],
+        [
+          396,
+          821,
+          32,
+          32
+        ],
+        [
+          429,
+          821,
+          32,
+          32
+        ],
+        [
+          462,
+          821,
+          32,
+          32
+        ],
+        [
+          495,
+          821,
+          32,
+          32
+        ],
+        [
+          528,
+          821,
+          32,
+          32
+        ],
+        [
+          561,
+          821,
+          32,
+          32
+        ],
+        [
+          594,
+          821,
+          32,
+          32
+        ],
+        [
+          627,
+          821,
+          32,
+          32
+        ],
+        [
+          660,
+          821,
+          32,
+          32
+        ],
+        [
+          693,
+          821,
+          32,
+          32
+        ],
+        [
+          726,
+          821,
+          32,
+          32
+        ],
+        [
+          759,
+          821,
+          32,
+          32
+        ],
+        [
+          792,
+          821,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton2_death": {
+      "name": "Enemies Skeleton2 Death",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          825,
+          821,
+          32,
+          32
+        ],
+        [
+          858,
+          821,
+          32,
+          32
+        ],
+        [
+          891,
+          821,
+          32,
+          32
+        ],
+        [
+          924,
+          821,
+          32,
+          32
+        ],
+        [
+          957,
+          821,
+          32,
+          32
+        ],
+        [
+          990,
+          821,
+          32,
+          32
+        ],
+        [
+          0,
+          854,
+          32,
+          32
+        ],
+        [
+          33,
+          854,
+          32,
+          32
+        ],
+        [
+          66,
+          854,
+          32,
+          32
+        ],
+        [
+          99,
+          854,
+          32,
+          32
+        ],
+        [
+          132,
+          854,
+          32,
+          32
+        ],
+        [
+          165,
+          854,
+          32,
+          32
+        ],
+        [
+          198,
+          854,
+          32,
+          32
+        ],
+        [
+          231,
+          854,
+          32,
+          32
+        ],
+        [
+          264,
+          854,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton2_death2": {
+      "name": "Enemies Skeleton2 Death2",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          297,
+          854,
+          32,
+          32
+        ],
+        [
+          330,
+          854,
+          32,
+          32
+        ],
+        [
+          363,
+          854,
+          32,
+          32
+        ],
+        [
+          396,
+          854,
+          32,
+          32
+        ],
+        [
+          429,
+          854,
+          32,
+          32
+        ],
+        [
+          462,
+          854,
+          32,
+          32
+        ],
+        [
+          495,
+          854,
+          32,
+          32
+        ],
+        [
+          528,
+          854,
+          32,
+          32
+        ],
+        [
+          561,
+          854,
+          32,
+          32
+        ],
+        [
+          594,
+          854,
+          32,
+          32
+        ],
+        [
+          627,
+          854,
+          32,
+          32
+        ],
+        [
+          660,
+          854,
+          32,
+          32
+        ],
+        [
+          693,
+          854,
+          32,
+          32
+        ],
+        [
+          726,
+          854,
+          32,
+          32
+        ],
+        [
+          759,
+          854,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton2_idle": {
+      "name": "Enemies Skeleton2 Idle",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          792,
+          854,
+          32,
+          32
+        ],
+        [
+          825,
+          854,
+          32,
+          32
+        ],
+        [
+          858,
+          854,
+          32,
+          32
+        ],
+        [
+          891,
+          854,
+          32,
+          32
+        ],
+        [
+          924,
+          854,
+          32,
+          32
+        ],
+        [
+          957,
+          854,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton2_movemen": {
+      "name": "Enemies Skeleton2 Movemen",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          990,
+          854,
+          32,
+          32
+        ],
+        [
+          0,
+          887,
+          32,
+          32
+        ],
+        [
+          33,
+          887,
+          32,
+          32
+        ],
+        [
+          66,
+          887,
+          32,
+          32
+        ],
+        [
+          99,
+          887,
+          32,
+          32
+        ],
+        [
+          132,
+          887,
+          32,
+          32
+        ],
+        [
+          165,
+          887,
+          32,
+          32
+        ],
+        [
+          198,
+          887,
+          32,
+          32
+        ],
+        [
+          231,
+          887,
+          32,
+          32
+        ],
+        [
+          264,
+          887,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-skeleton2_take_damage": {
+      "name": "Enemies Skeleton2 Take Damage",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          297,
+          887,
+          32,
+          32
+        ],
+        [
+          330,
+          887,
+          32,
+          32
+        ],
+        [
+          363,
+          887,
+          32,
+          32
+        ],
+        [
+          396,
+          887,
+          32,
+          32
+        ],
+        [
+          429,
+          887,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-vampire_attack": {
+      "name": "Enemies Vampire Attack",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          462,
+          887,
+          32,
+          32
+        ],
+        [
+          495,
+          887,
+          32,
+          32
+        ],
+        [
+          528,
+          887,
+          32,
+          32
+        ],
+        [
+          561,
+          887,
+          32,
+          32
+        ],
+        [
+          594,
+          887,
+          32,
+          32
+        ],
+        [
+          627,
+          887,
+          32,
+          32
+        ],
+        [
+          660,
+          887,
+          32,
+          32
+        ],
+        [
+          693,
+          887,
+          32,
+          32
+        ],
+        [
+          726,
+          887,
+          32,
+          32
+        ],
+        [
+          759,
+          887,
+          32,
+          32
+        ],
+        [
+          792,
+          887,
+          32,
+          32
+        ],
+        [
+          825,
+          887,
+          32,
+          32
+        ],
+        [
+          858,
+          887,
+          32,
+          32
+        ],
+        [
+          891,
+          887,
+          32,
+          32
+        ],
+        [
+          924,
+          887,
+          32,
+          32
+        ],
+        [
+          957,
+          887,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-vampire_death": {
+      "name": "Enemies Vampire Death",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          990,
+          887,
+          32,
+          32
+        ],
+        [
+          0,
+          920,
+          32,
+          32
+        ],
+        [
+          33,
+          920,
+          32,
+          32
+        ],
+        [
+          66,
+          920,
+          32,
+          32
+        ],
+        [
+          99,
+          920,
+          32,
+          32
+        ],
+        [
+          132,
+          920,
+          32,
+          32
+        ],
+        [
+          165,
+          920,
+          32,
+          32
+        ],
+        [
+          198,
+          920,
+          32,
+          32
+        ],
+        [
+          231,
+          920,
+          32,
+          32
+        ],
+        [
+          264,
+          920,
+          32,
+          32
+        ],
+        [
+          297,
+          920,
+          32,
+          32
+        ],
+        [
+          330,
+          920,
+          32,
+          32
+        ],
+        [
+          363,
+          920,
+          32,
+          32
+        ],
+        [
+          396,
+          920,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-vampire_idle": {
+      "name": "Enemies Vampire Idle",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          429,
+          920,
+          32,
+          32
+        ],
+        [
+          462,
+          920,
+          32,
+          32
+        ],
+        [
+          495,
+          920,
+          32,
+          32
+        ],
+        [
+          528,
+          920,
+          32,
+          32
+        ],
+        [
+          561,
+          920,
+          32,
+          32
+        ],
+        [
+          594,
+          920,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-vampire_movement": {
+      "name": "Enemies Vampire Movement",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          627,
+          920,
+          32,
+          32
+        ],
+        [
+          660,
+          920,
+          32,
+          32
+        ],
+        [
+          693,
+          920,
+          32,
+          32
+        ],
+        [
+          726,
+          920,
+          32,
+          32
+        ],
+        [
+          759,
+          920,
+          32,
+          32
+        ],
+        [
+          792,
+          920,
+          32,
+          32
+        ],
+        [
+          825,
+          920,
+          32,
+          32
+        ],
+        [
+          858,
+          920,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_enemies-vampire_take_damage": {
+      "name": "Enemies Vampire Take Damage",
+      "pack": "pixelpoem",
+      "category": "npcs",
+      "frames": [
+        [
+          891,
+          920,
+          32,
+          32
+        ],
+        [
+          924,
+          920,
+          32,
+          32
+        ],
+        [
+          957,
+          920,
+          32,
+          32
+        ],
+        [
+          990,
+          920,
+          32,
+          32
+        ],
+        [
+          0,
+          953,
+          32,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_interface_arrow": {
+      "name": "Arrow 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          33,
+          953,
+          16,
+          16
+        ],
+        [
+          50,
+          953,
+          16,
+          16
+        ],
+        [
+          67,
+          953,
+          16,
+          16
+        ],
+        [
+          84,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_interface_square_left": {
+      "name": "Square Left 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          101,
+          953,
+          16,
+          16
+        ],
+        [
+          118,
+          953,
+          16,
+          16
+        ],
+        [
+          135,
+          953,
+          16,
+          16
+        ],
+        [
+          152,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_interface_square_left_2": {
+      "name": "Square Left 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          169,
+          953,
+          16,
+          16
+        ],
+        [
+          186,
+          953,
+          16,
+          16
+        ],
+        [
+          203,
+          953,
+          16,
+          16
+        ],
+        [
+          220,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_interface_square_right": {
+      "name": "Square Right 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          237,
+          953,
+          16,
+          16
+        ],
+        [
+          254,
+          953,
+          16,
+          16
+        ],
+        [
+          271,
+          953,
+          16,
+          16
+        ],
+        [
+          288,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_interface_square_right_2": {
+      "name": "Square Right 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          305,
+          953,
+          16,
+          16
+        ],
+        [
+          322,
+          953,
+          16,
+          16
+        ],
+        [
+          339,
+          953,
+          16,
+          16
+        ],
+        [
+          356,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_interface_square_up_down": {
+      "name": "Square Up Down 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          373,
+          953,
+          16,
+          16
+        ],
+        [
+          390,
+          953,
+          16,
+          16
+        ],
+        [
+          407,
+          953,
+          16,
+          16
+        ],
+        [
+          424,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_arrow_arrow": {
+      "name": "Arrow 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          441,
+          953,
+          16,
+          32
+        ],
+        [
+          458,
+          953,
+          16,
+          32
+        ],
+        [
+          475,
+          953,
+          16,
+          32
+        ],
+        [
+          492,
+          953,
+          16,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_arrow_just_arrow": {
+      "name": "Just Arrow",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          509,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_box_1_box_1": {
+      "name": "Box 1 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          526,
+          953,
+          16,
+          16
+        ],
+        [
+          543,
+          953,
+          16,
+          16
+        ],
+        [
+          560,
+          953,
+          16,
+          16
+        ],
+        [
+          577,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_box_2_box_2": {
+      "name": "Box 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          594,
+          953,
+          16,
+          16
+        ],
+        [
+          611,
+          953,
+          16,
+          16
+        ],
+        [
+          628,
+          953,
+          16,
+          16
+        ],
+        [
+          645,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_chest_chest": {
+      "name": "Chest 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          662,
+          953,
+          16,
+          16
+        ],
+        [
+          679,
+          953,
+          16,
+          16
+        ],
+        [
+          696,
+          953,
+          16,
+          16
+        ],
+        [
+          713,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_chest_chest_open": {
+      "name": "Chest Open 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          730,
+          953,
+          16,
+          16
+        ],
+        [
+          747,
+          953,
+          16,
+          16
+        ],
+        [
+          764,
+          953,
+          16,
+          16
+        ],
+        [
+          781,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_coin_coin": {
+      "name": "Coin 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          798,
+          953,
+          16,
+          16
+        ],
+        [
+          815,
+          953,
+          16,
+          16
+        ],
+        [
+          832,
+          953,
+          16,
+          16
+        ],
+        [
+          849,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_flag_flag": {
+      "name": "Flag 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          866,
+          953,
+          16,
+          16
+        ],
+        [
+          883,
+          953,
+          16,
+          16
+        ],
+        [
+          900,
+          953,
+          16,
+          16
+        ],
+        [
+          917,
+          953,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_flamethrower_flamethrower_1": {
+      "name": "Flamethrower 1 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          934,
+          953,
+          16,
+          32
+        ],
+        [
+          951,
+          953,
+          16,
+          32
+        ],
+        [
+          968,
+          953,
+          16,
+          32
+        ],
+        [
+          985,
+          953,
+          16,
+          32
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_flamethrower_flamethrower_2": {
+      "name": "Flamethrower 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          0,
+          986,
+          32,
+          16
+        ],
+        [
+          33,
+          986,
+          32,
+          16
+        ],
+        [
+          66,
+          986,
+          32,
+          16
+        ],
+        [
+          99,
+          986,
+          32,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 64,
+      "height": 32,
+      "footprint": [
+        2,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_flasks_flasks_1": {
+      "name": "Flasks 1 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          132,
+          986,
+          16,
+          16
+        ],
+        [
+          149,
+          986,
+          16,
+          16
+        ],
+        [
+          166,
+          986,
+          16,
+          16
+        ],
+        [
+          183,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_flasks_flasks_2": {
+      "name": "Flasks 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          200,
+          986,
+          16,
+          16
+        ],
+        [
+          217,
+          986,
+          16,
+          16
+        ],
+        [
+          234,
+          986,
+          16,
+          16
+        ],
+        [
+          251,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_flasks_flasks_3": {
+      "name": "Flasks 3 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          268,
+          986,
+          16,
+          16
+        ],
+        [
+          285,
+          986,
+          16,
+          16
+        ],
+        [
+          302,
+          986,
+          16,
+          16
+        ],
+        [
+          319,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_flasks_flasks_4": {
+      "name": "Flasks 4 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          336,
+          986,
+          16,
+          16
+        ],
+        [
+          353,
+          986,
+          16,
+          16
+        ],
+        [
+          370,
+          986,
+          16,
+          16
+        ],
+        [
+          387,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_keys_keys_1": {
+      "name": "Keys 1 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          404,
+          986,
+          16,
+          16
+        ],
+        [
+          421,
+          986,
+          16,
+          16
+        ],
+        [
+          438,
+          986,
+          16,
+          16
+        ],
+        [
+          455,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_keys_keys_2": {
+      "name": "Keys 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          472,
+          986,
+          16,
+          16
+        ],
+        [
+          489,
+          986,
+          16,
+          16
+        ],
+        [
+          506,
+          986,
+          16,
+          16
+        ],
+        [
+          523,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_mini_box_1_mini_box_1": {
+      "name": "Mini Box 1 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          540,
+          986,
+          16,
+          16
+        ],
+        [
+          557,
+          986,
+          16,
+          16
+        ],
+        [
+          574,
+          986,
+          16,
+          16
+        ],
+        [
+          591,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_mini_box_2_mini_box_2": {
+      "name": "Mini Box 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          608,
+          986,
+          16,
+          16
+        ],
+        [
+          625,
+          986,
+          16,
+          16
+        ],
+        [
+          642,
+          986,
+          16,
+          16
+        ],
+        [
+          659,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_mini_chest_mini_chest": {
+      "name": "Mini Chest 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          676,
+          986,
+          16,
+          16
+        ],
+        [
+          693,
+          986,
+          16,
+          16
+        ],
+        [
+          710,
+          986,
+          16,
+          16
+        ],
+        [
+          727,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_mini_chest_mini_chest_open": {
+      "name": "Mini Chest Open 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          744,
+          986,
+          16,
+          16
+        ],
+        [
+          761,
+          986,
+          16,
+          16
+        ],
+        [
+          778,
+          986,
+          16,
+          16
+        ],
+        [
+          795,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_peaks_peaks": {
+      "name": "Peaks 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          812,
+          986,
+          16,
+          16
+        ],
+        [
+          829,
+          986,
+          16,
+          16
+        ],
+        [
+          846,
+          986,
+          16,
+          16
+        ],
+        [
+          863,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_torch_candlestick_1": {
+      "name": "Candlestick 1 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          880,
+          986,
+          16,
+          16
+        ],
+        [
+          897,
+          986,
+          16,
+          16
+        ],
+        [
+          914,
+          986,
+          16,
+          16
+        ],
+        [
+          931,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_torch_candlestick_2": {
+      "name": "Candlestick 2 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          948,
+          986,
+          16,
+          16
+        ],
+        [
+          965,
+          986,
+          16,
+          16
+        ],
+        [
+          982,
+          986,
+          16,
+          16
+        ],
+        [
+          999,
+          986,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_torch_side_torch": {
+      "name": "Side Torch 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          0,
+          1003,
+          16,
+          16
+        ],
+        [
+          17,
+          1003,
+          16,
+          16
+        ],
+        [
+          34,
+          1003,
+          16,
+          16
+        ],
+        [
+          51,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_items_and_trap_animation_torch_torch": {
+      "name": "Torch 4",
+      "pack": "pixelpoem",
+      "category": "items",
+      "frames": [
+        [
+          68,
+          1003,
+          16,
+          16
+        ],
+        [
+          85,
+          1003,
+          16,
+          16
+        ],
+        [
+          102,
+          1003,
+          16,
+          16
+        ],
+        [
+          119,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 7,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_00": {
+      "name": "Pixelpoem Tile 00",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          136,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_01": {
+      "name": "Pixelpoem Tile 01",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          153,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_02": {
+      "name": "Pixelpoem Tile 02",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          170,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_03": {
+      "name": "Pixelpoem Tile 03",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          187,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_04": {
+      "name": "Pixelpoem Tile 04",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          204,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_05": {
+      "name": "Pixelpoem Tile 05",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          221,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_06": {
+      "name": "Pixelpoem Tile 06",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          238,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_07": {
+      "name": "Pixelpoem Tile 07",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          255,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_08": {
+      "name": "Pixelpoem Tile 08",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          272,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_09": {
+      "name": "Pixelpoem Tile 09",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          289,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_10": {
+      "name": "Pixelpoem Tile 10",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          306,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_11": {
+      "name": "Pixelpoem Tile 11",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          323,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_12": {
+      "name": "Pixelpoem Tile 12",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          340,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_13": {
+      "name": "Pixelpoem Tile 13",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          357,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_14": {
+      "name": "Pixelpoem Tile 14",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          374,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_15": {
+      "name": "Pixelpoem Tile 15",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          391,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_16": {
+      "name": "Pixelpoem Tile 16",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          408,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_17": {
+      "name": "Pixelpoem Tile 17",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          425,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_18": {
+      "name": "Pixelpoem Tile 18",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          442,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_19": {
+      "name": "Pixelpoem Tile 19",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          459,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_20": {
+      "name": "Pixelpoem Tile 20",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          476,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_21": {
+      "name": "Pixelpoem Tile 21",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          493,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_22": {
+      "name": "Pixelpoem Tile 22",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          510,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_23": {
+      "name": "Pixelpoem Tile 23",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          527,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_24": {
+      "name": "Pixelpoem Tile 24",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          544,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_25": {
+      "name": "Pixelpoem Tile 25",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          561,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_26": {
+      "name": "Pixelpoem Tile 26",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          578,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_27": {
+      "name": "Pixelpoem Tile 27",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          595,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_28": {
+      "name": "Pixelpoem Tile 28",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          612,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_29": {
+      "name": "Pixelpoem Tile 29",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          629,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_30": {
+      "name": "Pixelpoem Tile 30",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          646,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_31": {
+      "name": "Pixelpoem Tile 31",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          663,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_32": {
+      "name": "Pixelpoem Tile 32",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          680,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_33": {
+      "name": "Pixelpoem Tile 33",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          697,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_34": {
+      "name": "Pixelpoem Tile 34",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          714,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_35": {
+      "name": "Pixelpoem Tile 35",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          731,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_36": {
+      "name": "Pixelpoem Tile 36",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          748,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_37": {
+      "name": "Pixelpoem Tile 37",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          765,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_38": {
+      "name": "Pixelpoem Tile 38",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          782,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_39": {
+      "name": "Pixelpoem Tile 39",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          799,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_40": {
+      "name": "Pixelpoem Tile 40",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          816,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_41": {
+      "name": "Pixelpoem Tile 41",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          833,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_42": {
+      "name": "Pixelpoem Tile 42",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          850,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_43": {
+      "name": "Pixelpoem Tile 43",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          867,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_44": {
+      "name": "Pixelpoem Tile 44",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          884,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_45": {
+      "name": "Pixelpoem Tile 45",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          901,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_46": {
+      "name": "Pixelpoem Tile 46",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          918,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_47": {
+      "name": "Pixelpoem Tile 47",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          935,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_48": {
+      "name": "Pixelpoem Tile 48",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          952,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_49": {
+      "name": "Pixelpoem Tile 49",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          969,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_50": {
+      "name": "Pixelpoem Tile 50",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          986,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_51": {
+      "name": "Pixelpoem Tile 51",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          1003,
+          1003,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_52": {
+      "name": "Pixelpoem Tile 52",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          0,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_53": {
+      "name": "Pixelpoem Tile 53",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          17,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_54": {
+      "name": "Pixelpoem Tile 54",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          34,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_55": {
+      "name": "Pixelpoem Tile 55",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          51,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_56": {
+      "name": "Pixelpoem Tile 56",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          68,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_57": {
+      "name": "Pixelpoem Tile 57",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          85,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_58": {
+      "name": "Pixelpoem Tile 58",
+      "pack": "pixelpoem",
+      "category": "floor",
+      "frames": [
+        [
+          102,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_59": {
+      "name": "Pixelpoem Tile 59",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          119,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_60": {
+      "name": "Pixelpoem Tile 60",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          136,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_61": {
+      "name": "Pixelpoem Tile 61",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          153,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_62": {
+      "name": "Pixelpoem Tile 62",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          170,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_63": {
+      "name": "Pixelpoem Tile 63",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          187,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_64": {
+      "name": "Pixelpoem Tile 64",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          204,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_65": {
+      "name": "Pixelpoem Tile 65",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          221,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_66": {
+      "name": "Pixelpoem Tile 66",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          238,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_67": {
+      "name": "Pixelpoem Tile 67",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          255,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_68": {
+      "name": "Pixelpoem Tile 68",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          272,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_69": {
+      "name": "Pixelpoem Tile 69",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          289,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_70": {
+      "name": "Pixelpoem Tile 70",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          306,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_71": {
+      "name": "Pixelpoem Tile 71",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          323,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_72": {
+      "name": "Pixelpoem Tile 72",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          340,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_73": {
+      "name": "Pixelpoem Tile 73",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          357,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_74": {
+      "name": "Pixelpoem Tile 74",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          374,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_75": {
+      "name": "Pixelpoem Tile 75",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          391,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_76": {
+      "name": "Pixelpoem Tile 76",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          408,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_77": {
+      "name": "Pixelpoem Tile 77",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          425,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_78": {
+      "name": "Pixelpoem Tile 78",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          442,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_79": {
+      "name": "Pixelpoem Tile 79",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          459,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_80": {
+      "name": "Pixelpoem Tile 80",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          476,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_81": {
+      "name": "Pixelpoem Tile 81",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          493,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_82": {
+      "name": "Pixelpoem Tile 82",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          510,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_83": {
+      "name": "Pixelpoem Tile 83",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          527,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_84": {
+      "name": "Pixelpoem Tile 84",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          544,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_85": {
+      "name": "Pixelpoem Tile 85",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          561,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_86": {
+      "name": "Pixelpoem Tile 86",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          578,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_87": {
+      "name": "Pixelpoem Tile 87",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          595,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_88": {
+      "name": "Pixelpoem Tile 88",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          612,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_89": {
+      "name": "Pixelpoem Tile 89",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          629,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_90": {
+      "name": "Pixelpoem Tile 90",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          646,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_91": {
+      "name": "Pixelpoem Tile 91",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          663,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_92": {
+      "name": "Pixelpoem Tile 92",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          680,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_93": {
+      "name": "Pixelpoem Tile 93",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          697,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_94": {
+      "name": "Pixelpoem Tile 94",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          714,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_95": {
+      "name": "Pixelpoem Tile 95",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          731,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_96": {
+      "name": "Pixelpoem Tile 96",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          748,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_97": {
+      "name": "Pixelpoem Tile 97",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          765,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_98": {
+      "name": "Pixelpoem Tile 98",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          782,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "pixelpoem_tile_99": {
+      "name": "Pixelpoem Tile 99",
+      "pack": "pixelpoem",
+      "category": "wall",
+      "frames": [
+        [
+          799,
+          1020,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    }
+  }
+}
