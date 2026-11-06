@@ -20,7 +20,7 @@
     cracked: { label: 'Cracked Stone', color: '#42414a' }
   };
   const CATALOG = {
-    altar: { label: 'Sacrificial Altar', category: 'relics', w: 4, h: 2, solid: true },
+    altar: { label: 'Sacrificial Altar', category: 'relics', w: 3, h: 2, solid: true },
     crystal: { label: 'Soul Crystal', category: 'relics', w: 1, h: 1, solid: false },
     braziers: { label: 'Crimson Brazier', category: 'relics', w: 1, h: 1, solid: true },
     runestone: { label: 'Runestone', category: 'relics', w: 1, h: 1, solid: true },
@@ -59,7 +59,7 @@
       floor, walls,
       objects: [
         { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:false },
-        { id:'sacrifice_altar', type:'altar', x:6, y:5, r:0 },
+        { id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 },
         { id:'brazier_west', type:'braziers', x:4, y:4, r:0 },
         { id:'brazier_east', type:'braziers', x:11, y:4, r:0 },
         { id:'pillar_west', type:'pillar', x:3, y:2, r:0 },
@@ -217,14 +217,17 @@
     const altar=scene.objects.find(o=>o.type==='altar');if(!altar)return;
     const stillAlive=opening&&!opening.sacrificed;
     const picture=readyImage('characters/human/human_altar_'+(stillAlive?'alive':'dead')+'.png');
-    // Approved lying hero art is native 64 × 32, half of the 128 × 64 altar.
-    // Render at 1:1 pixel scale, centered, without resizing the approved altar.
-    const x=altar.x*TILE+(4*TILE-64)/2,y=altar.y*TILE+(2*TILE-32)/2;
-    if(picture){ctx.drawImage(picture,x,y,64,32);return;}
-    // Temporary block-art fallback matches the same small 64 × 32 footprint.
-    pixel(ctx,'#261b24',x,y+4,64,24);
-    pixel(ctx,stillAlive?'#986771':'#694d5c',x+14,y+8,38,14);
-    pixel(ctx,'#cc9a85',x+4,y+8,12,12);
+    // The lying body is scaled to match the 32-pixel NPCs around the altar.
+    // Keep it centered on the real Architect footprint, even if rotated.
+    const [altarWidth,altarHeight]=dims(altar);
+    const bodyWidth=40,bodyHeight=20;
+    const x=altar.x*TILE+Math.floor((altarWidth*TILE-bodyWidth)/2),
+      y=altar.y*TILE+Math.floor((altarHeight*TILE-bodyHeight)/2);
+    if(picture){ctx.drawImage(picture,x,y,bodyWidth,bodyHeight);return;}
+    // Fallback block art uses the same reduced size when the sprite cannot load.
+    pixel(ctx,'#261b24',x,y+3,bodyWidth,15);
+    pixel(ctx,stillAlive?'#986771':'#694d5c',x+9,y+5,24,9);
+    pixel(ctx,'#cc9a85',x+2,y+5,8,8);
   }
   function drawActor(a){
     if(a.y<0)return;
