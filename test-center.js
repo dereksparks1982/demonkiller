@@ -272,7 +272,10 @@
     const height=lines.length*16+12;
     const cx=Math.round((a.x+.5)*TILE);
     const x=Math.max(4,Math.min(N*TILE-width-4,Math.round(cx-width/2)));
-    const y=Math.max(4,Math.round(a.y*TILE)-height-15);
+    // Keep dialogue clear of the speaker and the bound player on the altar.
+    // A two-tile gap prevents the label from obscuring the ritual actors.
+    const clearance=64;
+    const y=Math.max(4,Math.round(a.y*TILE)-height-clearance);
     const tail=Math.max(x+12,Math.min(x+width-15,cx-4));
     ctx.save();
     ctx.fillStyle='#151019';ctx.fillRect(x,y,width,height);
