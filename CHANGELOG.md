@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.8 development preview | 2026-11-05 | Raised temple dialogue boxes
+
+- Raised ritual speech bubbles for the cult leader, Devil, and Lilith to sit clear of the speaker and the bound player on the altar.
+- Increased vertical clearance from 15 to 64 pixels and retained horizontal clamping and the upper canvas boundary.
+- Added a regression test that confirms the cult leader's dialogue text is above the altar body area.
+- Kept the approved 3×2 altar, NPC scales, scripted dialogue, Architect behavior, and disposable development saves unchanged.
+- Updated the menu/temple cache query to v0.2.8.
+
+
 ## v0.2.7 development preview | 2026-11-05 | Altar and bound player scaling
 
 - Shrunk the sacrificial altar footprint from 4×2 to 3×2 tiles (96×64 pixels), recentering its starter-room placement on the north aisle at (7,5).
