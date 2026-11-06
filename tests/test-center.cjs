@@ -42,9 +42,11 @@ assert.match(js,/\{ id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 \}/,'Start
 assert.match(js,/const bodyWidth=40,bodyHeight=20/,'Lying body must match NPC scale');
 assert.match(js,/ctx\.drawImage\(picture,x,y,bodyWidth,bodyHeight\)/,'Lying body must use its reduced dimensions');
 const events={}, noop=()=>{};
-const previewOutlines=[],spokenLines=[];
-const graphics={fillRect:noop,strokeRect:(...args)=>previewOutlines.push(args),fillText:(text,x,y)=>spokenLines.push({text,x,y}),clearRect:noop,beginPath:noop,
-  moveTo:noop,lineTo:noop,stroke:noop,save:noop,restore:noop,
+const previewOutlines=[],spokenLines=[],filledPaths=[];
+let activePath=[];
+const graphics={fillRect:noop,strokeRect:(...args)=>previewOutlines.push(args),fillText:(text,x,y)=>spokenLines.push({text,x,y}),clearRect:noop,
+  beginPath:()=>{activePath=[];},moveTo:(x,y)=>activePath.push({x,y}),lineTo:(x,y)=>activePath.push({x,y}),
+  closePath:noop,fill:()=>filledPaths.push(activePath.slice()),stroke:noop,save:noop,restore:noop,
   translate:noop,rotate:noop,scale:noop};
 class Element {
   constructor(id){this.id=id;this.textContent='';this.value='';this.files=[];this.children=[];
@@ -89,6 +91,11 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.match(get('status').textContent,/Wait for the current scene/,'Interactions locked during sacrifice');
   tickFrames(175);
   assert(spokenLines.length>0,'Cult leader dialogue should render during the opening prayer');
+  assert(filledPaths.some(points=>points.length===3 &&
+    points[0].y===points[1].y &&
+    points[2].y-points[0].y>=24 &&
+    points[0].x<points[2].x && points[2].x<points[1].x),
+    'All ritual dialogue tails use a long, pointed triangle rather than a square stub');
   assert(Math.max(...spokenLines.map(line=>line.y))<=160,
     'Speech must render above the bound player on the altar, not across the body');
   tickFrames(1625);

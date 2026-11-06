@@ -276,12 +276,28 @@
     // A two-tile gap prevents the label from obscuring the ritual actors.
     const clearance=64;
     const y=Math.max(4,Math.round(a.y*TILE)-height-clearance);
-    const tail=Math.max(x+12,Math.min(x+width-15,cx-4));
+    const tailX=Math.max(x+14,Math.min(x+width-14,cx));
+    const tailBaseY=y+height-2;
+    const tailTipY=tailBaseY+26;
     ctx.save();
     ctx.fillStyle='#151019';ctx.fillRect(x,y,width,height);
     ctx.strokeStyle=border;ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,width-2,height-2);
-    ctx.fillStyle='#151019';ctx.fillRect(tail,y+height-1,9,9);
-    ctx.fillStyle=border;ctx.fillRect(tail,y+height+7,9,2);
+    // One long, pointed, character-aimed tail for every ritual dialogue box.
+    // Draw the border first, then a smaller dark triangle for a crisp tapered edge.
+    ctx.fillStyle=border;
+    ctx.beginPath();
+    ctx.moveTo(tailX-9,tailBaseY);
+    ctx.lineTo(tailX+9,tailBaseY);
+    ctx.lineTo(tailX,tailTipY);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle='#151019';
+    ctx.beginPath();
+    ctx.moveTo(tailX-6,tailBaseY);
+    ctx.lineTo(tailX+6,tailBaseY);
+    ctx.lineTo(tailX,tailTipY-5);
+    ctx.closePath();ctx.fill();
+    // Open the bubble's lower border into the tail (no detached red stub).
+    ctx.fillRect(tailX-5,tailBaseY-2,10,3);
     ctx.font='bold 11px monospace';ctx.textAlign='center';ctx.textBaseline='top';
     ctx.fillStyle='#fff0d5';
     for(let i=0;i<lines.length;i++)ctx.fillText?.(lines[i],x+width/2,y+8+i*16);

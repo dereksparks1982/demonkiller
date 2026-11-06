@@ -1,5 +1,12 @@
 # Demon Killer Changelog
 
+## v0.2.9 development preview | 2026-11-05 | Pointed dialogue tails
+
+- Replaced the shared 9×9 rectangular dialogue stub and detached bottom line with a longer, 26-pixel tapered pointer.
+- Pointers are drawn with the same character-specific border color and dark interior; the base joins the speech bubble and aligns toward the speaker.
+- Applied centrally to cult leader, Devil, and Lilith without changing raised box positions, NPC sizes, altar, temple geometry, or DK Architect.
+- Updated simulated Canvas regression coverage and cache/version labels. Owner visual acceptance remains pending.
+
 ## v0.2.8 development preview | 2026-11-05 | Raised temple dialogue boxes
 
 - Raised ritual speech bubbles for the cult leader, Devil, and Lilith to sit clear of the speaker and the bound player on the altar.

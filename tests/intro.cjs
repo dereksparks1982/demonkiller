@@ -5,7 +5,7 @@ const path=require('node:path'),vm=require('node:vm');
 const code=fs.readFileSync(path.join(__dirname,'..','test-center.js'),'utf8');
 const no=()=>{},events={},frames=[],stored=new Map(),elements={};
 const spoken=[],context={fillText:value=>spoken.push(String(value)),fillRect:no,strokeRect:no,clearRect:no,beginPath:no,
- moveTo:no,lineTo:no,stroke:no,save:no,restore:no,translate:no,rotate:no,scale:no,drawImage:no};
+ moveTo:no,lineTo:no,closePath:no,fill:no,stroke:no,save:no,restore:no,translate:no,rotate:no,scale:no,drawImage:no};
 class El{
  constructor(id){this.id=id;this.textContent='';this.value='';this.children=[];this.style={};
   this.selectedOptions=[{textContent:id}];this.classList={toggle:no};this.events={};}
