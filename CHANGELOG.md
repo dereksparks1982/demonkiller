@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.22 development preview | 2026-11-06 | Architect editing and character-only skill rust
+
+- Repaired DK Architect's bottom row to six compact individually framed controls, matching the upper category buttons instead of using a large decorative gold strip. Left tools are centered, hidden overlapping DK pennant removed, and right-rail icons are scaled to fit fully inside their borders. Approved game room geometry unchanged.
+- Split **Select** from **Move**. Move now operates click object → click destination. Rotate and Copy are tool-first: choose the tool, then click an existing placed object. Esc clears targeting and returns to Select, including when a text field was focused. Keyboard R arms Rotate; Delete arms Erase.
+- Individually selected wall sprites can rotate 90 degrees in place and save their facing in optional `wallRotations`. Automatic wall faces still choose corners by neighbors. Old temple saves without the new field load with default zero rotations; undo/redo includes wall orientation.
+- Added a pure, server-independent skill mastery/rust model. Every learned skill can rust a little after **60 days of meaningful per-character active playtime** without use. Only 0.1 per additional active week; at most five points or 20% loss, and never zero. Valid practice restores lost skill faster than new learning. No global cap across all skills.
+- Skill records are stored in existing per-character slots, not the shared room layout. Brief genuine player movement/interaction advances the personal skill clock; offline time, idle time, editor time, opening cutscene and the server world clock do not. Actual mining, taming and alchemy gameplay are later systems, not claimed to exist in this release.
+- Added regression checks for target-before-rotate, Esc cancellation, move/select separation, manual wall facing, and the skill module. No extra third-party assets, no changes to temple lore or approved sprites.
+- This is a development preview awaiting owner visual and functional acceptance.
+
+
 ## v0.2.21 development preview | 2026-11-06 | Real creator-built dungeon construction sets
 
 - Added 243 named transparent sprites from 0x72's **original 16x16 Dungeon Tileset v5**, verified byte-for-byte against both owner-provided copies and its official itch.io download.

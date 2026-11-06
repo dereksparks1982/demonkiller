@@ -41,6 +41,7 @@ assert(!html.includes('class="uo-dk-banner"'),
   'Do not crowd left tools with a partially hidden DK banner');
 assert(js.includes('UI_ATLAS=')&&js.includes('data-uo-art')&&
   js.includes('uoHouseToolbar.v2'),'Approved sprite atlas and new layout preference key required');
+assert(html.includes('dk-skills.js'),'Skill maintenance engine must load before the game');
 assert(html.includes('assets/art/dkarchitect/imported/first-catalog.js')&&
   html.includes('assets/art/dkarchitect/imported/catalog.js')&&
   html.includes('dk-dungeon-art.js'),
@@ -272,6 +273,20 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
 
   await get('editMode').emit('click');
   assert.equal(get('modeLabel').textContent,'ARCHITECT MODE');
+  await get('uoRotate').emit('click');
+  assert.equal(get('tool').value,'rotate','Click-to-rotate mode arms before clicking an object');
+  await click(7,5);await get('save').emit('click');
+  let targeted=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(targeted.objects.find(o=>o.id==='sacrifice_altar').r,1,
+    'Tool-first Rotate works with no previous object selection');
+  key('Escape');
+  assert.equal(get('tool').value,'select','Escape cancels the targeting tool');
+  await click(7,5);await get('save').emit('click');
+  targeted=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(targeted.objects.find(o=>o.id==='sacrifice_altar').r,1,
+    'Escape prevents a stale Rotate operation on the next click');
+  await get('undo').emit('click'); // Leave canonical altar orientation unchanged.
+
   const initial=Number(get('objectCount').textContent);
   await get('room').emit('mousemove',{clientX:2*32+16,clientY:5*32+16});
   await get('room').emit('wheel',{deltaY:100,preventDefault:noop});
@@ -348,6 +363,13 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   const erasedLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   assert.equal(erasedLayout.walls[8*16+1],0,'Dedicated wall eraser clears wall geometry');
   assert.equal(erasedLayout.wallStyles[8*16+1],'clean','Erased wall loses its former finish');
+  await get('uoRotate').emit('click');
+  await click(6,8);await get('save').emit('click');
+  const turned=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(turned.wallRotations[8*16+6],1,
+    'Tool-first rotation persists for a manual wall component');
+  key('Escape');
+
 
   // Static scene staging must use only approved game-ready sprites.
   wallCategory.value='library';await wallCategory.emit('change',{target:wallCategory});
@@ -362,6 +384,22 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   const newSprite=staged.objects.find(o=>o.type==='scenery'&&o.x===2&&o.y===6);
   assert(newSprite&&newSprite.spriteId==='crystal_gold_bright',
     'Staged sprite must retain its approved asset ID in saved room');
+  // Select does not move; Move is a separate two-click GM tool.
+  await get('uoSelect').emit('click');
+  await click(2,6);await click(3,6);await get('save').emit('click');
+  let stationary=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert(stationary.objects.some(o=>o.type==='scenery'&&o.x===2&&o.y===6),
+    'Select mode must not move a previously highlighted object');
+  await get('uoMove').emit('click');
+  await click(2,6);await click(3,6);await get('save').emit('click');
+  stationary=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert(stationary.objects.some(o=>o.type==='scenery'&&o.x===3&&o.y===6),
+    'Move mode targets the object first, then a destination');
+  await click(3,6);await click(2,6);
+  await get('uoCopy').emit('click');await click(2,6);
+  assert.equal(get('tool').value,'paste','Copy mode targets an item before enabling paste');
+  key('Escape');
+  assert.equal(get('tool').value,'select','Escape disarms paste');
   // Object inspector: exact position/rotation/collision and copy/paste.
   const toolSelect=get('tool');toolSelect.value='select';
   await toolSelect.emit('change',{target:toolSelect});

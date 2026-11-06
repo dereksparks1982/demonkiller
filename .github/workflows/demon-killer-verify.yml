@@ -27,5 +27,6 @@ jobs:
         run: |
           node --version
           node --check test-center.js
+          node --check dk-skills.js
           node --check cult-network.js
-          node --test tests/test-center.cjs tests/menu.cjs tests/intro.cjs tests/cult-system.cjs tests/cult-integration.cjs tests/population.cjs tests/cult-network.cjs
+          node --test tests/test-center.cjs tests/menu.cjs tests/intro.cjs tests/cult-system.cjs tests/cult-integration.cjs tests/population.cjs tests/cult-network.cjs tests/skills.cjs
