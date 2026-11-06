@@ -2,11 +2,23 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.26 | DK Server M5, the Living World
+## Current milestone: v0.2.27 | DK Server M6, People & Trade
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M6: Meet people and earn your place in the world
+
+- **NPC conversations:** Talk to living residents when within two cardinal tiles. The server checks the NPC's current location, schedule and whether they're alive.
+- **Persistent acquaintances:** Meeting each NPC adds a permanent contact record. A cooldown prevents repeatedly clicking one person to farm standing.
+- **Faction reputation:** Townsfolk, courtyard residents and travelers have separate saved reputation. Helping people changes how you're known.
+- **Merchant commissions:** Accept a real delivery request from an open shopkeeper nearby, collect the requested commodities, and return before its deadline. The server takes goods from inventory, pays from that business's own coins, replenishes its stock, and awards commerce experience and faction reputation.
+- **Contracts continue with world time:** Commissions can expire while you are away and time is running; stopping the world freezes the deadline.
+- **Pathfinding:** Resident travel now finds routes around walls and structures using the existing Architect geometry, with no diagonal or through-wall movement and physical village/courtyard portal connections.
+- **Playable controls:** The outdoor sidebar adds Talk, Accept Commission and Deliver Goods controls; double-clicking an NPC also talks to them while the actual DK Server is connected.
+
+**This is foundational simulation, not a claim of full Ultima Online parity.** NPC dialogue is currently short and role-based, commissioning is deliberately limited to one active delivery, and contracts do not yet include procedurally authored stories or complex diplomacy.
 
 ### Persistent simulation, when DK Server is actually running
 

@@ -3,6 +3,8 @@
 // All randomness uses a saved seed; no client timer or reload-triggered events.
 const {COURT,VILLAGE,traversable,portal}=require('./regions.cjs');
 const {regenerate}=require('./gameplay.cjs');
+const {tick:socialTick}=require('./social-m6.cjs');
+const {chooseStep}=require('./npc-navigation-m6.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -81,26 +83,10 @@ function npcDestination(n,minute){
  return {area_id:n.home_area,x:n.home_x,y:n.home_y-2};
 }
 function npcStep(n,world,dest){
- const area=world.areas[n.area_id];
- const target=n.area_id===dest.area_id?dest:
-  n.area_id===VILLAGE?{x:64,y:127}:{x:32,y:0};
- const dx=target.x-n.x,dy=target.y-n.y;
- if(dx===0&&dy===0)return false;
- const preferred=Math.abs(dx)>=Math.abs(dy)?
-  [[Math.sign(dx),0],[0,Math.sign(dy)]]:
-  [[0,Math.sign(dy)],[Math.sign(dx),0]];
- for(const [mx,my] of preferred){
-  if(!mx&&!my)continue;
-  const nx=n.x+mx,ny=n.y+my;
-  const next=portal(world,n.area_id,nx,ny);
-  if(next&&!next.blocked){
-   n.area_id=next.area_id;n.x=next.x;n.y=next.y;return true;
-  }
-  if(traversable(area,nx,ny)){
-   n.x=nx;n.y=ny;return true;
-  }
- }
- return false;
+ const step=chooseStep(world,n,dest);
+ if(!step)return false;
+ n.area_id=step.area_id;n.x=step.x;n.y=step.y;
+ return true;
 }
 function changeStatus(n,desired,minute,living,allEvents){
  if(n.status===desired)return;
@@ -112,6 +98,7 @@ function changeStatus(n,desired,minute,living,allEvents){
 function minuteTick(world,m,generated){
  const living=world.living,t=m%DAY,day=t<360;
  regenerate(world,m,generated);
+ socialTick(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
   const desired=npcDestination(n,m);

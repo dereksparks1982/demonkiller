@@ -10,6 +10,7 @@ const { makeWorld, validateWorld, createCharacter, playableCharacter, applyChara
 const { localRequestAllowed, serveGame } = require('./local-game.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
+const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -121,6 +122,7 @@ async function createDKServer({
     world=await loadWorld(dataDir,now());
     const regionsAdded=ensureRegions(world),livingAdded=ensureLivingWorld(world);
     const resourcesAdded=ensureResources(world);
+    const socialAdded=ensureSocial(world);
     const playerAdded=Object.values(world.characters).some(c=>ensureProgress(c));
     const templeDoor=world.areas[AREA_ID]?.objects.find(o=>o.id==='temple_north_door');
     const courtyardDoor=world.areas[COURT]?.objects.find(o=>o.id==='courtyard_temple_door');
@@ -132,7 +134,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(world,null,2)+'\n');
   }catch(error){await releaseLock();throw error;}
@@ -212,6 +214,20 @@ async function createDKServer({
     });
     writeQueue=pending.catch(()=>{});return pending;
   }
+  async function saveSocialAction(command){
+    const pending=writeQueue.then(async()=>{
+      if(!world.runtime?.running)throw Error('World is paused; press Start Server');
+      const tick=advance(world,now(),180);
+      const result=applySocial(checkpointWorldTime(tick.world,now()),command);
+      await durableWrite(path.join(dataDir,'world.json'),
+        JSON.stringify(result.world,null,2)+'\n');
+      world=result.world;
+      try{await appendEvents([...tick.events,result.event]);}
+      catch(e){console.error('Social event archive write failed:',e);}
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});return pending;
+  }
   async function saveCollectedLetter(id){
     const pending=writeQueue.then(async()=>{
       if(!world.runtime?.running)throw Error('World is paused; press Start Server');
@@ -261,7 +277,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m5', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m6', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -291,6 +307,29 @@ async function createDKServer({
       return sendJSON(res,200,{events:entries,next:entries.length?
         Number(entries.at(-1).id.slice(6)):after,
         last_event_sequence:world.living.event_sequence},method);
+    }
+    if(url.pathname==='/api/v1/social'&&!write){
+      const c=world.characters['1'];
+      if(!c)return sendJSON(res,404,{error:'No character exists'},method);
+      return sendJSON(res,200,{...socialListing(world,c),minute:world.living.minute,
+        revision:world.revision},method);
+    }
+    if(url.pathname==='/api/v1/social'&&method==='POST'){
+      let body;try{body=await readJSON(req);}
+      catch(e){return sendJSON(res,e.status||400,{error:e.message});}
+      try{
+        const result=await saveSocialAction(body);
+        return sendJSON(res,200,{character:playableCharacter(result.character),
+          event:result.event,dialogue:result.dialogue||null,
+          contract:result.contract||null,reward:result.reward||0,
+          reputation_delta:result.reputation_delta||0,revision:result.world.revision});
+      }catch(e){
+        if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
+        if(/closer|available|Ghosts|No character|closed|already|commission|expired|required|goods|afford|owner|fallen|paused|active|person/.test(e.message))
+          return sendJSON(res,409,{error:e.message});
+        console.error('Social action failed:',e);
+        return sendJSON(res,500,{error:'Social transaction could not be saved'});
+      }
     }
     if(url.pathname==='/api/v1/gameplay'&&!write){
       const c=world.characters['1'];

@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M6 (v0.2.27)
+
+M6 adds real NPC conversational actions, persistent contact records, faction reputation, time-limited physical goods commissions and NPC pathfinding that obeys existing variable-size DK Architect geometry. The social state is validated, migrated safely from M5 worlds, written atomically, and recorded in the permanent event log. Shop commissions check proximity, status, inventory, actual business funds and server-time deadlines; the player receives real gold and skill progress, rather than a browser-only reward. See `server/social-m6.cjs`, `server/npc-navigation-m6.cjs`, `tests/social-m6.cjs`, and `tests/npc-navigation-m6.cjs`.
+
+The existing courtyard/village renderer now includes server-backed social controls, with no newly generated pictures. NPC pathfinding is bounded, cardinal-only, and uses actual region portals. M6 does **not** create a publicly hosted persistent process; the GitHub Pages menu still reports Not Connected. Future work includes richer NPC inventories and speech, faction conflict, UO-style crafting, equipment, housing, player economy, guard response, and substantial settlement scale.
+
 ## Implemented milestone: DK Server M5 | 2026-11-06
 
 The authoritative local server now includes three connected variable-size regions, autonomous NPC work/rest/movement, shops, traveling camps, territorial threats, bank-box mail, resources, server-owned inventory and gold, and a persistent event archive. This **supersedes earlier planning notes** below that describe the temple as the only region or claim the playable client is not connected. The public GitHub Pages preview is not connected to a hosted DK Server; its static gameplay demonstration is not an online persistent world. The full current design and implementation boundaries are in [UO Living World M5](uo-living-world-m5.md).

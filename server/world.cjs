@@ -5,6 +5,7 @@
 const {TEMPLE,COURT,VILLAGE,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
 const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
+const {ensureSocial,validateSocial}=require('./social-m6.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -65,6 +66,7 @@ function makeWorld(now = Date.now()) {
     runtime: { running: true, elapsed_ms: 0, resumed_at_utc: new Date(now).toISOString() }
   };
   ensureResources(result);
+  ensureSocial(result);
   return result;
 }
 
@@ -127,6 +129,7 @@ function validateWorld(world) {
   if(world.areas[COURT])checkRegion(world.areas[COURT]);
   if(world.areas[VILLAGE])checkRegion(world.areas[VILLAGE]);
   if(world.living)validateLiving(world.living);
+  validateSocial(world);
   return world;
 }
 

@@ -1,13 +1,13 @@
 {
   "name": "dk-server",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
-  "description": "Engine-free single-player persistent DK world with regions, NPCs, commerce, bank and mail",
+  "description": "Engine-free persistent living DK world with NPC schedules, commerce, banking and social contracts",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "start": "node dk-server.cjs",
-    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-local.cjs ../tests/dk-server-m4.cjs ../tests/dk-uo-m5.cjs ../tests/outdoor-m5.cjs ../tests/menu.cjs ../tests/menu-server.cjs ../tests/test-center.cjs"
+    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-local.cjs ../tests/dk-server-m4.cjs ../tests/dk-uo-m5.cjs ../tests/social-m6.cjs ../tests/npc-navigation-m6.cjs ../tests/outdoor-m5.cjs ../tests/menu.cjs ../tests/menu-server.cjs ../tests/test-center.cjs"
   }
 }

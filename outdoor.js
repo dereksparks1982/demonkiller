@@ -12,7 +12,7 @@ const PREVIEW_KEY='dkSoftworks.demonkiller.outdoors.preview.v1';
 const TEMPLE_SAVE='dkSoftworks.demonkiller.characters.v1';
 const TILE=32,VIEW=20;
 const images=new Map();
-let area=null,world=null,player=null,living=null,gameplay=null,busy=false,rightHeld=false;
+let area=null,world=null,player=null,living=null,gameplay=null,social=null,busy=false,rightHeld=false;
 let pointer=null,camera={x:0,y:0},lastMove=0,lastDraw=0,animStart=0;
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
 function image(path){
@@ -203,6 +203,59 @@ function packText(c){
    '\n'+goods+'\nForaging '+(c.skills?.foraging??0)+
    ' · Commerce '+(c.skills?.commerce??0);
 }
+async function refreshSocial(){
+ if(!SERVER||!player)return;
+ try{
+  social=await SERVER.social();
+  const active=social.contracts?.[0];
+  $('socialStatus').textContent='Reputation: Town '+(social.reputation?.town||0)+
+    ', Courtyard '+(social.reputation?.courtyard||0)+
+    ', Travelers '+(social.reputation?.travelers||0)+
+    ' · Contacts '+Object.keys(social.contacts||{}).length+
+    (active?' · Commission: '+active.quantity+' '+active.item_type+
+      ' for '+active.reward+' gold':' · No active commission');
+ }catch(e){$('socialStatus').textContent='Social records unavailable: '+e.message;}
+}
+function closestNpc(){
+ return Object.values(living?.npcs||{}).filter(n=>n.alive&&n.area_id===player.area_id&&
+  Math.abs(n.x-player.x)+Math.abs(n.y-player.y)<=2)
+ .sort((a,b)=>(Math.abs(a.x-player.x)+Math.abs(a.y-player.y))-
+  (Math.abs(b.x-player.x)+Math.abs(b.y-player.y)))[0]||null;
+}
+async function socialAction(action,fields={}){
+ if(!SERVER)return message('People and commissions require a connected DK Server.');
+ if(busy)return;
+ busy=true;
+ try{
+  const result=await SERVER.socialAction(action,fields);
+  if(result.character)player=result.character;
+  message(action==='talk'?result.dialogue.name+': "'+result.dialogue.line+'"':
+   result.event?.text||'Conversation recorded.');
+  await Promise.all([refreshSocial(),refreshGameplay(),refreshLiving()]);
+ }catch(e){message('Cannot '+action.replaceAll('_',' ')+': '+e.message);}
+ finally{busy=false;}
+}
+function talk(){
+ const npc=closestNpc();
+ if(!npc)return message('Move next to a resident and try again.');
+ return socialAction('talk',{npc_id:npc.id});
+}
+function acceptContract(){
+ const nearby=Object.values(living?.businesses||{}).filter(b=>{
+  const owner=living?.npcs?.[b.owner_id];
+  return b.open&&owner?.alive&&b.area_id===player.area_id&&
+   Math.abs(owner.x-player.x)+Math.abs(owner.y-player.y)<=3;
+ });
+ const offered=nearby.find(b=>['village_bakery','village_smithy','village_market',
+  'village_tavern','courtyard_market'].includes(b.id));
+ if(!offered)return message('Stand beside an open shop owner to request a commission.');
+ return socialAction('accept_contract',{business_id:offered.id});
+}
+function deliverContract(){
+ const contract=social?.contracts?.[0];
+ if(!contract)return message('You have no active commission.');
+ return socialAction('complete_contract',{contract_id:contract.id});
+}
 async function refreshGameplay(){
  if(!SERVER)return;
  try{
@@ -338,7 +391,8 @@ function inspect(x,y,doubleClick){
  const item=actorAt(x,y);if(!item)return message('Nothing notable here.');
  if(item.npc){
   const n=item.npc;
-  return message(n.name+' · '+n.role+' · '+n.status+'.');
+  if(doubleClick&&SERVER)return socialAction('talk',{npc_id:n.id});
+  return message(n.name+' · '+n.role+' · '+n.status+(SERVER?' · Double-click to talk.':'.'));
  }
  const o=item.object;
  if(o.id==='courtyard_temple_door'){
@@ -402,6 +456,9 @@ document.addEventListener('keydown',e=>{
 $('showBank').addEventListener('click',openBank);
 $('closeBank').addEventListener('click',()=>{$('bankPanel').hidden=true;});
 $('gatherButton').addEventListener('click',gather);
+$('talkButton').addEventListener('click',talk);
+$('contractButton').addEventListener('click',acceptContract);
+$('deliverButton').addEventListener('click',deliverContract);
 $('buyButton').addEventListener('click',()=>trade(true));
 $('sellButton').addEventListener('click',()=>trade(false));
 $('depositButton').addEventListener('click',()=>takeAction('bank_deposit',{amount:1}));
@@ -421,8 +478,8 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay()]);
-   setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial()]);
+   setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);setInterval(refreshSocial,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -434,7 +491,8 @@ async function begin(){
    $('worldStatus').textContent='BROWSER PREVIEW';
    $('clockStatus').textContent='No persistent world connected';
    $('packStatus').textContent='Persistent inventory and trading require DK Server.';
-   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton'])
+   $('socialStatus').textContent='Social records require DK Server.';
+   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton'])
      $(id).disabled=true;
   }
   if(firstVisit){

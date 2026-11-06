@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.27 / DK Server M6 | 2026-11-06 | NPC relationships, contracts and pathfinding
+
+- **Social memory:** Added saved NPC contacts with per-person conversation frequency and a one-meeting-per-30-world-minute faction reputation gain limit.
+- **Physical conversations:** Added `talk` server actions with alive/form/Manhattan-distance checks, role-specific NPC responses and durable world-history records.
+- **Real commissions:** Open business owners can issue a single active goods-delivery contract. Deadlines progress only with running world time. Server validation prevents remote acceptance, reward spoofing, inventory forgery and repeated payouts; completing one transfers goods to shop stock and money from the shop to the character, adding commerce skill and reputation.
+- **Pathfinding:** Replaced straight-line NPC steering with cardinal-only bounded BFS around existing Architect walls, house footprints and obstacle tiles. Travel passes through the real courtyard/village portal instead of cutting through a wall.
+- **Playable interaction:** Outdoor UI includes Talk, Accept Commission and Deliver Goods controls; double-clicking an NPC starts a real conversation through the connected server. The static public preview does not claim these features function without DK Server.
+- **New server APIs:** `GET/POST /api/v1/social` provide read-only nearby contacts/active contracts and allowlisted authoritative social actions. Social state migrates safely into existing M5 saved worlds, is validated, and is saved via the existing atomic writer and append-only event archive.
+- **Testing:** Added social and NPC-navigation regression suites, extended the existing Node test command, updated version checks, README and server design documentation. Module-level pure-JavaScript checks exercised contracts, immutable transactions, duplicate-reward rejection, path detours and portal travel; complete Node integration suite still requires running in a full source checkout.
+- **Boundaries:** No new graphics, no Godot, no new server dashboard, no additional character slots and no internet-hosted persistent backend. Full UO-level relationships, AI and world hosting remain future milestones.
+
 ## v0.2.26 / DK Server M5 | 2026-11-06 | Regions, living NPCs and UO-inspired economy
 
 - **Variable-size world:** Added shared 16×16 temple, 64×64 courtyard and 128×128 village geometry with correct **16×16 temple exterior**, houses, paths and regional gate links; existing DK Architect walls now support arbitrary area dimensions.
