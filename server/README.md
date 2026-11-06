@@ -1,49 +1,57 @@
-# Demon Killer · DK Server M4 (local-authoritative prototype)
+# DK Server M5 | Living World (v0.2.26)
 
-Node.js 20+, no additional npm dependencies and no separate dashboard. The current version is **single-player and local-only**, without passwords, accounts or login screens. Start the game with `./start-demon-killer.sh`; it launches DK Server detached and opens the normal Demon Killer menu. Do not run a separate `/player` page. `/player` now redirects to the menu.
+**Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
-## Process lifecycle
+## Lifetime and saved data
 
-- Loopback only: `http://127.0.0.1:8766/`, same origin for game assets and world API.
-- Browser close: does **not** stop the running server. Its clock advances in real time while the server is active, including with no browser connected.
-- **Options → Persistent World → START SERVER / STOP SERVER**: M4 controls start/resume and pause the persistent world clock while the local host process remains up. This writes the run state durably; no clock catch-up occurs for intentionally stopped time.
-- Restart: run `./start-demon-killer.sh` again. The launcher detects a running M4 server and reopens the menu. An older M1/M2 server must be stopped manually once before updating. Logs: `${XDG_STATE_HOME:-$HOME/.local/state}/demon-killer/server.log`.
-- The launcher explicitly opens the browser as part of launching the game. To debug the server in the foreground, run `node server/dk-server.cjs` instead, and then open its local address.
-- Old private `server/data/owner-identity.json` and `admin-token` files, if present from prototype M2, are **not used** in M4. The server does not delete them or your world automatically.
+The process is launched in local development by `start-demon-killer.sh` and serves the normal Demon Killer game menu, temple, courtyard and village. The **browser can close while the server runs**. **Start Server / Stop Server** in the game Options resume or pause the whole world clock, saving the state without terminating the process.
 
-## What the server owns now
+`server/data/world.json` stores the character, regions, NPCs, businesses, territory, camp, mail, resources, run/pause flag and clock. The writer queue uses fsync plus atomic rename under a single-process lock. `server/data/world-events.ndjson` is an append-only long-term event record; the snapshot also retains the most recent 512 events. An archive-write error is logged; the world snapshot remains the authoritative state. Manual process shutdown pauses the world. An unexpected host outage does **not** manufacture time or NPC actions while the host is not running. Legacy M3/M4 data receives non-destructive missing-region, runtime and gameplay-field migration.
 
-DK Server exclusively writes `server/data/world.json` with durable temporary writes, file sync, atomic rename and a single-writer lock. The browser does **not** upload entire save files. The server validates these character commands:
+**One character slot** (slot 1), with no overwrite via New Game. Existing save files are not automatically deleted.
 
-- `GET /api/v1/health`: process health and build `local-m4`; includes the world-running flag.
-- `GET /api/v1/world`: shared public temple snapshot and synchronized day/night clock.
-- `GET /api/v1/clock`: six real hours of day followed by six real hours of night **while running**; frozen while paused.
-- `GET /api/v1/events`: server-sent world-clock events.
-- `GET /api/v1/characters`: the single server-owned character slot (slot 1).
-- `POST /api/v1/characters`: create an empty slot using exactly `{"slot":1,"name":"A"}`. Names may be one character; occupied slots cannot be silently replaced.
-- `GET /api/v1/characters/1`: reload the authoritative record.
-- `POST /api/v1/characters/1/actions`: accept only `{"action":"finish_opening"}`, `{"action":"move","direction":"north"}`, `{"action":"toggle_door"}` or `{"action":"resurrect"}`. The server checks action legitimacy, collision, position, form and object state, persists the result, and only then replies.
-- `GET /api/v1/server/state`: authoritative running/paused state and world time.
-- `POST /api/v1/server/start`: resume world time; same-origin `X-DK-Control: start`.
-- `POST /api/v1/server/stop`: pause world time and persist it; same-origin `X-DK-Control: stop`.
-- `POST /api/v1/server/shutdown`: legacy process exit; pauses world and waits for all pending writes first.
+## Endpoints
 
-Public remote clients are not supported. Local requests are restricted by loopback binding, Host/Origin/Fetch-Site checks, without CORS. The custom shutdown header prevents drive-by HTML form submissions. These restrictions do not constitute internet-facing multiplayer security.
+All routes have the `/api/v1` prefix. The server serves game assets via an allowlist; no `server/data` or executable server sources are publicly served.
 
-## Current boundaries
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/health` | DK Server build `local-m5`, online state and world running flag |
+| GET | `/world` | Temple legacy snapshot and world clock |
+| GET | `/clock` | Six-hour day/night state and paused/running flag |
+| GET | `/server/state` | Server world running/paused state |
+| POST | `/server/start` | Resume world time, requires `X-DK-Control: start` |
+| POST | `/server/stop` | Pause and durably save world, requires `X-DK-Control: stop` |
+| POST | `/server/shutdown` | Existing explicit process shutdown, pauses first |
+| GET | `/areas` | Region list with independent width and height |
+| GET | `/areas/:id` | Full server-authoritative area geometry, doors and objects |
+| GET | `/living` | Live NPCs, businesses, territory, camps and recent events |
+| GET | `/living/events?after=N` | Cursor-based recent world events |
+| GET | `/gameplay` | Character inventory/gold/skills, regional resources and merchants |
+| POST | `/gameplay` | Strict gather, buy, sell, bank_deposit or bank_withdraw actions |
+| GET | `/bank/box` | Letters only when physically present at the Village Bank |
+| POST | `/bank/collect` | Collect one actually delivered bank-box letter |
+| GET/POST | `/characters` | Read or create character, slot 1 only |
+| GET | `/characters/1` | Load the authoritative record |
+| POST | `/characters/1/actions` | Validated cardinal move, opening, resurrection or door toggle |
+| GET | `/events` | Server-sent clock, state and living-world updates |
 
-No legacy browser saves are imported into the server. The old GitHub Pages preview still has its own isolated, non-authoritative save path; it is **not** part of the live persistent game. DK Architect room edits can still be exported, but server-mode browser room-save buttons are disabled until dedicated server-side edit transactions exist. Cult journal and NPC simulation state still require migration to validated server operations. No automated monster-territory, settlement or NPC daily simulation is claimed yet.
+**Gameplay POST examples (body only)**:
 
-The world format is v1 with additive server-owned character fields. Corrupt or unsupported world files are **rejected**, never overwritten automatically. The approved temple remains a 16×16 grid with altar (7,5), north door (8,0), and a soul crystal introduced only by the ritual.
+- `{"action":"gather","node_id":"courtyard_herbs_west"}`
+- `{"action":"buy","business_id":"courtyard_market","quantity":1}`
+- `{"action":"sell","business_id":"courtyard_market","item_type":"herbs","quantity":1}`
+- `{"action":"bank_deposit","amount":1}`
+- `{"action":"bank_withdraw","amount":1}`
 
-## Tests
+The server checks range, player form, stock, currency, inventory, cooldowns, shop hours and exact allowed fields; it never trusts a client-submitted world snapshot. The actual menu converts a double-click into the one validated `toggle_door` command.
 
-```bash
-node --test tests/dk-server.cjs tests/dk-server-local.cjs tests/menu.cjs
-```
+## What runs with no browser
 
-The server tests cover world geometry, day/night timing, atomic restart saves, collision, no-password character creation, one-character names, action validation, same-origin asset serving and private-file denial, single-writer exclusion, and graceful local shutdown. The menu test checks the established menu and music controls. Run tests locally before committing. No custom GitHub Actions workflow is used.
+The Node timer advances stored world minutes and NPC routines while the server process remains running. Travel, business transactions, post delivery, resource renewal, territory threats and traveling camps are deterministic and persistent. A stopped server freezes them all. See [living-world design](../docs/uo-living-world-m5.md) for complete rules, performance limitations and next milestones.
 
-## Hosting limitation (2026-11-06)
+## Safety and hosting boundary
 
-The GitHub Pages frontend is **not** connected to a hosted DK Server. The server currently binds to loopback and refuses external requests by design. Do not remove that boundary or deploy an unauthenticated public game-state writer. The next hosted milestone needs an always-on HTTPS host, durable volume or database, and a browser-pairing authorization scheme that does not require the user to type a password. A serverless web function or temporary sandbox alone would not satisfy continuous autonomous simulation. This release includes no hosted deployment, no online NPC simulation, and no fake online status.
+Current `createDKServer()` **refuses public network interfaces** and filters Host, Origin and Fetch-Site. These local protections are not suitable internet-user authentication. Do not expose the local API publicly. An always-on host, durable mounted storage or database, HTTPS and a single-owner pairing/authorization mechanism are prerequisites for a hosted version.
+
+Use `node --test tests/dk-uo-m5.cjs tests/outdoor-m5.cjs` in a development checkout to run the new regression contracts. No GitHub Actions testing infrastructure is required for the runtime itself.

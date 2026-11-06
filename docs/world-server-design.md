@@ -1,3 +1,7 @@
+## Implemented milestone: DK Server M5 | 2026-11-06
+
+The authoritative local server now includes three connected variable-size regions, autonomous NPC work/rest/movement, shops, traveling camps, territorial threats, bank-box mail, resources, server-owned inventory and gold, and a persistent event archive. This **supersedes earlier planning notes** below that describe the temple as the only region or claim the playable client is not connected. The public GitHub Pages preview is not connected to a hosted DK Server; its static gameplay demonstration is not an online persistent world. The full current design and implementation boundaries are in [UO Living World M5](uo-living-world-m5.md).
+
 ## DK Server M4: pause/resume world runtime (v0.2.25)
 
 The loopback game service has durable `runtime.running`, `runtime.elapsed_ms` and `runtime.resumed_at_utc` fields. `POST /api/v1/server/start` resumes the world clock; `POST /api/v1/server/stop` saves and freezes it, without killing the process. The process-restart path does not simulate elapsed time while the service was off. World writes are serialized and checkpoints continue with no browser connected. The server now enforces **one character slot**. Local New Game/Continue automatically resumes world time.

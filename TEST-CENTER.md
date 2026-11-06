@@ -1,3 +1,5 @@
+> **Current release v0.2.26 (2026-11-06):** The Forsaken Temple is connected to the 64×64 Lilith courtyard, which leads into a 128×128 village. The temple is still 16×16; its outdoor building is exactly 16×16. Walking through an open door changes areas; only double-click changes a door's open/closed state. Some older lab notes below describe an earlier temple-only build. See [Living World M5](docs/uo-living-world-m5.md) for the active architecture.
+
 # Sacrificial Temple | DK Architect Development Lab
 
 **Current active branch:** `main`  

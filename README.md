@@ -1,21 +1,38 @@
 # Demon Killer
 
-**Demon Killer** is DK Softworks' original engine-free, top-down Gothic adventure with a local single-player persistent world, an Ultima Online-inspired control scheme, and the DK Architect construction tool. The playable Forsaken Temple, sacrifice, ghost, and resurrection story remain intact.
+**Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Persistent world progress: DK Server M4 (v0.2.25)
+## Current milestone: v0.2.26 | DK Server M5, the Living World
 
-The **public Demon Killer webpage** is published on GitHub Pages, but its **always-on world server is not deployed**. The website's Options → Persistent World panel reports **Not Connected** rather than inventing a server. The Start Server button cannot turn GitHub Pages into a backend.
+The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
-The server code in this repository now supports **one authoritative character slot**, server-validated temple actions, durable world-state writes, and **Start / Stop world simulation** endpoints. Stop pauses the server-owned six-hour day / six-hour night clock and writes its state to disk. Start resumes from that exact game time without counting the paused interval. If DK Server stays running, closing the browser does not stop that clock. The integrated menu automatically sends Start when creating or continuing the server-owned character.
+The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
 
-**This is not yet an autonomous NPC world:** NPC schedules, businesses, monster territory, and server-authoritative Architect edits still need implementation. A genuine always-on Linux host with persistent storage and owner-only HTTPS access must be supplied before the public website can connect to a real world. We deliberately have not exposed the current unauthenticated loopback-only prototype to the internet. Standard short-lived serverless functions are not suitable substitutes.
+### Persistent simulation, when DK Server is actually running
 
-## Local development only
+- **One character, one life:** server-validated character actions, position, ghost/living state, inventory, gold and skills.
+- **12 NPCs:** server-owned positions, cardinal movement, work/rest schedules, hunger, energy and health. NPCs move while the browser is closed.
+- **6 businesses:** daily opening/closing, stock, purchases, sales, expenses and deliveries.
+- **Dynamic territories:** monster threats and settlement capture or recovery are simulated without waiting for the player.
+- **Traveling camp:** arrives and departs on the simulated world clock; wandering trader and escort NPCs travel between areas.
+- **Bank and mail:** couriers deliver letters to the player's bank box, never to a magically omniscient messenger; letters must be collected physically at the Village Bank.
+- **Gathering and commerce:** replenishing herbs/wood/ore, player-owned inventory, proximity-checked buying/selling, deposited gold and two starter skill tracks.
+- **World history:** an append-only `server/data/world-events.ndjson` records world events and player transactions. Recent events remain in the save for quick display.
+- **Start/Stop:** the server clock runs through a six-real-hour day and six-real-hour night. Closing the **browser** does not stop a running host. Stop Server pauses time and saves state; later Start resumes without adding stopped time.
 
-The repository includes a Linux-only detached launcher, `start-demon-killer.sh`, for developers to test the integrated local server without installing a game engine. That local development workflow is **not** a requirement for playing the eventual website. It runs DK Server at `127.0.0.1:8766`, uses one-character server-side saves, and can be paused/resumed through the game menu. The older process shutdown endpoint remains available to the launcher; the new normal Options Stop button **pauses the world without terminating its host process**.
+### Important deployment boundary
 
-## Playable public preview
+**The public GitHub Pages version is still a standalone browser preview, not an online DK Server.** It can show the temple, courtyard and village with browser-only movement, but **persistent NPC lives, economics, server inventory, and real mail require a connected live DK Server**. The webpage correctly says **Not Connected** instead of claiming those features are online.
 
-[**▶ Open the browser preview**](https://dereksparks1982.github.io/demonkiller/)
+The backend is a **loopback-only Node.js prototype**, not securely hosted yet. Deploying it publicly will require an actual always-on Linux host, durable storage, HTTPS, and owner-only pairing/access controls. GitHub Pages, temporary sandboxes and ordinary short-lived serverless functions cannot by themselves run this world continuously.
 
-See [server/README.md](server/README.md) for local API details and tests, and [CHANGELOG.md](CHANGELOG.md) for versioned build notes.
+This build also does **not** include complex pathfinding, complete NPC conversations, births/family systems, all house interiors, or the full server-authoritative Architect edit pipeline. Those remain future milestones.
+
+## Project resources
+
+- [Playable static browser preview](https://dereksparks1982.github.io/demonkiller/)
+- [DK Server runtime and API](server/README.md)
+- [Living-world architecture and milestone details](docs/uo-living-world-m5.md)
+- [Changelog](CHANGELOG.md)
+
+The canonical code, original art, and release history live together in this GitHub repository. No Godot runtime or game-engine dependency is needed.

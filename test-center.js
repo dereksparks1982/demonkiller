@@ -11,7 +11,7 @@
   const ACTIVE_STORE = 'dkSoftworks.demonkiller.activeCharacter.v1';
   const SERVER = typeof window !== 'undefined' && window.DemonKillerServer &&
     new URLSearchParams(window.location.search).has('dkSlot') ? window.DemonKillerServer : null;
-  let serverReady = !SERVER, serverBusy = false, serverLastMove = 0;
+  let serverReady = !SERVER, serverBusy = false, serverLastMove = 0, pointerStepAt = -1000;
   const $ = id => document.getElementById(id);
   const canvas = $('room'), ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -916,6 +916,21 @@
   function facing(dx,dy){
     return Math.abs(dx)>=Math.abs(dy)?(dx>=0?'east':'west'):(dy>=0?'south':'north');
   }
+  function leaveTemple(){
+    if(!SERVER){
+      scene.player.x=8;scene.player.y=1;scene.player.facing='south';
+      persistCharacter();
+      const key='dkSoftworks.demonkiller.outdoors.preview.v1';
+      let old={};try{old=JSON.parse(localStorage.getItem(key)||'null')||{};}catch(_){}
+      localStorage.setItem(key,JSON.stringify({
+        area_id:'dk.courtyard.lilith.001',x:32,y:47,facing:'north',
+        form:scene.player.form,doorOpen:true,
+        firstCourtyardSeen:Boolean(old.firstCourtyardSeen)
+      }));
+    }
+    rightMouseHeld=false;clickDestination=null;
+    window.location.href='./outdoor.html'+(SERVER?'?dkSlot='+activeSlot:'');
+  }
   function step(dx,dy) {
     if(SERVER){
       if(!serverReady||serverBusy)return false;
@@ -927,6 +942,7 @@
       serverBusy=true;
       SERVER.action(activeSlot,'move',{direction})
         .then(character=>{
+          if(character.area_id!==AREA){leaveTemple();return;}
           const p=scene.player;
           p.x=character.x;p.y=character.y;p.facing=character.facing;
           visual.queue.push({x:p.x,y:p.y});
@@ -943,13 +959,17 @@
     const p=scene.player,nx=p.x+dx,ny=p.y+dy;
     p.facing=facing(dx,dy);
     if(nx===8&&ny===0&&!scene.introSeen){message('I cannot leave.');return false;}
+    if(nx===8&&ny===0&&scene.introSeen){
+      const gate=scene.objects.find(o=>o.id==='temple_north_door');
+      if(!gate?.open){message('The iron arch is closed. Double-click the door to open it.');return false;}
+      leaveTemple();return true;
+    }
     if(!canStand(nx,ny)){draw();message('Blocked at ('+nx+', '+ny+'). The '+(p.form==='ghost'?'stone boundary':'wall or solid object')+' bars your way.');return false;}
     p.x=nx;p.y=ny;dirty=true;
     noteCharacterActivity();
     visual.queue.push({x:nx,y:ny});
     draw();persistCharacter();
-    if(nx===8&&ny===0)message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test. You remain in '+AREA+'.');
-    else message((p.form==='ghost'?'Ghost':'Living')+' at '+AREA+' ('+nx+', '+ny+').');
+    message((p.form==='ghost'?'Ghost':'Living')+' at '+AREA+' ('+nx+', '+ny+').');
     return true;
   }
   // Ultima Online controls: left mouse INTERACTS. Holding right mouse MOVES.
@@ -967,6 +987,11 @@
     if(obj.type==='braziers'&&p.form==='ghost'){message("The fire doesn't affect me.");return;}
     if(obj.type==='pew'&&p.form==='ghost'){message('Ghosts need no rest.');return;}
     if(obj.type==='door') {
+      if(!doubleClick){
+        message('Iron arch: '+(obj.open?'OPEN':'CLOSED')+
+          '. Double-click to '+(obj.open?'close':'open')+'.');
+        return;
+      }
       if(SERVER){
         if(serverBusy)return;
         serverBusy=true;
@@ -1001,55 +1026,22 @@
       else step(0,dy>=0?1:-1);
       return;
     }
-    // A held right-mouse pointer is an EXACT pixel-space target of the
-    // character's ground position. No UO-style radius or .35-tile standoff.
-    // Preserves the existing hold-to-steer / release-to-stop controls.
-    visual.queue.length=0;
-    const dx=target.x-(visual.x+.5)*TILE;
-    const dy=target.y-(visual.y+.5)*TILE;
-    const pixels=Math.hypot(dx,dy);
-    if(pixels<=0.01){
+    // UO-style hold-to-steer, but one CARDINAL tile at a time:
+    // no sideways drift or diagonal crossing between tile addresses.
+    if(mode!=='walk'||opening||ritual||lastFrameTime-pointerStepAt<190)return;
+    const p=scene.player,dx=target.x-(p.x+.5)*TILE,dy=target.y-(p.y+.5)*TILE;
+    if(Math.hypot(dx,dy)<TILE*.35){
       if(!rightMouseHeld)clickDestination=null;
       return;
     }
-    noteCharacterActivity();
-    const tilesToTravel=Math.min(pixels/TILE,(pixels>4*TILE?5.6:3.1)*dt);
-    if(tilesToTravel<=0)return;
-    const ax=dx/pixels*tilesToTravel,ay=dy/pixels*tilesToTravel;
-    const legal=(x,y)=>{
-      const tx=Math.round(x),ty=Math.round(y);
-      if(!canStand(tx,ty)||(tx===8&&ty===0&&!scene.introSeen))return false;
-      const p=scene.player;
-      // Prevent diagonally cutting through the corners of two solid tiles.
-      if(tx!==p.x&&ty!==p.y&&(!canStand(tx,p.y)||!canStand(p.x,ty)))return false;
-      return true;
-    };
-    let nx=visual.x+ax,ny=visual.y+ay;
-    if(!legal(nx,ny)){
-      if(legal(nx,visual.y))ny=visual.y;
-      else if(legal(visual.x,ny))nx=visual.x;
-      else {
-        if(!rightMouseHeld)clickDestination=null;
-        return;
-      }
-    }
-    const vx=nx-visual.x,vy=ny-visual.y;
-    if(!vx&&!vy)return;
-    visual.x=nx;visual.y=ny;
-    const p=scene.player,tx=Math.round(nx),ty=Math.round(ny);
-    p.facing=facing(vx,vy);
-    if(p.x!==tx||p.y!==ty){
-      p.x=tx;p.y=ty;dirty=true;persistCharacter();
-      if(tx===8&&ty===0)
-        message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test.');
-    }
-    // Pixel-perfect arrival, without the former standing-distance shortcut.
-    if(!rightMouseHeld&&clickDestination&&
-      Math.hypot(clickDestination.x-(visual.x+.5)*TILE,
-        clickDestination.y-(visual.y+.5)*TILE)<=0.01){
-      clickDestination=null;
-      persistCharacter();
-    }
+    pointerStepAt=lastFrameTime;
+    const keepDestination=clickDestination;
+    const moved=Math.abs(dx)>=Math.abs(dy)?
+      step(dx>0?1:-1,0):step(0,dy>0?1:-1);
+    if(!rightMouseHeld)clickDestination=moved?keepDestination:null;
+    // Character sprites intentionally have NO walking animation.
+    // Draw at the new cell, never halfway across two axes.
+    visual.queue.length=0;visual.x=scene.player.x;visual.y=scene.player.y;
     draw();
   }
   function advanceFrame(now) {
@@ -1922,6 +1914,10 @@
       try{
         if(!activeSlot)throw Error('Select a valid character from the main menu.');
         const [character,serverWorld]=await Promise.all([SERVER.getCharacter(activeSlot),SERVER.world()]);
+        if(character.area_id!==AREA){
+          window.location.href='./outdoor.html?dkSlot='+activeSlot;
+          return;
+        }
         scene=fresh();
         scene.player={x:character.x,y:character.y,facing:character.facing,form:character.form};
         scene.introSeen=character.opening_state!=='not_started';

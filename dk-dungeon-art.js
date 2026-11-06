@@ -80,7 +80,8 @@
     return draw(g,id,px,py,32,32,time,0);
   }
   function drawWall(g,scene,x,y,time=0){
-    const k=y*16+x,custom=scene.wallVariants?.[k],e=entries[custom];
+    const width=scene.width||16,height=scene.height||16;
+    const k=y*width+x,custom=scene.wallVariants?.[k],e=entries[custom];
     if(e&&e.category==='wall'){
       const turn=scene.wallRotations?.[k]||0;
       if(!turn)return draw(g,custom,x*32,y*32,32,32,time);
@@ -89,8 +90,8 @@
       g.restore();return painted;
     }
     const pack=scene.wallPacks?.[k]==='ox72'?'ox72':'ox72i';
-    const on=(tx,ty)=>tx>=0&&ty>=0&&tx<16&&ty<16&&
-      scene.walls[ty*16+tx]&&(scene.wallPacks?.[ty*16+tx]||'ox72i')===pack;
+    const on=(tx,ty)=>tx>=0&&ty>=0&&tx<width&&ty<height&&
+      scene.walls[ty*width+tx]&&(scene.wallPacks?.[ty*width+tx]||'ox72i')===pack;
     const nearby={n:!!on(x,y-1),e:!!on(x+1,y),s:!!on(x,y+1),w:!!on(x-1,y)};
     return pack==='ox72'?drawAutoSecond(g,x*32,y*32,nearby,time):
       drawAutoFirst(g,x*32,y*32,nearby,time);

@@ -1,0 +1,143 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
+const {createDKServer}=require('../server/dk-server.cjs');
+const W=require('../server/world.cjs'),R=require('../server/regions.cjs');
+const L=require('../server/living-world.cjs'),G=require('../server/gameplay.cjs');
+const ORIGIN=Date.UTC(2026,10,6),MINUTE=60000;
+const JSON_POST=(base,path,data)=>fetch(base+path,{method:'POST',
+  headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+
+test('temple, courtyard and village have independent true-to-scale tile extents',()=>{
+ const w=W.makeWorld(ORIGIN),temple=w.areas[R.TEMPLE],court=w.areas[R.COURT],village=w.areas[R.VILLAGE];
+ assert.deepEqual([temple.width,temple.height],[16,16]);
+ assert.deepEqual([court.width,court.height],[64,64]);
+ assert.deepEqual([village.width,village.height],[128,128]);
+ assert.equal(court.objects.find(o=>o.id==='temple_exterior').w,16);
+ assert.equal(court.objects.find(o=>o.id==='temple_exterior').h,16);
+ assert.equal(court.objects.filter(o=>o.type==='house').length,4);
+ assert.equal(village.objects.filter(o=>o.type==='house').length,6);
+ assert.equal(R.portal(w,R.COURT,32,0).area_id,R.VILLAGE);
+ assert.equal(R.portal(w,R.VILLAGE,64,127).area_id,R.COURT);
+ assert.doesNotThrow(()=>W.validateWorld(w));
+});
+test('open temple doorway connects both directions; closed doorway blocks even ghosts',()=>{
+ let w=W.makeWorld(ORIGIN);
+ w=W.createCharacter(w,1,'ONE').world;
+ w=W.applyCharacterAction(w,1,{action:'finish_opening'}).world;
+ w.characters['1'].x=8;w.characters['1'].y=1;
+ w=W.applyCharacterAction(w,1,{action:'move',direction:'north'}).world;
+ assert.equal(w.characters['1'].area_id,R.COURT);
+ assert.deepEqual([w.characters['1'].x,w.characters['1'].y],[32,47]);
+ assert.equal(w.characters['1'].courtyard_visit_count,1);
+ assert.equal(w.characters['1'].lilith_branch,'golden');
+ assert.equal(w.areas[R.COURT].objects.find(o=>o.id==='lilith_willow').world_form,'golden');
+ w=W.applyCharacterAction(w,1,{action:'toggle_door'}).world;
+ assert.equal(w.areas[R.TEMPLE].objects.find(o=>o.id==='temple_north_door').open,false);
+ assert.equal(w.areas[R.COURT].objects.find(o=>o.id==='courtyard_temple_door').open,false);
+ assert.throws(()=>W.applyCharacterAction(w,1,{action:'move',direction:'south'}),/closed door/);
+ w=W.applyCharacterAction(w,1,{action:'toggle_door'}).world;
+ w=W.applyCharacterAction(w,1,{action:'move',direction:'south'}).world;
+ assert.equal(w.characters['1'].area_id,R.TEMPLE);
+ assert.deepEqual([w.characters['1'].x,w.characters['1'].y],[8,1]);
+});
+test('living-world branch makes Lilith a sickly willow only after resurrection',()=>{
+ let w=W.makeWorld(ORIGIN);
+ w=W.createCharacter(w,1,'TEST').world;
+ w=W.applyCharacterAction(w,1,{action:'finish_opening'}).world;
+ w.characters['1'].x=8;w.characters['1'].y=8;
+ w=W.applyCharacterAction(w,1,{action:'resurrect'}).world;
+ w.characters['1'].x=8;w.characters['1'].y=1;
+ w=W.applyCharacterAction(w,1,{action:'move',direction:'north'}).world;
+ assert.equal(w.characters['1'].lilith_branch,'sickly');
+ assert.equal(w.areas[R.COURT].objects.find(o=>o.id==='lilith_willow').world_form,'sickly');
+});
+test('90 world minutes simulate NPC movement, business, bank letters and dated events',()=>{
+ const world=W.makeWorld(ORIGIN);
+ const a=L.advance(world,ORIGIN+90*MINUTE,100);
+ assert.equal(a.minutes,90);
+ assert.equal(a.world.living.minute,90);
+ assert.equal(a.world.living.mail.boxes['1'].length,1,'Bank receives actual postal delivery');
+ assert(a.events.some(e=>e.type==='npc.move'));
+ assert(a.events.some(e=>e.type==='npc.needs'));
+ assert(a.events.some(e=>e.type==='business.trade'));
+ assert(a.events.some(e=>e.type==='mail.delivered'));
+ assert.equal(Object.keys(a.world.living.npcs).length,12);
+ assert.equal(Object.keys(a.world.living.businesses).length,6);
+ const staged=L.advance(L.advance(L.advance(world,ORIGIN+30*MINUTE,30).world,
+   ORIGIN+60*MINUTE,30).world,ORIGIN+90*MINUTE,30);
+ assert.deepEqual(staged.world.living,a.world.living,'World events are deterministic, not reload-triggered');
+ const stopped=W.setWorldRunning(a.world,false,ORIGIN+90*MINUTE);
+ assert.equal(L.advance(stopped,ORIGIN+10*DAY_MS(),200).minutes,0,'Stopped world must stay frozen');
+});
+function DAY_MS(){return 720*MINUTE;}
+test('inventory, harvesting, trade and bank gold are authoritative and conserved',()=>{
+ let w=W.makeWorld(ORIGIN);w=W.createCharacter(w,1,'TEST').world;
+ w.characters['1'].form='living';w.characters['1'].opening_state='resurrected';
+ w.characters['1'].area_id=R.COURT;w.characters['1'].x=18;w.characters['1'].y=33;
+ w=L.advance(w,ORIGIN+16*MINUTE,25).world;
+ w=G.apply(w,{action:'gather',node_id:'courtyard_herbs_west'}).world;
+ assert.equal(w.characters['1'].inventory.herbs,1);
+ assert.throws(()=>G.apply(w,{action:'gather',node_id:'courtyard_herbs_west'}),/wait/);
+ w.characters['1'].x=10;w.characters['1'].y=25;
+ w=G.apply(w,{action:'sell',business_id:'courtyard_market',item_type:'herbs',quantity:1}).world;
+ assert.equal(w.characters['1'].gold,8);
+ w=G.apply(w,{action:'buy',business_id:'courtyard_market',quantity:1}).world;
+ assert.equal(w.characters['1'].gold,5);
+ assert.equal(w.characters['1'].inventory.herbs,1);
+ w.characters['1'].area_id=R.VILLAGE;w.characters['1'].x=54;w.characters['1'].y=103;
+ w=G.apply(w,{action:'bank_deposit',amount:3}).world;
+ w=G.apply(w,{action:'bank_withdraw',amount:2}).world;
+ assert.deepEqual([w.characters['1'].gold,w.characters['1'].bank_gold],[4,1]);
+ assert.equal(w.characters['1'].skills.foraging,1);
+ assert.equal(w.characters['1'].skills.commerce,2);
+ assert.doesNotThrow(()=>W.validateWorld(w));
+});
+test('bank box letters require physically visiting the bank and cannot be collected twice',()=>{
+ let w=W.makeWorld(ORIGIN);w=W.createCharacter(w,1,'ONE').world;
+ w=L.advance(w,ORIGIN+90*MINUTE,100).world;
+ w.characters['1'].form='living';w.characters['1'].opening_state='resurrected';
+ assert.throws(()=>L.collectLetter(w,'letter_1'),/Visit/);
+ w.characters['1'].area_id=R.VILLAGE;w.characters['1'].x=54;w.characters['1'].y=103;
+ const collected=L.collectLetter(w,'letter_1');
+ assert.equal(collected.letter.subject,'A bank box has been reserved');
+ assert.equal(collected.world.living.mail.boxes['1'].length,0);
+ assert.equal(collected.world.living.mail.collected.length,1);
+ assert.throws(()=>L.collectLetter(collected.world,'letter_1'),/not in/);
+});
+test('loopback DK Server advances the world without clients and archives events',async t=>{
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-uo-m5-'));
+ let now=ORIGIN;
+ const app=await createDKServer({dataDir:dir,port:0,now:()=>now,tickMs:250});
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true})});
+ const base='http://127.0.0.1:'+app.address.port;
+ assert.equal((await fetch(base+'/outdoor.html')).status,200);
+ assert.equal((await fetch(base+'/world-regions.js')).status,200);
+ assert.equal((await fetch(base+'/outdoor.js')).status,200);
+ assert.equal((await fetch(base+'/server/living-world.cjs')).status,404);
+ assert.equal((await (await fetch(base+'/api/v1/areas')).json()).regions.length,3);
+ assert.equal((await (await fetch(base+'/api/v1/health')).json()).build,'local-m5');
+ assert.equal((await JSON_POST(base,'/api/v1/characters',{slot:2,name:'NO'})).status,422);
+ assert.equal((await JSON_POST(base,'/api/v1/characters',{slot:1,name:'YES'})).status,201);
+ assert.equal((await fetch(base+'/api/v1/bank/box')).status,409);
+ now+=90*MINUTE;
+ let living;
+ for(let attempt=0;attempt<30;attempt++){
+   await new Promise(resolve=>setTimeout(resolve,150));
+   living=await (await fetch(base+'/api/v1/living')).json();
+   if(living.minute>=90)break;
+ }
+ assert.equal(living.minute,90,'Server must advance without attached browser');
+ assert(living.last_event_sequence>50);
+ assert.equal((await (await fetch(base+'/api/v1/living/events?after=0')).json()).events.length>0,true);
+ assert.equal((await fetch(base+'/api/v1/areas/'+R.VILLAGE)).status,200);
+ assert.equal((await fetch(base+'/api/v1/gameplay')).status,200);
+ assert.equal((await JSON_POST(base,'/api/v1/gameplay',{action:'gather',node_id:'village_ore'})).status,409);
+ await app.close();
+ const archive=await fs.readFile(path.join(dir,'world-events.ndjson'),'utf8');
+ assert(archive.split('\n').filter(Boolean).length>50,'NPC events must be archived durably');
+ const disk=JSON.parse(await fs.readFile(path.join(dir,'world.json'),'utf8'));
+ assert.equal(disk.runtime.running,false);
+ assert.equal(disk.living.minute,90);
+ assert.equal(disk.areas[R.VILLAGE].width,128);
+});

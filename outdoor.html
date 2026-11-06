@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demon Killer | The Living World</title>
+<link rel="stylesheet" href="./outdoor.css"></head>
+<body>
+<main class="world-app">
+ <header class="head"><div><h1>DEMON KILLER</h1><small>DK SOFTWORKS · THE LIVING WORLD</small></div>
+ <nav><a href="./index.html">MAIN MENU</a><button id="showBank" type="button">BANK BOX</button></nav></header>
+ <div class="layout"><section class="world-pane"><div class="world-title"><strong id="areaName">OUTDOOR REGION</strong>
+ <span id="worldStatus">Loading world...</span></div>
+ <canvas id="world" width="640" height="640" tabindex="0" aria-label="Overhead world, cardinal directions only"></canvas>
+ <div class="hints">HOLD RIGHT MOUSE to walk · LEFT CLICK to inspect · DOUBLE-CLICK doors · WASD / ARROWS to walk</div>
+ </section>
+ <aside class="world-sidebar">
+ <h2>YOUR CHARACTER</h2><p id="characterStatus">Loading...</p>
+ <h2>PACK & TRADE</h2><p id="packStatus">Gold and inventory are server-owned.</p>
+ <div class="goods-controls">
+  <button id="gatherButton" type="button">GATHER</button>
+  <button id="buyButton" type="button">BUY ONE</button>
+  <button id="sellButton" type="button">SELL ONE</button>
+  <button id="depositButton" type="button">DEPOSIT 1 GOLD</button>
+  <button id="withdrawButton" type="button">WITHDRAW 1 GOLD</button>
+ </div>
+ <h2>WORLD</h2><p id="clockStatus">Waiting for world clock...</p>
+ <p id="activityStatus">NPC activity appears when DK Server is connected.</p>
+ <h2>JOURNAL</h2><p id="message" role="status" aria-live="polite">Leaving the Forsaken Temple...</p>
+ <section id="bankPanel" hidden aria-label="Village bank box"><h2>YOUR BANK BOX</h2>
+ <div id="letters"></div><button type="button" id="closeBank">CLOSE BOX</button></section>
+ <section class="note">The public GitHub Pages version is a static gameplay preview. It does not impersonate the persistent world server. World time, NPC lives, trade, and mail are authoritative only when the real DK Server is connected.</section>
+ </aside></div>
+</main>
+<script src="./assets/art/dkarchitect/imported/first-catalog.js"></script>
+<script src="./assets/art/dkarchitect/imported/catalog.js"></script>
+<script src="./dk-dungeon-art.js"></script>
+<script src="./world-regions.js"></script>
+<script src="./dk-menu-server.js"></script>
+<script src="./outdoor.js?v=0.2.26"></script>
+</body></html>

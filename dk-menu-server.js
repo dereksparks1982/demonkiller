@@ -47,6 +47,16 @@
       });
     },
     async clock() { return request('/api/v1/clock'); },
+    async regions() { return request('/api/v1/areas'); },
+    async area(id) { return request('/api/v1/areas/' + encodeURIComponent(id)); },
+    async living() { return request('/api/v1/living'); },
+    async events(after=0) { return request('/api/v1/living/events?after='+after); },
+    async gameplay() { return request('/api/v1/gameplay'); },
+    async gameAction(action,fields={}) {
+      return post('/api/v1/gameplay',{action,...fields});
+    },
+    async bankBox() { return request('/api/v1/bank/box'); },
+    async collectLetter(letter_id) { return post('/api/v1/bank/collect',{letter_id}); },
     async world() { return request('/api/v1/world'); },
     async shutdown() {
       return request('/api/v1/server/shutdown', {
@@ -77,7 +87,7 @@
     }
     try {
       const [health, worldClock] = await Promise.all([client.health(), client.clock()]);
-      if (health.build !== 'local-m4') throw Error('DK Server needs the latest M4 build');
+      if (health.build !== 'local-m5') throw Error('DK Server needs the latest M4 build');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';

@@ -38,12 +38,12 @@ test('Start/Stop persist world state; closing the browser does not stop time',as
  const app=await createDKServer({dataDir:dir,port:0,now:()=>tNow,tickMs:250});
  t.after(()=>app.server.listening?app.close():undefined);
  const base='http://127.0.0.1:'+app.address.port;
+ assert.equal((await send(base,1,'ALIVE')).status,201);
  assert.equal((await POST(base,'/api/v1/server/stop','start')).status,403);
  assert.equal((await POST(base,'/api/v1/server/stop','stop')).status,200);
  assert.equal((await (await fetch(base+'/api/v1/server/state')).json()).running,false);
  tNow+=DAY_MS*2;
  assert.equal((await (await fetch(base+'/api/v1/clock')).json()).phase,'day');
- await send(base,1,'ALIVE');
  assert.equal((await fetch(base+'/api/v1/characters/1/actions',{method:'POST',
    headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'finish_opening'})})).status,409);
  assert.equal((await POST(base,'/api/v1/server/start','start')).status,200);

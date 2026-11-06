@@ -14,7 +14,7 @@ const ROOT_FILES = new Set([
   'index.html','test-center.html','test-center.js','test-center.css',
   'cult-system.js','cult-network.js','cult-journal.css',
   'citizen-population.js','temple-music.js','dk-dungeon-art.js',
-  'dk-skills.js','dk-menu-server.js'
+  'dk-skills.js','dk-menu-server.js','world-regions.js','outdoor.html','outdoor.js','outdoor.css'
 ]);
 
 function localRequestAllowed(req, port) {

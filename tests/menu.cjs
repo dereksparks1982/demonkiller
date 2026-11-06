@@ -60,7 +60,7 @@ const document={
  querySelectorAll:sel=>sel==='.back'?backs:sel==='.art-button'?Object.values(actions):[],
  body:{classList:{add:noop}}
 };
-const localStorage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,String(v))};
+const localStorage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,String(v)),removeItem:k=>saved.delete(k)};
 const location={href:''};
 class AudioNode{
  constructor(){this.connections=[];this.gain={value:1};this.threshold={value:0};this.knee={value:0};

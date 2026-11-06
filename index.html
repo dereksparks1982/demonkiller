@@ -200,7 +200,13 @@ async function launch(id){
    location.href='./test-center.html?dkSlot='+id;
    return;
  }
- try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.25';}
+ try{
+  localStorage.setItem(ACTIVE_KEY,String(id));
+  let outdoor=null;try{outdoor=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.outdoors.preview.v1')||'null');}catch(_){}
+  location.href=outdoor&&outdoor.firstCourtyardSeen&&
+    ['dk.courtyard.lilith.001','dk.village.001'].includes(outdoor.area_id)?
+    './outdoor.html?v=0.2.26':'./test-center.html?v=0.2.26';
+}
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }
 async function openSlots(next){
@@ -250,7 +256,7 @@ $('nameForm').addEventListener('submit',async event=>{
  const slots=readSlots();const created=Date.now();
  slots[chosen]={id:chosen+1,name,scene:null,updated:created,
   worldSeed:created.toString(36)+'-'+Math.floor(Math.random()*4294967296).toString(36)+'-'+(chosen+1)};
- writeSlots(slots);launch(chosen+1);
+ writeSlots(slots);localStorage.removeItem('dkSoftworks.demonkiller.outdoors.preview.v1');launch(chosen+1);
  }catch(e){notice('Cannot create a save because browser storage is unavailable.');}
 });
 document.querySelectorAll('.back').forEach(el=>el.addEventListener('click',()=>show('home')));

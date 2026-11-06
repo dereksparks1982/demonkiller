@@ -2,7 +2,10 @@
 
 // DK Server's first immutable-area snapshot mirrors the approved playable
 // Forsaken Temple. No player-character progression is shared or invented here.
-const AREA_ID = 'dk.temple.sacrifice.001';
+const {TEMPLE,COURT,VILLAGE,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
+const {seed,validateLiving}=require('./living-world.cjs');
+const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
+const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
 const DAY_MS = 6 * 60 * 60 * 1000;
@@ -51,16 +54,18 @@ function templeTemplate() {
 
 function makeWorld(now = Date.now()) {
   if (!Number.isFinite(now) || now < 0) throw new Error('Invalid world creation time');
-  return {
+  const result={
     schema_version: SCHEMA_VERSION,
     world_id: 'dk.world.001',
     created_at_utc: new Date(now).toISOString(),
     clock_anchor_utc: new Date(now).toISOString(),
     revision: 0,
-    areas: { [AREA_ID]: templeTemplate() },
-    characters: {},
+    areas: { [AREA_ID]: templeTemplate(),[COURT]:courtyard(),[VILLAGE]:village() },
+    characters: {},living:seed(),
     runtime: { running: true, elapsed_ms: 0, resumed_at_utc: new Date(now).toISOString() }
   };
+  ensureResources(result);
+  return result;
 }
 
 function validateWorld(world) {
@@ -73,16 +78,24 @@ function validateWorld(world) {
   for (const [slot, character] of Object.entries(world.characters)) {
     if (!/^[123]$/.test(slot) || !character || character.slot !== Number(slot) ||
         typeof character.name !== 'string' || !/^[A-Z0-9 _-]{1,8}$/.test(character.name) ||
-        character.area_id !== AREA_ID || !['ghost','living'].includes(character.form) ||
+        ![AREA_ID,COURT,VILLAGE].includes(character.area_id) ||
+        !['ghost','living'].includes(character.form) ||
         !['not_started','complete','resurrected'].includes(character.opening_state) ||
         (character.opening_state === 'resurrected') !== (character.form === 'living') ||
-        (character.x !== undefined && (!Number.isInteger(character.x) || character.x < 0 || character.x > 15)) ||
-        (character.y !== undefined && (!Number.isInteger(character.y) || character.y < 0 || character.y > 15)) ||
+        (character.x !== undefined && (!Number.isInteger(character.x) || character.x < 0 ||
+          character.x >= (world.areas[character.area_id]?.width ?? 16))) ||
+        (character.y !== undefined && (!Number.isInteger(character.y) || character.y < 0 ||
+          character.y >= (world.areas[character.area_id]?.height ?? 16))) ||
         (character.facing !== undefined && !['north','south','east','west'].includes(character.facing)) ||
         (character.crystal_spent !== undefined && typeof character.crystal_spent !== 'boolean') ||
+        (character.courtyard_visit_count !== undefined &&
+          (!Number.isSafeInteger(character.courtyard_visit_count)||character.courtyard_visit_count<0)) ||
+        (character.lilith_branch !== undefined &&
+          !['golden','sickly'].includes(character.lilith_branch)) ||
         !Number.isSafeInteger(character.revision) || character.revision < 1 ||
         !Number.isFinite(Date.parse(character.created_at_utc)))
       throw new Error('Invalid character record in DK Server data');
+    validateProgress(character);
   }
   if (world.runtime !== undefined) {
     const r = world.runtime;
@@ -111,6 +124,9 @@ function validateWorld(world) {
   }
   if (!ids.has('sacrifice_altar') || !ids.has('temple_north_door'))
     throw new Error('Required approved temple objects missing');
+  if(world.areas[COURT])checkRegion(world.areas[COURT]);
+  if(world.areas[VILLAGE])checkRegion(world.areas[VILLAGE]);
+  if(world.living)validateLiving(world.living);
   return world;
 }
 
@@ -123,6 +139,7 @@ function createCharacter(world, slot, name, now = Date.now()) {
   const character = {slot, name: name.trim().toUpperCase(), revision: 1,
     created_at_utc: new Date(now).toISOString(), area_id: AREA_ID,
     form: 'ghost', opening_state: 'not_started', x: 8, y: 12, facing: 'north', crystal_spent: false};
+  ensureProgress(character);
   const next = structuredClone(world);
   next.characters[String(slot)] = character;
   next.revision++;
@@ -148,12 +165,14 @@ function applyCharacterAction(world, slot, command) {
   const next = structuredClone(world);
   const character = playableCharacter(next.characters[String(slot)]);
   const door = next.areas[AREA_ID].objects.find(o=>o.id==='temple_north_door');
+  const courtyardDoor=next.areas[COURT]?.objects.find(o=>o.id==='courtyard_temple_door');
+  function setDoor(open){if(door)door.open=open;if(courtyardDoor)courtyardDoor.open=open;}
   if (command.action === 'finish_opening') {
     if (character.opening_state !== 'not_started') throw new Error('Opening already completed');
     character.opening_state = 'complete';
-    if (door) door.open = true;
+    setDoor(true);
   } else if (command.action === 'resurrect') {
-    if (character.form !== 'ghost' || character.opening_state !== 'complete' || character.crystal_spent)
+    if (character.area_id !== AREA_ID || character.form !== 'ghost' || character.opening_state !== 'complete' || character.crystal_spent)
       throw new Error('Resurrection is not available');
     if (Math.abs(character.x - 8) + Math.abs(character.y - 7) > 1)
       throw new Error('Move beside the soul crystal first');
@@ -162,19 +181,31 @@ function applyCharacterAction(world, slot, command) {
     character.facing = 'south';
   } else if(command.action === 'toggle_door') {
     if (character.opening_state === 'not_started') throw new Error('Opening ritual not complete');
-    if (Math.abs(character.x - 8) + character.y > 1)
+    const nearTemple = character.area_id===AREA_ID &&
+      Math.abs(character.x-8)+Math.abs(character.y)<=1;
+    const nearCourtyard = character.area_id===COURT &&
+      Math.abs(character.x-32)+Math.abs(character.y-48)<=1;
+    if(!nearTemple&&!nearCourtyard)
       throw new Error('Move beside the temple door first');
-    if (door) door.open = !door.open;
+    setDoor(!door?.open);
   } else {
     if (character.opening_state === 'not_started') throw new Error('Opening ritual not complete');
     const moves = {north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]};
     if (!Object.hasOwn(moves,command.direction)) throw new Error('Invalid movement direction');
     const [dx,dy] = moves[command.direction];
     const x=character.x+dx, y=character.y+dy;
-    if (x < 0 || y < 0 || x > 15 || y > 15 ||
-        (next.areas[AREA_ID].walls[y*16+x] && !(x===8 && y===0)))
+    const currentArea=next.areas[character.area_id];
+    if(!currentArea||x<0||y<0||x>=currentArea.width||y>=currentArea.height)
+      throw new Error('Movement blocked by the region boundary');
+    const regionPortal=portal(next,character.area_id,x,y);
+    if(regionPortal?.blocked)throw new Error('Movement blocked by the closed door');
+    if(character.area_id===AREA_ID &&
+       (currentArea.walls[y*16+x] && !(x===8 && y===0)))
       throw new Error('Movement blocked by temple walls');
-    if (character.form === 'living') {
+    if(character.area_id!==AREA_ID && !regionPortal &&
+       !traversable(currentArea,x,y,character.form))
+      throw new Error('Movement blocked by walls or scenery');
+    if (character.area_id===AREA_ID && character.form === 'living') {
       const solids = new Set(['altar','braziers','pillar','statue','pew','coffin','chest']);
       if (next.areas[AREA_ID].objects.some(object =>
         solids.has(object.type) && x >= object.x && y >= object.y &&
@@ -184,7 +215,21 @@ function applyCharacterAction(world, slot, command) {
       if (x===8 && y===0 && door && !door.open)
         throw new Error('Movement blocked by the closed door');
     }
-    character.x=x; character.y=y; character.facing=command.direction;
+    if (regionPortal) {
+      if(character.area_id===AREA_ID&&regionPortal.area_id===COURT){
+        character.courtyard_visit_count=(character.courtyard_visit_count||0)+1;
+        if(character.courtyard_visit_count===1){
+          character.lilith_branch=character.form==='ghost'?'golden':'sickly';
+          const willow=next.areas[COURT]?.objects.find(o=>o.id==='lilith_willow');
+          if(willow)willow.world_form=character.lilith_branch;
+        }
+      }
+      character.area_id=regionPortal.area_id;
+      character.x=regionPortal.x;character.y=regionPortal.y;
+      character.facing=regionPortal.facing;
+    } else {
+      character.x=x; character.y=y; character.facing=command.direction;
+    }
   }
   character.revision++;
   next.characters[String(slot)] = character;
@@ -238,4 +283,4 @@ function checkpointWorldTime(world, now = Date.now()) {
   return next;
 }
 
-module.exports = { setWorldRunning, checkpointWorldTime, playableCharacter, applyCharacterAction, AREA_ID, GRID_SIZE, TILE_SIZE, DAY_MS, CYCLE_MS, templeTemplate, makeWorld, validateWorld, createCharacter, worldClock };
+module.exports = { COURT,VILLAGE,ensureRegions,setWorldRunning, checkpointWorldTime, playableCharacter, applyCharacterAction, AREA_ID, GRID_SIZE, TILE_SIZE, DAY_MS, CYCLE_MS, templeTemplate, makeWorld, validateWorld, createCharacter, worldClock };

@@ -1,3 +1,5 @@
+> **Implementation note, 2026-11-06:** This file records the original approved scene canon and older authorization limits. Later explicit build authorization implemented the courtyard, temple/village portals and Lilith's two tree outcomes in M5. The historical "future/not yet built" statements below refer to the original planning date, not to the current code. Current implementation: [UO Living World M5](uo-living-world-m5.md).
+
 # Forsaken Temple Opening | Approved Scene Canon (Planning Only)
 
 **Project:** Demon Killer, Elderred Softworks LLC / DKLab

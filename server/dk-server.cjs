@@ -6,8 +6,10 @@ const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { makeWorld, validateWorld, createCharacter, playableCharacter, applyCharacterAction, worldClock, AREA_ID, setWorldRunning, checkpointWorldTime } = require('./world.cjs');
+const { makeWorld, validateWorld, createCharacter, playableCharacter, applyCharacterAction, worldClock, AREA_ID, COURT, VILLAGE, ensureRegions, setWorldRunning, checkpointWorldTime } = require('./world.cjs');
 const { localRequestAllowed, serveGame } = require('./local-game.cjs');
+const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
+const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -116,16 +118,33 @@ async function createDKServer({
   const releaseLock = await acquireWriterLock(dataDir);
   let world;
   try {
-    world = await loadWorld(dataDir, now());
-  } catch (error) { await releaseLock(); throw error; }
-  // A process restart never advances the clock for the time DK Server was down.
-  // A running world resumes automatically; a deliberately stopped one stays paused.
-  if (world.runtime?.running) {
-    world.runtime.resumed_at_utc = new Date(now()).toISOString();
-    await durableWrite(path.join(dataDir, 'world.json'), JSON.stringify(world, null, 2) + '\n');
-  }
+    world=await loadWorld(dataDir,now());
+    const regionsAdded=ensureRegions(world),livingAdded=ensureLivingWorld(world);
+    const resourcesAdded=ensureResources(world);
+    const playerAdded=Object.values(world.characters).some(c=>ensureProgress(c));
+    const templeDoor=world.areas[AREA_ID]?.objects.find(o=>o.id==='temple_north_door');
+    const courtyardDoor=world.areas[COURT]?.objects.find(o=>o.id==='courtyard_temple_door');
+    const doorSynced=Boolean(templeDoor&&courtyardDoor&&courtyardDoor.open!==templeDoor.open);
+    if(doorSynced)courtyardDoor.open=templeDoor.open;
+    // A stopped world stays frozen. No NPC catch-up or world time is simulated
+    // during an intentional server shutdown or an offline host restart.
+    if(!world.runtime)world.runtime={
+      running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
+    };
+    else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
+    if(regionsAdded||livingAdded||resourcesAdded||playerAdded||doorSynced)world.revision++;
+    validateWorld(world);
+    await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(world,null,2)+'\n');
+  }catch(error){await releaseLock();throw error;}
   const streams = new Set();
   let server, writeQueue = Promise.resolve(), stopping = false;
+  const eventLog=path.join(dataDir,'world-events.ndjson');
+  async function appendEvents(events){
+    if(!events?.length)return;
+    const payload=events.map(e=>JSON.stringify(e)).join('\n')+'\n';
+    const fd=await fs.open(eventLog,'a',0o600);
+    try{await fd.writeFile(payload);await fd.sync();}finally{await fd.close();}
+  }
   function snapshot() {
     return {
       protocol: 'dk.world.v1', mode: 'server-saves', world_id: world.world_id,
@@ -133,24 +152,33 @@ async function createDKServer({
     };
   }
   async function saveRuntimeChange(running) {
-    const pending = writeQueue.then(async () => {
-      if (Boolean(world.runtime?.running ?? true) === running)
-        return { world, changed: false };
-      const next = setWorldRunning(world, running, now());
-      await durableWrite(path.join(dataDir,'world.json'), JSON.stringify(next,null,2)+'\n');
-      world = next;
-      for (const viewer of streams) push(viewer,'world.state', {running, clock: worldClock(world,now())});
+    const pending=writeQueue.then(async()=>{
+      if(Boolean(world.runtime?.running??true)===running)
+        return {world,changed:false};
+      const tick=advance(world,now(),1440);
+      const next=setWorldRunning(tick.world,running,now());
+      const milestone=recordWorld(next,running?'started':'paused',next.living.minute);
+      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(next,null,2)+'\n');
+      world=next;
+      try{await appendEvents([...tick.events,...(milestone?[milestone]:[])]);}
+      catch(e){console.error('World event archive write failed:',e);}
+      for(const viewer of streams)push(viewer,'world.state',{running,clock:worldClock(world,now())});
       return {world,changed:true};
     });
-    writeQueue = pending.catch(()=>{});
+    writeQueue=pending.catch(()=>{});
     return pending;
   }
   async function saveCreatedCharacter(slot, name) {
     // Serialize concurrent requests, then write and sync BEFORE acknowledging.
     const pending = writeQueue.then(async () => {
-      const result = createCharacter(checkpointWorldTime(world, now()), slot, name, now());
-      await durableWrite(path.join(dataDir, 'world.json'), JSON.stringify(result.world, null, 2) + '\n');
-      world = result.world;
+      if(!world.runtime?.running)throw Error('World is paused; press Start Server');
+      const tick=advance(world,now(),180);
+      const result=createCharacter(checkpointWorldTime(tick.world,now()),slot,name,now());
+      const playerEvent=recordPlayer(result.world,'created',result.character,result.world.living.minute);
+      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      world=result.world;
+      try{await appendEvents([...tick.events,...(playerEvent?[playerEvent]:[])]);}
+      catch(e){console.error('World event archive write failed:',e);}
       return result;
     });
     writeQueue = pending.catch(() => {});
@@ -158,14 +186,44 @@ async function createDKServer({
   }
   async function saveAction(slot, command) {
     const pending = writeQueue.then(async () => {
-      if (!worldClock(world, now()).running) throw new Error('World is paused; press Start Server');
-      const result = applyCharacterAction(checkpointWorldTime(world, now()), slot, command);
-      await durableWrite(path.join(dataDir, 'world.json'), JSON.stringify(result.world, null, 2) + '\n');
-      world = result.world;
+      if(!worldClock(world,now()).running)throw Error('World is paused; press Start Server');
+      const tick=advance(world,now(),180);
+      const result=applyCharacterAction(checkpointWorldTime(tick.world,now()),slot,command);
+      const playerEvent=recordPlayer(result.world,command,result.character,result.world.living.minute);
+      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      world=result.world;
+      try{await appendEvents([...tick.events,...(playerEvent?[playerEvent]:[])]);}
+      catch(e){console.error('World event archive write failed:',e);}
       return result;
     });
     writeQueue = pending.catch(() => {});
     return pending;
+  }
+  async function saveGameplayAction(command){
+    const pending=writeQueue.then(async()=>{
+      if(!world.runtime?.running)throw Error('World is paused; press Start Server');
+      const tick=advance(world,now(),180);
+      const result=applyGameplay(checkpointWorldTime(tick.world,now()),command);
+      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      world=result.world;
+      try{await appendEvents([...tick.events,result.event]);}
+      catch(e){console.error('World event archive write failed:',e);}
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});return pending;
+  }
+  async function saveCollectedLetter(id){
+    const pending=writeQueue.then(async()=>{
+      if(!world.runtime?.running)throw Error('World is paused; press Start Server');
+      const tick=advance(world,now(),180);
+      const result=collectLetter(tick.world,id);
+      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      world=result.world;
+      try{await appendEvents([...tick.events,result.event]);}
+      catch(e){console.error('World event archive write failed:',e);}
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});return pending;
   }
   function push(res, event, message) {
     if (res.destroyed || res.writableEnded) return;
@@ -203,9 +261,82 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m4', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m5', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
+    if(url.pathname==='/api/v1/areas'&&!write)
+      return sendJSON(res,200,{regions:Object.values(world.areas).map(a=>({
+        area_id:a.area_id,width:a.width,height:a.height,tile_size:a.tile_size,
+        objects:a.objects.length
+      }))},method);
+    const areaMatch=url.pathname.match(/^\/api\/v1\/areas\/(dk\.[a-z0-9.]+)$/);
+    if(areaMatch&&!write){
+      const area=world.areas[areaMatch[1]];
+      return area?sendJSON(res,200,{area,revision:world.revision},method):
+        sendJSON(res,404,{error:'Unknown region'},method);
+    }
+    if(url.pathname==='/api/v1/living'&&!write){
+      const l=world.living;
+      return sendJSON(res,200,{minute:l.minute,npcs:l.npcs,businesses:l.businesses,
+        territories:l.territories,traveling_camps:l.traveling_camps,
+        pending_mail:l.mail.outbound.length,latest_events:l.events.slice(-30),
+        last_event_sequence:l.event_sequence,world_running:worldClock(world,now()).running,
+        world_revision:world.revision},method);
+    }
+    if(url.pathname==='/api/v1/living/events'&&!write){
+      const after=Number(url.searchParams.get('after')||0);
+      if(!Number.isSafeInteger(after)||after<0)
+        return sendJSON(res,400,{error:'Invalid event cursor'},method);
+      const entries=world.living.events.filter(e=>Number(e.id.slice(6))>after).slice(0,200);
+      return sendJSON(res,200,{events:entries,next:entries.length?
+        Number(entries.at(-1).id.slice(6)):after,
+        last_event_sequence:world.living.event_sequence},method);
+    }
+    if(url.pathname==='/api/v1/gameplay'&&!write){
+      const c=world.characters['1'];
+      if(!c)return sendJSON(res,404,{error:'No character exists'},method);
+      const nodes=Object.values(world.living.resources||{}).filter(n=>n.area_id===c.area_id);
+      const businesses=Object.values(world.living.businesses).filter(b=>b.area_id===c.area_id);
+      return sendJSON(res,200,{character:playableCharacter(c),resources:nodes,
+        businesses,minute:world.living.minute,world_running:world.runtime?.running},method);
+    }
+    if(url.pathname==='/api/v1/gameplay'&&method==='POST'){
+      let body;try{body=await readJSON(req);}
+      catch(e){return sendJSON(res,e.status||400,{error:e.message});}
+      try{
+        const result=await saveGameplayAction(body);
+        return sendJSON(res,200,{character:playableCharacter(result.character),
+          world_revision:result.world.revision,event:result.event});
+      }catch(e){
+        if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
+        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance/.test(e.message))
+          return sendJSON(res,409,{error:e.message});
+        console.error('Player gameplay failed:',e);
+        return sendJSON(res,500,{error:'Gameplay transaction was not saved'});
+      }
+    }
+    if(url.pathname==='/api/v1/bank/box'&&!write){
+      const c=world.characters['1'];
+      if(!c||c.area_id!==VILLAGE||Math.abs(c.x-54)+Math.abs(c.y-103)>3)
+        return sendJSON(res,409,{error:'Visit the Village Bank to open your box'},method);
+      return sendJSON(res,200,{letters:world.living.mail.boxes['1'],
+        delivered_count:world.living.mail.boxes['1'].length},method);
+    }
+    if(url.pathname==='/api/v1/bank/collect'&&method==='POST'){
+      let body;try{body=await readJSON(req);}
+      catch(e){return sendJSON(res,e.status||400,{error:e.message});}
+      if(Object.keys(body).join(',')!=='letter_id'||typeof body.letter_id!=='string'||
+        !/^letter_[0-9]+$/.test(body.letter_id))
+        return sendJSON(res,422,{error:'Invalid letter identifier'});
+      try{
+        const result=await saveCollectedLetter(body.letter_id);
+        return sendJSON(res,200,{letter:result.letter,world_revision:world.revision});
+      }catch(e){
+        if(/Visit|not in|paused|Ghosts/.test(e.message))return sendJSON(res,409,{error:e.message});
+        console.error('Bank collection failed:',e);
+        return sendJSON(res,500,{error:'Bank box could not be saved'});
+      }
+    }
     if (url.pathname === '/api/v1/characters' && (method === 'GET' || method === 'HEAD' || method === 'POST')) {
       if (method === 'POST') {
         let body;
@@ -218,7 +349,7 @@ async function createDKServer({
           const saved = await saveCreatedCharacter(body.slot, body.name);
           return sendJSON(res, 201, { character: saved.character, world_revision: saved.world.revision });
         } catch (e) {
-          if (/already occupied/.test(e.message)) return sendJSON(res, 409, { error: e.message });
+          if (/already occupied|paused/.test(e.message)) return sendJSON(res, 409, { error: e.message });
           if (/Invalid character slot|Character name/.test(e.message)) return sendJSON(res, 422, { error: e.message });
           console.error('DK Server save failed:', e);
           return sendJSON(res, 500, { error: 'Character not saved; see server log' });
@@ -276,14 +407,23 @@ async function createDKServer({
   // the pending write queue prevents an older snapshot overwriting gameplay.
   let lastCheckpoint = now();
   const ticker = setInterval(() => {
-    if (world.runtime?.running && now()-lastCheckpoint >= 30_000) {
-      lastCheckpoint = now();
-      const task = writeQueue.then(async()=>{
-        const next = checkpointWorldTime(world, now());
-        await durableWrite(path.join(dataDir,'world.json'), JSON.stringify(next,null,2)+'\n');
+    if(world.runtime?.running && now()-lastCheckpoint>=5000){
+      lastCheckpoint=now();
+      const task=writeQueue.then(async()=>{
+        const tick=advance(world,now(),180);
+        const clockElapsed=now()-Date.parse(world.runtime.resumed_at_utc);
+        if(!tick.minutes&&clockElapsed<30_000)return;
+        const next=checkpointWorldTime(tick.world,now());
+        await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(next,null,2)+'\n');
         world=next;
+        if(tick.events.length){
+          try{await appendEvents(tick.events);}
+          catch(e){console.error('World event archive write failed:',e);}
+          for(const viewer of streams)push(viewer,'world.living',
+            {minute:world.living.minute,events:tick.events.slice(-15)});
+        }
       });
-      writeQueue=task.catch(e=>console.error('World clock checkpoint failed:',e));
+      writeQueue=task.catch(e=>console.error('Living world tick failed:',e));
     }
     const clock = worldClock(world, now());
     for (const res of streams) {
@@ -304,10 +444,14 @@ async function createDKServer({
     async close() {
       clearInterval(ticker);
       await writeQueue;
-      if (world.runtime?.running) {
-        const next = setWorldRunning(world,false,now());
+      if(world.runtime?.running){
+        const tick=advance(world,now(),1440);
+        const next=setWorldRunning(tick.world,false,now());
+        const milestone=recordWorld(next,'paused',next.living.minute);
         await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(next,null,2)+'\n');
         world=next;
+        try{await appendEvents([...tick.events,...(milestone?[milestone]:[])]);}
+        catch(e){console.error('World event archive write failed:',e);}
       }
       for (const res of streams) res.end();
       streams.clear();

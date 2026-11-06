@@ -163,7 +163,7 @@ const tickFrames=count=>{for(let i=0;i<count;i++){
   cb(++frameNumber*16);
 }};
 const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAnimationFrame,
-  window:{addEventListener:noop}};
+  window:{addEventListener:noop,location:{href:''}}};
 vm.runInNewContext(read('assets/art/dkarchitect/imported/first-catalog.js'),sandbox,{filename:'first-catalog.js',timeout:3000});
 vm.runInNewContext(read('assets/art/dkarchitect/imported/catalog.js'),sandbox,{filename:'catalog.js',timeout:3000});
 vm.runInNewContext(dungeonRuntime,sandbox,{filename:'dk-dungeon-art.js',timeout:3000});
@@ -227,9 +227,9 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   tickFrames(1800);
   key('a');for(let i=0;i<11;i++)key('w');
   key('d');key('w');
-  assert.equal(get('position').textContent,'(8, 0)');
+  assert.equal(sandbox.window.location.href,'./outdoor.html',
+    'Walking into the open north door loads the courtyard automatically');
   assert.match(get('lifeState').textContent,/GHOST/);
-  assert.match(get('status').textContent,/courtyard/i);
 
 
   await get('new').emit('click');
@@ -255,20 +255,28 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   tickFrames(10);
   assert.equal(get('position').textContent,stopped,'Releasing stops motion');
   await room.emit('mousedown',{button:2,clientX:10*32+16,clientY:5*32+16,preventDefault:noop});
-  tickFrames(18);
-  const moved=get('position').textContent;
-  assert.notEqual(moved,stopped,'Diagonal right mouse follows cursor');
+  let previous=stopped;
+  const parse=record=>record.match(/\((\d+), (\d+)\)/).slice(1).map(Number);
+  for(let i=0;i<18;i++){
+    tickFrames(1);
+    const current=get('position').textContent;
+    const [px,py]=parse(previous),[cx,cy]=parse(current);
+    assert(Math.abs(cx-px)+Math.abs(cy-py)<=1,
+      'Right mouse may move one cardinal tile per step, never diagonally');
+    previous=current;
+  }
+  assert.notEqual(previous,stopped,'Right mouse follows cursor through cardinal steps');
   await room.emit('mouseup',{button:2});
 
-  // Regression: pointer targets under 18px away must still be reached
-  // exactly; the old movement system refused to enter this inner circle.
+  // Inside the current 32px tile, pointer motion cannot shift the character
+  // by fractions of a tile; the gameplay grid has four cardinal directions.
   await get('new').emit('click');tickFrames(1800);
   await room.emit('mousedown',{button:2,clientX:8*32+26,clientY:12*32+20,preventDefault:noop});
   tickFrames(40);
-  assert(Math.abs(lastPlayerTranslation.x-(8*32+10))<0.03,
-    'Player reaches exact clicked X, without the old half-tile dead zone');
-  assert(Math.abs(lastPlayerTranslation.y-(12*32+4))<0.03,
-    'Player reaches exact clicked Y, without the old half-tile dead zone');
+  assert.equal(get('position').textContent,'(8, 12)',
+    'Clicking within the current grid tile never moves the logical player');
+  assert.equal(lastPlayerTranslation.x,8*32);
+  assert.equal(lastPlayerTranslation.y,12*32);
   await room.emit('mouseup',{button:2});
 
   await get('editMode').emit('click');

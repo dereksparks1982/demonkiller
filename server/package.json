@@ -1,11 +1,13 @@
 {
   "name": "dk-server",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "private": true,
-  "description": "Single-player Demon Killer persistent world authority and integrated local game host",
-  "engines": { "node": ">=20" },
+  "description": "Engine-free single-player persistent DK world with regions, NPCs, commerce, bank and mail",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node dk-server.cjs",
-    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-local.cjs"
+    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-local.cjs ../tests/dk-server-m4.cjs ../tests/dk-uo-m5.cjs ../tests/outdoor-m5.cjs ../tests/menu.cjs ../tests/menu-server.cjs ../tests/test-center.cjs"
   }
 }

@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.26 / DK Server M5 | 2026-11-06 | Regions, living NPCs and UO-inspired economy
+
+- **Variable-size world:** Added shared 16×16 temple, 64×64 courtyard and 128×128 village geometry with correct **16×16 temple exterior**, houses, paths and regional gate links; existing DK Architect walls now support arbitrary area dimensions.
+- **Playable outdoor client:** Added camera-following courtyard/village pages using existing art and deliberately simple in-game scenery. Temple north-door exit and reverse entry now transfer automatically. **Single-click door inspection; double-click door toggling.** Houses have realistic footprints but are not falsely advertised as fully furnished interiors.
+- **Lilith:** Server persists the first courtyard entry and the ghost/golden-willow versus resurrected/sickly-willow outcome; small Canvas transformation uses existing character material and primitive rendering, no new pictures.
+- **Living server world:** Added 12 NPCs, schedules, physical movement, health/needs, 6 businesses, shops/stock/expenses, postal courier and bank box, roaming camp, monster-threat territories and autonomous settlement changes. The world advances on the server while the browser is closed.
+- **Player systems:** Server-owned starting inventory, gold and bank balance, gathering nodes/respawn, commerce and foraging skill progress, proximity-checked buying/selling and bank deposits/withdrawals. Ghosts cannot transact with physical goods.
+- **Permanent record foundation:** Atomic authoritative world snapshots plus a serialized append-only world-events NDJSON archive and bounded recent-event API. Expanded single-slot client and backend API, region discovery, state reads, bank collection and structured gameplay actions.
+- **Server restrictions retained:** One character, no Godot, no passwords or second dashboard, loopback-only binding. The public static website still has **no hosted persistent DK Server**, so its preview never fabricates NPC simulation or a live bank.
+- Added targeted Node regression contracts for spatial consistency, portals, living-world ticks, deterministic schedules, pause, mail, trade, skills and HTTP persistence. Documentation and game version updated.
+
 ## v0.2.25 / DK Server M4 | 2026-11-06 | Persistent run/pause state and one server-owned life
 
 - Added durable server-owned world runtime with **START / STOP** control endpoints. Stop freezes the six-real-hour day/night cycle, and Start resumes from the saved instant. No time is counted while DK Server is off or deliberately paused.
