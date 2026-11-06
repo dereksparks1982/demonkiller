@@ -2,13 +2,15 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.33 | DK Server M12, NPC Possessions and Corpses
+## Current milestone: v0.2.34 | DK Server M12 Integration Fix
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
 
 ### M12: An NPC's possessions outlive them
+
+**v0.2.34 integration fix:** Restored the server startup migration and live corpse APIs that were missing from the M12 server entry point despite being present in the M12 gameplay modules. A connected DK Server now seeds saved NPC backpacks on older worlds, exposes corpse data to the outdoor scene and allows the actual gameplay endpoint to save corpse recovery.
 
 - **Persistent NPC backpacks:** Every living resident has their own server-owned item container, separate from the player and from business stock. Starting belongings have distinct immutable item serials.
 - **Deaths have physical consequences:** When a resident dies from starvation or monster attacks, DK Server creates a persistent corpse on the exact tile. The resident's money moves into the body, and their existing belongings retain their item identities.

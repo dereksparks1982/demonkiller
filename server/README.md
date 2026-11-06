@@ -138,3 +138,7 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 `tests/mobile-assets-m12.cjs` adds regression cases for migration, NPC backpacks, corpse creation, looting, duplicate and remote access prevention, scheduled decay, item identity and HTTP persistence. The M11 scheduler tests were updated for the fifth job. Full Node integration still needs to be run in a complete checkout, although the new combined modules passed isolated functional checks.
 
 **Unimplemented:** Player permanent death, heirs, probate, player-owned houses, crime/guard justice, individualized equipment damage, insurance, resurrection penalties, dynamic NPC generation, and a continuously hosted online process.
+
+## v0.2.34 integration correction
+
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m12`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.

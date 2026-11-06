@@ -1,5 +1,11 @@
 # Demon Killer Changelog
 
+## v0.2.34 | 2026-11-06 | M12 server integration correction
+
+- Fixed the M12 release missing its `server/dk-server.cjs` mobile-assets integration. Ensures NPC backpacks at startup and publishes both nearby corpses and read-only corpse markers to the actual server routes.
+- Restored compatibility with the outdoor corpse renderer and saved corpse loot transactions. The original v0.2.33 modules were already committed; their live server entry point is corrected here.
+- Updated versioned docs and cache references, with no game artwork, world resets, hosted deployment or extra character slots.
+
 ## v0.2.33 / DK Server M12 | 2026-11-06 | NPC possessions and persistent corpses
 
 - Added individual server-owned NPC backpacks and starter possessions with stable serial IDs, independently inspired by RunUO's Mobile/Corpse/Container architecture.

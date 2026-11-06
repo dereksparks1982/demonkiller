@@ -16,6 +16,7 @@ const {ensure:ensureStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,counts:assertEntityCounts,inspect:inspectEntities}=require('./entity-registry-m10.cjs');
 const {build:buildSectorIndex,lookup:sectorLookup}=require('./sectors-m10.cjs');
 const {ensure:ensureScheduler,listing:schedulerListing}=require('./world-scheduler-m11.cjs');
+const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m12.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -137,6 +138,7 @@ async function createDKServer({
     if(doorSynced)courtyardDoor.open=templeDoor.open;
     const entitiesAdded=reconcileEntities(world);
     const schedulerAdded=ensureScheduler(world);
+    const mobileAdded=ensureMobileAssets(world);
     assertEntityCounts(world);
     // A stopped world stays frozen. No NPC catch-up or world time is simulated
     // during an intentional server shutdown or an offline host restart.
@@ -144,7 +146,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(world,null,2)+'\n');
   }catch(error){await releaseLock();throw error;}
@@ -310,6 +312,11 @@ async function createDKServer({
       return area?sendJSON(res,200,{area,revision:world.revision},method):
         sendJSON(res,404,{error:'Unknown region'},method);
     }
+    if(url.pathname==='/api/v1/corpses'&&!write){
+      const c=world.characters['1'];
+      if(!c)return sendJSON(res,404,{error:'No character exists'},method);
+      return sendJSON(res,200,nearbyCorpses(world),method);
+    }
     if(url.pathname==='/api/v1/schedule'&&!write){
       return sendJSON(res,200,{...schedulerListing(world),revision:world.revision},method);
     }
@@ -336,6 +343,7 @@ async function createDKServer({
         territories:l.territories,traveling_camps:l.traveling_camps,
         combat:{creatures:l.combat?.creatures||{},drops:l.combat?.drops||{}},
         storage:{ground:l.storage?.ground||{}},
+        mobile_assets:{corpses:l.mobile_assets?.corpses||{}},
         pending_mail:l.mail.outbound.length,latest_events:l.events.slice(-30),
         last_event_sequence:l.event_sequence,world_running:worldClock(world,now()).running,
         world_revision:world.revision},method);
@@ -389,7 +397,7 @@ async function createDKServer({
           world_revision:result.world.revision,event:result.event});
       }catch(e){
         if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
-        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored/.test(e.message))
+        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead/.test(e.message))
           return sendJSON(res,409,{error:e.message});
         console.error('Player gameplay failed:',e);
         return sendJSON(res,500,{error:'Gameplay transaction was not saved'});
