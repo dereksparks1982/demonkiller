@@ -268,7 +268,26 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   const newSprite=staged.objects.find(o=>o.type==='scenery'&&o.x===2&&o.y===6);
   assert(newSprite&&newSprite.spriteId==='crystal_gold_bright',
     'Staged sprite must retain its approved asset ID in saved room');
-  const invalidAsset=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  // Object inspector: exact position/rotation/collision and copy/paste.
+  const toolSelect=get('tool');toolSelect.value='select';
+  await toolSelect.emit('change',{target:toolSelect});
+  await click(2,6);
+  assert.equal(get('inspectorFields').hidden,false,'Selected object exposes coordinate inspector');
+  get('inspectorX').value='3';get('inspectorY').value='6';
+  get('inspectorFacing').value='1';get('inspectorSolid').value='solid';
+  await get('inspectorApply').emit('click');
+  await get('save').emit('click');
+  const editedScene=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  const editedSprite=editedScene.objects.find(o=>o.type==='scenery'&&o.x===3&&o.y===6);
+  assert(editedSprite&&editedSprite.r===1&&editedSprite.solidOverride===true,
+    'Inspector applies exact position, cardinal facing and scene collision');
+  await get('inspectorCopy').emit('click');
+  assert.equal(get('tool').value,'paste','Copy switches Architect to paste mode');
+  await click(2,6);await get('save').emit('click');
+  const copiedScene=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(copiedScene.objects.filter(o=>o.type==='scenery'&&
+    o.spriteId==='crystal_gold_bright').length,2,'Paste duplicates selected approved asset');
+    const invalidAsset=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   invalidAsset.objects.find(o=>o.type==='scenery').spriteId='not-in-art-library';
   get('import').files=[{size:8000,text:async()=>JSON.stringify(invalidAsset)}];
   await get('import').emit('change',{target:get('import')});

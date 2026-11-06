@@ -106,6 +106,7 @@
       <label for="tool">Editing action</label>
       <select id="tool">
         <option value="place">Place object</option>
+        <option value="paste">Paste copied object</option>
         <option value="select">Select / Move</option>
         <option value="erase">Erase object / wall</option>
         <option value="floor">Paint floor</option>
@@ -148,6 +149,34 @@
         <button id="redo" type="button">Redo</button>
       </div>
         </div>
+        <section id="architectObjectInspector" class="architect-object-inspector" aria-label="Object inspector">
+          <div class="palette-head"><strong>OBJECT INSPECTOR</strong><small>COORDINATE EDITOR</small></div>
+          <small id="inspectorObjectLabel">Select an object in the scene to edit its position.</small>
+          <div id="inspectorFields" class="architect-inspector-fields" hidden>
+            <label for="inspectorX">X <input id="inspectorX" type="number" min="0" max="15" step="1"></label>
+            <label for="inspectorY">Y <input id="inspectorY" type="number" min="0" max="15" step="1"></label>
+            <label for="inspectorFacing">Facing
+              <select id="inspectorFacing">
+                <option value="0">North</option><option value="1">East</option>
+                <option value="2">South</option><option value="3">West</option>
+              </select>
+            </label>
+            <label for="inspectorSolid">Collision
+              <select id="inspectorSolid">
+                <option value="default">Default</option>
+                <option value="solid">Solid</option>
+                <option value="passable">Passable</option>
+              </select>
+            </label>
+          </div>
+          <div class="architect-object-actions">
+            <button id="inspectorApply" type="button">Apply Position / Properties</button>
+            <button id="inspectorCopy" type="button">Copy Object</button>
+            <button id="inspectorPaste" type="button">Paste at Click</button>
+            <button id="inspectorFront" type="button">Bring to Front</button>
+            <button id="inspectorBack" type="button">Send to Back</button>
+          </div>
+        </section>
         <div id="architectAdminInfo" class="architect-info" hidden role="note">
           <strong>WORLD ADMIN · DEVELOPMENT</strong>
           <p>Spawn placement, room export/import and access checks are available below. Persistent server permissions, NPC management and live world controls are later builds.</p>
@@ -196,12 +225,12 @@
       <div id="hint" class="hint">After the sacrifice and Lilith's departure: hold RIGHT MOUSE to move · LEFT CLICK inspects · DOUBLE-LEFT-CLICK the crystal to resurrect · WASD / arrows move · Architect Mode editing is unchanged.</div>
     </section>
   </div>
-  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.13</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
+  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.14</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
 <script src="./cult-system.js" defer></script>
 <script src="./citizen-population.js" defer></script>
 <script src="./cult-network.js" defer></script>
-<script src="./temple-music.js?v=0.2.13" defer></script>
-<script src="./test-center.js?v=0.2.13" defer></script>
+<script src="./temple-music.js?v=0.2.14" defer></script>
+<script src="./test-center.js?v=0.2.14" defer></script>
 </body>
 </html>

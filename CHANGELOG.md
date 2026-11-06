@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.14 development preview | 2026-11-05 | Coordinate inspector + copy/paste, build 3
+
+- Added an object inspector inside the floating Pandora-inspired builder with exact X/Y position, north/east/south/west facing and optional solid/passable collision on non-door objects.
+- Added copy-object then paste-on-click with accurate placement preview and standard overlap/geometry protection.
+- Added bring-to-front and send-to-back controls for static scene-object draw order. Undo/redo and saved room data cover each change.
+- Existing closed-door blocking remains authoritative; malicious or invalid collision fields are rejected on import.
+- No player permission bypass, new NPC AI, quest creation, artwork, scene layout changes or new offscreen map.
+
+
 ## v0.2.13 development preview | 2026-11-05 | Staged approved sprite library, build 2
 
 - Added a searchable approved Sprite Library tab to the floating Architect with individually usable 19 crystal sprites and 6 static character appearances: ghost, human, cult member, Lilith, cult leader, Devil.

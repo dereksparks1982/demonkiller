@@ -116,6 +116,7 @@
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
   // Pandora-style architect wall brush state. Wall types do not change tile geometry.
   let wallFinish='clean',wallStroke=null,skipWallClick=false,selectedSprite='crystal_gold_bright';
+  let architectClipboard=null;
   const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
   const Population=typeof DemonKillerPopulation!=='undefined'?DemonKillerPopulation:null;
   let cultWorld=null,populationWorld=null,cultNetworkView=null;
@@ -468,7 +469,10 @@
     if (!inside(x,y) || scene.walls[index(x,y)]) return false;
     if (form === 'ghost') return true;
     return !scene.objects.some(o => {
-      if (!CATALOG[o.type].solid && !(o.type === 'door' && !o.open)) return false;
+      // Closed doors retain their canonical gate semantics.
+      const blocking=o.type==='door'?!o.open:
+        typeof o.solidOverride==='boolean'?o.solidOverride:CATALOG[o.type].solid;
+      if(!blocking)return false;
       const d = dims(o);
       return x >= o.x && x < o.x + d[0] && y >= o.y && y < o.y + d[1];
     });
@@ -744,9 +748,11 @@
       if(corner){ctx.strokeStyle='#e5bfd8';ctx.lineWidth=3;ctx.strokeRect(corner.x*TILE+2,corner.y*TILE+2,TILE-4,TILE-4);}
     }
     if(hover&&mode==='edit'){
-      if(tool==='place'&&CATALOG[current]){
-        const preview={id:'__architect_preview__',type:current,x:hover.x,y:hover.y,
-          r:previewRotation,open:true,spent:false,...(current==='scenery'?{spriteId:selectedSprite}:{})};
+      if(tool==='place'&&CATALOG[current]||tool==='paste'&&architectClipboard){
+        const preview=tool==='paste'
+          ?{...architectClipboard,id:'__architect_preview__',x:hover.x,y:hover.y}
+          :{id:'__architect_preview__',type:current,x:hover.x,y:hover.y,
+            r:previewRotation,open:true,spent:false,...(current==='scenery'?{spriteId:selectedSprite}:{})};
         const [pw,ph]=dims(preview);
         const allowed=canPlace(preview);
         ctx.save();ctx.globalAlpha=allowed?.58:.32;
@@ -768,6 +774,7 @@
       :CATALOG[o.type].label)+' ('+o.x+', '+o.y+')'
       :wallAt?'Wall: '+(scene.wallStyles?.[index(hover.x,hover.y)]||'clean')+' ('+hover.x+', '+hover.y+')':'None';
     $('saveState').textContent=dirty?'Unsaved edits':loaded?'Saved layout':'Starter scene';
+    updateObjectInspector();
     $('modeLabel').textContent=mode==='walk'?'WALK MODE':'ARCHITECT MODE';
     $('coordTop').textContent=hover?'X '+hover.x+' · Y '+hover.y:'16 × 16 · 32 PX';
     $('selectedTool').textContent=tool.toUpperCase();
@@ -779,6 +786,23 @@
     $('walkMode').classList.toggle('active',mode==='walk');$('editMode').classList.toggle('active',mode==='edit');
     if(typeof updateArchitectTabs==='function')updateArchitectTabs();
     $('walkMode').setAttribute('aria-pressed',String(mode==='walk'));$('editMode').setAttribute('aria-pressed',String(mode==='edit'));
+  }
+  function updateObjectInspector(){
+    const selected=objectAtId(selectedId),fields=$('inspectorFields');
+    fields.hidden=!selected;
+    $('inspectorObjectLabel').textContent=selected
+      ?(selected.type==='scenery'?ARCHITECT_SPRITES[selected.spriteId]?.label||'Staged Sprite':
+        CATALOG[selected.type].label)+' · '+selected.id
+      :'Select an object using Select / Move.';
+    for(const id of ['inspectorApply','inspectorCopy','inspectorFront','inspectorBack'])
+      $(id).disabled=!selected;
+    $('inspectorPaste').disabled=!architectClipboard;
+    if(!selected)return;
+    const values={inspectorX:selected.x,inspectorY:selected.y,inspectorFacing:selected.r||0,
+      inspectorSolid:typeof selected.solidOverride==='boolean'?
+        (selected.solidOverride?'solid':'passable'):'default'};
+    for(const [id,value] of Object.entries(values))
+      if(document.activeElement!==$(id))$(id).value=String(value);
   }
   function palette() {
     const list=$('palette');list.replaceChildren();$('paletteTitle').textContent=GROUPS[category];
@@ -817,7 +841,7 @@
           if(category==='library')selectedSprite=key;
           previewRotation=0;
           if(category==='floors'&&tool==='place')$('tool').value=tool='floor';
-          if(category!=='floors'&&(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle'].includes(tool)))
+          if(category!=='floors'&&(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle','paste'].includes(tool)))
             $('tool').value=tool='place';
         }
         palette();draw();message('Selected '+entry.label+'. Click a grid coordinate in Architect Mode.');
@@ -1036,6 +1060,15 @@
       },'Painted '+FLOOR[floor].label+' at ('+x+', '+y+').');
       corner=null;draw();return;
     }
+    if(tool==='paste'){
+      if(!architectClipboard)return message('Copy an object before pasting.');
+      const obj={...clone(architectClipboard),id:idFor(architectClipboard.type),x,y};
+      const accepted=transact(()=>{
+        if(canPlace(obj))scene.objects.push(obj);
+      },'Pasted '+CATALOG[obj.type].label+' at ('+x+', '+y+').');
+      if(accepted){selectedId=obj.id;draw();}
+      return;
+    }
     if(tool==='place'){
       if(!CATALOG[current])return message('Choose a relic, structure or prop from the palette.');
       const obj={id:idFor(current),type:current,x,y,r:previewRotation};
@@ -1044,6 +1077,45 @@
       if(current==='crystal')obj.spent=false;
       transact(()=>{if(canPlace(obj))scene.objects.push(obj);},'Placed '+CATALOG[current].label+' at ('+x+', '+y+').');return;
     }
+  }
+  function applyInspector(){
+    const o=objectAtId(selectedId);
+    if(!o)return message('Select an object before editing properties.');
+    const x=Number($('inspectorX').value),y=Number($('inspectorY').value),
+      r=Number($('inspectorFacing').value),collision=$('inspectorSolid').value;
+    if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(r)||r<0||r>3||
+      !['default','solid','passable'].includes(collision))
+      return message('Inspector rejected invalid coordinates, rotation or collision.');
+    if(o.type==='door'&&collision!=='default')
+      return message('Door collision follows its open/closed state.');
+    const candidate={...o,x,y,r};
+    delete candidate.solidOverride;
+    if(collision!=='default')candidate.solidOverride=collision==='solid';
+    if(!canPlace(candidate,o.id))
+      return message('Inspector destination blocked or outside this room.');
+    transact(()=>{
+      const target=objectAtId(selectedId);
+      Object.assign(target,candidate);
+      if(collision==='default')delete target.solidOverride;
+    },'Updated '+CATALOG[o.type].label+' at ('+x+', '+y+').');
+  }
+  function copySelected(){
+    const o=objectAtId(selectedId);
+    if(!o)return message('Select an object to copy.');
+    architectClipboard=clone(o);
+    tool='paste';$('tool').value=tool;corner=null;
+    draw();message('Copied '+CATALOG[o.type].label+'. Click a free tile to paste.');
+  }
+  function bringSelected(front){
+    const o=objectAtId(selectedId);
+    if(!o)return message('Select an object to change draw order.');
+    const i=scene.objects.findIndex(item=>item.id===o.id);
+    if(i===(front?scene.objects.length-1:0))
+      return message('Selected object is already at that end of the drawing order.');
+    transact(()=>{
+      const [item]=scene.objects.splice(i,1);
+      if(front)scene.objects.push(item);else scene.objects.unshift(item);
+    },front?'Object moved to front.':'Object sent to back.');
   }
   function rotateSelected() {
     const obj=objectAtId(selectedId);if(!obj)return message('Select an object before rotating.');
@@ -1088,6 +1160,8 @@
       const [w,h]=dims(o);if(!inside(o.x+w-1,o.y+h-1))throw Error('Object crosses area boundary.');
       if(o.type==='door'&&typeof o.open!=='boolean')throw Error('Door must have an open/closed state.');
       if(o.type==='crystal'&&typeof o.spent!=='boolean')throw Error('Crystal must have a spent state.');
+      if('solidOverride' in o&&(typeof o.solidOverride!=='boolean'||o.type==='door'))
+        throw Error('Invalid custom collision property.');
       if(o.type==='scenery'&&(!Object.hasOwn(ARCHITECT_SPRITES,o.spriteId)))
         throw Error('Unknown staged sprite asset.');
     }
@@ -1331,7 +1405,7 @@
     else if(category==='library'){current='scenery';tool='place';$('tool').value=tool;}
     else {
       current=Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
-      if(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle'].includes(tool)){
+      if(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle','paste'].includes(tool)){
         tool='place';$('tool').value=tool;
       }
     }
@@ -1345,6 +1419,15 @@
       corner=null;wallStroke=null;palette();draw();message('Wall tool: '+action+'.');
     });
   }
+  $('inspectorApply').addEventListener('click',applyInspector);
+  $('inspectorCopy').addEventListener('click',copySelected);
+  $('inspectorPaste').addEventListener('click',()=>{
+    if(!architectClipboard)return message('Copy an object first.');
+    tool='paste';$('tool').value=tool;draw();
+    message('Paste mode: click a free tile in the room.');
+  });
+  $('inspectorFront').addEventListener('click',()=>bringSelected(true));
+  $('inspectorBack').addEventListener('click',()=>bringSelected(false));
   $('rotate').addEventListener('click',rotateSelected);
   $('duplicate').addEventListener('click',duplicateSelected);
   $('remove').addEventListener('click',deleteSelected);
