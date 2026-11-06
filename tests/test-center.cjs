@@ -37,8 +37,10 @@ assert(css.includes('background-position:-16.8px -318.4px'),
   'Gold six-command bar must be cropped from approved owner sheet');
 assert(js.includes('UI_ATLAS=')&&js.includes('data-uo-art')&&
   js.includes('uoHouseToolbar.v2'),'Approved sprite atlas and new layout preference key required');
-assert(html.includes('assets/art/dkarchitect/walls/catalog.js'),
-  'Actual cropped wall-piece catalog must load before Architect game script');
+assert(html.includes('assets/art/dkarchitect/imported/first-catalog.js')&&
+  html.includes('assets/art/dkarchitect/imported/catalog.js')&&
+  html.includes('dk-dungeon-art.js'),
+  'Original 0x72, Dungeon II and both Pixel_Poem packs must load before Architect game script');
 assert(js.includes("paletteViewport.addEventListener('wheel'"),
   'A mouse wheel must scroll the horizontal tile palette');
 
