@@ -286,3 +286,33 @@ footer span:first-child{color:#bb8a9d}
  .uo-architect .uo-upper{grid-template-columns:1fr 39px}
  .uo-architect .uo-command-bar button{font-size:9px}
 }
+
+/* Owner-approved Architect compactness repair: keep the upper category tabs
+   and window geometry; fix cropping, alignment, and remove the large footer art. */
+.uo-architect .uo-left-tools{justify-content:center;align-items:center;padding:5px 3px}
+.uo-architect .uo-tool-grid{margin:auto;justify-content:center;align-content:center}
+.uo-architect .uo-right-controls{justify-content:center;gap:4px;padding:4px 3px;overflow:visible}
+.uo-architect .uo-right-controls .uo-art-button{
+ width:31px!important;height:26px!important;min-width:31px!important;
+ min-height:26px!important;overflow:visible
+}
+.uo-architect .uo-command-frame{
+ width:100%;height:auto;min-height:29px;margin:5px auto 2px;
+ border:0;border-radius:0;box-shadow:none;background:transparent;
+ display:flex;justify-content:center;align-items:center
+}
+.uo-architect .uo-command-bar{
+ display:grid;grid-template-columns:repeat(6,minmax(0,94px));
+ width:100%;height:auto;gap:6px;padding:0;justify-content:center
+}
+.uo-architect .uo-command-bar button{
+ width:100%;height:28px;min-height:28px;min-width:0;
+ border:1px solid #b99668;border-radius:2px;
+ background:linear-gradient(#51423d,#2a252b);box-shadow:inset 0 1px #947d6a;
+ padding:2px 5px;color:#f0dbad;font:bold 11px Georgia,serif;
+}
+.uo-architect .uo-command-bar button:disabled{opacity:.42;background:#29252b}
+@media(max-width:680px){
+ .uo-architect .uo-command-bar{grid-template-columns:repeat(3,minmax(0,100px));gap:4px}
+ .uo-architect .uo-command-frame{min-height:60px}
+}
