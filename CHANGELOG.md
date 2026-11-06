@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.12 development preview | 2026-11-05 | Floating Pandora-inspired Architect, build 1
+
+- Replaced fixed Architect controls and the room details sidebar with a draggable, resizable floating construction window inspired by Pandora's Box and the UO house builder reference.
+- Preserved existing tools, asset thumbnails, room properties, saving/export/import, wall construction, object operations and the original 512px playable canvas.
+- Added category tabs (Walls/Floors/Structure/Items/Ritual) and clearly marked future Admin and Quest panels; neither panel claims server permissions or working mission creation.
+- Added minimize/restore and close; close returns to Walk Temple. Saved only window position/dimensions and minimized state under a new isolated UI preference key.
+- No old room/save keys, art assets, temple geometry, resurrection behavior or player world permissions changed. Owner browser review pending.
+
+
 ## v0.2.11 development preview | 2026-11-05 | Approved masonry + Pandora-inspired Architect
 
 - Replaced the old 20 wall graphics with 80 extracted sprite variants sourced from the owner-approved Dungeon Temple Wall Tile Atlas: straight, corner, T, intersection/post and end in four directions and clean/moss/cracked/broken treatments.

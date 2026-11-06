@@ -56,3 +56,55 @@ footer span:first-child{color:#bb8a9d}
 #assetSearch{display:block;width:100%;box-sizing:border-box;background:#15121b;border:1px solid #725666;
   color:#f5e8e7;font:12px "Trebuchet MS",sans-serif;padding:9px;outline-offset:2px}
 #assetSearch:focus-visible{outline:2px solid #bb88ad}
+
+
+/* Floating Pandora-style builder: replaces the fixed DK Architect panel. */
+.workspace{display:block}
+.workspace>.stage{max-width:1000px;margin:0 auto}
+.workspace>.details{display:none}
+.architect-window{position:fixed;z-index:35;left:18px;top:110px;width:390px;height:670px;
+  min-width:310px;min-height:140px;max-width:min(94vw,1050px);max-height:90vh;
+  display:flex;flex-direction:column;resize:both;overflow:hidden;
+  background:#303a40;color:#e7e4d5;border:2px solid #81929a;
+  box-shadow:inset 1px 1px #b0c2c5,inset -2px -2px #111b23,0 15px 38px #000b;
+  font:12px/1.4 Arial,sans-serif}
+.architect-window[hidden],.architect-window-body[hidden],.architect-asset-tools[hidden],
+.architect-info[hidden]{display:none!important}
+.architect-window.minimized{height:49px!important;min-height:49px;resize:none}
+.architect-window button{font-family:Arial,sans-serif}
+.architect-titlebar{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  user-select:none;touch-action:none;cursor:move;min-height:45px;padding:5px 8px;
+  background:linear-gradient(180deg,#63737c,#33434c 56%,#29363e);
+  border-bottom:2px solid #161f25}
+.architect-identity strong{display:block;font-size:12px;color:#f2eacb;letter-spacing:.09em}
+.architect-identity small{color:#c6d6d5;font-size:9px;letter-spacing:.09em}
+.architect-window-actions{display:flex;gap:5px}
+.architect-window-actions button{padding:2px 7px;min-width:28px;min-height:26px;
+  background:#51636d;border:1px solid #9baeb5;color:#fff;font-size:17px}
+.architect-window-body{overflow:auto;min-height:0;flex:1;padding:7px 9px 10px}
+.architect-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;margin-bottom:10px}
+.architect-tabs button{padding:7px 2px;min-height:31px;border:1px solid #97a4a4;
+  font-size:11px;background:linear-gradient(#52616b,#293842);color:#e7e9de}
+.architect-tabs button.active{background:#a68c67;color:#101719;border-color:#d7bc88}
+.architect-window .panel-title{margin-top:10px}
+.architect-window .panel-title h2,.architect-window .panel-title span{color:#f1dfba}
+.architect-window label:not(.import-btn){color:#d2dbdc}
+.architect-window select,.architect-window #assetSearch{background:#202b33;color:#fff;border-color:#778992}
+.architect-window .palette{grid-template-columns:repeat(3,minmax(0,1fr));max-height:240px;
+  border:1px solid #75838c;background:#212d34;padding:5px}
+.architect-window .palette button{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;gap:3px;min-width:0;min-height:72px;font-size:10px;
+  padding:5px 2px;background:#42515a;border-color:#667780;color:#f3efe8}
+.architect-window .palette button.active{background:#85694a;border-color:#f4d89c}
+.architect-window .button-grid button,.architect-window .wall-builder-tools button{background:#41505a}
+.architect-record{margin-top:14px;padding-top:5px;border-top:2px ridge #88969b}
+.architect-record .stack{grid-template-columns:1fr 1fr}
+.architect-record .stack>*{min-width:0;font-size:10px}
+.architect-record .help{margin-top:10px;background:#253139}
+.architect-record .data dd{color:#efdeb8}
+.architect-permission-note{display:block;border-top:1px solid #8a9d9c;margin-top:13px;padding-top:8px;
+ color:#bcc9c6;font-size:9px;letter-spacing:.05em}
+.architect-info{background:#25333a;border:1px solid #71818c;padding:11px}
+.architect-info strong{color:#f4dda4}
+.architect-info p{font-size:11px}
+@media(max-width:760px){.architect-window{left:3vw;top:78px;width:94vw;max-height:80vh}}

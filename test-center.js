@@ -731,6 +731,7 @@
       ctx.restore();
     }
     $('walkMode').classList.toggle('active',mode==='walk');$('editMode').classList.toggle('active',mode==='edit');
+    if(typeof updateArchitectTabs==='function')updateArchitectTabs();
     $('walkMode').setAttribute('aria-pressed',String(mode==='walk'));$('editMode').setAttribute('aria-pressed',String(mode==='edit'));
   }
   function palette() {
@@ -776,6 +777,7 @@
     rightMouseHeld=false;
     resetVisual();
     mode=next;selectedId=null;corner=null;wallStroke=null;skipWallClick=false;
+    $('architectWindow').hidden=next!=='edit';
     draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':opening?'Opening scene is still playing.':ritual?'The resurrection ritual is still playing.':'Walk Mode active. Single-click the soul crystal to inspect; double-left-click to resurrect, or remain a ghost.');
     canvas.focus({preventScroll:true});
   }
@@ -1158,8 +1160,100 @@
     const v=directions[e.key.length===1?e.key.toLowerCase():e.key];
     if(v){e.preventDefault();step(v[0],v[1]);}
   });
+  // A single floating construction tool replaces the former fixed Architect sidebar.
+  // Layout preferences are local UI state, never part of the room or player save.
+  const architectWindow=$('architectWindow'),architectBody=$('architectBody'),
+    architectTitle=$('architectDrag');
+  const ARCHITECT_WINDOW_KEY='dkSoftworks.demonkiller.architectWindow.v1';
+  let architectDragging=null,architectView='assets';
+  function saveArchitectWindow(){
+    try {
+      const rect=architectWindow.getBoundingClientRect();
+      localStorage.setItem(ARCHITECT_WINDOW_KEY,JSON.stringify({
+        left:parseInt(architectWindow.style.left||'18',10),
+        top:parseInt(architectWindow.style.top||'110',10),
+        width:Math.max(300,Math.round(rect.width)),
+        height:Math.max(100,Math.round(rect.height)),
+        minimized:architectBody.hidden
+      }));
+    }catch(error){ /* Restrictive browsers may disable local storage. */ }
+  }
+  try {
+    const saved=JSON.parse(localStorage.getItem(ARCHITECT_WINDOW_KEY)||'null');
+    if(saved&&typeof saved==='object'){
+      const maxX=Math.max(8,(window.innerWidth||1200)-100),maxY=Math.max(8,(window.innerHeight||900)-52);
+      const left=Number(saved.left),top=Number(saved.top);
+      if(Number.isFinite(left)&&Number.isFinite(top)){
+        architectWindow.style.left=Math.max(0,Math.min(maxX,left))+'px';
+        architectWindow.style.top=Math.max(0,Math.min(maxY,top))+'px';
+      }
+      if(Number.isFinite(saved.width)&&saved.width>=300&&saved.width<=1100)
+        architectWindow.style.width=Math.min(saved.width,window.innerWidth||1200)+'px';
+      if(Number.isFinite(saved.height)&&saved.height>=140&&saved.height<=1000)
+        architectWindow.style.height=Math.min(saved.height,window.innerHeight||900)+'px';
+      architectBody.hidden=Boolean(saved.minimized);
+    }
+  }catch(error){ /* Invalid UI preferences never affect world state. */ }
+  function updateArchitectTabs(){
+    const buttons=architectWindow.querySelectorAll?.('[data-architect-category],[data-architect-view]')||[];
+    for(const button of buttons){
+      const active=architectView==='assets'&&button.dataset?.architectCategory===category
+        ||architectView===button.dataset?.architectView;
+      button.classList.toggle('active',Boolean(active));
+      button.setAttribute('aria-pressed',String(Boolean(active)));
+    }
+  }
+  function architectScreen(view){
+    architectView=view;
+    $('architectAssetTools').hidden=view!=='assets';
+    $('architectAdminInfo').hidden=view!=='admin';
+    $('architectQuestInfo').hidden=view!=='quests';
+    updateArchitectTabs();
+  }
+  const tabButtons=architectWindow.querySelectorAll?.('[data-architect-category],[data-architect-view]')||[];
+  for(const button of tabButtons){
+    button.addEventListener('click',()=>{
+      if(button.dataset.architectView){architectScreen(button.dataset.architectView);return;}
+      const next=button.dataset.architectCategory;
+      if(!Object.hasOwn(GROUPS,next))return;
+      category=next;$('category').value=category;$('assetSearch').value='';
+      current=category==='floors'?'stone':Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
+      if(category==='walls'){tool='wall';$('tool').value=tool;}
+      else if(category==='floors'){tool='floor';$('tool').value=tool;}
+      else{tool='place';$('tool').value=tool;}
+      corner=null;selectedId=null;architectScreen('assets');
+      palette();draw();message('Architect category: '+GROUPS[category]+'.');
+    });
+  }
+  $('architectClose').addEventListener('click',()=>setMode('walk'));
+  $('architectMinimize').addEventListener('click',()=>{
+    architectBody.hidden=!architectBody.hidden;
+    $('architectMinimize').setAttribute('aria-expanded',String(!architectBody.hidden));
+    architectWindow.classList.toggle('minimized',architectBody.hidden);
+    saveArchitectWindow();
+  });
+  if(architectBody.hidden)architectWindow.classList.add('minimized');
+  architectTitle.addEventListener('pointerdown',e=>{
+    if(e.button!==0||e.target?.closest?.('button'))return;
+    architectDragging={x:e.clientX,y:e.clientY,
+      left:parseFloat(architectWindow.style.left)||18,
+      top:parseFloat(architectWindow.style.top)||110};
+    e.preventDefault?.();
+  });
+  document.addEventListener('pointermove',e=>{
+    if(!architectDragging)return;
+    const maxX=Math.max(0,(window.innerWidth||1200)-80);
+    const maxY=Math.max(0,(window.innerHeight||900)-40);
+    architectWindow.style.left=Math.round(Math.max(0,Math.min(maxX,
+      architectDragging.left+e.clientX-architectDragging.x)))+'px';
+    architectWindow.style.top=Math.round(Math.max(0,Math.min(maxY,
+      architectDragging.top+e.clientY-architectDragging.y)))+'px';
+  });
+  document.addEventListener('pointerup',()=>{
+    if(architectDragging){architectDragging=null;saveArchitectWindow();}
+  });
   $('walkMode').addEventListener('click',()=>setMode('walk'));
-  $('editMode').addEventListener('click',()=>setMode('edit'));
+  $('editMode').addEventListener('click',()=>{architectScreen('assets');setMode('edit');});
   $('tool').addEventListener('change',e=>{
     tool=e.target.value;corner=null;selectedId=null;wallStroke=null;
     if(['wall','wallErase','wallLine','wallRectangle'].includes(tool)){

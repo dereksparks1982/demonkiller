@@ -81,7 +81,26 @@
     <p><strong>The sacrifice begins here.</strong> You lie bound upon the altar while the cult gathers. Its leader prays and takes your life. Your ghost rises, the Devil claims you, and Lilith kneels to leave a soul crystal. Only after she leaves can you double-left-click the crystal to resurrect, or walk away and remain a ghost.</p>
   </section>
   <div class="workspace">
-    <aside class="panel controls" aria-label="DK Architect tools">
+    <aside id="architectWindow" class="architect-window" hidden aria-label="Movable DK Architect construction window">
+      <header id="architectDrag" class="architect-titlebar">
+        <div class="architect-identity"><strong>✥ PANDORA // DK ARCHITECT</strong><small>WORLD CONSTRUCTION · DEVELOPER</small></div>
+        <div class="architect-window-actions">
+          <button id="architectMinimize" type="button" aria-label="Minimize Architect" aria-expanded="true">▁</button>
+          <button id="architectClose" type="button" aria-label="Close Architect">×</button>
+        </div>
+      </header>
+      <div id="architectBody" class="architect-window-body">
+        <nav class="architect-tabs" aria-label="Builder asset categories">
+          <button type="button" data-architect-category="walls">Walls</button>
+          <button type="button" data-architect-category="floors">Floors</button>
+          <button type="button" data-architect-category="structure">Structure</button>
+          <button type="button" data-architect-category="furniture">Items</button>
+          <button type="button" data-architect-category="relics">Ritual</button>
+          <button type="button" data-architect-view="admin">Admin</button>
+          <button type="button" data-architect-view="quests">Quests</button>
+        </nav>
+        <div id="architectAssetTools" class="architect-asset-tools">
+
       <div class="panel-title"><span>01</span><h2>THE ARCHITECT</h2></div>
       <label for="tool">Editing action</label>
       <select id="tool">
@@ -126,16 +145,17 @@
         <button id="undo" type="button">Undo</button>
         <button id="redo" type="button">Redo</button>
       </div>
-    </aside>
-    <section class="stage" aria-label="Playable sacrificial temple">
-      <div class="stage-head"><span>AREA · DK.TEMPLE.SACRIFICE.001</span><strong id="modeLabel">WALK MODE</strong><span id="coordTop">16 × 16 · 32 PX</span></div>
-      <div class="stage-body">
-        <canvas id="room" width="512" height="512" tabindex="0" role="img" aria-label="Top-down Gothic temple on a 16 by 16 tile grid. Hold right mouse to move, left-click to interact, or use W A S D and arrow keys."></canvas>
-      </div>
-      <div id="status" class="status" role="status" aria-live="polite">The cult gathers. You lie bound upon the altar.</div>
-      <div id="hint" class="hint">After the sacrifice and Lilith's departure: hold RIGHT MOUSE to move · LEFT CLICK inspects · DOUBLE-LEFT-CLICK the crystal to resurrect · WASD / arrows move · Architect Mode editing is unchanged.</div>
-    </section>
-    <aside class="panel details" aria-label="Room data and persistence">
+        </div>
+        <div id="architectAdminInfo" class="architect-info" hidden role="note">
+          <strong>WORLD ADMIN · DEVELOPMENT</strong>
+          <p>Spawn placement, room export/import and access checks are available below. Persistent server permissions, NPC management and live world controls are later builds.</p>
+        </div>
+        <div id="architectQuestInfo" class="architect-info" hidden role="note">
+          <strong>QUEST DESIGN · PLANNED</strong>
+          <p>The visual quest-chain editor will follow the world-building and server-authority work. No mission authoring is enabled in this build.</p>
+        </div>
+        <section class="architect-record" aria-label="Room information and actions">
+
       <div class="panel-title"><span>02</span><h2>THE RECORD</h2></div>
       <dl class="data">
         <dt>Area</dt><dd>dk.temple.sacrifice.001</dd>
@@ -160,14 +180,26 @@
         <p><strong>Build:</strong> Pandora-inspired DK Architect has original tile thumbnails, searchable assets, a drag wall brush, straight wall runs, room-outline walls, wall eraser and clean/mossy/cracked/broken masonry. No wall placement changes the underlying 16×16 temple plan. Floor brush, selection, rotation and undo/redo remain available.</p>
         <p><strong>Exit:</strong> the northern doorway is a connection marker only. The courtyard is not yet built.</p>
       </div>
+
+        </section>
+        <small class="architect-permission-note">DEVELOPER TOOL · LOCAL WORLD DATA · NO SERVER PERMISSIONS YET</small>
+      </div>
     </aside>
+    <section class="stage" aria-label="Playable sacrificial temple">
+      <div class="stage-head"><span>AREA · DK.TEMPLE.SACRIFICE.001</span><strong id="modeLabel">WALK MODE</strong><span id="coordTop">16 × 16 · 32 PX</span></div>
+      <div class="stage-body">
+        <canvas id="room" width="512" height="512" tabindex="0" role="img" aria-label="Top-down Gothic temple on a 16 by 16 tile grid. Hold right mouse to move, left-click to interact, or use W A S D and arrow keys."></canvas>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite">The cult gathers. You lie bound upon the altar.</div>
+      <div id="hint" class="hint">After the sacrifice and Lilith's departure: hold RIGHT MOUSE to move · LEFT CLICK inspects · DOUBLE-LEFT-CLICK the crystal to resurrect · WASD / arrows move · Architect Mode editing is unchanged.</div>
+    </section>
   </div>
-  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.11</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
+  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.12</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
 <script src="./cult-system.js" defer></script>
 <script src="./citizen-population.js" defer></script>
 <script src="./cult-network.js" defer></script>
-<script src="./temple-music.js?v=0.2.11" defer></script>
-<script src="./test-center.js?v=0.2.11" defer></script>
+<script src="./temple-music.js?v=0.2.12" defer></script>
+<script src="./test-center.js?v=0.2.12" defer></script>
 </body>
 </html>
