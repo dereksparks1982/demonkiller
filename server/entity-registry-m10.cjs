@@ -35,6 +35,8 @@ function refTargets(world){
       targets.push(['fixture:'+area_id+':'+o.id,'fixture',area_id]);
   for(const drop of Object.values(world.living?.storage?.ground||{}))
     targets.push(['ground:'+drop.id,'ground',drop.area_id]);
+  for(const corpse of Object.values(world.living?.mobile_assets?.corpses||{}))
+    targets.push(['corpse:'+corpse.id,'corpse',corpse.area_id]);
   return targets.sort((a,b)=>a[0].localeCompare(b[0]));
 }
 function targets(world,registry){
@@ -54,10 +56,11 @@ function targets(world,registry){
     add(VAULT,type,amount);
   for(const d of Object.values(world.living?.storage?.ground||{}))
     add(d.id,d.item,d.quantity);
-  // Chests have no M9 count mirror: their item serial records are canonical.
+  // Chests and NPC backpacks have no M9 count mirror; their serials are canonical.
   for(const item of Object.values(registry.items))
-    if(item.parent===CHEST)want.set(CHEST+'|'+item.type,
-      (want.get(CHEST+'|'+item.type)||0)+item.amount);
+    if(item.parent===CHEST||registry.containers[item.parent]?.kind==='npc_pack')
+      want.set(item.parent+'|'+item.type,
+        (want.get(item.parent+'|'+item.type)||0)+item.amount);
   return want;
 }
 function reconcile(world){
@@ -164,7 +167,7 @@ function validate(world){
     serials.add(s);highest=Math.max(highest,n);
   };
   for(const [key,ref] of Object.entries(r.refs)){
-    if(typeof key!=='string'||!ref||!['character','mobile','monster','fixture','ground'].includes(ref.kind)||
+    if(typeof key!=='string'||!ref||!['character','mobile','monster','fixture','ground','corpse'].includes(ref.kind)||
       !world.areas?.[ref.area_id]||typeof ref.active!=='boolean')
       throw Error('Invalid entity reference');
     verifySerial(ref.serial);
@@ -183,7 +186,7 @@ function validate(world){
     byParent[item.parent]=(byParent[item.parent]||0)+item.amount;
   }
   for(const [id,c] of Object.entries(r.containers)){
-    if(!c||c.id!==id||!['pack','bank','equip','chest'].includes(c.kind)||
+    if(!c||c.id!==id||!['pack','bank','equip','chest','npc_pack'].includes(c.kind)||
       !Number.isInteger(c.capacity)||c.capacity<1||c.capacity>500||
       (c.kind==='chest'&&(!world.areas?.[c.area_id]||
         !Number.isInteger(c.x)||!Number.isInteger(c.y)||

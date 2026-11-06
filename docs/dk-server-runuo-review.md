@@ -46,3 +46,7 @@ We have independently adopted RunUO's key *architectural ideas* from `World.cs`,
 ## Milestone 11: Saved timer jobs (v0.2.32)
 
 Source review of RunUO `Server/Timer.cs` confirmed priorities and server-controlled callback dispatch. DK Server M11 independently uses a small validated world-minute job queue (courier deliveries, camp rotation, merchant restock, guard wages) and retains all due times inside the world snapshot. No RunUO C# code is copied. Deliberate Stop freezes jobs; Start resumes with no offline catch-up. This provides the foundation for future timed NPC appointments, property tasks, crafting production and sector simulation.
+
+## Milestone 12: Mobile possessions and corpse lifetime (v0.2.33)
+
+RunUO's `Server/Mobile.cs`, `Server/Items/Container.cs` and `Scripts/Items/Misc/Corpses/Corpse.cs` illustrated mobile inventories, contained loot, ownership and decay timers. DK Server implements these concepts independently through `server/mobile-assets-m12.cjs`, M10's item serials and sectors, and M11's saved job scheduler. An NPC's backpack and wealth now persist into a physical corpse; looting transfers belongings without duplicating wealth, and unclaimed remains decay only on simulated world time. We have not implemented RunUO's full looting-rights, criminality, notoriety, carving, player corpse or resurrection systems.

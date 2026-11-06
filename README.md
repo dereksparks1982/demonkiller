@@ -2,11 +2,20 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.32 | DK Server M11, Durable World Events
+## Current milestone: v0.2.33 | DK Server M12, NPC Possessions and Corpses
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M12: An NPC's possessions outlive them
+
+- **Persistent NPC backpacks:** Every living resident has their own server-owned item container, separate from the player and from business stock. Starting belongings have distinct immutable item serials.
+- **Deaths have physical consequences:** When a resident dies from starvation or monster attacks, DK Server creates a persistent corpse on the exact tile. The resident's money moves into the body, and their existing belongings retain their item identities.
+- **Recover and remember:** A living player standing beside the corpse can recover its goods and coins once. The transaction happens on the server, updates their inventory and gold, and is written into permanent world history. Remote looting, ghosts and client-supplied rewards are rejected.
+- **Decay on world time:** A corpse remains for 720 running world minutes, then its remaining contents decay. Cleanup is scheduled by the M11 saved job system; a deliberate server stop freezes the decay.
+- **World views:** Corpses are indexed into M10 spatial sectors and drawn with a deliberately crude original pixel marker; the outdoor area adds an interaction button and double-click inspection.
+- **Still single-player:** This is the foundation for later NPC estates, heirs, property inheritance, murders and investigations. Player permanent death is not added or decided here.
 
 ### M11: Scheduled world events independent of the browser
 

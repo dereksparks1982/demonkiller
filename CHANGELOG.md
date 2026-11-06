@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.33 / DK Server M12 | 2026-11-06 | NPC possessions and persistent corpses
+
+- Added individual server-owned NPC backpacks and starter possessions with stable serial IDs, independently inspired by RunUO's Mobile/Corpse/Container architecture.
+- NPC survival deaths and monster attack deaths produce durable corpses with the deceased's actual coins and existing inventory records. NPC wealth is transferred out of their living record; corpses and loot use immutable transaction authority and a permanent event history.
+- A living player adjacent to a corpse can loot its goods and coins once. Validations prevent distant or ghost looting, forged rewards, over-capacity and duplicate claims. M10 item serials remain the same through the transfer.
+- Added corpses to region sector lookups, original crude on-map markers, double-click and in-game Recover Nearby Body Goods control, and read-only `GET /api/v1/corpses` for nearby inspection.
+- Added a fifth persistent job `corpse_cleanup` that removes unclaimed corpses after 720 running world minutes, on the next 60-minute cleanup cycle. Old M11 scheduler saves migrate without timer replay or NPC save loss.
+- Added `tests/mobile-assets-m12.cjs` and updated the M11 scheduler suite for the fifth recurring job. Pure module tests passed for NPC provisioning, wealth conservation, stable item serials, one-time looting and decay. Full Node integration testing is pending a complete repository checkout.
+- The game remains single-player. No MMO code, no permanent player death, no new art pack and no hosted persistent server were added.
+
 ## v0.2.32 / DK Server M11 | 2026-11-06 | Persistent scheduled-world jobs
 
 - Added a durable, validated and idempotent world-time job scheduler with saved job IDs, priorities, intervals, next due minute, and execution counts. The queue is independent of browser timers.

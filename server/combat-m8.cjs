@@ -3,6 +3,7 @@
 // Only the server decides health, attack distance, drops and region cleansing.
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
+const {onDeath:recordMobileDeath}=require('./mobile-assets-m12.cjs');
 const MAX_CREATURES=48,MAX_DROPS=2048;
 function seed(){return {schema:1,sequence:0,creatures:{},drops:{}};}
 function ensure(world){
@@ -117,6 +118,7 @@ function tick(world,minute,events){
     target.health=Math.max(0,target.health-damage);
     if(target.health===0){
      target.alive=false;
+     recordMobileDeath(world,target,minute,events);
      events.push(event(world,minute,'npc.death',
       target.name+' was slain by an imp.',{npc_id:target.id,area_id:target.area_id}));
     }

@@ -3,11 +3,13 @@
 // Inspired by RunUO's server-side timer architecture, independently designed.
 // No arbitrary function serialization, no browser timers, and no replay on restart.
 const {COURT,VILLAGE}=require('./regions.cjs');
+const {expire:expireCorpses}=require('./mobile-assets-m12.cjs');
 const JOBS=Object.freeze({
   postal_dispatch:{every:1,priority:0},
   camp_rotation:{every:90,priority:1},
   shop_restock:{every:120,priority:1},
-  guard_payroll:{every:360,priority:2}
+  guard_payroll:{every:360,priority:2},
+  corpse_cleanup:{every:60,priority:2}
 });
 const MAX_JOBS=2048,MAX_PER_MINUTE=128;
 function future(minute,interval){
@@ -25,9 +27,20 @@ function make(minute=0){
 }
 function ensure(world){
   if(!world.living)throw Error('Scheduler requires living world');
-  if(world.living.scheduler)return false;
-  world.living.scheduler=make(world.living.minute);
-  return true;
+  if(!world.living.scheduler){
+    world.living.scheduler=make(world.living.minute);
+    return true;
+  }
+  const s=world.living.scheduler;
+  let changed=false;
+  for(const [kind,def] of Object.entries(JOBS)){
+    if(Object.values(s.jobs).some(job=>job.kind===kind))continue;
+    const id='job_'+(++s.sequence);
+    s.jobs[id]={id,kind,priority:def.priority,interval_minutes:def.every,
+      due_minute:future(world.living.minute,def.every),fires:0,enabled:true};
+    changed=true;
+  }
+  return changed;
 }
 function validate(world){
   const s=world.living?.scheduler;
@@ -48,7 +61,7 @@ function validate(world){
       throw Error('Invalid world scheduler job');
     ids.add(id);
   }
-  for(const kind of Object.keys(JOBS))
+  for(const kind of ['postal_dispatch','camp_rotation','shop_restock','guard_payroll'])
     if(!Object.values(s.jobs).some(job=>job.kind===kind))
       throw Error('Required world scheduler job missing');
   return true;
@@ -111,7 +124,8 @@ function payroll(world,minute,out){
   }
 }
 const HANDLERS=Object.freeze({
-  postal_dispatch:postal,camp_rotation:camp,shop_restock:restock,guard_payroll:payroll
+  postal_dispatch:postal,camp_rotation:camp,shop_restock:restock,guard_payroll:payroll,
+  corpse_cleanup:expireCorpses
 });
 function runMinute(world,minute,out){
   ensure(world);

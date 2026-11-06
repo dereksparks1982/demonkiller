@@ -161,6 +161,26 @@ function drawMonsters(){
   px('#28242a',x+7,y+19,18,8);px('#d2ae55',x+11,y+16,10,5);
  }
 }
+function drawCorpses(){
+ for(const body of Object.values(living?.mobile_assets?.corpses||{})){
+  if(body.area_id!==area.area_id)continue;
+  const x=body.x*TILE,y=body.y*TILE;
+  px('#231f21',x+8,y+23,17,6);
+  px('#745e4e',x+11,y+12,11,14);
+  px('#b39a80',x+11,y+9,11,6);
+  px('#3e3031',x+6,y+17,6,4);
+ }
+}
+function closestCorpse(){
+ return Object.values(living?.mobile_assets?.corpses||{}).filter(body=>
+  body.area_id===player.area_id&&Math.abs(body.x-player.x)+
+   Math.abs(body.y-player.y)<=1)[0]||null;
+}
+function lootCorpse(){
+ const body=closestCorpse();
+ if(!body)return message('Move beside a fallen resident to recover their belongings.');
+ return takeAction('loot_corpse',{corpse_id:body.id});
+}
 function nearestCreature(){
  return Object.values(living?.combat?.creatures||{}).filter(n=>n.alive&&
   n.area_id===player.area_id&&Math.abs(n.x-player.x)+Math.abs(n.y-player.y)<=1)[0]||null;
@@ -272,6 +292,7 @@ function draw(){
  drawResources();
  drawNpcs();
  drawMonsters();
+ drawCorpses();
  drawGroundItems();
  drawChest();
  const spriteGroup=player.form==='ghost'?'ghost':'human';
@@ -286,6 +307,9 @@ function draw(){
   ') · '+player.facing.toUpperCase();
 }
 function actorAt(x,y){
+ const body=Object.values(living?.mobile_assets?.corpses||{}).find(c=>
+  c.area_id===area.area_id&&c.x===x&&c.y===y);
+ if(body)return {body};
  const ground=Object.values(living?.storage?.ground||{}).find(d=>
   d.area_id===area.area_id&&d.x===x&&d.y===y);
  if(ground)return {ground};
@@ -440,7 +464,9 @@ async function refreshLiving(){
     n.alive&&n.area_id===area.area_id);
   $('combatStatus').textContent=activeImps.length+' active imps · '+
     Object.values(living.combat?.drops||{}).filter(d=>d.area_id===area.area_id).length+
-    ' monster loot piles · '+groundCount+' dropped item piles · Combat skill '+(player.skills?.combat||0);
+    ' monster loot piles · '+groundCount+' dropped item piles · '+
+     Object.values(living.mobile_assets?.corpses||{}).filter(c=>c.area_id===area.area_id).length+
+     ' fallen residents · Combat skill '+(player.skills?.combat||0);
   $('activityStatus').textContent=present.length+' NPCs nearby · '+
     Object.values(living.businesses).filter(b=>b.area_id===area.area_id&&b.open).length+
     ' businesses open · '+Object.values(living.territories).filter(t=>t.control==='monsters').length+
@@ -515,6 +541,10 @@ async function toggleDoor(){
 }
 function inspect(x,y,doubleClick){
  const item=actorAt(x,y);if(!item)return message('Nothing notable here.');
+ if(item.body){
+  if(doubleClick&&SERVER)return takeAction('loot_corpse',{corpse_id:item.body.id});
+  return message(item.body.name+' died here. Double-click beside the body to recover its goods.');
+ }
  if(item.ground){
   if(doubleClick&&SERVER)return takeAction('pick_up',{drop_id:item.ground.id});
   return message('Dropped '+item.ground.quantity+' '+item.ground.item+
@@ -606,6 +636,7 @@ $('storeItem').addEventListener('click',()=>bankGoods('bank_store'));
 $('takeItem').addEventListener('click',()=>bankGoods('bank_take'));
 $('attackButton').addEventListener('click',attack);
 $('lootButton').addEventListener('click',loot);
+$('lootCorpse').addEventListener('click',lootCorpse);
 $('craftTorch').addEventListener('click',()=>takeAction('craft',{recipe:'torch'}));
 $('craftRations').addEventListener('click',()=>takeAction('craft',{recipe:'rations'}));
 $('craftBandages').addEventListener('click',()=>takeAction('craft',{recipe:'bandages'}));
@@ -662,10 +693,10 @@ async function begin(){
    $('packStatus').textContent='Persistent inventory and trading require DK Server.';
    $('socialStatus').textContent='Social records require DK Server.';
    $('needsStatus').textContent='Crafting and survival need DK Server.';
-   $('combatStatus').textContent='Monster combat and loot require DK Server.';
+   $('combatStatus').textContent='Monster combat, NPC remains and loot require DK Server.';
    $('sectorStatus').textContent='The sector index requires DK Server.';
     $('scheduleStatus').textContent='World timers require DK Server.';
-   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake'])
+   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake'])
      $(id).disabled=true;
   }
   if(firstVisit){

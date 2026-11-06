@@ -40,6 +40,9 @@ function build(world){
     add({kind:'ground_item',id:drop.id,serial:serialFor('ground:'+drop.id),
       area_id:drop.area_id,x:drop.x,y:drop.y,
       type:drop.item,quantity:drop.quantity});
+  for(const corpse of Object.values(world.living?.mobile_assets?.corpses||{}))
+    add({kind:'corpse',id:corpse.id,serial:serialFor('corpse:'+corpse.id),
+      name:corpse.name,area_id:corpse.area_id,x:corpse.x,y:corpse.y});
   for(const drop of Object.values(world.living?.combat?.drops||{}))
     add({kind:'monster_loot',id:drop.id,serial:null,
       area_id:drop.area_id,x:drop.x,y:drop.y,type:drop.item});

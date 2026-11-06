@@ -1,4 +1,4 @@
-# DK Server M11 | Durable Scheduled World Events (v0.2.32)
+# DK Server M12 | NPC Possessions, Corpses and World-Time Decay (v0.2.33)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m11`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m12`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -126,3 +126,15 @@ Four jobs currently run: `postal_dispatch` each minute, `camp_rotation` each 90 
 `GET /api/v1/schedule` provides a **read-only** inspection of the schedule and running state. The outdoor sidebar displays the nearest jobs. The route accepts no write operations. Legacy M10 saves are migrated with new due dates computed from their last simulated minute, not the current wall clock. The `tests/scheduler-m11.cjs` suite covers courier delivery, merchant restock, traveling camps, guard wages, idempotency, save migration, pause/resume and HTTP inspection.
 
 **Limitations:** Four fixed jobs, not a full hierarchical/calendar scheduler. No user-supplied scripts, no dynamic NPC appointments yet, and no public hosted process. Sector activation and UO-style long-distance AI job scheduling remain future work.
+
+## M12 NPC mobile possessions and corpses
+
+`server/mobile-assets-m12.cjs` independently adapts the ownership and corpse-container concepts reviewed in RunUO `Server/Mobile.cs` and `Scripts/Items/Misc/Corpses/Corpse.cs`. All new NPCs receive a registered `npc_pack_<id>` container with a single small initial provision. The provision's server-issued `ent_...` item serial is preserved if the NPC later dies and the player recovers the item. NPC wealth is not duplicated: death transfers coins from the NPC record into a persistent corpse record; corpse looting transfers the same wealth into the player's wallet. NPC records remain dead and searchable as part of world history.
+
+Deaths from survival and monster attacks now call the same idempotent corpse creation routine. The M10 sector index includes corpse markers. `GET /api/v1/corpses` returns only bodies physically within two tiles of the current character, with the contained items. `POST /api/v1/gameplay` accepts the allowlisted `{"action":"loot_corpse","corpse_id":"corpse_1"}`; the server requires a living, conscious character within one cardinal tile and sufficient pack space and gold capacity. The action is saved atomically, permanently removes the corpse, writes a dated history event, and retains each transferred item's serial. Looting twice and loot from a distance are rejected.
+
+The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 running world minutes. Corpses expire 720 world minutes after death, with removal of any unclaimed NPC goods and containers. Existing M11 scheduler saves acquire the new job without losing old due times or replaying previous jobs. Old NPCs are migrated safely, preserving their health, schedule, coins and other existing world state. The game remains single-player and locally authoritative; none of this means GitHub Pages now has a hosted DK Server.
+
+`tests/mobile-assets-m12.cjs` adds regression cases for migration, NPC backpacks, corpse creation, looting, duplicate and remote access prevention, scheduled decay, item identity and HTTP persistence. The M11 scheduler tests were updated for the fifth job. Full Node integration still needs to be run in a complete checkout, although the new combined modules passed isolated functional checks.
+
+**Unimplemented:** Player permanent death, heirs, probate, player-owned houses, crime/guard justice, individualized equipment damage, insurance, resurrection penalties, dynamic NPC generation, and a continuously hosted online process.

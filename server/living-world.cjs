@@ -10,6 +10,7 @@ const {tick:combatTick}=require('./combat-m8.cjs');
 const {tick:storageTick}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,runMinute:runScheduled}=require('./world-scheduler-m11.cjs');
+const {ensure:ensureMobileAssets,onDeath:recordMobileDeath}=require('./mobile-assets-m12.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -128,6 +129,7 @@ function minuteTick(world,m,generated){
    if(n.health===0){
     n.alive=false;generated.push(event(living,m,'npc.death',n.name+' died.',
       {npc_id:n.id,area_id:n.area_id}));
+    recordMobileDeath(world,n,m,generated);
    }
   }
  }
@@ -195,6 +197,7 @@ function advance(world,now=Date.now(),limit=180){
  if(!count)return {world,events:[],minutes:0};
  const next=structuredClone(world),events=[];
  ensureScheduler(next);
+ ensureMobileAssets(next);
  for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
   minuteTick(next,m,events);
  next.living.minute+=count;
