@@ -275,17 +275,17 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(get('modeLabel').textContent,'ARCHITECT MODE');
   await get('uoRotate').emit('click');
   assert.equal(get('tool').value,'rotate','Click-to-rotate mode arms before clicking an object');
-  await click(7,5);await get('save').emit('click');
+  await click(3,2);await get('save').emit('click');
   let targeted=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
-  assert.equal(targeted.objects.find(o=>o.id==='sacrifice_altar').r,1,
+  assert.equal(targeted.objects.find(o=>o.id==='pillar_west').r,1,
     'Tool-first Rotate works with no previous object selection');
   key('Escape');
   assert.equal(get('tool').value,'select','Escape cancels the targeting tool');
-  await click(7,5);await get('save').emit('click');
+  await click(3,2);await get('save').emit('click');
   targeted=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
-  assert.equal(targeted.objects.find(o=>o.id==='sacrifice_altar').r,1,
+  assert.equal(targeted.objects.find(o=>o.id==='pillar_west').r,1,
     'Escape prevents a stale Rotate operation on the next click');
-  await get('undo').emit('click'); // Leave canonical altar orientation unchanged.
+  await get('undo').emit('click'); // Leave canonical temple prop orientation unchanged.
 
   const initial=Number(get('objectCount').textContent);
   await get('room').emit('mousemove',{clientX:2*32+16,clientY:5*32+16});
