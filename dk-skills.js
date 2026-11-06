@@ -42,7 +42,7 @@
   function advance(profile,minutes){
     if(!bounded(minutes))throw Error('Active-play minutes must be finite and nonnegative.');
     if(minutes===0)return profile;
-    profile.activeMinutes=round(profile.activeMinutes+minutes);
+    profile.activeMinutes=Math.min(1e9,profile.activeMinutes+minutes);
     for(const entry of Object.values(profile.skills)){
       const inactive=profile.activeMinutes-entry.lastPracticeMinute;
       if(inactive<=GRACE+INTERVAL)continue;

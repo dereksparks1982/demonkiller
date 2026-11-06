@@ -129,6 +129,10 @@
       selectedSprite='crystal_gold_bright',selectedWallAsset=null,
       selectedWallPack='ox72i',selectedFloorAsset=null,selectedImportedId=null,vendorClock=0;
   let architectClipboard=null;
+  const Skills=typeof DemonKillerSkills!=='undefined'?DemonKillerSkills:null;
+  let characterSkills=Skills?.create()||null;
+  let lastMeaningfulSkillInput=-Infinity,skillSaveSeconds=0;
+  function noteCharacterActivity(){lastMeaningfulSkillInput=lastFrameTime;}
   const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
   const Population=typeof DemonKillerPopulation!=='undefined'?DemonKillerPopulation:null;
   let cultWorld=null,populationWorld=null,cultNetworkView=null;
@@ -442,6 +446,7 @@
     if (!record) return;
     try {
       record.slot.scene = clone(scene);
+      if(Skills&&characterSkills)record.slot.skills=Skills.snapshot(characterSkills);
       if(cultWorld)record.slot.cultWorld=clone(cultWorld);
       if(populationWorld)record.slot.populationWorld=clone(populationWorld);
       record.slot.updated = Date.now();
@@ -453,6 +458,7 @@
     if (!record || !record.slot.scene) return;
     try {
       scene = validate(record.slot.scene);
+      if(Skills)characterSkills=Skills.hydrate(record.slot.skills);
       if(!('introSeen' in scene))scene.introSeen=true;
       dirty = false; loaded = true; resetVisual();
       message('Welcome back, ' + record.slot.name + '. The Forsaken Temple is ready.');
@@ -895,6 +901,7 @@
     if(nx===8&&ny===0&&!scene.introSeen){message('I cannot leave.');return false;}
     if(!canStand(nx,ny)){draw();message('Blocked at ('+nx+', '+ny+'). The '+(p.form==='ghost'?'stone boundary':'wall or solid object')+' bars your way.');return false;}
     p.x=nx;p.y=ny;dirty=true;
+    noteCharacterActivity();
     visual.queue.push({x:nx,y:ny});
     draw();persistCharacter();
     if(nx===8&&ny===0)message('NORTHERN ARCH: connected courtyard is planned, not implemented in this test. You remain in '+AREA+'.');
@@ -907,6 +914,7 @@
     if (opening||ritual) {message('Wait for the current scene to finish.');return;}
     const obj=objectAt(x,y),p=scene.player;
     if (!obj) return message('There is nothing here to interact with.');
+    noteCharacterActivity();
     const [w,h]=dims(obj);
     const distanceX=Math.max(obj.x-p.x,0,p.x-(obj.x+w-1));
     const distanceY=Math.max(obj.y-p.y,0,p.y-(obj.y+h-1));
@@ -943,6 +951,7 @@
       if(!rightMouseHeld)clickDestination=null;
       return;
     }
+    noteCharacterActivity();
     const tilesToTravel=Math.min(pixels/TILE,(pixels>4*TILE?5.6:3.1)*dt);
     if(tilesToTravel<=0)return;
     const ax=dx/pixels*tilesToTravel,ay=dy/pixels*tilesToTravel;
@@ -985,6 +994,15 @@
   function advanceFrame(now) {
     const dt=lastFrameTime?Math.max(0,Math.min((now-lastFrameTime)/1000,.06)):0;
     lastFrameTime=now;
+    // Only conscious character gameplay advances personal skill-rust time.
+    // Inactivity, Architect admin work, offline time and server catch-up do not.
+    if(Skills&&characterSkills&&activeSlot&&mode==='walk'&&!opening&&!ritual&&
+      document.visibilityState!=='hidden'&&
+      now-lastMeaningfulSkillInput<=1500){
+      Skills.advance(characterSkills,dt/60);
+      skillSaveSeconds+=dt;
+      if(skillSaveSeconds>=30){skillSaveSeconds=0;persistCharacter();}
+    }
     const crystalChanged=updateCrystalFlicker(dt);
     vendorClock+=dt;
     if(opening){updateOpening(dt);draw();requestAnimationFrame(advanceFrame);return;}
