@@ -2,11 +2,20 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.31 | DK Server M10, Persistent Entities and Spatial Sectors
+## Current milestone: v0.2.32 | DK Server M11, Durable World Events
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M11: Scheduled world events independent of the browser
+
+- **World-owned timer queue:** Four persistent server jobs have stable identifiers, due world-minute timestamps, repeat intervals, priority, execution counts and idempotent processing. Jobs are stored in the authoritative world save, not browser timers or unsaved callbacks.
+- **Courier mail:** A delivery job checks the courier's real position by the Village Bank and delivers pending letters to the player's bank box without teleporting to the character. The letter is removed from the postal queue exactly once.
+- **Merchant supplies and traveling camps:** Periodic restocks and camp arrival/departure now run from the saved scheduler rather than scattered modulo checks. Existing timing and event-history behavior is maintained.
+- **Guard wages:** Living village guards now receive wages paid from actual Village Bank business funds every 360 world minutes. The bank's expenses increase accordingly; no coins appear from nowhere.
+- **Stop means frozen:** Pausing DK Server freezes job due dates alongside the rest of the world. Reopening a stopped world does not replay the real-world downtime. Restarted jobs continue from their saved due minute.
+- **Inspection:** The outdoor sidebar shows upcoming world timers when connected. `GET /api/v1/schedule` provides a read-only schedule. No browser can inject arbitrary jobs or scripts.
 
 ### M10: World identity, real containers and efficient sectors
 

@@ -223,6 +223,16 @@ async function chestGoods(destination,source){
   await takeAction('move_item',{serial:selected.serial,quantity:order.quantity,destination});
  }catch(e){message('Chest access: '+e.message);}
 }
+async function refreshSchedule(){
+ if(!SERVER)return;
+ try{
+  const s=await SERVER.schedule();
+  const next=s.jobs?.slice(0,3).map(job=>job.kind.replaceAll('_',' ')+
+   ' at '+job.next_minute).join(' · ');
+  $('scheduleStatus').textContent=(s.paused?'SCHEDULE PAUSED':'Scheduled jobs')+
+   ' · '+(next||'No pending jobs');
+ }catch(e){$('scheduleStatus').textContent='World schedule unavailable.';}
+}
 async function refreshSector(){
  if(!SERVER||!player)return;
  try{
@@ -636,9 +646,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -654,6 +664,7 @@ async function begin(){
    $('needsStatus').textContent='Crafting and survival need DK Server.';
    $('combatStatus').textContent='Monster combat and loot require DK Server.';
    $('sectorStatus').textContent='The sector index requires DK Server.';
+    $('scheduleStatus').textContent='World timers require DK Server.';
    for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake'])
      $(id).disabled=true;
   }

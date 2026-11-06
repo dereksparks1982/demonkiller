@@ -9,6 +9,7 @@ const {tick:craftTick}=require('./crafting-m7.cjs');
 const {tick:combatTick}=require('./combat-m8.cjs');
 const {tick:storageTick}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
+const {ensure:ensureScheduler,runMinute:runScheduled}=require('./world-scheduler-m11.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -170,43 +171,7 @@ function minuteTick(world,m,generated){
  }
  combatTick(world,m,generated);
  storageTick(world,m,generated);
- if(m%90===0){
-  const camp=living.traveling_camps.camp_1;
-  if(camp.present&&m>=camp.leaves_at){
-   camp.present=false;
-   generated.push(event(living,m,'camp.departed','The traveling camp has departed.',
-     {area_id:camp.area_id}));
-  }else if(!camp.present&&m-camp.leaves_at>=180){
-   camp.present=true;camp.area_id=camp.area_id===COURT?VILLAGE:COURT;
-   camp.x=camp.area_id===COURT?52:80;camp.y=camp.area_id===COURT?27:68;
-   camp.arrived_at=m;camp.leaves_at=m+240;
-   generated.push(event(living,m,'camp.arrived','A traveling camp has arrived.',
-     {area_id:camp.area_id}));
-  }
- }
- if(m%120===0){
-  for(const shop of Object.values(living.businesses)){
-   if(shop.stock<12&&shop.coins>=30){
-    shop.stock+=25;shop.coins-=30;shop.expenses+=30;
-    generated.push(event(living,m,'business.delivery',
-      'A supplier replenished '+shop.name+'.',
-      {business_id:shop.id,area_id:shop.area_id,units:25}));
-   }
-  }
- }
- for(let i=living.mail.outbound.length-1;i>=0;i--){
-  const item=living.mail.outbound[i];
-  if(item.eta_minute>m)continue;
-  // Postal delivery is an in-world timed event, not a courier teleporting
-  // to the player's current location.
-  const courier=living.npcs.courier;
-  if(!courier.alive||courier.area_id!==VILLAGE||
-      Math.abs(courier.x-54)+Math.abs(courier.y-103)>3)continue;
-  living.mail.outbound.splice(i,1);
-  (living.mail.boxes[String(item.to_slot)]??=[]).push({...item,delivered_minute:m});
-  generated.push(event(living,m,'mail.delivered',
-    'A letter was delivered to a bank box.',{letter_id:item.id,area_id:VILLAGE}));
- }
+ runScheduled(world,m,generated);
 }
 function validateLiving(l){
  if(!l||l.schema!==1||!Number.isSafeInteger(l.minute)||l.minute<0||
@@ -229,6 +194,7 @@ function advance(world,now=Date.now(),limit=180){
  const count=Math.max(0,Math.min(limit,target-world.living.minute));
  if(!count)return {world,events:[],minutes:0};
  const next=structuredClone(world),events=[];
+ ensureScheduler(next);
  for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
   minuteTick(next,m,events);
  next.living.minute+=count;

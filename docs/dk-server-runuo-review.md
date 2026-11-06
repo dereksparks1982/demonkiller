@@ -42,3 +42,7 @@ The short-lived M2 owner-password and standalone /player prototype described abo
 ## Milestone 10 implementation follow-up (v0.2.31)
 
 We have independently adopted RunUO's key *architectural ideas* from `World.cs`, `Item.cs`, `Sector.cs`, `Map.cs` and `Timer.cs`, without copying its GPL implementation. The new `server/entity-registry-m10.cjs` issues stable entity serials and validates container/ownership transfers. The new `server/sectors-m10.cjs` uses fixed 16×16 spatial buckets for each variable-size region, with read-only current-area proximity queries. Existing M9 saves migrate into the registry, preserving the single character and prior history. Full RunUO parity, sector sleep/activation, nested containers and a persistent hosted server are **not** claimed. Earlier milestone descriptions in this review remain historical notes and may no longer describe the current implementation.
+
+## Milestone 11: Saved timer jobs (v0.2.32)
+
+Source review of RunUO `Server/Timer.cs` confirmed priorities and server-controlled callback dispatch. DK Server M11 independently uses a small validated world-minute job queue (courier deliveries, camp rotation, merchant restock, guard wages) and retains all due times inside the world snapshot. No RunUO C# code is copied. Deliberate Stop freezes jobs; Start resumes with no offline catch-up. This provides the foundation for future timed NPC appointments, property tasks, crafting production and sector simulation.

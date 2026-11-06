@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.32 / DK Server M11 | 2026-11-06 | Persistent scheduled-world jobs
+
+- Added a durable, validated and idempotent world-time job scheduler with saved job IDs, priorities, intervals, next due minute, and execution counts. The queue is independent of browser timers.
+- Migrated existing in-world postal delivery, traveling camp rotation and merchant restocking from ad hoc minute loops into recurring scheduled jobs, retaining the existing physical courier/bank-box requirement.
+- Added village guard payroll every 360 simulated minutes: existing Village Bank business money funds guards' wages, generating permanent economic history events without money creation.
+- Added read-only `GET /api/v1/schedule`, outdoor scheduled-events status, old-save migration, updated tests and documentation.
+- Verified pure module-level integration for delivery at the bank, future timer execution, no duplicate firing, guard payroll, frozen world pause and resume without offline catch-up. The full Node checkout suite remains to be run.
+- RunUO's `Timer.cs` was reviewed as architectural inspiration; no GPL source code was copied. The game remains single-player and loopback-only until persistent website hosting is arranged.
+
 ## v0.2.31 / DK Server M10 | 2026-11-06 | Persistent entity registry, containers and sectors
 
 - **RunUO-informed independent design:** Added a typed world entity registry with stable monotonic serial IDs for item stacks, character/NPC/monster references, fixtures and ground items. No GPL RunUO code is incorporated.

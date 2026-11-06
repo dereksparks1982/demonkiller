@@ -1,13 +1,13 @@
 {
   "name": "dk-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "DK Server M10: single-player living world with stable entity serials, containers, spatial sectors and authoritative persistence",
+  "description": "DK Server M11: durable world-time scheduling for courier mail, merchant supplies, camps and guard wages",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "start": "node dk-server.cjs",
-    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-local.cjs ../tests/dk-server-m4.cjs ../tests/dk-uo-m5.cjs ../tests/social-m6.cjs ../tests/crafting-m7.cjs ../tests/combat-m8.cjs ../tests/storage-m9.cjs ../tests/entities-m10.cjs ../tests/sectors-m10.cjs ../tests/npc-navigation-m6.cjs ../tests/outdoor-m5.cjs ../tests/menu.cjs ../tests/menu-server.cjs ../tests/test-center.cjs"
+    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-local.cjs ../tests/dk-server-m4.cjs ../tests/dk-uo-m5.cjs ../tests/social-m6.cjs ../tests/crafting-m7.cjs ../tests/combat-m8.cjs ../tests/storage-m9.cjs ../tests/entities-m10.cjs ../tests/sectors-m10.cjs ../tests/npc-navigation-m6.cjs ../tests/outdoor-m5.cjs ../tests/menu.cjs ../tests/menu-server.cjs ../tests/test-center.cjs ../tests/scheduler-m11.cjs"
   }
 }

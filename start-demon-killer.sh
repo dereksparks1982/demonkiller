@@ -18,7 +18,7 @@ health() {
     const timeout=AbortSignal.timeout(900);
     fetch(process.env.DK_GAME_URL+"api/v1/health",{signal:timeout})
       .then(async r=>{const x=await r.json(); if(!r.ok||x.name!=="DK Server")process.exit(2);
-        if(x.build!=="local-m10")process.exit(3);})
+        if(x.build!=="local-m11")process.exit(3);})
       .catch(()=>process.exit(1));
   ' >/dev/null 2>&1
 }

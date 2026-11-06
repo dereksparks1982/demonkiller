@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M11 (v0.2.32)
+
+RunUO's timer priorities and world-event dispatch informed an independent, persisted **world-minute scheduler**. `server/world-scheduler-m11.cjs` owns the fixed allowlisted job registry, due times, recurring intervals, priority ordering and idempotent last-processed minute. Postal dispatch, traveling camp rotation and merchant supply deliveries are no longer scattered through M5's minute loop. Guards gain recurring wages funded from actual bank business coins. These events save with the same authoritative snapshot and existing history journal, so browser closure does not stop them and deliberate server stop freezes them without wall-clock catch-up. M10 worlds migrate with the next due minute after their last simulated time.
+
+The only new route is `GET /api/v1/schedule` for inspection; clients cannot create jobs or run arbitrary server callbacks. There is no hosted browser-accessible world yet, no multiplayer requirement, and no sector sleep manager at this stage.
+
 ## Implemented milestone: DK Server M10 (v0.2.31)
 
 The world now has an independent RunUO-inspired entity registry (`server/entity-registry-m10.cjs`) with monotonically allocated stable IDs for mobile/object references and movable item stacks. Every item belongs to a real pack, equipment slot, bank vault, one village chest or saved ground pile; a whole transfer preserves the serial and a partial transfer creates a distinct serial without duplication. The registry is migrated from M9 counts non-destructively. Legacy crafting, gathering, bank, combat and inventory actions continue using M9-compatible count views while world saving reconciles and asserts serial-derived quantities. The physical village chest and API-protected transfers require real player proximity.

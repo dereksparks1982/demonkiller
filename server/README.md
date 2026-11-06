@@ -1,4 +1,4 @@
-# DK Server M10 | Persistent Entity Registry and Spatial Sectors (v0.2.31)
+# DK Server M11 | Durable Scheduled World Events (v0.2.32)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m10`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m11`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -116,3 +116,13 @@ Online persistent hosting, full combat, equipment durability, death and resurrec
 **Regression coverage:** `tests/entities-m10.cjs` and `tests/sectors-m10.cjs` cover safe M9 migration, serial stability, stack splitting, guarded transfers, no duplicate goods, sector boundaries, physical proximity, cross-region isolation and persistence on disk across server restarts. Full Node integration tests must run against a complete source checkout before a gameplay test release.
 
 **Not yet available:** Public always-on hosted world; full UO persistence format, multiple item attributes/provenance, nested containers, housing deeds, regional sector sleeping and streamed interest subscriptions. Current DK Server remains loopback-only and the public static game has no connected backend.
+
+## M11 durable world scheduler
+
+`server/world-scheduler-m11.cjs` independently implements the architecture suggested by RunUO's `Server/Timer.cs`: saved due times, intervals, priorities, bounded deterministic execution, and a fixed handler registry. No GPL RunUO code was incorporated. Timers are **world-minute based**, part of the same atomic world save, and advance only while DK Server is running. Handler names and schedule parameters come from server code, never from HTTP requests or executable serialized functions.
+
+Four jobs currently run: `postal_dispatch` each minute, `camp_rotation` each 90 minutes, `shop_restock` each 120 minutes, and `guard_payroll` each 360 minutes. The first three replace prior M5 inline modulo routines without changing player-facing postal/camp/restock behavior. Guard wages now debit the bank's business coins and credit living village guards, with a dated NPC-wages history event. Each task stores next due minute and successful execution count, so a server restart or duplicate invocation cannot replay the same minute. The existing world pause/resume mechanism freezes these tasks exactly as it freezes NPC simulation.
+
+`GET /api/v1/schedule` provides a **read-only** inspection of the schedule and running state. The outdoor sidebar displays the nearest jobs. The route accepts no write operations. Legacy M10 saves are migrated with new due dates computed from their last simulated minute, not the current wall clock. The `tests/scheduler-m11.cjs` suite covers courier delivery, merchant restock, traveling camps, guard wages, idempotency, save migration, pause/resume and HTTP inspection.
+
+**Limitations:** Four fixed jobs, not a full hierarchical/calendar scheduler. No user-supplied scripts, no dynamic NPC appointments yet, and no public hosted process. Sector activation and UO-style long-distance AI job scheduling remain future work.
