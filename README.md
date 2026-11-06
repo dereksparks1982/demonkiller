@@ -2,11 +2,20 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.30 | DK Server M9, Physical Goods and Bank Storage
+## Current milestone: v0.2.31 | DK Server M10, Persistent Entities and Spatial Sectors
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M10: World identity, real containers and efficient sectors
+
+- **Stable item serials:** Persistent world objects now have unique, server-assigned `ent_…` identifiers. A whole item stack preserves its serial when transferred between the pack, bank vault, equipped gear, ground, and a village chest. Splitting a stack creates a new serial for the separated piece. NPCs, monsters and building fixtures are also registered by stable identities.
+- **Container ownership:** A persistent chest beside the Village Bank holds up to 64 items. Item transfers are atomic and enforce the player's real location, bank hours, equipment slots and capacity. Ground items still decay on world time and are collectible once.
+- **Safe migration:** Existing M9 saves are upgraded without discarding characters, towns, NPCs, gold, existing goods or event history. The old item-count fields remain compatible with gathering, crafting and trading while the entity registry tracks identity. Registry records are cross-checked against those counts before every gameplay save.
+- **Large-region spatial index:** The 16×16 temple is one sector; the 64×64 courtyard uses 16 sectors; the 128×128 village uses 64. The server indexes nearby mobile, monster, fixture and ground entities without treating all rooms as the same size or revealing distant world state.
+- **Outdoor controls:** A basic village chest marker, Store/Take buttons and nearby-sector readout use the existing intentionally simple pixel renderer. The Village Bank now correctly returns its stored items through the game API.
+- **What this is not:** Sectors currently provide efficient proximity lookup, not UO's complete activation/sleep system. Individual named unique weapons, NPC ownership inheritance and complex nested containers remain future features.
 
 ### M9: Goods have a place in the world
 

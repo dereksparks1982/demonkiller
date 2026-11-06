@@ -173,6 +173,14 @@ function attack(){const n=nearestCreature();if(!n)return message('Move beside a 
  return takeAction('attack',{target_id:n.id});}
 function loot(){const d=nearestLoot();if(!d)return message('Move beside a loot pile first.');
  return takeAction('loot',{drop_id:d.id});}
+function drawChest(){
+ if(!area||area.area_id!==R.VILLAGE)return;
+ const x=54*TILE,y=105*TILE;
+ px('#241e1b',x+4,y+13,25,15);
+ px('#775439',x+4,y+10,24,17);
+ px('#be965f',x+6,y+12,20,3);
+ px('#d3b067',x+14,y+17,5,6);
+}
 function drawGroundItems(){
  for(const d of Object.values(living?.storage?.ground||{})){
   if(d.area_id!==area.area_id)continue;
@@ -201,6 +209,29 @@ function pickupGoods(){
  const d=closestGroundItem();
  if(!d)return message('Move beside a dropped item.');
  return takeAction('pick_up',{drop_id:d.id});
+}
+async function chestGoods(destination,source){
+ if(!SERVER)return message('Chest storage needs DK Server.');
+ if(busy)return;
+ const order=itemOrder();
+ if(!order)return;
+ try{
+  const view=await SERVER.items();
+  const selected=view.items.find(i=>i.parent===source&&i.type===order.item_type&&
+   i.amount>=order.quantity);
+  if(!selected)return message('No accessible matching stack. Reduce the quantity or move beside the chest.');
+  await takeAction('move_item',{serial:selected.serial,quantity:order.quantity,destination});
+ }catch(e){message('Chest access: '+e.message);}
+}
+async function refreshSector(){
+ if(!SERVER||!player)return;
+ try{
+  const info=await SERVER.nearby(8);
+  const chest=info.entities.find(o=>o.kind==='chest');
+  $('sectorStatus').textContent='Sector '+info.sector.sx+','+info.sector.sy+
+   ' · '+info.entities.length+' nearby entities'+
+   (chest?' · Village chest visible':'');
+ }catch(e){$('sectorStatus').textContent='Nearby world objects unavailable.';}
 }
 async function bankGoods(action){
  const order=itemOrder();if(!order||busy)return;
@@ -232,6 +263,7 @@ function draw(){
  drawNpcs();
  drawMonsters();
  drawGroundItems();
+ drawChest();
  const spriteGroup=player.form==='ghost'?'ghost':'human';
  const pImg=ready('characters/'+spriteGroup+'/'+spriteGroup+'_'+player.facing+'.png');
  if(pImg)ctx.drawImage(pImg,player.x*TILE,player.y*TILE,TILE,TILE);
@@ -558,6 +590,8 @@ $('closeBank').addEventListener('click',()=>{$('bankPanel').hidden=true;});
 $('gatherButton').addEventListener('click',gather);
 $('dropItem').addEventListener('click',dropGoods);
 $('pickItem').addEventListener('click',pickupGoods);
+$('chestStore').addEventListener('click',()=>chestGoods('chest_village_1','pack_1'));
+$('chestTake').addEventListener('click',()=>chestGoods('pack_1','chest_village_1'));
 $('storeItem').addEventListener('click',()=>bankGoods('bank_store'));
 $('takeItem').addEventListener('click',()=>bankGoods('bank_take'));
 $('attackButton').addEventListener('click',attack);
@@ -602,8 +636,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial()]);
-   setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);setInterval(refreshSocial,15000);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector()]);
+   setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -618,7 +653,8 @@ async function begin(){
    $('socialStatus').textContent='Social records require DK Server.';
    $('needsStatus').textContent='Crafting and survival need DK Server.';
    $('combatStatus').textContent='Monster combat and loot require DK Server.';
-   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','dropItem','pickItem','storeItem','takeItem'])
+   $('sectorStatus').textContent='The sector index requires DK Server.';
+   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake'])
      $(id).disabled=true;
   }
   if(firstVisit){

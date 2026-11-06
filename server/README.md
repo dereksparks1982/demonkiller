@@ -1,4 +1,4 @@
-# DK Server M9 | Living World, Physical Items and Bank Storage (v0.2.30)
+# DK Server M10 | Persistent Entity Registry and Spatial Sectors (v0.2.31)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m9`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m10`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -102,3 +102,17 @@ Online persistent hosting, full combat, equipment durability, death and resurrec
 - Dropped goods are stored with a world-minute origin and 360-world-minute expiry. A local player within one cardinal tile may collect each pile once. World ticks remove expired piles even when nobody has the webpage open, provided DK Server is running.
 - The existing `GET /api/v1/bank/box` includes stored goods as `items` alongside letters. `GET /api/v1/living` returns the public ground-item positions and counts for drawing minimal pixel markers. Actual server save and event archival remain behind the existing single-writer queue.
 - `tests/storage-m9.cjs` adds bank balance, location, closed hours, validation, one-time item collection, world-time decay and HTTP persistence contracts. No internet-hosted process exists and public APIs remain loopback-only.
+
+## M10: World entity identities, physical containers and sectors
+
+**Identity:** `server/entity-registry-m10.cjs` independently implements serial IDs (e.g. `ent_53`) for active and retired character/NPC/monster/fixture/ground references and persistent item stacks. The same stack keeps its serial on a full transfer; a partially separated quantity gets a new serial. The monotonic serial counter is saved alongside the world. No RunUO GPL implementation or asset is copied.
+
+**Ownership and migration:** Item records track `parent` across `pack_1`, `vault_1`, `hand_1`, `light_1`, `chest_village_1`, and existing ground pile IDs. On loading an older save, the registry is generated from the original M9 counts. Subsequent M5–M9 actions reconcile their count changes with existing serial records. Source and destination quantities are checked for consistency before saving; the M9 format remains a compatibility view, not a second authoritative inventory. The chest at Village (54,105) has a 64-item capacity and retains distinct item serials. Banks remain accessible only in person while open. Full moves preserve identity; split moves create a new serial for the separated quantity. Item state and world-event history are written through the existing single-writer atomic commit.
+
+**Sector index:** `server/sectors-m10.cjs` builds a derived 16×16-tile spatial index for each independent map's actual dimensions. It indexes nearby characters, NPCs, monsters, map fixtures, world drops and chest markers. The sector map is rebuilt on world revision change and is **not** an independently saved state. Its server-controlled query is limited to the single player's current area, a maximum Manhattan radius of 16 tiles and strictly validated coordinates. This is a foundation for later interest management and NPC activation; it does not suspend autonomous simulation.
+
+**API additions:** `GET /api/v1/nearby?radius=8` returns the player's local sector and nearby entity summaries. `GET /api/v1/entities/items` returns only owned pack/equipment items plus vault and chest items when physically accessible. The existing `POST /api/v1/gameplay` now supports `{"action":"move_item","serial":"ent_50","quantity":1,"destination":"chest_village_1"}`. Destinations include pack, vault, chest, hand, light and ground, subject to type/capacity/proximity checks. Existing bank-box reads now return the M9 item-vault counts, and living-world reads return persisted ground piles for the outdoor renderer.
+
+**Regression coverage:** `tests/entities-m10.cjs` and `tests/sectors-m10.cjs` cover safe M9 migration, serial stability, stack splitting, guarded transfers, no duplicate goods, sector boundaries, physical proximity, cross-region isolation and persistence on disk across server restarts. Full Node integration tests must run against a complete source checkout before a gameplay test release.
+
+**Not yet available:** Public always-on hosted world; full UO persistence format, multiple item attributes/provenance, nested containers, housing deeds, regional sector sleeping and streamed interest subscriptions. Current DK Server remains loopback-only and the public static game has no connected backend.

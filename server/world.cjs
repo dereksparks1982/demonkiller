@@ -8,6 +8,7 @@ const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs'
 const {ensureSocial,validateSocial}=require('./social-m6.cjs');
 const {ensure:ensureCombat,validate:validateCombat}=require('./combat-m8.cjs');
 const {ensure:ensureStorage,validate:validateStorage}=require('./storage-m9.cjs');
+const {reconcile:reconcileEntities,validate:validateEntities}=require('./entity-registry-m10.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -71,6 +72,7 @@ function makeWorld(now = Date.now()) {
   ensureSocial(result);
   ensureCombat(result);
   ensureStorage(result);
+  reconcileEntities(result);
   return result;
 }
 
@@ -136,6 +138,7 @@ function validateWorld(world) {
   validateSocial(world);
   validateCombat(world);
   validateStorage(world);
+  validateEntities(world);
   return world;
 }
 
@@ -151,6 +154,7 @@ function createCharacter(world, slot, name, now = Date.now()) {
   ensureProgress(character);
   const next = structuredClone(world);
   next.characters[String(slot)] = character;
+  reconcileEntities(next);
   next.revision++;
   validateWorld(next);
   return {world: next, character};

@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.31 / DK Server M10 | 2026-11-06 | Persistent entity registry, containers and sectors
+
+- **RunUO-informed independent design:** Added a typed world entity registry with stable monotonic serial IDs for item stacks, character/NPC/monster references, fixtures and ground items. No GPL RunUO code is incorporated.
+- **Identity-preserving item transfers:** A complete item stack keeps the same serial when moved among the player pack, bank vault, equipped hand/light, a persistent village chest and ground. Partial transfers split into a new serial without multiplying item quantities. The village chest has a 64-item capacity and physical access requirements.
+- **Non-destructive M9 migration:** Existing inventory, bank balances, world ground piles, NPCs and event history remain. M5–M9 gameplay count changes reconcile against serial-bearing items, and counts are asserted before committing authoritative gameplay saves.
+- **16×16 sectors:** Added spatial lookup derived from real per-region dimensions, including the 16×16 temple, 64×64 courtyard and 128×128 village. Indexes NPCs, monsters, fixtures, ground items and containers with bounded player-centric queries. No new map-size restriction or diagonal movement.
+- **New read APIs:** `GET /api/v1/nearby?radius=8` and `GET /api/v1/entities/items` give current-area and physically accessible data. Existing `POST /api/v1/gameplay` accepts a validated item-serial transfer command.
+- **M9 integration repairs:** Server startup now migrates the M9 storage module; the bank-box endpoint returns item counts, and the living-world response includes ground drops for the renderer. These features were not fully exposed in the prior server release.
+- **Client and testing:** Added simple chest drawing and controls, sector status, two targeted Node regression suites, server version and menu cache updates. Module-level simulations verified serial preservation, safe migration, sector geometry, chest access, wall-clock ticks and inventory conservation. The full Node integration suite still requires running in a complete checkout.
+- **Boundaries:** No new artwork, no engine, no added character slots, no public hosted server, and no claim of completed UO-style sector activation or nested/individualized item property simulation.
+
 ## v0.2.30 / DK Server M9 | 2026-11-06 | Bank item vault and persistent ground goods
 
 - Added a server-owned 500-item vault at the Village Bank. Goods deposits and withdrawals require the player to physically visit the bank while it is open; transfers update bank and inventory amounts in one atomic world transaction.

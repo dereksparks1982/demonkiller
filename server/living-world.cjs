@@ -8,6 +8,7 @@ const {chooseStep}=require('./npc-navigation-m6.cjs');
 const {tick:craftTick}=require('./crafting-m7.cjs');
 const {tick:combatTick}=require('./combat-m8.cjs');
 const {tick:storageTick}=require('./storage-m9.cjs');
+const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -231,6 +232,7 @@ function advance(world,now=Date.now(),limit=180){
  for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
   minuteTick(next,m,events);
  next.living.minute+=count;
+ reconcileEntities(next);
  next.revision++;
  validateLiving(next.living);
  return {world:next,events,minutes:count};
