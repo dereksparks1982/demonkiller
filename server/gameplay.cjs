@@ -2,7 +2,8 @@
 // UO-inspired first economy loop: gathering, inventory, shop transactions,
 // and banked gold. The authoritative server validates every transaction.
 const {COURT,VILLAGE}=require('./regions.cjs');
-const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals']);
+const CRAFT=require('./crafting-m7.cjs');
+const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages']);
 const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4};
 const NODES=[
  ['courtyard_herbs_west',COURT,18,32,'herbs',6],
@@ -21,6 +22,7 @@ function ensureProgress(character){
  for(const [key,value] of [['gold',5],['bank_gold',0],['gather_after_minute',-1]])
   if(character[key]===undefined){character[key]=value;changed=true;}
  if(!character.skills){character.skills={foraging:0,commerce:0};changed=true;}
+ if(CRAFT.ensure(character))changed=true;
  return changed;
 }
 function ensureResources(world){
@@ -40,6 +42,7 @@ function validateProgress(character){
    if(!TYPES.has(type)||!Number.isSafeInteger(count)||count<0||count>200)
     throw Error('Invalid server-owned inventory');
  }
+ CRAFT.validate(character);
  for(const key of ['gold','bank_gold'])
   if(character[key]!==undefined&&(!Number.isSafeInteger(character[key])||
     character[key]<0||character[key]>1e9))throw Error('Invalid character gold');
@@ -68,6 +71,8 @@ function bankLocation(world,c){
  return shop;
 }
 function apply(world,command){
+ if(['craft','consume','equip','unequip','rest'].includes(command?.action))
+   return CRAFT.apply(world,command);
  const allowed={gather:['action','node_id'],
   buy:['action','business_id','quantity'],
   sell:['action','business_id','item_type','quantity'],
@@ -92,7 +97,7 @@ function apply(world,command){
   if(Object.values(c.inventory).reduce((sum,v)=>sum+v,0)>=200)
    throw Error('Your pack is full');
   n.remaining--;c.inventory[n.type]++;
-  c.gather_after_minute=minute;c.skills.foraging++;
+  c.gather_after_minute=minute;c.skills.foraging+=c.crafting?.hand==='tools'?2:1;
   item=n.type;
  }else if(action==='buy'){
   shop=nearShop(next,c,command.business_id);

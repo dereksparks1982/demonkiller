@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.28 / DK Server M7 | 2026-11-06 | Crafting, equipment and world-time survival
+
+- Added server-authored recipes for torches, rations, bandages and smithy tools. Crafting consumes actual server inventory and awards crafting progression, with a world-minute cooldown.
+- Added equip/unequip hand tools and torches. Worn tools improve foraging experience; lit torches expire after 90 world minutes, with a saved event.
+- Added living-character hunger, energy, health and nonfatal incapacitation, advanced by the persistent world tick even while no browser is open. Food and bandages consume real items to restore needs. Rest has a cooldown and provides a way to recover from collapse.
+- Extended inventory type validation and save migration for existing characters. Server gameplay dispatch, durable journal logging, public readout and future region travel all use the existing character's single authoritative record.
+- Added outdoor buttons for Make Torch, Make Rations, Make Bandages, Eat, Equip Tools, Light Torch and Rest. No newly generated graphics.
+- Added `tests/crafting-m7.cjs` to server suite; corrected stale main-menu asset cache-bust versions, build identifiers, README and design docs. Module-level checks passed for crafting, equipment, food, timed torch expiry and save validation; complete Node integration suite must still be run in a full checkout.
+- No new hosting or multiplayer. Public GitHub Pages remains a static preview without a connected persistent DK Server.
+
 ## v0.2.27 / DK Server M6 | 2026-11-06 | NPC relationships, contracts and pathfinding
 
 - **Social memory:** Added saved NPC contacts with per-person conversation frequency and a one-meeting-per-30-world-minute faction reputation gain limit.

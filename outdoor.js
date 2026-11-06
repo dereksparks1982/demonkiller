@@ -262,6 +262,12 @@ async function refreshGameplay(){
   gameplay=await SERVER.gameplay();
   player={...player,...gameplay.character};
   $('packStatus').textContent=packText(gameplay.character);
+  const needs=gameplay.character.crafting;
+  if(needs)$('needsStatus').textContent='Health '+needs.health+
+    ' · Hunger '+needs.hunger+' · Energy '+needs.energy+
+    ' · Crafting '+needs.skill+' · Hand '+(needs.hand||'empty')+
+    ' · Light '+(needs.light||'none')+
+    (needs.incapacitated?' · UNCONSCIOUS: REST TO RECOVER':'');
  }catch(e){message('Inventory unavailable: '+e.message);}
  draw();
 }
@@ -456,6 +462,24 @@ document.addEventListener('keydown',e=>{
 $('showBank').addEventListener('click',openBank);
 $('closeBank').addEventListener('click',()=>{$('bankPanel').hidden=true;});
 $('gatherButton').addEventListener('click',gather);
+$('craftTorch').addEventListener('click',()=>takeAction('craft',{recipe:'torch'}));
+$('craftRations').addEventListener('click',()=>takeAction('craft',{recipe:'rations'}));
+$('craftBandages').addEventListener('click',()=>takeAction('craft',{recipe:'bandages'}));
+$('eatFood').addEventListener('click',()=>{
+ const inventory=player?.inventory||{};
+ const choice=['rations','meals','bread','produce'].find(i=>inventory[i]>0);
+ if(!choice)return message('There is no food in your pack.');
+ takeAction('consume',{item_type:choice});
+});
+$('equipTools').addEventListener('click',()=>{
+ const gear=player?.crafting;
+ takeAction(gear?.hand?'unequip':'equip',gear?.hand?{slot:'hand'}:{item_type:'tools'});
+});
+$('equipTorch').addEventListener('click',()=>{
+ const gear=player?.crafting;
+ takeAction(gear?.light?'unequip':'equip',gear?.light?{slot:'light'}:{item_type:'torches'});
+});
+$('restButton').addEventListener('click',()=>takeAction('rest'));
 $('talkButton').addEventListener('click',talk);
 $('contractButton').addEventListener('click',acceptContract);
 $('deliverButton').addEventListener('click',deliverContract);
@@ -492,7 +516,8 @@ async function begin(){
    $('clockStatus').textContent='No persistent world connected';
    $('packStatus').textContent='Persistent inventory and trading require DK Server.';
    $('socialStatus').textContent='Social records require DK Server.';
-   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton'])
+   $('needsStatus').textContent='Crafting and survival need DK Server.';
+   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton'])
      $(id).disabled=true;
   }
   if(firstVisit){

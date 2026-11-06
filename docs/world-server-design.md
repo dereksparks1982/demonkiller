@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M7 (v0.2.28)
+
+The authoritative world now tracks a living player's hunger, energy, health, incapacitation, two equipment slots, crafting skill, cooldowns and torch expiration. Recipe transactions consume and produce actual inventory items: torch (wood/herbs), rations (bread/produce), bandages (herbs/produce), and tools (ore/wood, smithy proximity required). Eating, bandaging, equipping, removing gear and resting are server-authored state transactions, recorded in the existing world event journal. Passive needs advance only with running simulated minutes. The module does not implement permanent player death or overwrite the single life. Existing characters receive a non-destructive default M7 crafting record on startup.
+
+Source: `server/crafting-m7.cjs`, `server/gameplay.cjs`, `server/living-world.cjs`. Contracts and NPC relationships from M6 remain. New outdoor UI actions use the existing gameplay endpoint. Public GitHub Pages is **not a persistent online server**; no remote provider is configured.
+
 ## Implemented milestone: DK Server M6 (v0.2.27)
 
 M6 adds real NPC conversational actions, persistent contact records, faction reputation, time-limited physical goods commissions and NPC pathfinding that obeys existing variable-size DK Architect geometry. The social state is validated, migrated safely from M5 worlds, written atomically, and recorded in the permanent event log. Shop commissions check proximity, status, inventory, actual business funds and server-time deadlines; the player receives real gold and skill progress, rather than a browser-only reward. See `server/social-m6.cjs`, `server/npc-navigation-m6.cjs`, `tests/social-m6.cjs`, and `tests/npc-navigation-m6.cjs`.

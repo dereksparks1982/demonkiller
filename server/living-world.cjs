@@ -5,6 +5,7 @@ const {COURT,VILLAGE,traversable,portal}=require('./regions.cjs');
 const {regenerate}=require('./gameplay.cjs');
 const {tick:socialTick}=require('./social-m6.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
+const {tick:craftTick}=require('./crafting-m7.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -99,6 +100,7 @@ function minuteTick(world,m,generated){
  const living=world.living,t=m%DAY,day=t<360;
  regenerate(world,m,generated);
  socialTick(world,m,generated);
+ craftTick(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
   const desired=npcDestination(n,m);

@@ -2,11 +2,20 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.27 | DK Server M6, People & Trade
+## Current milestone: v0.2.28 | DK Server M7, Crafting & Survival
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M7: Use what you gather
+
+- **Ingredient-based crafting:** Combine physically gathered or purchased goods into torches, rations, bandages and tools. Toolmaking requires visiting the village smithy.
+- **Equipped gear:** Tools occupy the hand slot and provide a foraging skill benefit. Torches occupy the light slot and burn out after 90 world minutes.
+- **Food and health:** Bread, produce, meals and crafted rations restore hunger. Bandages restore health and consume a real item.
+- **Living character needs:** Hunger and energy change during actual server world time, including while Firefox is closed. Severe starvation can cause incapacitation; Rest allows recovery without silently deleting the player's single life.
+- **World-backed advancement:** Crafting skill, equipment, needs and item counts are persisted and validated on the server. No recipes or rewards are calculated by the browser.
+- **Usable interface:** Outdoor controls let you craft, eat, equip or unequip basic tools and torches, and rest. The static webpage preview does not pretend it has a connected server.
 
 ### M6: Meet people and earn your place in the world
 
