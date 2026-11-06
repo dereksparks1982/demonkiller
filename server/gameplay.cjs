@@ -3,6 +3,7 @@
 // and banked gold. The authoritative server validates every transaction.
 const {COURT,VILLAGE}=require('./regions.cjs');
 const CRAFT=require('./crafting-m7.cjs');
+const COMBAT=require('./combat-m8.cjs');
 const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages']);
 const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4};
 const NODES=[
@@ -22,6 +23,7 @@ function ensureProgress(character){
  for(const [key,value] of [['gold',5],['bank_gold',0],['gather_after_minute',-1]])
   if(character[key]===undefined){character[key]=value;changed=true;}
  if(!character.skills){character.skills={foraging:0,commerce:0};changed=true;}
+ if(character.skills.combat===undefined){character.skills.combat=0;changed=true;}
  if(CRAFT.ensure(character))changed=true;
  return changed;
 }
@@ -43,11 +45,12 @@ function validateProgress(character){
     throw Error('Invalid server-owned inventory');
  }
  CRAFT.validate(character);
+ if(character.last_attack_utc_ms!==undefined&&(!Number.isSafeInteger(character.last_attack_utc_ms)||character.last_attack_utc_ms<0))throw Error('Invalid attack timestamp');
  for(const key of ['gold','bank_gold'])
   if(character[key]!==undefined&&(!Number.isSafeInteger(character[key])||
     character[key]<0||character[key]>1e9))throw Error('Invalid character gold');
  if(character.skills){
-  for(const key of ['foraging','commerce'])
+  for(const key of ['foraging','commerce','combat'])
    if(!Number.isSafeInteger(character.skills[key])||character.skills[key]<0||
      character.skills[key]>1e7)throw Error('Invalid character skill');
  }
@@ -70,7 +73,8 @@ function bankLocation(world,c){
  if(!shop.open)throw Error('The bank is closed');
  return shop;
 }
-function apply(world,command){
+function apply(world,command,now=Date.now()){
+ if(['attack','loot'].includes(command?.action))return COMBAT.apply(world,command,now);
  if(['craft','consume','equip','unequip','rest'].includes(command?.action))
    return CRAFT.apply(world,command);
  const allowed={gather:['action','node_id'],

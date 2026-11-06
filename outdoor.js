@@ -146,6 +146,33 @@ function drawNpcs(){
   px('#2c2228',x+10,y+6,10,15);
  }
 }
+function drawMonsters(){
+ if(!living?.combat)return;
+ for(const n of Object.values(living.combat.creatures||{})){
+  if(!n.alive||n.area_id!==area.area_id)continue;
+  const x=n.x*TILE,y=n.y*TILE;
+  px('#201920',x+9,y+24,15,5);px('#793348',x+10,y+13,13,13);
+  px('#aa4550',x+10,y+8,14,10);px('#e1be84',x+11,y+14,3,3);
+  px('#e1be84',x+19,y+14,3,3);
+ }
+ for(const drop of Object.values(living.combat.drops||{})){
+  if(drop.area_id!==area.area_id)continue;
+  const x=drop.x*TILE,y=drop.y*TILE;
+  px('#28242a',x+7,y+19,18,8);px('#d2ae55',x+11,y+16,10,5);
+ }
+}
+function nearestCreature(){
+ return Object.values(living?.combat?.creatures||{}).filter(n=>n.alive&&
+  n.area_id===player.area_id&&Math.abs(n.x-player.x)+Math.abs(n.y-player.y)<=1)[0]||null;
+}
+function nearestLoot(){
+ return Object.values(living?.combat?.drops||{}).filter(d=>
+  d.area_id===player.area_id&&Math.abs(d.x-player.x)+Math.abs(d.y-player.y)<=1)[0]||null;
+}
+function attack(){const n=nearestCreature();if(!n)return message('Move beside a living imp to attack.');
+ return takeAction('attack',{target_id:n.id});}
+function loot(){const d=nearestLoot();if(!d)return message('Move beside a loot pile first.');
+ return takeAction('loot',{drop_id:d.id});}
 function drawResources(){
  for(const node of gameplay?.resources||[]){
   if(!node.remaining)continue;
@@ -169,6 +196,7 @@ function draw(){
  for(const o of area.objects)drawObject(o);
  drawResources();
  drawNpcs();
+ drawMonsters();
  const spriteGroup=player.form==='ghost'?'ghost':'human';
  const pImg=ready('characters/'+spriteGroup+'/'+spriteGroup+'_'+player.facing+'.png');
  if(pImg)ctx.drawImage(pImg,player.x*TILE,player.y*TILE,TILE,TILE);
@@ -181,6 +209,12 @@ function draw(){
   ') · '+player.facing.toUpperCase();
 }
 function actorAt(x,y){
+ const creature=Object.values(living?.combat?.creatures||{}).find(n=>n.alive&&
+  n.area_id===area.area_id&&n.x===x&&n.y===y);
+ if(creature)return {creature};
+ const loot=Object.values(living?.combat?.drops||{}).find(d=>
+  d.area_id===area.area_id&&d.x===x&&d.y===y);
+ if(loot)return {loot};
  const npc=Object.values(living?.npcs||{}).find(n=>n.alive&&n.area_id===area.area_id&&n.x===x&&n.y===y);
  if(npc)return {npc};
  const object=area.objects.find(o=>o.type==='willow'&&x>=o.x&&x<o.x+3&&y>=o.y&&y<o.y+3||
@@ -321,6 +355,11 @@ async function refreshLiving(){
   $('clockStatus').textContent=clock.phase.toUpperCase()+
    ' · '+Math.ceil(clock.seconds_until_transition/60)+' min until transition';
   const present=Object.values(living.npcs).filter(n=>n.alive&&n.area_id===area.area_id);
+  const activeImps=Object.values(living.combat?.creatures||{}).filter(n=>
+    n.alive&&n.area_id===area.area_id);
+  $('combatStatus').textContent=activeImps.length+' active imps · '+
+    Object.values(living.combat?.drops||{}).filter(d=>d.area_id===area.area_id).length+
+    ' loot piles · Combat skill '+(player.skills?.combat||0);
   $('activityStatus').textContent=present.length+' NPCs nearby · '+
     Object.values(living.businesses).filter(b=>b.area_id===area.area_id&&b.open).length+
     ' businesses open · '+Object.values(living.territories).filter(t=>t.control==='monsters').length+
@@ -395,6 +434,14 @@ async function toggleDoor(){
 }
 function inspect(x,y,doubleClick){
  const item=actorAt(x,y);if(!item)return message('Nothing notable here.');
+ if(item.creature){
+  if(doubleClick&&SERVER)return takeAction('attack',{target_id:item.creature.id});
+  return message('Imp · '+item.creature.health+' health. Double-click beside it to attack.');
+ }
+ if(item.loot){
+  if(doubleClick&&SERVER)return takeAction('loot',{drop_id:item.loot.id});
+  return message('Loot · '+item.loot.gold+' gold and '+item.loot.item+'. Double-click beside it to collect.');
+ }
  if(item.npc){
   const n=item.npc;
   if(doubleClick&&SERVER)return socialAction('talk',{npc_id:n.id});
@@ -462,6 +509,8 @@ document.addEventListener('keydown',e=>{
 $('showBank').addEventListener('click',openBank);
 $('closeBank').addEventListener('click',()=>{$('bankPanel').hidden=true;});
 $('gatherButton').addEventListener('click',gather);
+$('attackButton').addEventListener('click',attack);
+$('lootButton').addEventListener('click',loot);
 $('craftTorch').addEventListener('click',()=>takeAction('craft',{recipe:'torch'}));
 $('craftRations').addEventListener('click',()=>takeAction('craft',{recipe:'rations'}));
 $('craftBandages').addEventListener('click',()=>takeAction('craft',{recipe:'bandages'}));
@@ -517,7 +566,8 @@ async function begin(){
    $('packStatus').textContent='Persistent inventory and trading require DK Server.';
    $('socialStatus').textContent='Social records require DK Server.';
    $('needsStatus').textContent='Crafting and survival need DK Server.';
-   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton'])
+   $('combatStatus').textContent='Monster combat and loot require DK Server.';
+   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton'])
      $(id).disabled=true;
   }
   if(firstVisit){

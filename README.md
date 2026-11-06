@@ -2,11 +2,21 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.28 | DK Server M7, Crafting & Survival
+## Current milestone: v0.2.29 | DK Server M8, Monsters & Liberation
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M8: Monsters are actual inhabitants, not just a territory label
+
+- **Occupied regions:** When monsters overrun an area, DK Server creates persistent imp entities with saved positions and health.
+- **Creature AI:** Imps pursue nearby characters or guards, navigating around real walls and scenery in cardinal directions. Guards can fight back, and NPCs may be wounded or killed as the world continues.
+- **Physical combat:** Attack only a living monster within one tile. Damage comes from the server, with equipped tools doing more damage; the player gains combat skill. Server-time cooldowns stop attack spam.
+- **Consequences:** Imp attacks can injure the character and cause recoverable incapacitation. No permanent deletion of the player's one life has been introduced.
+- **Persistent ground loot:** Defeated imps leave actual saved drops. Stand beside a drop and collect gold and goods; the server removes it, so the same loot cannot be collected twice.
+- **Liberation:** Destroying the last occupying imp can restore control to settlers, affect shop operation, and create a dated territory event.
+- **Outdoor interaction:** Basic red pixel imps and loot markers render with existing primitive code, with Attack and Loot buttons and double-click interactions. No new artwork was generated.
 
 ### M7: Use what you gather
 

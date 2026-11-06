@@ -11,6 +11,7 @@ const { localRequestAllowed, serveGame } = require('./local-game.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
+const {ensure:ensureCombat}=require('./combat-m8.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -123,6 +124,7 @@ async function createDKServer({
     const regionsAdded=ensureRegions(world),livingAdded=ensureLivingWorld(world);
     const resourcesAdded=ensureResources(world);
     const socialAdded=ensureSocial(world);
+    const combatAdded=ensureCombat(world);
     const playerAdded=Object.values(world.characters).some(c=>ensureProgress(c));
     const templeDoor=world.areas[AREA_ID]?.objects.find(o=>o.id==='temple_north_door');
     const courtyardDoor=world.areas[COURT]?.objects.find(o=>o.id==='courtyard_temple_door');
@@ -134,7 +136,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(world,null,2)+'\n');
   }catch(error){await releaseLock();throw error;}
@@ -205,10 +207,10 @@ async function createDKServer({
     const pending=writeQueue.then(async()=>{
       if(!world.runtime?.running)throw Error('World is paused; press Start Server');
       const tick=advance(world,now(),180);
-      const result=applyGameplay(checkpointWorldTime(tick.world,now()),command);
+      const result=applyGameplay(checkpointWorldTime(tick.world,now()),command,now());
       await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
       world=result.world;
-      try{await appendEvents([...tick.events,result.event]);}
+      try{await appendEvents([...tick.events,...(result.events||[result.event])]);}
       catch(e){console.error('World event archive write failed:',e);}
       return result;
     });
@@ -277,7 +279,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m7', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m8', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -295,6 +297,7 @@ async function createDKServer({
       const l=world.living;
       return sendJSON(res,200,{minute:l.minute,npcs:l.npcs,businesses:l.businesses,
         territories:l.territories,traveling_camps:l.traveling_camps,
+        combat:{creatures:l.combat?.creatures||{},drops:l.combat?.drops||{}},
         pending_mail:l.mail.outbound.length,latest_events:l.events.slice(-30),
         last_event_sequence:l.event_sequence,world_running:worldClock(world,now()).running,
         world_revision:world.revision},method);
@@ -348,7 +351,7 @@ async function createDKServer({
           world_revision:result.world.revision,event:result.event});
       }catch(e){
         if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
-        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance/.test(e.message))
+        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight/.test(e.message))
           return sendJSON(res,409,{error:e.message});
         console.error('Player gameplay failed:',e);
         return sendJSON(res,500,{error:'Gameplay transaction was not saved'});

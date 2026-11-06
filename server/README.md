@@ -1,4 +1,4 @@
-# DK Server M7 | Living World, Crafting, Survival and Equipment (v0.2.28)
+# DK Server M8 | Living World, Creature Combat and Liberation (v0.2.29)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m7`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m8`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -82,3 +82,14 @@ The existing `POST /api/v1/gameplay` now also accepts allowlisted `craft`, `cons
 `server/crafting-m7.cjs` owns the recipes, validation, needs, gear and timed torch expiry. `server/gameplay.cjs` dispatches these transactions through the same serialized and atomic authority path as gathering, trading and banking. `server/living-world.cjs` advances the hunger/energy loop as simulated minutes pass, **only when the server world is running**. Unknown parameters, fake counts and client-supplied rewards are rejected. The single life is never deleted by this module. The basic UI is on the outdoor page. Run `npm --prefix server test` locally against a full checkout to exercise the M7 regression suite.
 
 Online persistent hosting, full combat, equipment durability, death and resurrection consequences, housing and vendor inventories beyond the current prototypes remain unfinished.
+
+## M8 persistent monster combat
+
+- `server/combat-m8.cjs` adds one server-owned combat store under `world.living.combat`, containing living imps, their health and positions, and persistent ground loot. Existing saves migrate non-destructively. Combat state is validated with the rest of the world before writing.
+- Whenever an existing territory is occupied by monsters, the server seeds a bounded group of imps on actual traversable tiles. Every five simulated world minutes, imps track nearby player/guard targets using bounded cardinal pathfinding and can attack. Guards fight back and can die. The player can become incapacitated, but their one character save is not deleted.
+- `POST /api/v1/gameplay` accepts exactly `{"action":"attack","target_id":"imp_1"}` and `{"action":"loot","drop_id":"drop_2"}`. The server validates form, proximity, world state, weapon bonus and a real-time 900ms strike cooldown. Kills generate fixed loot and, on the last enemy, a physical territory-liberation transaction. Loot adds actual gold and one ingredient to inventory and deletes the world drop in the same atomic save.
+- `GET /api/v1/living` now exposes read-only creature positions/health and loot markers for the local game client. The outdoor screen displays deliberately simple imps and loot, and supports double-click plus Attack / Loot controls.
+- The server-owned write queue persists the **entire attack event batch** (strike, death, loot creation and liberation) to the append-only event archive, rather than only the final event.
+- `tests/combat-m8.cjs` verifies migration, spawn, distance, cooldown, skill, guard combat, liberation, unique loot and HTTP persistence. Run it from a full Node checkout using the existing server test script.
+
+**Limitations:** Imp movement/guard combat are a prototype, not a finished combat system; no UO-style spells, weapon durability, armor, dungeon drops or player permadeath. Public GitHub Pages still has no connected persistent server; internet-facing binding remains deliberately disabled.

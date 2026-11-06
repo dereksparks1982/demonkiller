@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.29 / DK Server M8 | 2026-11-06 | Persistent imps, guard combat and territorial liberation
+
+- Added real imp creatures to monster-held courtyard/village regions, with server-owned position, health, bounded cardinal pathfinding, and saved state that continues progressing without an open browser while DK Server runs.
+- Existing guard NPCs fight imps; imps pursue nearby residents or the player, inflict real health damage, and can incapacitate a living character without deleting the one-life record.
+- Added server-validated player `attack` action: adjacent-target check, 900ms cooldown, skill growth and equipment-dependent damage. No client-supplied damage or reward values are accepted.
+- Added permanent world-ground loot drops and `loot` collection. Imp defeat creates real persistent gold/materials; collecting them moves items into the player's pack once, preventing duplicate payouts.
+- Killing the final occupying imp can return an area to settlers and resume settlement functions. The server writes related combat, defeat, and liberation events through the append-only world-history queue.
+- Added basic original Canvas imp and loot markers plus outdoor Attack and Loot controls. Reused the same actor inspection/double-click interaction pattern; no new art assets.
+- Added `tests/combat-m8.cjs` regression contracts; updated server version checks, M8 docs, frontend cache versions and test script. Pure in-memory tests verified damage, cooldowns, loot, liberation and world validation; the complete Node integration suite still requires a full source checkout.
+- Public GitHub Pages remains a static preview without an always-on hosted DK Server. No multiplayer, Godot or permanent player death.
+
 ## v0.2.28 / DK Server M7 | 2026-11-06 | Crafting, equipment and world-time survival
 
 - Added server-authored recipes for torches, rations, bandages and smithy tools. Crafting consumes actual server inventory and awards crafting progression, with a world-minute cooldown.

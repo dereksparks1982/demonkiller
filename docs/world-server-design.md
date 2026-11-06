@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M8 (v0.2.29)
+
+The persistent world now represents monster occupancy with actual imp entities rather than a status flag alone. When territory becomes occupied, imp populations are seeded onto traversable grid tiles. They patrol/pursue nearby targets on the server using cardinal pathfinding; guards can fight back, and NPC lives and character health are affected. The server exposes combat state read-only and provides validated, atomic `attack` and `loot` gameplay actions. Monster kills produce saved ground loot and can liberate the occupied territory, with all related actions in the permanent NDJSON archive. The existing M7 hunger/health/incapacitation state provides a nonfatal fallback for player defeat, without overwriting the single character.
+
+The outdoor view displays original primitive monster and drop markers; no new generated art. `server/combat-m8.cjs` is the authoritative module and `tests/combat-m8.cjs` provides regression contracts. This is not UO-level combat or a network-hosted persistent server. Public GitHub Pages still cannot run the simulation.
+
 ## Implemented milestone: DK Server M7 (v0.2.28)
 
 The authoritative world now tracks a living player's hunger, energy, health, incapacitation, two equipment slots, crafting skill, cooldowns and torch expiration. Recipe transactions consume and produce actual inventory items: torch (wood/herbs), rations (bread/produce), bandages (herbs/produce), and tools (ore/wood, smithy proximity required). Eating, bandaging, equipping, removing gear and resting are server-authored state transactions, recorded in the existing world event journal. Passive needs advance only with running simulated minutes. The module does not implement permanent player death or overwrite the single life. Existing characters receive a non-destructive default M7 crafting record on startup.
