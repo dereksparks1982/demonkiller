@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.30 / DK Server M9 | 2026-11-06 | Bank item vault and persistent ground goods
+
+- Added a server-owned 500-item vault at the Village Bank. Goods deposits and withdrawals require the player to physically visit the bank while it is open; transfers update bank and inventory amounts in one atomic world transaction.
+- Added persistent outdoor item drops, cardinal-distance pickup rules, item quantities, one-time collection, 200-item pack limits and expiry after 360 simulated running minutes. Item decay advances with the world, not the client's browser.
+- Added basic original ground-item pixel markers, commodity and quantity selector, Drop/Pick Up controls and goods storage inside the existing bank-box view.
+- Existing bank-letter and deposited-gold functionality remain intact. No separate inventory dashboard or new art pack was introduced.
+- Added `tests/storage-m9.cjs` regression contracts for save migration, ownership, closed-bank rules, forgery, item decay, duplication prevention and HTTP persistence. Full Node integration run still requires a current checked-out source tree.
+- Incremented DK Server build identity to `local-m9` and updated versioned release docs and frontend cache references. The public GitHub Pages game remains an unconnected browser preview, not an internet-hosted persistent server.
+
 ## v0.2.29 / DK Server M8 | 2026-11-06 | Persistent imps, guard combat and territorial liberation
 
 - Added real imp creatures to monster-held courtyard/village regions, with server-owned position, health, bounded cardinal pathfinding, and saved state that continues progressing without an open browser while DK Server runs.

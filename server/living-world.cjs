@@ -7,6 +7,7 @@ const {tick:socialTick}=require('./social-m6.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
 const {tick:craftTick}=require('./crafting-m7.cjs');
 const {tick:combatTick}=require('./combat-m8.cjs');
+const {tick:storageTick}=require('./storage-m9.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -167,6 +168,7 @@ function minuteTick(world,m,generated){
   }
  }
  combatTick(world,m,generated);
+ storageTick(world,m,generated);
  if(m%90===0){
   const camp=living.traveling_camps.camp_1;
   if(camp.present&&m>=camp.leaves_at){

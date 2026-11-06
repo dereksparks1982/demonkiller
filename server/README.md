@@ -1,4 +1,4 @@
-# DK Server M8 | Living World, Creature Combat and Liberation (v0.2.29)
+# DK Server M9 | Living World, Physical Items and Bank Storage (v0.2.30)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m8`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m9`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -93,3 +93,12 @@ Online persistent hosting, full combat, equipment durability, death and resurrec
 - `tests/combat-m8.cjs` verifies migration, spawn, distance, cooldown, skill, guard combat, liberation, unique loot and HTTP persistence. Run it from a full Node checkout using the existing server test script.
 
 **Limitations:** Imp movement/guard combat are a prototype, not a finished combat system; no UO-style spells, weapon durability, armor, dungeon drops or player permadeath. Public GitHub Pages still has no connected persistent server; internet-facing binding remains deliberately disabled.
+
+## M9 physical items and bank vaults
+
+- `server/storage-m9.cjs` adds `world.living.storage`: one persistent bank vault for the sole character and a bounded set of outdoor ground-item records. These save alongside the existing world, without replacing M8 data.
+- `POST /api/v1/gameplay` adds four allowlisted commands: `{"action":"bank_store","item_type":"herbs","quantity":2}`, `{"action":"bank_take","item_type":"herbs","quantity":2}`, `{"action":"drop_item","item_type":"herbs","quantity":2}`, and `{"action":"pick_up","drop_id":"ground_1"}`. Clients cannot specify credits or rewards.
+- Bank goods require a living, conscious character physically beside the open village bank. The bank vault holds up to 500 total items and the pack up to 200; transfers reject missing inventory, invalid quantities or overcapacity.
+- Dropped goods are stored with a world-minute origin and 360-world-minute expiry. A local player within one cardinal tile may collect each pile once. World ticks remove expired piles even when nobody has the webpage open, provided DK Server is running.
+- The existing `GET /api/v1/bank/box` includes stored goods as `items` alongside letters. `GET /api/v1/living` returns the public ground-item positions and counts for drawing minimal pixel markers. Actual server save and event archival remain behind the existing single-writer queue.
+- `tests/storage-m9.cjs` adds bank balance, location, closed hours, validation, one-time item collection, world-time decay and HTTP persistence contracts. No internet-hosted process exists and public APIs remain loopback-only.

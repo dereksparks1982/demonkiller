@@ -2,11 +2,20 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.29 | DK Server M8, Monsters & Liberation
+## Current milestone: v0.2.30 | DK Server M9, Physical Goods and Bank Storage
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M9: Goods have a place in the world
+
+- **Bank vault:** The village bank now stores real inventory items, separately from banked gold and letters. Put goods in and take them out only while standing near an open bank. The saved bank has a 500-item total capacity.
+- **Persistent ground goods:** Drop an actual quantity from the character's pack onto a traversable outdoor tile. That item becomes an independently saved world object until collected or decayed.
+- **Pickups and decay:** Move beside a dropped pile to collect it once. Drops expire after 360 running world minutes and are recorded in the world event history.
+- **Strict inventory accounting:** Deposits, withdrawals, drops and pickups all transfer actual server-owned quantities. The client cannot create free supplies, store things remotely or exceed pack capacity.
+- **Outdoor controls:** Select a commodity and quantity, drop or pick up goods, and store or withdraw items inside the existing bank box. Simple square ground markers match the intentionally primitive approved pixel style.
+- **No imaginary services:** The website remains an unconnected static preview. These are DK Server features, not claims that GitHub Pages runs a persistent world.
 
 ### M8: Monsters are actual inhabitants, not just a territory label
 

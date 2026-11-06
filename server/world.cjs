@@ -7,6 +7,7 @@ const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
 const {ensureSocial,validateSocial}=require('./social-m6.cjs');
 const {ensure:ensureCombat,validate:validateCombat}=require('./combat-m8.cjs');
+const {ensure:ensureStorage,validate:validateStorage}=require('./storage-m9.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -69,6 +70,7 @@ function makeWorld(now = Date.now()) {
   ensureResources(result);
   ensureSocial(result);
   ensureCombat(result);
+  ensureStorage(result);
   return result;
 }
 
@@ -133,6 +135,7 @@ function validateWorld(world) {
   if(world.living)validateLiving(world.living);
   validateSocial(world);
   validateCombat(world);
+  validateStorage(world);
   return world;
 }
 

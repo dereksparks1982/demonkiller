@@ -4,6 +4,7 @@
 const {COURT,VILLAGE}=require('./regions.cjs');
 const CRAFT=require('./crafting-m7.cjs');
 const COMBAT=require('./combat-m8.cjs');
+const STORAGE=require('./storage-m9.cjs');
 const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages']);
 const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4};
 const NODES=[
@@ -74,6 +75,7 @@ function bankLocation(world,c){
  return shop;
 }
 function apply(world,command,now=Date.now()){
+ if(['bank_store','bank_take','drop_item','pick_up'].includes(command?.action))return STORAGE.apply(world,command);
  if(['attack','loot'].includes(command?.action))return COMBAT.apply(world,command,now);
  if(['craft','consume','equip','unequip','rest'].includes(command?.action))
    return CRAFT.apply(world,command);

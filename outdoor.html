@@ -20,6 +20,18 @@
   <button id="sellButton" type="button">SELL ONE</button>
   <button id="depositButton" type="button">DEPOSIT 1 GOLD</button>
   <button id="withdrawButton" type="button">WITHDRAW 1 GOLD</button>
+  <label for="itemChoice">Goods</label>
+  <select id="itemChoice">
+   <option value="herbs">Herbs</option><option value="wood">Wood</option>
+   <option value="ore">Ore</option><option value="bread">Bread</option>
+   <option value="tools">Tools</option><option value="produce">Produce</option>
+   <option value="meals">Meals</option><option value="torches">Torches</option>
+   <option value="rations">Rations</option><option value="bandages">Bandages</option>
+  </select>
+  <label for="itemQuantity">Quantity</label>
+  <input id="itemQuantity" type="number" min="1" max="20" value="1">
+  <button id="dropItem" type="button">DROP GOODS</button>
+  <button id="pickItem" type="button">PICK UP GOODS</button>
  </div>
  <h2>PEOPLE & COMMISSIONS</h2><p id="socialStatus">Relationships and commissions are server-owned.</p>
  <div class="goods-controls"><button id="talkButton" type="button">TALK TO NEARBY NPC</button>
@@ -44,7 +56,12 @@
  <p id="activityStatus">NPC activity appears when DK Server is connected.</p>
  <h2>JOURNAL</h2><p id="message" role="status" aria-live="polite">Leaving the Forsaken Temple...</p>
  <section id="bankPanel" hidden aria-label="Village bank box"><h2>YOUR BANK BOX</h2>
- <div id="letters"></div><button type="button" id="closeBank">CLOSE BOX</button></section>
+ <div id="letters"></div><h3>STORED GOODS</h3>
+ <div id="storedItems">Your bank vault is empty.</div>
+ <div class="goods-controls">
+  <button id="storeItem" type="button">STORE SELECTED GOODS</button>
+  <button id="takeItem" type="button">WITHDRAW SELECTED GOODS</button>
+ </div><button type="button" id="closeBank">CLOSE BOX</button></section>
  <section class="note">The public GitHub Pages version is a static gameplay preview. It does not impersonate the persistent world server. World time, NPC lives, trade, and mail are authoritative only when the real DK Server is connected.</section>
  </aside></div>
 </main>
@@ -53,5 +70,5 @@
 <script src="./dk-dungeon-art.js"></script>
 <script src="./world-regions.js"></script>
 <script src="./dk-menu-server.js"></script>
-<script src="./outdoor.js?v=0.2.29"></script>
+<script src="./outdoor.js?v=0.2.30"></script>
 </body></html>
