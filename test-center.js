@@ -1227,9 +1227,11 @@
     if(!Array.isArray(data.objects)||data.objects.length>160)throw Error('Invalid object count.');
     const seen=new Set();
     for(const o of data.objects){
-      if(!o||!Object.hasOwn(CATALOG,o.type)||typeof o.id!=='string'||!/^[a-z0-9_-]{1,60}$/i.test(o.id)||seen.has(o.id))
+      if(!o||(!Object.hasOwn(CATALOG,o.type)&&o.type!=='wallPiece')||
+        typeof o.id!=='string'||!/^[a-z0-9_-]{1,60}$/i.test(o.id)||seen.has(o.id))
         throw Error('Invalid, repeated or unsupported object ID.');
       seen.add(o.id);
+      if(o.type==='wallPiece')continue; // retired wall objects are not restored
       if(!inside(o.x,o.y)||!Number.isInteger(o.r)||o.r<0||o.r>3)throw Error('Invalid object coordinates or rotation.');
       const [w,h]=dims(o);if(!inside(o.x+w-1,o.y+h-1))throw Error('Object crosses area boundary.');
       if(o.type==='door'&&typeof o.open!=='boolean')throw Error('Door must have an open/closed state.');
@@ -1238,8 +1240,8 @@
         throw Error('Invalid custom collision property.');
       if(o.type==='scenery'&&(!Object.hasOwn(ARCHITECT_SPRITES,o.spriteId)))
         throw Error('Unknown staged sprite asset.');
-      if(o.type==='wallPiece'&&!Object.hasOwn(WALL_PIECES,o.wallPieceId))
-        throw Error('Unknown Architect wall piece.');
+      if(o.type==='imported'&&!Object.hasOwn(VENDOR,o.assetId))
+        throw Error('Unknown imported dungeon artwork.');
     }
     if(!data.spawn||!inside(data.spawn.x,data.spawn.y)||!data.player||!inside(data.player.x,data.player.y))
       throw Error('Invalid player or spawn coordinates.');
@@ -1249,15 +1251,24 @@
     if('wallStyles' in data && (!Array.isArray(data.wallStyles)||data.wallStyles.length!==COUNT||
       !data.wallStyles.every(v=>Object.hasOwn(WALL_FINISHES,v))))
       throw Error('Invalid wall finish records.');
-    // Obsolete directional wall files are intentionally retired. Old manual
-    // selections become seamless material blocks without moving or deleting walls.
-    if('wallVariants' in data&&(!Array.isArray(data.wallVariants)||data.wallVariants.length!==COUNT||
-      !data.wallVariants.every(v=>v===null||
-        (typeof v==='string'&&/^wall_(straight|corner|t|cross|end|pillar|arch|window|buttress|ruin|curve)_(north|east|south|west)(_(dirty|moss|cracked|broken))?$/.test(v)))))
-      throw Error('Invalid legacy manually selected wall art.');
+    if('wallPacks' in data&&(!Array.isArray(data.wallPacks)||
+      data.wallPacks.length!==COUNT||!data.wallPacks.every(validWallPack)))
+      throw Error('Invalid wall pack reference.');
+    if('floorArt' in data&&(!Array.isArray(data.floorArt)||data.floorArt.length!==COUNT||
+      !data.floorArt.every(v=>v===null||VENDOR[v]?.category==='floor')))
+      throw Error('Unknown imported floor artwork.');
+    if('wallVariants' in data&&(!Array.isArray(data.wallVariants)||
+      data.wallVariants.length!==COUNT||!data.wallVariants.every(v=>
+        v===null||VENDOR[v]?.category==='wall'||
+        typeof v==='string'&&/^wall_(straight|corner|t|cross|end|pillar|arch|window|buttress|ruin|curve)_(north|east|south|west)(_(dirty|moss|cracked|broken))?$/.test(v))))
+      throw Error('Unknown manual wall artwork.');
     const restored=clone(data);
-    if(!restored.wallStyles)restored.wallStyles=Array(COUNT).fill('clean');
-    restored.wallVariants=Array(COUNT).fill(null);
+    restored.wallPacks=restored.wallPacks||Array(COUNT).fill('ox72i');
+    restored.floorArt=restored.floorArt||Array(COUNT).fill(null);
+    restored.wallStyles=restored.wallStyles||Array(COUNT).fill('clean');
+    restored.wallVariants=(restored.wallVariants||Array(COUNT).fill(null)).map(
+      v=>VENDOR[v]?.category==='wall'?v:null);
+    restored.objects=restored.objects.filter(o=>o.type!=='wallPiece');
     return restored;
   }
   function save() {
@@ -1451,8 +1462,8 @@
       category=next;$('category').value=category;$('assetSearch').value='';
       current=category==='floors'?'stone'
         :category==='library'?'scenery'
-        :Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
-      if(category==='walls'){tool='wall';$('tool').value=tool;}
+        :Object.keys(CATALOG).find(k=>CATALOG[k].category===category)||'imported';
+      if(category==='walls'){selectedWallAsset=null;tool='wall';$('tool').value=tool;}
       else if(category==='floors'){tool='floor';$('tool').value=tool;}
       else{tool='place';$('tool').value=tool;}
       corner=null;selectedId=null;architectScreen('assets');
@@ -1497,6 +1508,8 @@
   });
   $('category').addEventListener('change',e=>{
     category=e.target.value;previewRotation=0;$('assetSearch').value='';
+    if(category==='walls')selectedWallAsset=null;
+    if(category==='floors')selectedFloorAsset=null;
     if(category==='floors'){current='stone';tool='floor';$('tool').value=tool;}
     else if(category==='walls'){tool='wall';$('tool').value=tool;}
     else if(category==='library'){current='scenery';tool='place';$('tool').value=tool;}
@@ -1512,7 +1525,8 @@
   for(const [id,action] of [['wallBrush','wall'],['wallLineButton','wallLine'],
       ['wallOutlineButton','wallRectangle'],['wallEraseButton','wallErase']]){
     $(id).addEventListener('click',()=>{
-      tool=action;category='walls';$('category').value=category;$('tool').value=tool;
+      tool=action;category='walls';selectedWallAsset=null;
+      $('category').value=category;$('tool').value=tool;
       corner=null;wallStroke=null;palette();draw();message('Wall tool: '+action+'.');
     });
   }
@@ -1597,7 +1611,7 @@
   function uoTool(id,next){
     $(id).addEventListener('click',()=>{
       if(next==='wall'||next==='wallRectangle'){
-        selectedWallPiece=null;
+        selectedWallAsset=null;
         category='walls';$('category').value=category;palette();
       }else if(next==='floor'){
         category='floors';current='stone';$('category').value=category;palette();
