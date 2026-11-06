@@ -58,7 +58,7 @@
       introSeen: false,
       floor, walls,
       objects: [
-        { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:true },
+        { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:false },
         { id:'sacrifice_altar', type:'altar', x:6, y:5, r:0 },
         { id:'brazier_west', type:'braziers', x:4, y:4, r:0 },
         { id:'brazier_east', type:'braziers', x:11, y:4, r:0 },
@@ -113,7 +113,12 @@
     return a.index===a.route.length;
   }
   function phase(name,line){opening.phase=name;opening.time=0;message(line);}
+  function setTempleDoor(open){
+    const door=scene.objects.find(o=>o.id==='temple_north_door'&&o.type==='door');
+    if(door)door.open=open;
+  }
   function startOpening(){
+    setTempleDoor(false);
     // Remove the obsolete prototype starter crystal only before its introductory ritual.
     scene.objects=scene.objects.filter(o=>!(o.id==='soul_crystal'&&o.type==='crystal'&&
       o.x===8&&o.y===9&&!scene.introSeen));
@@ -144,6 +149,7 @@
       case 'sacrifice':
         if(opening.time>=.45)opening.sacrificed=true;
         if(opening.time>=2.2){
+          setTempleDoor(true);
           for(const m of opening.members){
             const edge=m.x<8?5:11;
             route(m,[[edge,m.y],[edge,2],[8,2],[8,-1]]);
@@ -155,6 +161,8 @@
         const gone=opening.members.map(m=>moveActor(m,dt,4.8)).every(Boolean);
         const leaderGone=moveActor(opening.leader,dt,4.2);
         if(gone&&leaderGone){
+          setTempleDoor(false);
+          opening.devil.facing='south';opening.woman.facing='south';
           opening.ghostVisible=true;
           // Let the ghost emerge farther down the central aisle (starter spawn: 8,12).
           scene.player.x=scene.spawn.x;scene.player.y=scene.spawn.y;
@@ -171,12 +179,11 @@
           message('The Devil whispers: "Death offers no escape."');
         }
         if(opening.time>=3){
-          route(opening.devil,[[11,3],[8,3],[8,-1]]);
-          phase('devilExit','The Devil leaves first. Lilith stays behind.');
+          phase('devilExit','The Devil disappears where he stands. Lilith stays behind.');
         }break;
       case 'devilExit':
-        if(moveActor(opening.devil,dt,3.8)){
-          // Stay off the altar while approaching the prayer tile at its foot.
+        if(opening.time>=.35){
+          // The Devil vanishes without moving toward the temple door.
           route(opening.woman,[[5,7],[7,7],[8,7]]);
           phase('approach','Lilith approaches the altar.');
         }break;
@@ -196,7 +203,10 @@
           phase('lilithExit','The golden soul crystal remains. Lilith leaves.');
         }break;
       case 'lilithExit':
+        // Lilith opens the north door near its threshold and never closes it.
+        if(opening.woman.y<=2.3)setTempleDoor(true);
         if(moveActor(opening.woman,dt,3.8)){
+          setTempleDoor(true);
           opening=null;scene.introSeen=true;dirty=true;resetVisual();persistCharacter();
           message('Double-left-click the crystal to resurrect, or leave as a ghost.');
         }break;
@@ -278,7 +288,7 @@
       for(const m of opening.members)drawActor(m);
       drawActor(opening.leader);
     }
-    if(['ghostRise','devilSpeaks','devilExit'].includes(p))drawActor(opening.devil);
+    if(['ghostRise','devilSpeaks'].includes(p))drawActor(opening.devil);
     if(['ghostRise','devilSpeaks','devilExit','approach','kneel','place','lilithExit'].includes(p))
       drawActor(opening.woman);
     if(p==='prayer')

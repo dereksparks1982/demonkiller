@@ -10,7 +10,7 @@
   if (navigation?.type === 'reload') window.location.replace('./index.html');
 }());
 </script>
-<title>Demon Killer | DK Architect: Sacrificial Temple Test Center</title>
+<title>Demon Killer | The Forsaken Temple</title>
 <meta name="description" content="Independent, engine-free Gothic temple room prototype for Demon Killer.">
 <link rel="stylesheet" href="./test-center.css">
 <link rel="stylesheet" href="./cult-journal.css">
@@ -68,9 +68,10 @@
     <div>
       <div class="eyebrow">DK SOFTWORKS · DEMON KILLER · MAIN DEVELOPMENT</div>
       <h1>THE FORSAKEN <em>TEMPLE</em></h1>
-      <p>DK Architect Test Center · original Gothic pixel art · precise grid coordinates · no Godot runtime</p>
+      <p>DK Architect · original Gothic pixel art · precise grid coordinates · no Godot runtime</p>
     </div>
     <div class="mode-buttons" role="group" aria-label="Room modes">
+      <button id="templeMusicToggle" type="button" aria-pressed="true" title="Toggle temple music">♪ MUSIC ON</button>
       <button class="primary active" id="walkMode" type="button" aria-pressed="true">☽ Walk Temple</button>
       <button id="editMode" type="button" aria-pressed="false">✥ Architect Mode</button>
     </div>
@@ -148,11 +149,12 @@
       </div>
     </aside>
   </div>
-  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.5</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
+  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.6</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
 <script src="./cult-system.js" defer></script>
 <script src="./citizen-population.js" defer></script>
 <script src="./cult-network.js" defer></script>
-<script src="./test-center.js?v=0.2.5" defer></script>
+<script src="./temple-music.js?v=0.2.6" defer></script>
+<script src="./test-center.js?v=0.2.6" defer></script>
 </body>
 </html>

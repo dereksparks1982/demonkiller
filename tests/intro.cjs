@@ -52,6 +52,8 @@ key('w');assert.equal(get('position').textContent,'(8, 11)','Ghost control unloc
 get('save').emit('click');
 const saved=JSON.parse(stored.get('dkSoftworks.demonkiller.testCenter.v1'));
 assert.equal(saved.introSeen,true,'Completed intro persists to save');
+assert.equal(saved.objects.find(o=>o.id==='temple_north_door').open,true,
+ 'Lilith leaves the temple door open after cult closes it');
 get('new').emit('click');
 key('w');assert.equal(get('position').textContent,'(8, 12)','Reset replays locked opening');
 get('editMode').emit('click');
