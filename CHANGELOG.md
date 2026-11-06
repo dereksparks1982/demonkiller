@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.13 development preview | 2026-11-05 | Staged approved sprite library, build 2
+
+- Added a searchable approved Sprite Library tab to the floating Architect with individually usable 19 crystal sprites and 6 static character appearances: ghost, human, cult member, Lilith, cult leader, Devil.
+- Staged assets are genuine one-tile objects: place, move, rotate to cardinal facings, duplicate, erase, undo/redo, save, load and import/export through existing Architect operations.
+- Staged actors are visual-only scene props, not scripted live NPCs. Other crystal colors are static visual props only, with no invented soul powers or resurrection behavior.
+- Explicitly reject unknown sprite IDs on room import. No new artwork was generated and no protected story, temple geometry, cult state or player save keys were changed.
+- Approved decoration and portrait master sheets still need correct individual slicing and review before being placed from the library. Browser visuals remain pending.
+
+
 ## v0.2.12 development preview | 2026-11-05 | Floating Pandora-inspired Architect, build 1
 
 - Replaced fixed Architect controls and the room details sidebar with a draggable, resizable floating construction window inspired by Pandora's Box and the UO house builder reference.

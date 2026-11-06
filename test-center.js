@@ -36,10 +36,37 @@
     pew: { label: 'Temple Pew', category: 'furniture', w: 2, h: 1, solid: true },
     coffin: { label: 'Stone Sarcophagus', category: 'furniture', w: 2, h: 1, solid: true },
     candle: { label: 'Candle Cluster', category: 'furniture', w: 1, h: 1, solid: false },
-    chest: { label: 'Reliquary Chest', category: 'furniture', w: 1, h: 1, solid: true }
+    chest: { label: 'Reliquary Chest', category: 'furniture', w: 1, h: 1, solid: true },
+    scenery: { label: 'Staged Sprite', category: 'library', w: 1, h: 1, solid: false }
   };
+  // Only artwork already approved and available as usable game sprites is
+  // placeable here. Masters awaiting extraction are intentionally excluded.
+  const ARCHITECT_SPRITES=(()=>{
+    const entries=Object.create(null);
+    const colors=['gold','red','orange','yellow','green','cyan','blue','purple','pink'];
+    for(const color of colors)for(const shade of ['bright','dim']){
+      const id='crystal_'+color+'_'+shade;
+      entries[id]={label:'Crystal · '+color+' '+shade,group:'crystal',path:'crystals/'+id+'.png',size:24};
+    }
+    entries.crystal_silver_depleted={
+      label:'Crystal · silver (spent)',group:'crystal',path:'crystals/crystal_silver_depleted.png',size:24
+    };
+    for(const [id,name,prefix] of [
+      ['ghost','Ghost (static)','characters/ghost/ghost_'],
+      ['human','Human (static)','characters/human/human_'],
+      ['cult-member','Cult member (static)','characters/cult-member/cult_member_'],
+      ['crystal-woman','Lilith visual (static)','characters/crystal-woman/crystal_woman_']]){
+      entries[id]={label:name,group:'actor',prefix,size:32};
+    }
+    entries['cult-leader']={label:'Cult leader visual (static)',group:'actor',
+      sheet:'characters/cult-leader/cult_leader_spritesheet.png',size:32};
+    entries.devil={label:'Devil visual (static)',group:'actor',
+      sheet:'characters/devil/devil_spritesheet.png',size:32};
+    return Object.freeze(entries);
+  })();
   const GROUPS = { relics: 'Relics & Ritual', structure: 'Gothic Structure',
-    furniture: 'Furniture & Props', floors: 'Stone Floors',walls:'Walls & Masonry' };
+    furniture: 'Furniture & Props', floors: 'Stone Floors',
+    walls:'Walls & Masonry',library:'Approved Sprite Library' };
   const clone = value => JSON.parse(JSON.stringify(value));
   const index = (x, y) => y * N + x;
   const inside = (x, y) => Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < N && y < N;
@@ -88,7 +115,7 @@
       previewRotation = 0,
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
   // Pandora-style architect wall brush state. Wall types do not change tile geometry.
-  let wallFinish='clean',wallStroke=null,skipWallClick=false;
+  let wallFinish='clean',wallStroke=null,skipWallClick=false,selectedSprite='crystal_gold_bright';
   const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
   const Population=typeof DemonKillerPopulation!=='undefined'?DemonKillerPopulation:null;
   let cultWorld=null,populationWorld=null,cultNetworkView=null;
@@ -533,6 +560,24 @@
     return (finish==='clean'?null:readyImage(path+'_'+finish+'.png'))||readyImage(path+'.png');
   }
   function art(g,o) {
+    if(o.type==='scenery'){
+      const entry=ARCHITECT_SPRITES[o.spriteId];
+      if(!entry)return;
+      const face=direction[o.r||0]||'north';
+      const path=entry.path||(entry.prefix?entry.prefix+face+'.png':entry.sheet);
+      const picture=readyImage(entry.sheet||path),size=entry.size||32;
+      const x=(o.x+.5)*TILE,y=(o.y+.5)*TILE;
+      if(picture&&typeof g.drawImage==='function'){
+        g.save();g.translate(x,y);
+        if(entry.group!=='actor')g.rotate((o.r||0)*Math.PI/2);
+        if(entry.sheet){
+          const frame={south:0,west:1,east:2,north:3}[face];
+          g.drawImage(picture,frame*32,0,32,32,-size/2,-size/2,size,size);
+        }else g.drawImage(picture,-size/2,-size/2,size,size);
+        g.restore();
+      }else pixel(g,entry.group==='crystal'?'#bc9b66':'#8a7c92',x-6,y-8,12,16);
+      return;
+    }
     // A soul crystal occupies a tile for interaction, but its visible crystal is
     // far smaller than the 32x32 player. Never stretch it to fill the whole tile.
     if(o.type==='crystal'){
@@ -701,7 +746,7 @@
     if(hover&&mode==='edit'){
       if(tool==='place'&&CATALOG[current]){
         const preview={id:'__architect_preview__',type:current,x:hover.x,y:hover.y,
-          r:previewRotation,open:true,spent:false};
+          r:previewRotation,open:true,spent:false,...(current==='scenery'?{spriteId:selectedSprite}:{})};
         const [pw,ph]=dims(preview);
         const allowed=canPlace(preview);
         ctx.save();ctx.globalAlpha=allowed?.58:.32;
@@ -719,7 +764,8 @@
     $('objectCount').textContent=String(scene.objects.length);
     const o=objectAtId(selectedId);
     const wallAt=hover&&scene.walls[index(hover.x,hover.y)];
-    $('itemInfo').textContent=o?CATALOG[o.type].label+' ('+o.x+', '+o.y+')'
+    $('itemInfo').textContent=o?(o.type==='scenery'?ARCHITECT_SPRITES[o.spriteId]?.label||'Staged Sprite'
+      :CATALOG[o.type].label)+' ('+o.x+', '+o.y+')'
       :wallAt?'Wall: '+(scene.wallStyles?.[index(hover.x,hover.y)]||'clean')+' ('+hover.x+', '+hover.y+')':'None';
     $('saveState').textContent=dirty?'Unsaved edits':loaded?'Saved layout':'Starter scene';
     $('modeLabel').textContent=mode==='walk'?'WALK MODE':'ARCHITECT MODE';
@@ -738,12 +784,14 @@
     const list=$('palette');list.replaceChildren();$('paletteTitle').textContent=GROUPS[category];
     const all=category==='walls'?Object.entries(WALL_FINISHES)
       :category==='floors'?Object.entries(FLOOR)
+      :category==='library'?Object.entries(ARCHITECT_SPRITES)
       :Object.entries(CATALOG).filter(([,a])=>a.category===category);
     const query=$('assetSearch').value.trim().toLowerCase();
     const entries=all.filter(([name,entry])=>(name+' '+entry.label).toLowerCase().includes(query));
     for(const [key,entry] of entries){
       const b=document.createElement('button');b.type='button';
-      b.className=(category==='walls'?wallFinish===key:current===key)?'active':'';
+      b.className=(category==='walls'?wallFinish===key
+        :category==='library'?selectedSprite===key:current===key)?'active':'';
       const mini=document.createElement('canvas');mini.width=32;mini.height=32;mini.setAttribute('aria-hidden','true');
       const c=mini.getContext('2d');c.imageSmoothingEnabled=false;
       if(category==='floors'){
@@ -755,6 +803,8 @@
         const image=readyImage(name);
         if(image&&typeof c.drawImage==='function')c.drawImage(image,0,0,32,32);
         else{c.fillStyle=entry.color;c.fillRect(3,7,26,18);c.strokeStyle='#201921';c.strokeRect(3,7,26,18);}
+      }else if(category==='library'){
+        art(c,{type:'scenery',spriteId:key,x:0,y:0,r:0});
       }else{
         const base=CATALOG[key];c.scale(1/base.w,1/base.h);art(c,{type:key,x:0,y:0,r:0,open:false});
       }
@@ -763,7 +813,9 @@
         if(category==='walls'){
           wallFinish=key;tool='wall';$('tool').value=tool;
         }else{
-          current=key;previewRotation=0;
+          current=category==='library'?'scenery':key;
+          if(category==='library')selectedSprite=key;
+          previewRotation=0;
           if(category==='floors'&&tool==='place')$('tool').value=tool='floor';
           if(category!=='floors'&&(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle'].includes(tool)))
             $('tool').value=tool='place';
@@ -910,7 +962,13 @@
         $('category').value=category;$('tool').value=tool;palette();draw();
         message('Eyedropper: '+WALL_FINISHES[wallFinish].label+' wall.');return;
       }
-      if(here){current=here.type;category=CATALOG[here.type].category;tool='place';$('category').value=category;$('tool').value=tool;palette();draw();message('Eyedropper: '+CATALOG[here.type].label);}
+      if(here){
+        current=here.type;category=CATALOG[here.type].category;tool='place';
+        if(here.type==='scenery')selectedSprite=here.spriteId;
+        $('category').value=category;$('tool').value=tool;
+        palette();draw();message('Eyedropper: '+(here.type==='scenery'?
+          ARCHITECT_SPRITES[here.spriteId].label:CATALOG[here.type].label));
+      }
       else{current=scene.floor[i];category='floors';tool='floor';$('category').value=category;$('tool').value=tool;palette();draw();message('Eyedropper: '+FLOOR[current].label);}
       return;
     }
@@ -981,6 +1039,7 @@
     if(tool==='place'){
       if(!CATALOG[current])return message('Choose a relic, structure or prop from the palette.');
       const obj={id:idFor(current),type:current,x,y,r:previewRotation};
+      if(current==='scenery')obj.spriteId=selectedSprite;
       if(current==='door')obj.open=true;
       if(current==='crystal')obj.spent=false;
       transact(()=>{if(canPlace(obj))scene.objects.push(obj);},'Placed '+CATALOG[current].label+' at ('+x+', '+y+').');return;
@@ -1029,6 +1088,8 @@
       const [w,h]=dims(o);if(!inside(o.x+w-1,o.y+h-1))throw Error('Object crosses area boundary.');
       if(o.type==='door'&&typeof o.open!=='boolean')throw Error('Door must have an open/closed state.');
       if(o.type==='crystal'&&typeof o.spent!=='boolean')throw Error('Crystal must have a spent state.');
+      if(o.type==='scenery'&&(!Object.hasOwn(ARCHITECT_SPRITES,o.spriteId)))
+        throw Error('Unknown staged sprite asset.');
     }
     if(!data.spawn||!inside(data.spawn.x,data.spawn.y)||!data.player||!inside(data.player.x,data.player.y))
       throw Error('Invalid player or spawn coordinates.');
@@ -1217,7 +1278,9 @@
       const next=button.dataset.architectCategory;
       if(!Object.hasOwn(GROUPS,next))return;
       category=next;$('category').value=category;$('assetSearch').value='';
-      current=category==='floors'?'stone':Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
+      current=category==='floors'?'stone'
+        :category==='library'?'scenery'
+        :Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
       if(category==='walls'){tool='wall';$('tool').value=tool;}
       else if(category==='floors'){tool='floor';$('tool').value=tool;}
       else{tool='place';$('tool').value=tool;}
@@ -1265,6 +1328,7 @@
     category=e.target.value;previewRotation=0;$('assetSearch').value='';
     if(category==='floors'){current='stone';tool='floor';$('tool').value=tool;}
     else if(category==='walls'){tool='wall';$('tool').value=tool;}
+    else if(category==='library'){current='scenery';tool='place';$('tool').value=tool;}
     else {
       current=Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
       if(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle'].includes(tool)){

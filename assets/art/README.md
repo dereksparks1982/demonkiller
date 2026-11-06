@@ -25,6 +25,10 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 - DK Architect presents the wall finishes in a searchable asset palette and provides paint/drag, straight-run, room-outline and erase tools. Wall styles are optional per-cell scene data; wall geometry, collision and the temple's northern doorway remain unchanged. Arches and window artwork remain in the original atlas for a future separately authorized placement pass.
 - Matching damaged/clean/dirty floor artwork is planned next, not included in this wall change.
 
+## Pandora-style staged sprite library (2026-11-05)
+
+The floating Architect Sprite Library offers 25 existing game-ready static/visual assets: 19 separate approved crystal sprite images and six character appearance choices (ghost, human, cult member, Lilith, cult leader and Devil). Sprite staging uses non-solid `scenery` room objects with validated sprite IDs, orientation and one-tile coordinates; it does not create NPC behavior or assign magical effects. Existing cutscene actors are unchanged. The approved portrait and temple-decoration master atlases are not silently cropped or substituted, and remain candidates for a later explicitly reviewed extraction.
+
 ## Approved soul crystal sprites (2026-11-05)
 
 The exact owner-uploaded original master sheet is preserved as `crystals/Glowing and Dull Pixel Crystals.png`. It contains ten crystal colors in two rows, bright above and dim below. The repo now includes 19 separate transparent 32 × 32 PNG sprites extracted from that sheet, not new drawings: gold, red, orange, yellow, green, cyan, blue, purple, and pink each have `_bright` and `_dim` files. The bright silver crystal appears once as `crystal_silver_depleted.png`. No silver animation is used.

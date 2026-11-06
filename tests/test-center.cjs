@@ -255,6 +255,25 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(erasedLayout.walls[8*16+1],0,'Dedicated wall eraser clears wall geometry');
   assert.equal(erasedLayout.wallStyles[8*16+1],'clean','Erased wall loses its former finish');
 
+  // Static scene staging must use only approved game-ready sprites.
+  wallCategory.value='library';await wallCategory.emit('change',{target:wallCategory});
+  assert.equal(get('palette').children.length,25,'19 crystal images and six staging characters');
+  await get('palette').children[0].emit('click');
+  assert.equal(get('tool').value,'place','Selecting a staged asset enables placement');
+  const countBeforeSprite=Number(get('objectCount').textContent);
+  await click(2,6);
+  assert.equal(Number(get('objectCount').textContent),countBeforeSprite+1,'Staged sprite should place');
+  await get('save').emit('click');
+  const staged=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  const newSprite=staged.objects.find(o=>o.type==='scenery'&&o.x===2&&o.y===6);
+  assert(newSprite&&newSprite.spriteId==='crystal_gold_bright',
+    'Staged sprite must retain its approved asset ID in saved room');
+  const invalidAsset=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  invalidAsset.objects.find(o=>o.type==='scenery').spriteId='not-in-art-library';
+  get('import').files=[{size:8000,text:async()=>JSON.stringify(invalidAsset)}];
+  await get('import').emit('change',{target:get('import')});
+  assert.match(get('status').textContent,/Import rejected/,'Unknown staged artwork cannot load');
+
   const invalid=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   invalid.area_id='other.world';
   get('import').files=[{size:8000,text:async()=>JSON.stringify(invalid)}];
