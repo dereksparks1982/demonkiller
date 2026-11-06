@@ -1,0 +1,1925 @@
+{
+  "schema": 1,
+  "source": "assets/art/temple/Demon Killer Stone Wall Tileset.png",
+  "source_sha256": "204ccc88f97f9246de3096bf341bd3f7f8142179525cb1bce16822b191204def",
+  "source_scale": 0.5,
+  "piece_count": 106,
+  "pieces": {
+    "dk_wall_structures_01": {
+      "label": "Structure 01",
+      "category": "structures",
+      "width": 47,
+      "height": 52,
+      "renderWidth": 24,
+      "renderHeight": 26,
+      "w": 1,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_01.png",
+      "sourceRect": [
+        37,
+        40,
+        47,
+        52
+      ]
+    },
+    "dk_wall_structures_02": {
+      "label": "Structure 02",
+      "category": "structures",
+      "width": 72,
+      "height": 60,
+      "renderWidth": 36,
+      "renderHeight": 30,
+      "w": 2,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_02.png",
+      "sourceRect": [
+        129,
+        41,
+        72,
+        60
+      ]
+    },
+    "dk_wall_structures_03": {
+      "label": "Structure 03",
+      "category": "structures",
+      "width": 43,
+      "height": 48,
+      "renderWidth": 22,
+      "renderHeight": 24,
+      "w": 1,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_03.png",
+      "sourceRect": [
+        239,
+        42,
+        43,
+        48
+      ]
+    },
+    "dk_wall_structures_04": {
+      "label": "Structure 04",
+      "category": "structures",
+      "width": 117,
+      "height": 66,
+      "renderWidth": 58,
+      "renderHeight": 33,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_04.png",
+      "sourceRect": [
+        328,
+        32,
+        117,
+        66
+      ]
+    },
+    "dk_wall_structures_05": {
+      "label": "Structure 05",
+      "category": "structures",
+      "width": 204,
+      "height": 66,
+      "renderWidth": 102,
+      "renderHeight": 33,
+      "w": 4,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_05.png",
+      "sourceRect": [
+        492,
+        32,
+        204,
+        66
+      ]
+    },
+    "dk_wall_structures_06": {
+      "label": "Structure 06",
+      "category": "structures",
+      "width": 31,
+      "height": 106,
+      "renderWidth": 16,
+      "renderHeight": 53,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_06.png",
+      "sourceRect": [
+        747,
+        14,
+        31,
+        106
+      ]
+    },
+    "dk_wall_structures_07": {
+      "label": "Structure 07",
+      "category": "structures",
+      "width": 36,
+      "height": 110,
+      "renderWidth": 18,
+      "renderHeight": 55,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_07.png",
+      "sourceRect": [
+        820,
+        12,
+        36,
+        110
+      ]
+    },
+    "dk_wall_structures_08": {
+      "label": "Structure 08",
+      "category": "structures",
+      "width": 120,
+      "height": 105,
+      "renderWidth": 60,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_08.png",
+      "sourceRect": [
+        898,
+        17,
+        120,
+        105
+      ]
+    },
+    "dk_wall_structures_09": {
+      "label": "Structure 09",
+      "category": "structures",
+      "width": 118,
+      "height": 107,
+      "renderWidth": 59,
+      "renderHeight": 54,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_09.png",
+      "sourceRect": [
+        1057,
+        17,
+        118,
+        107
+      ]
+    },
+    "dk_wall_structures_10": {
+      "label": "Structure 10",
+      "category": "structures",
+      "width": 103,
+      "height": 110,
+      "renderWidth": 52,
+      "renderHeight": 55,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_10.png",
+      "sourceRect": [
+        1217,
+        14,
+        103,
+        110
+      ]
+    },
+    "dk_wall_structures_11": {
+      "label": "Structure 11",
+      "category": "structures",
+      "width": 42,
+      "height": 110,
+      "renderWidth": 21,
+      "renderHeight": 55,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_11.png",
+      "sourceRect": [
+        1369,
+        12,
+        42,
+        110
+      ]
+    },
+    "dk_wall_structures_12": {
+      "label": "Structure 12",
+      "category": "structures",
+      "width": 48,
+      "height": 97,
+      "renderWidth": 24,
+      "renderHeight": 48,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_structures_12.png",
+      "sourceRect": [
+        1451,
+        19,
+        48,
+        97
+      ]
+    },
+    "dk_wall_corners_01": {
+      "label": "Corner 01",
+      "category": "corners",
+      "width": 94,
+      "height": 105,
+      "renderWidth": 47,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_01.png",
+      "sourceRect": [
+        33,
+        144,
+        94,
+        105
+      ]
+    },
+    "dk_wall_corners_02": {
+      "label": "Corner 02",
+      "category": "corners",
+      "width": 104,
+      "height": 105,
+      "renderWidth": 52,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_02.png",
+      "sourceRect": [
+        170,
+        144,
+        104,
+        105
+      ]
+    },
+    "dk_wall_corners_03": {
+      "label": "Corner 03",
+      "category": "corners",
+      "width": 88,
+      "height": 104,
+      "renderWidth": 44,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_03.png",
+      "sourceRect": [
+        318,
+        144,
+        88,
+        104
+      ]
+    },
+    "dk_wall_corners_04": {
+      "label": "Corner 04",
+      "category": "corners",
+      "width": 100,
+      "height": 104,
+      "renderWidth": 50,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_04.png",
+      "sourceRect": [
+        453,
+        144,
+        100,
+        104
+      ]
+    },
+    "dk_wall_corners_05": {
+      "label": "Corner 05",
+      "category": "corners",
+      "width": 94,
+      "height": 105,
+      "renderWidth": 47,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_05.png",
+      "sourceRect": [
+        602,
+        144,
+        94,
+        105
+      ]
+    },
+    "dk_wall_corners_06": {
+      "label": "Corner 06",
+      "category": "corners",
+      "width": 83,
+      "height": 104,
+      "renderWidth": 42,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_06.png",
+      "sourceRect": [
+        745,
+        145,
+        83,
+        104
+      ]
+    },
+    "dk_wall_corners_07": {
+      "label": "Corner 07",
+      "category": "corners",
+      "width": 80,
+      "height": 105,
+      "renderWidth": 40,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_07.png",
+      "sourceRect": [
+        878,
+        144,
+        80,
+        105
+      ]
+    },
+    "dk_wall_corners_08": {
+      "label": "Corner 08",
+      "category": "corners",
+      "width": 39,
+      "height": 105,
+      "renderWidth": 20,
+      "renderHeight": 52,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_08.png",
+      "sourceRect": [
+        1008,
+        145,
+        39,
+        105
+      ]
+    },
+    "dk_wall_corners_09": {
+      "label": "Corner 09",
+      "category": "corners",
+      "width": 37,
+      "height": 105,
+      "renderWidth": 18,
+      "renderHeight": 52,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_09.png",
+      "sourceRect": [
+        1113,
+        144,
+        37,
+        105
+      ]
+    },
+    "dk_wall_corners_10": {
+      "label": "Corner 10",
+      "category": "corners",
+      "width": 94,
+      "height": 108,
+      "renderWidth": 47,
+      "renderHeight": 54,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_10.png",
+      "sourceRect": [
+        1219,
+        146,
+        94,
+        108
+      ]
+    },
+    "dk_wall_corners_11": {
+      "label": "Corner 11",
+      "category": "corners",
+      "width": 109,
+      "height": 104,
+      "renderWidth": 54,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_corners_11.png",
+      "sourceRect": [
+        1385,
+        144,
+        109,
+        104
+      ]
+    },
+    "dk_wall_straight_01": {
+      "label": "Straight 01",
+      "category": "straight",
+      "width": 128,
+      "height": 49,
+      "renderWidth": 64,
+      "renderHeight": 24,
+      "w": 2,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_01.png",
+      "sourceRect": [
+        35,
+        282,
+        128,
+        49
+      ]
+    },
+    "dk_wall_straight_02": {
+      "label": "Straight 02",
+      "category": "straight",
+      "width": 102,
+      "height": 50,
+      "renderWidth": 51,
+      "renderHeight": 25,
+      "w": 2,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_02.png",
+      "sourceRect": [
+        206,
+        282,
+        102,
+        50
+      ]
+    },
+    "dk_wall_straight_03": {
+      "label": "Straight 03",
+      "category": "straight",
+      "width": 127,
+      "height": 49,
+      "renderWidth": 64,
+      "renderHeight": 24,
+      "w": 2,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_03.png",
+      "sourceRect": [
+        352,
+        282,
+        127,
+        49
+      ]
+    },
+    "dk_wall_straight_04": {
+      "label": "Straight 04",
+      "category": "straight",
+      "width": 117,
+      "height": 49,
+      "renderWidth": 58,
+      "renderHeight": 24,
+      "w": 2,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_04.png",
+      "sourceRect": [
+        522,
+        283,
+        117,
+        49
+      ]
+    },
+    "dk_wall_straight_05": {
+      "label": "Straight 05",
+      "category": "straight",
+      "width": 152,
+      "height": 49,
+      "renderWidth": 76,
+      "renderHeight": 24,
+      "w": 3,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_05.png",
+      "sourceRect": [
+        684,
+        282,
+        152,
+        49
+      ]
+    },
+    "dk_wall_straight_06": {
+      "label": "Straight 06",
+      "category": "straight",
+      "width": 150,
+      "height": 49,
+      "renderWidth": 75,
+      "renderHeight": 24,
+      "w": 3,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_06.png",
+      "sourceRect": [
+        878,
+        282,
+        150,
+        49
+      ]
+    },
+    "dk_wall_straight_07": {
+      "label": "Straight 07",
+      "category": "straight",
+      "width": 85,
+      "height": 50,
+      "renderWidth": 42,
+      "renderHeight": 25,
+      "w": 2,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_07.png",
+      "sourceRect": [
+        1066,
+        283,
+        85,
+        50
+      ]
+    },
+    "dk_wall_straight_08": {
+      "label": "Straight 08",
+      "category": "straight",
+      "width": 67,
+      "height": 48,
+      "renderWidth": 34,
+      "renderHeight": 24,
+      "w": 2,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_08.png",
+      "sourceRect": [
+        1184,
+        283,
+        67,
+        48
+      ]
+    },
+    "dk_wall_straight_09": {
+      "label": "Straight 09",
+      "category": "straight",
+      "width": 53,
+      "height": 47,
+      "renderWidth": 26,
+      "renderHeight": 24,
+      "w": 1,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_09.png",
+      "sourceRect": [
+        1290,
+        282,
+        53,
+        47
+      ]
+    },
+    "dk_wall_straight_10": {
+      "label": "Straight 10",
+      "category": "straight",
+      "width": 48,
+      "height": 55,
+      "renderWidth": 24,
+      "renderHeight": 28,
+      "w": 1,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_10.png",
+      "sourceRect": [
+        1387,
+        280,
+        48,
+        55
+      ]
+    },
+    "dk_wall_straight_11": {
+      "label": "Straight 11",
+      "category": "straight",
+      "width": 52,
+      "height": 55,
+      "renderWidth": 26,
+      "renderHeight": 28,
+      "w": 1,
+      "h": 1,
+      "safeToAutotile": false,
+      "filename": "dk_wall_straight_11.png",
+      "sourceRect": [
+        1456,
+        280,
+        52,
+        55
+      ]
+    },
+    "dk_wall_mossy_01": {
+      "label": "Mossy 01",
+      "category": "mossy",
+      "width": 85,
+      "height": 89,
+      "renderWidth": 42,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_01.png",
+      "sourceRect": [
+        31,
+        385,
+        85,
+        89
+      ]
+    },
+    "dk_wall_mossy_02": {
+      "label": "Mossy 02",
+      "category": "mossy",
+      "width": 148,
+      "height": 66,
+      "renderWidth": 74,
+      "renderHeight": 33,
+      "w": 3,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_02.png",
+      "sourceRect": [
+        151,
+        384,
+        148,
+        66
+      ]
+    },
+    "dk_wall_mossy_03": {
+      "label": "Mossy 03",
+      "category": "mossy",
+      "width": 84,
+      "height": 92,
+      "renderWidth": 42,
+      "renderHeight": 46,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_03.png",
+      "sourceRect": [
+        327,
+        382,
+        84,
+        92
+      ]
+    },
+    "dk_wall_mossy_04": {
+      "label": "Mossy 04",
+      "category": "mossy",
+      "width": 114,
+      "height": 105,
+      "renderWidth": 57,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_04.png",
+      "sourceRect": [
+        439,
+        369,
+        114,
+        105
+      ]
+    },
+    "dk_wall_mossy_05": {
+      "label": "Mossy 05",
+      "category": "mossy",
+      "width": 95,
+      "height": 90,
+      "renderWidth": 48,
+      "renderHeight": 45,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_05.png",
+      "sourceRect": [
+        580,
+        384,
+        95,
+        90
+      ]
+    },
+    "dk_wall_mossy_06": {
+      "label": "Mossy 06",
+      "category": "mossy",
+      "width": 104,
+      "height": 90,
+      "renderWidth": 52,
+      "renderHeight": 45,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_06.png",
+      "sourceRect": [
+        709,
+        384,
+        104,
+        90
+      ]
+    },
+    "dk_wall_mossy_07": {
+      "label": "Mossy 07",
+      "category": "mossy",
+      "width": 106,
+      "height": 90,
+      "renderWidth": 53,
+      "renderHeight": 45,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_07.png",
+      "sourceRect": [
+        841,
+        384,
+        106,
+        90
+      ]
+    },
+    "dk_wall_mossy_08": {
+      "label": "Mossy 08",
+      "category": "mossy",
+      "width": 73,
+      "height": 90,
+      "renderWidth": 36,
+      "renderHeight": 45,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_08.png",
+      "sourceRect": [
+        981,
+        384,
+        73,
+        90
+      ]
+    },
+    "dk_wall_mossy_09": {
+      "label": "Mossy 09",
+      "category": "mossy",
+      "width": 78,
+      "height": 90,
+      "renderWidth": 39,
+      "renderHeight": 45,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_09.png",
+      "sourceRect": [
+        1080,
+        384,
+        78,
+        90
+      ]
+    },
+    "dk_wall_mossy_10": {
+      "label": "Mossy 10",
+      "category": "mossy",
+      "width": 80,
+      "height": 90,
+      "renderWidth": 40,
+      "renderHeight": 45,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_10.png",
+      "sourceRect": [
+        1192,
+        384,
+        80,
+        90
+      ]
+    },
+    "dk_wall_mossy_11": {
+      "label": "Mossy 11",
+      "category": "mossy",
+      "width": 103,
+      "height": 104,
+      "renderWidth": 52,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_11.png",
+      "sourceRect": [
+        1312,
+        370,
+        103,
+        104
+      ]
+    },
+    "dk_wall_mossy_12": {
+      "label": "Mossy 12",
+      "category": "mossy",
+      "width": 48,
+      "height": 108,
+      "renderWidth": 24,
+      "renderHeight": 54,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_mossy_12.png",
+      "sourceRect": [
+        1451,
+        363,
+        48,
+        108
+      ]
+    },
+    "dk_wall_ruins_01": {
+      "label": "Ruin 01",
+      "category": "ruins",
+      "width": 85,
+      "height": 88,
+      "renderWidth": 42,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_01.png",
+      "sourceRect": [
+        31,
+        505,
+        85,
+        88
+      ]
+    },
+    "dk_wall_ruins_02": {
+      "label": "Ruin 02",
+      "category": "ruins",
+      "width": 146,
+      "height": 72,
+      "renderWidth": 73,
+      "renderHeight": 36,
+      "w": 3,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_02.png",
+      "sourceRect": [
+        144,
+        505,
+        146,
+        72
+      ]
+    },
+    "dk_wall_ruins_03": {
+      "label": "Ruin 03",
+      "category": "ruins",
+      "width": 86,
+      "height": 88,
+      "renderWidth": 43,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_03.png",
+      "sourceRect": [
+        318,
+        505,
+        86,
+        88
+      ]
+    },
+    "dk_wall_ruins_04": {
+      "label": "Ruin 04",
+      "category": "ruins",
+      "width": 111,
+      "height": 80,
+      "renderWidth": 56,
+      "renderHeight": 40,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_04.png",
+      "sourceRect": [
+        423,
+        505,
+        111,
+        80
+      ]
+    },
+    "dk_wall_ruins_05": {
+      "label": "Ruin 05",
+      "category": "ruins",
+      "width": 145,
+      "height": 72,
+      "renderWidth": 72,
+      "renderHeight": 36,
+      "w": 3,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_05.png",
+      "sourceRect": [
+        567,
+        505,
+        145,
+        72
+      ]
+    },
+    "dk_wall_ruins_06": {
+      "label": "Ruin 06",
+      "category": "ruins",
+      "width": 91,
+      "height": 83,
+      "renderWidth": 46,
+      "renderHeight": 42,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_06.png",
+      "sourceRect": [
+        739,
+        505,
+        91,
+        83
+      ]
+    },
+    "dk_wall_ruins_07": {
+      "label": "Ruin 07",
+      "category": "ruins",
+      "width": 37,
+      "height": 80,
+      "renderWidth": 18,
+      "renderHeight": 40,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_07.png",
+      "sourceRect": [
+        861,
+        505,
+        37,
+        80
+      ]
+    },
+    "dk_wall_ruins_08": {
+      "label": "Ruin 08",
+      "category": "ruins",
+      "width": 52,
+      "height": 80,
+      "renderWidth": 26,
+      "renderHeight": 40,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_08.png",
+      "sourceRect": [
+        928,
+        505,
+        52,
+        80
+      ]
+    },
+    "dk_wall_ruins_09": {
+      "label": "Ruin 09",
+      "category": "ruins",
+      "width": 68,
+      "height": 80,
+      "renderWidth": 34,
+      "renderHeight": 40,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_09.png",
+      "sourceRect": [
+        1013,
+        505,
+        68,
+        80
+      ]
+    },
+    "dk_wall_ruins_10": {
+      "label": "Ruin 10",
+      "category": "ruins",
+      "width": 42,
+      "height": 85,
+      "renderWidth": 21,
+      "renderHeight": 42,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_10.png",
+      "sourceRect": [
+        1109,
+        503,
+        42,
+        85
+      ]
+    },
+    "dk_wall_ruins_11": {
+      "label": "Ruin 11",
+      "category": "ruins",
+      "width": 67,
+      "height": 87,
+      "renderWidth": 34,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_11.png",
+      "sourceRect": [
+        1181,
+        505,
+        67,
+        87
+      ]
+    },
+    "dk_wall_ruins_12": {
+      "label": "Ruin 12",
+      "category": "ruins",
+      "width": 49,
+      "height": 95,
+      "renderWidth": 24,
+      "renderHeight": 48,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_12.png",
+      "sourceRect": [
+        1265,
+        497,
+        49,
+        95
+      ]
+    },
+    "dk_wall_ruins_13": {
+      "label": "Ruin 13",
+      "category": "ruins",
+      "width": 71,
+      "height": 84,
+      "renderWidth": 36,
+      "renderHeight": 42,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_13.png",
+      "sourceRect": [
+        1345,
+        505,
+        71,
+        84
+      ]
+    },
+    "dk_wall_ruins_14": {
+      "label": "Ruin 14",
+      "category": "ruins",
+      "width": 74,
+      "height": 95,
+      "renderWidth": 37,
+      "renderHeight": 48,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_ruins_14.png",
+      "sourceRect": [
+        1433,
+        494,
+        74,
+        95
+      ]
+    },
+    "dk_wall_curves_01": {
+      "label": "Curve 01",
+      "category": "curves",
+      "width": 102,
+      "height": 105,
+      "renderWidth": 51,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_01.png",
+      "sourceRect": [
+        32,
+        624,
+        102,
+        105
+      ]
+    },
+    "dk_wall_curves_02": {
+      "label": "Curve 02",
+      "category": "curves",
+      "width": 120,
+      "height": 100,
+      "renderWidth": 60,
+      "renderHeight": 50,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_02.png",
+      "sourceRect": [
+        167,
+        626,
+        120,
+        100
+      ]
+    },
+    "dk_wall_curves_03": {
+      "label": "Curve 03",
+      "category": "curves",
+      "width": 135,
+      "height": 101,
+      "renderWidth": 68,
+      "renderHeight": 50,
+      "w": 3,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_03.png",
+      "sourceRect": [
+        318,
+        624,
+        135,
+        101
+      ]
+    },
+    "dk_wall_curves_04": {
+      "label": "Curve 04",
+      "category": "curves",
+      "width": 118,
+      "height": 100,
+      "renderWidth": 59,
+      "renderHeight": 50,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_04.png",
+      "sourceRect": [
+        485,
+        624,
+        118,
+        100
+      ]
+    },
+    "dk_wall_curves_05": {
+      "label": "Curve 05",
+      "category": "curves",
+      "width": 80,
+      "height": 92,
+      "renderWidth": 40,
+      "renderHeight": 46,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_05.png",
+      "sourceRect": [
+        640,
+        630,
+        80,
+        92
+      ]
+    },
+    "dk_wall_curves_06": {
+      "label": "Curve 06",
+      "category": "curves",
+      "width": 80,
+      "height": 92,
+      "renderWidth": 40,
+      "renderHeight": 46,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_06.png",
+      "sourceRect": [
+        754,
+        630,
+        80,
+        92
+      ]
+    },
+    "dk_wall_curves_07": {
+      "label": "Curve 07",
+      "category": "curves",
+      "width": 87,
+      "height": 89,
+      "renderWidth": 44,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_07.png",
+      "sourceRect": [
+        876,
+        631,
+        87,
+        89
+      ]
+    },
+    "dk_wall_curves_08": {
+      "label": "Curve 08",
+      "category": "curves",
+      "width": 87,
+      "height": 89,
+      "renderWidth": 44,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_08.png",
+      "sourceRect": [
+        999,
+        632,
+        87,
+        89
+      ]
+    },
+    "dk_wall_curves_09": {
+      "label": "Curve 09",
+      "category": "curves",
+      "width": 73,
+      "height": 89,
+      "renderWidth": 36,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_09.png",
+      "sourceRect": [
+        1117,
+        632,
+        73,
+        89
+      ]
+    },
+    "dk_wall_curves_10": {
+      "label": "Curve 10",
+      "category": "curves",
+      "width": 72,
+      "height": 89,
+      "renderWidth": 36,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_10.png",
+      "sourceRect": [
+        1219,
+        632,
+        72,
+        89
+      ]
+    },
+    "dk_wall_curves_11": {
+      "label": "Curve 11",
+      "category": "curves",
+      "width": 77,
+      "height": 88,
+      "renderWidth": 38,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_11.png",
+      "sourceRect": [
+        1314,
+        620,
+        77,
+        88
+      ]
+    },
+    "dk_wall_curves_12": {
+      "label": "Curve 12",
+      "category": "curves",
+      "width": 80,
+      "height": 89,
+      "renderWidth": 40,
+      "renderHeight": 44,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_curves_12.png",
+      "sourceRect": [
+        1419,
+        620,
+        80,
+        89
+      ]
+    },
+    "dk_wall_pillars_01": {
+      "label": "Pillar 01",
+      "category": "pillars",
+      "width": 51,
+      "height": 123,
+      "renderWidth": 26,
+      "renderHeight": 62,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_01.png",
+      "sourceRect": [
+        37,
+        744,
+        51,
+        123
+      ]
+    },
+    "dk_wall_pillars_02": {
+      "label": "Pillar 02",
+      "category": "pillars",
+      "width": 46,
+      "height": 117,
+      "renderWidth": 23,
+      "renderHeight": 58,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_02.png",
+      "sourceRect": [
+        118,
+        750,
+        46,
+        117
+      ]
+    },
+    "dk_wall_pillars_03": {
+      "label": "Pillar 03",
+      "category": "pillars",
+      "width": 53,
+      "height": 123,
+      "renderWidth": 26,
+      "renderHeight": 62,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_03.png",
+      "sourceRect": [
+        202,
+        744,
+        53,
+        123
+      ]
+    },
+    "dk_wall_pillars_04": {
+      "label": "Pillar 04",
+      "category": "pillars",
+      "width": 49,
+      "height": 84,
+      "renderWidth": 24,
+      "renderHeight": 42,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_04.png",
+      "sourceRect": [
+        291,
+        768,
+        49,
+        84
+      ]
+    },
+    "dk_wall_pillars_05": {
+      "label": "Pillar 05",
+      "category": "pillars",
+      "width": 46,
+      "height": 75,
+      "renderWidth": 23,
+      "renderHeight": 38,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_05.png",
+      "sourceRect": [
+        373,
+        773,
+        46,
+        75
+      ]
+    },
+    "dk_wall_pillars_06": {
+      "label": "Pillar 06",
+      "category": "pillars",
+      "width": 43,
+      "height": 97,
+      "renderWidth": 22,
+      "renderHeight": 48,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_06.png",
+      "sourceRect": [
+        479,
+        757,
+        43,
+        97
+      ]
+    },
+    "dk_wall_pillars_07": {
+      "label": "Pillar 07",
+      "category": "pillars",
+      "width": 45,
+      "height": 75,
+      "renderWidth": 22,
+      "renderHeight": 38,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_07.png",
+      "sourceRect": [
+        554,
+        779,
+        45,
+        75
+      ]
+    },
+    "dk_wall_pillars_08": {
+      "label": "Pillar 08",
+      "category": "pillars",
+      "width": 40,
+      "height": 94,
+      "renderWidth": 20,
+      "renderHeight": 47,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_08.png",
+      "sourceRect": [
+        629,
+        758,
+        40,
+        94
+      ]
+    },
+    "dk_wall_pillars_09": {
+      "label": "Pillar 09",
+      "category": "pillars",
+      "width": 41,
+      "height": 92,
+      "renderWidth": 20,
+      "renderHeight": 46,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_09.png",
+      "sourceRect": [
+        698,
+        760,
+        41,
+        92
+      ]
+    },
+    "dk_wall_pillars_10": {
+      "label": "Pillar 10",
+      "category": "pillars",
+      "width": 44,
+      "height": 107,
+      "renderWidth": 22,
+      "renderHeight": 54,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_10.png",
+      "sourceRect": [
+        797,
+        756,
+        44,
+        107
+      ]
+    },
+    "dk_wall_pillars_11": {
+      "label": "Pillar 11",
+      "category": "pillars",
+      "width": 42,
+      "height": 100,
+      "renderWidth": 21,
+      "renderHeight": 50,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_11.png",
+      "sourceRect": [
+        866,
+        758,
+        42,
+        100
+      ]
+    },
+    "dk_wall_pillars_12": {
+      "label": "Pillar 12",
+      "category": "pillars",
+      "width": 40,
+      "height": 73,
+      "renderWidth": 20,
+      "renderHeight": 36,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_12.png",
+      "sourceRect": [
+        931,
+        776,
+        40,
+        73
+      ]
+    },
+    "dk_wall_pillars_13": {
+      "label": "Pillar 13",
+      "category": "pillars",
+      "width": 43,
+      "height": 89,
+      "renderWidth": 22,
+      "renderHeight": 44,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_13.png",
+      "sourceRect": [
+        993,
+        761,
+        43,
+        89
+      ]
+    },
+    "dk_wall_pillars_14": {
+      "label": "Pillar 14",
+      "category": "pillars",
+      "width": 47,
+      "height": 73,
+      "renderWidth": 24,
+      "renderHeight": 36,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_14.png",
+      "sourceRect": [
+        1080,
+        781,
+        47,
+        73
+      ]
+    },
+    "dk_wall_pillars_15": {
+      "label": "Pillar 15",
+      "category": "pillars",
+      "width": 39,
+      "height": 92,
+      "renderWidth": 20,
+      "renderHeight": 46,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_15.png",
+      "sourceRect": [
+        1161,
+        759,
+        39,
+        92
+      ]
+    },
+    "dk_wall_pillars_16": {
+      "label": "Pillar 16",
+      "category": "pillars",
+      "width": 46,
+      "height": 68,
+      "renderWidth": 23,
+      "renderHeight": 34,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_16.png",
+      "sourceRect": [
+        1226,
+        782,
+        46,
+        68
+      ]
+    },
+    "dk_wall_pillars_17": {
+      "label": "Pillar 17",
+      "category": "pillars",
+      "width": 44,
+      "height": 96,
+      "renderWidth": 22,
+      "renderHeight": 48,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_17.png",
+      "sourceRect": [
+        1309,
+        758,
+        44,
+        96
+      ]
+    },
+    "dk_wall_pillars_18": {
+      "label": "Pillar 18",
+      "category": "pillars",
+      "width": 42,
+      "height": 103,
+      "renderWidth": 21,
+      "renderHeight": 52,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_18.png",
+      "sourceRect": [
+        1385,
+        751,
+        42,
+        103
+      ]
+    },
+    "dk_wall_pillars_19": {
+      "label": "Pillar 19",
+      "category": "pillars",
+      "width": 45,
+      "height": 89,
+      "renderWidth": 22,
+      "renderHeight": 44,
+      "w": 1,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_pillars_19.png",
+      "sourceRect": [
+        1456,
+        762,
+        45,
+        89
+      ]
+    },
+    "dk_wall_fortified_01": {
+      "label": "Fortified 01",
+      "category": "fortified",
+      "width": 72,
+      "height": 102,
+      "renderWidth": 36,
+      "renderHeight": 51,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_01.png",
+      "sourceRect": [
+        31,
+        898,
+        72,
+        102
+      ]
+    },
+    "dk_wall_fortified_02": {
+      "label": "Fortified 02",
+      "category": "fortified",
+      "width": 72,
+      "height": 103,
+      "renderWidth": 36,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_02.png",
+      "sourceRect": [
+        121,
+        897,
+        72,
+        103
+      ]
+    },
+    "dk_wall_fortified_03": {
+      "label": "Fortified 03",
+      "category": "fortified",
+      "width": 78,
+      "height": 103,
+      "renderWidth": 39,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_03.png",
+      "sourceRect": [
+        213,
+        897,
+        78,
+        103
+      ]
+    },
+    "dk_wall_fortified_04": {
+      "label": "Fortified 04",
+      "category": "fortified",
+      "width": 72,
+      "height": 104,
+      "renderWidth": 36,
+      "renderHeight": 52,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_04.png",
+      "sourceRect": [
+        312,
+        897,
+        72,
+        104
+      ]
+    },
+    "dk_wall_fortified_05": {
+      "label": "Fortified 05",
+      "category": "fortified",
+      "width": 67,
+      "height": 112,
+      "renderWidth": 34,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_05.png",
+      "sourceRect": [
+        402,
+        889,
+        67,
+        112
+      ]
+    },
+    "dk_wall_fortified_06": {
+      "label": "Fortified 06",
+      "category": "fortified",
+      "width": 93,
+      "height": 111,
+      "renderWidth": 46,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_06.png",
+      "sourceRect": [
+        492,
+        889,
+        93,
+        111
+      ]
+    },
+    "dk_wall_fortified_07": {
+      "label": "Fortified 07",
+      "category": "fortified",
+      "width": 96,
+      "height": 112,
+      "renderWidth": 48,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_07.png",
+      "sourceRect": [
+        606,
+        889,
+        96,
+        112
+      ]
+    },
+    "dk_wall_fortified_08": {
+      "label": "Fortified 08",
+      "category": "fortified",
+      "width": 76,
+      "height": 112,
+      "renderWidth": 38,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_08.png",
+      "sourceRect": [
+        731,
+        889,
+        76,
+        112
+      ]
+    },
+    "dk_wall_fortified_09": {
+      "label": "Fortified 09",
+      "category": "fortified",
+      "width": 78,
+      "height": 112,
+      "renderWidth": 39,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_09.png",
+      "sourceRect": [
+        826,
+        889,
+        78,
+        112
+      ]
+    },
+    "dk_wall_fortified_10": {
+      "label": "Fortified 10",
+      "category": "fortified",
+      "width": 77,
+      "height": 112,
+      "renderWidth": 38,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_10.png",
+      "sourceRect": [
+        925,
+        889,
+        77,
+        112
+      ]
+    },
+    "dk_wall_fortified_11": {
+      "label": "Fortified 11",
+      "category": "fortified",
+      "width": 78,
+      "height": 113,
+      "renderWidth": 39,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_11.png",
+      "sourceRect": [
+        1020,
+        888,
+        78,
+        113
+      ]
+    },
+    "dk_wall_fortified_12": {
+      "label": "Fortified 12",
+      "category": "fortified",
+      "width": 83,
+      "height": 112,
+      "renderWidth": 42,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_12.png",
+      "sourceRect": [
+        1117,
+        889,
+        83,
+        112
+      ]
+    },
+    "dk_wall_fortified_13": {
+      "label": "Fortified 13",
+      "category": "fortified",
+      "width": 80,
+      "height": 112,
+      "renderWidth": 40,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_13.png",
+      "sourceRect": [
+        1217,
+        889,
+        80,
+        112
+      ]
+    },
+    "dk_wall_fortified_14": {
+      "label": "Fortified 14",
+      "category": "fortified",
+      "width": 83,
+      "height": 112,
+      "renderWidth": 42,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_14.png",
+      "sourceRect": [
+        1315,
+        889,
+        83,
+        112
+      ]
+    },
+    "dk_wall_fortified_15": {
+      "label": "Fortified 15",
+      "category": "fortified",
+      "width": 88,
+      "height": 112,
+      "renderWidth": 44,
+      "renderHeight": 56,
+      "w": 2,
+      "h": 2,
+      "safeToAutotile": false,
+      "filename": "dk_wall_fortified_15.png",
+      "sourceRect": [
+        1416,
+        889,
+        88,
+        112
+      ]
+    }
+  },
+  "grid_finishes": [
+    "clean",
+    "dirty",
+    "moss",
+    "cracked",
+    "broken"
+  ],
+  "notice": "Only the grid stones are seam-safe autotiles. The 106 original-image cutouts are individual building components."
+}
