@@ -6,6 +6,6 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "start": "node dk-server.cjs",
-    "test": "node --test ../tests/dk-server.cjs"
+    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-auth.cjs"
   }
 }

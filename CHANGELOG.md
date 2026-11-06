@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## DK Server M2 development preview | 2026-11-06 | Owner sign-in and server-backed New Game / Continue
+
+- Introduced a loopback-only DK Server character-record interface at /player, with first-time owner password setup, sign-in/out, a three-slot New Game form, and Continue reading the authenticated server record. No browser-local save import, client-submitted snapshots, or automatic record overwrite.
+- Owner credentials are stored as a salted scrypt digest, not a password; local sessions use random HttpOnly SameSite=Strict cookies, memory-only session revocation, 12-hour validity, and a temporary lockout on repeated incorrect passwords. The bootstrap admin token is not included in public browser code.
+- DK Server accepts authenticated session cookies alongside the existing private Bearer administration path. All changes are written by the server; the browser never sends arbitrary world saves. A failed or corrupted identity file refuses startup.
+- Preserved the M1 world geometry and six-hour clock. Original browser gameplay and its older isolated saves remain untouched until the **playable** client is converted; this is not falsely presented as a completed gameplay migration.
+- **13/13 Node tests passed locally**, including existing M1 tests, owner setup/sign-in, session revocation, parallel initialization, unauthorized mutations, and restart login. No GitHub Actions testing used. Chromium visual rendering could not be confirmed in the test environment; owner review remains pending.
+
 ## DK Server M1 development preview | 2026-11-06 | RunUO-inspired persistence foundation
 
 - Added independent Linux **DK Server** under server/, with an original Node.js implementation. RunUO's World, SaveStrategy, entity and timer systems were inspected as design references; no GPL C# or UO assets copied.

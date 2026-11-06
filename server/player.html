@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demon Killer | DK Server Character Records</title>
+<link rel="stylesheet" href="/player.css">
+</head>
+<body>
+<main class="screen">
+<p class="studio">DK SOFTWORKS · HOUSE OF CULTURE</p>
+<h1>DEMON KILLER</h1>
+<p class="subtitle">DK Server · Persistent Character Records</p>
+<p class="description">New characters and their records belong to DK Server, not the browser. The Forsaken Temple gameplay connection is still being built.</p>
+<p id="serverStatus" class="status" role="status" aria-live="polite">Connecting to DK Server...</p>
+<section id="accessPanel" hidden>
+  <h2 id="accessHeading">OWNER SIGN-IN</h2>
+  <form id="accessForm">
+    <label for="ownerPassword">Owner password</label>
+    <input type="password" id="ownerPassword" name="ownerPassword" minlength="12" maxlength="128" autocomplete="current-password" required>
+    <button id="accessSubmit" type="submit">SIGN IN</button>
+  </form>
+  <small id="accessHelp">Enter the password configured on this local DK Server.</small>
+</section>
+<section id="charactersPanel" hidden>
+  <div class="row"><h2>CHARACTER RECORDS</h2><button id="logout" class="secondary" type="button">SIGN OUT</button></div>
+  <div id="slots" class="slots" aria-label="DK Server character slots"></div>
+  <section id="createPanel" hidden>
+    <h3 id="newHeading">CREATE CHARACTER</h3>
+    <form id="createForm">
+      <label for="characterName">Name, 1 to 8 characters</label>
+      <input type="text" id="characterName" maxlength="8" pattern="[A-Za-z0-9 _-]{1,8}" required autocomplete="off">
+      <div class="row"><button type="submit">CREATE ON SERVER</button><button id="cancel" class="secondary" type="button">CANCEL</button></div>
+    </form>
+  </section>
+  <section id="selectedPanel" hidden aria-live="polite">
+    <h3>SERVER RECORD LOADED</h3><p id="selectedRecord"></p>
+    <p>Game-world entry is the next DK Server milestone. This screen does not use old browser saves.</p>
+  </section>
+</section>
+<a class="monitor" href="/">VIEW WORLD MONITOR</a>
+<footer>Development prototype. The existing standalone browser game remains separate until server-authoritative gameplay is ready.</footer>
+</main>
+<script src="/player.js"></script>
+</body>
+</html>

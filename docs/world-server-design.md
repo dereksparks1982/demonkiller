@@ -1,6 +1,6 @@
 # Demon Killer | Persistent World Server Design
 
-**Status:** Design target plus the first implemented DK Server localhost prototype. New-character persistence and a shared world clock work in the separate server; the playable browser client is **not yet connected** and the service is not deployed.  
+**Status:** Design target plus the first implemented DK Server localhost prototype. New-character persistence, local password-based owner sign-in, server-owned New Game/Continue record selection, and a shared world clock work in the separate server; the **playable temple client is not yet connected** and the service is not deployed.  
 **Source:** New Demon Killer server, independently implemented, with architectural inspiration from RunUO / Ultima Online and earlier in-house work.  
 **First playable world:** The one existing sacrificial temple (`dk.temple.sacrifice.001`). Do not add the courtyard or any meadow during server development.
 

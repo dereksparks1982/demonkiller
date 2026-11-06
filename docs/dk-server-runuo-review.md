@@ -30,3 +30,7 @@ DK Server runs as a separate native Node service. It stores a newly created worl
 ## Implementation next
 
 Connect a properly authenticated game client and New Game / Continue to the server. Then migrate gameplay **behavior**, not old save data: server-authoritative movement/collision, per-character ghost/living path and one-time crystal transaction, object persistence, DK Architect privileges and world timers. Do not begin a courtyard or alter the approved opening during this work.
+
+## Milestone 2: browser sign-in without exposing the admin token
+
+A local /player page now configures one owner password (salted scrypt digest stored separately from the world), uses HttpOnly SameSite=Strict session cookies, and reads/creates authenticated character records through DK Server. No browser localStorage character migration or client-side save snapshots are accepted. This is a character-record interface, **not a playable temple migration**: the original public browser game is left unchanged pending authoritative gameplay integration. Tests cover session isolation, parallel setup, guessing lockout, restart sign-in and server-only record storage.

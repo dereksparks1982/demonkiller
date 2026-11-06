@@ -4,7 +4,7 @@
 
 In the Forsaken Temple, the player survives a dark ritual as a wandering spirit and can choose whether to return to their body or continue as a ghost. The game currently includes character slots, cult investigation features, and **DK Architect**, an in-game construction tool for placing walls, floors, furnishings, and original pixel-art objects. Main menu Options include a music toggle and an adjustable amplified volume control.
 
-DK Server's separate Linux-based persistent-world foundation is in development. The playable browser client has not been switched to server saves yet.
+DK Server's separate Linux-based persistent-world foundation and server-owned character-record screen are in development. The playable browser client has not been switched to server saves yet.
 
 ## Play Demon Killer
 

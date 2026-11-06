@@ -7,6 +7,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { makeWorld, validateWorld, createCharacter, worldClock, AREA_ID } = require('./world.cjs');
+const { createOwnerAuth } = require('./owner-auth.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -138,13 +139,17 @@ async function createDKServer({
     throw new Error('DK Server M1 binds only to loopback (remote access requires authentication)');
   await fs.mkdir(dataDir, { recursive: true, mode: 0o700 });
   const releaseLock = await acquireWriterLock(dataDir);
-  let secret, world, monitorHTML, monitorJS, monitorCSS;
+  let secret, world, monitorHTML, monitorJS, monitorCSS, playerHTML, playerJS, playerCSS, ownerAuth;
   try {
     secret = await accessToken(dataDir, token);
     world = await loadWorld(dataDir, now());
     monitorHTML = await fs.readFile(path.join(__dirname, 'monitor.html'));
     monitorJS = await fs.readFile(path.join(__dirname, 'monitor.js'));
     monitorCSS = await fs.readFile(path.join(__dirname, 'monitor.css'));
+    playerHTML = await fs.readFile(path.join(__dirname, 'player.html'));
+    playerJS = await fs.readFile(path.join(__dirname, 'player.js'));
+    playerCSS = await fs.readFile(path.join(__dirname, 'player.css'));
+    ownerAuth = await createOwnerAuth(dataDir, durableWrite, now);
   } catch (error) { await releaseLock(); throw error; }
   const streams = new Set();
   let server, writeQueue = Promise.resolve();
@@ -177,12 +182,30 @@ async function createDKServer({
       const permitted = 'http://' + req.headers.host;
       if (req.headers.origin !== permitted) return sendJSON(res, 403, { error: 'Cross-origin writes are not allowed' });
     }
+    if (url.pathname === '/api/v1/auth/status' && !write)
+      return sendJSON(res, 200, ownerAuth.status(req), method);
+    if (url.pathname === '/api/v1/auth/setup' && method === 'POST' ||
+        url.pathname === '/api/v1/auth/login' && method === 'POST') {
+      let body;
+      try { body = await readJSON(req); }
+      catch (e) { return sendJSON(res, e.status || 400, { error: e.message }); }
+      if (Object.keys(body).join(',') !== 'password')
+        return sendJSON(res, 422, { error: 'Only a password is accepted' });
+      const result = url.pathname.endsWith('setup') ? await ownerAuth.setup(body.password, res)
+        : await ownerAuth.login(body.password, res);
+      return sendJSON(res, result.code, result.body);
+    }
+    if (url.pathname === '/api/v1/auth/logout' && method === 'POST') {
+      ownerAuth.clearSession(req, res);
+      return sendJSON(res, 200, { authenticated: false });
+    }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
       { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', online: true }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if (url.pathname === '/api/v1/characters' && (method === 'GET' || method === 'HEAD' || method === 'POST')) {
-      if (!isAuthorized(req, secret)) return sendJSON(res, 401, { error: 'DK Server bearer token required' });
+      if (!isAuthorized(req, secret) && !ownerAuth.authenticated(req))
+        return sendJSON(res, 401, { error: 'DK Server login required' });
       if (method === 'POST') {
         let body;
         try { body = await readJSON(req); }
@@ -204,7 +227,8 @@ async function createDKServer({
     }
     const match = url.pathname.match(/^\/api\/v1\/characters\/([123])$/);
     if (match && !write) {
-      if (!isAuthorized(req, secret)) return sendJSON(res, 401, { error: 'DK Server bearer token required' });
+      if (!isAuthorized(req, secret) && !ownerAuth.authenticated(req))
+        return sendJSON(res, 401, { error: 'DK Server login required' });
       const character = world.characters[match[1]];
       return character ? sendJSON(res, 200, { character, world_revision: world.revision }, method)
         : sendJSON(res, 404, { error: 'Empty character slot' }, method);
@@ -221,10 +245,12 @@ async function createDKServer({
       res.on('close', () => streams.delete(res));
       return;
     }
-    if (['/', '/monitor.js', '/monitor.css'].includes(url.pathname) && !write) {
-      const js = url.pathname === '/monitor.js';
-      const css = url.pathname === '/monitor.css';
-      const payload = js ? monitorJS : css ? monitorCSS : monitorHTML;
+    if (['/', '/monitor.js', '/monitor.css', '/player', '/player.js', '/player.css'].includes(url.pathname) && !write) {
+      const js = url.pathname === '/monitor.js' || url.pathname === '/player.js';
+      const css = url.pathname === '/monitor.css' || url.pathname === '/player.css';
+      const player = url.pathname.startsWith('/player');
+      const payload = player ? js ? playerJS : css ? playerCSS : playerHTML :
+        js ? monitorJS : css ? monitorCSS : monitorHTML;
       res.writeHead(200, {
         'Content-Type': js ? 'text/javascript; charset=utf-8' : css ? 'text/css; charset=utf-8' : 'text/html; charset=utf-8',
         'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
