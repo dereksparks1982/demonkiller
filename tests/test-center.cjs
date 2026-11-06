@@ -36,8 +36,14 @@ assert(js.includes("const STORE = 'dkSoftworks.demonkiller.testCenter.v1'"));
 assert(!js.includes('dkSoftworks.testCenter.room.v1'),'Must not reuse C&C test save key');
 assert(!js.includes('ccRoomLayoutV1'),'Must not access Capital & Consequence career keys');
 assert(css.includes('image-rendering:pixelated'),'Pixel artwork should remain crisp');
+// One 3 × 2 altar footprint is shared between the starter room and DK Architect.
+assert.match(js,/altar:\s*\{[^}]*w:\s*3,\s*h:\s*2/,'Architect altar must be three by two tiles');
+assert.match(js,/\{ id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 \}/,'Starter altar stays centered on north aisle');
+assert.match(js,/const bodyWidth=40,bodyHeight=20/,'Lying body must match NPC scale');
+assert.match(js,/ctx\.drawImage\(picture,x,y,bodyWidth,bodyHeight\)/,'Lying body must use its reduced dimensions');
 const events={}, noop=()=>{};
-const graphics={fillRect:noop,strokeRect:noop,clearRect:noop,beginPath:noop,
+const previewOutlines=[];
+const graphics={fillRect:noop,strokeRect:(...args)=>previewOutlines.push(args),clearRect:noop,beginPath:noop,
   moveTo:noop,lineTo:noop,stroke:noop,save:noop,restore:noop,
   translate:noop,rotate:noop,scale:noop};
 class Element {
@@ -156,6 +162,19 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(Number(get('objectCount').textContent),initial,'Undo sprite placement');
   await get('redo').emit('click');
   assert.equal(Number(get('objectCount').textContent),initial+1,'Redo sprite placement');
+  // Verify the translucent Architect preview and placement share the resized footprint.
+  await get('palette').children[0].emit('click'); // Sacrificial altar in Relics
+  await room.emit('mousemove',{clientX:4*32+16,clientY:6*32+16});
+  assert(previewOutlines.some(([x,y,w,h])=>x===4*32+1&&y===6*32+1&&w===3*32-2&&h===2*32-2),
+    'Altar preview should cover three by two grid tiles');
+  await room.emit('wheel',{deltaY:100,preventDefault:noop});
+  assert(previewOutlines.some(([x,y,w,h])=>x===4*32+1&&y===6*32+1&&w===2*32-2&&h===3*32-2),
+    'Rotated altar preview should cover two by three grid tiles');
+  await room.emit('wheel',{deltaY:-100,preventDefault:noop});
+  await click(4,6);
+  assert.equal(Number(get('objectCount').textContent),initial+2,'Architect places the resized altar');
+  await click(5,7);
+  assert.equal(Number(get('objectCount').textContent),initial+2,'Overlapping altar placement should be rejected');
   await get('save').emit('click');
   const layout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   assert.equal(layout.objects.find(o=>o.x===2&&o.y===5).r,1,'Placed sprite keeps wheel rotation');
