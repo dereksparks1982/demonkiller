@@ -48,6 +48,9 @@ label{cursor:pointer}
 #musicVolume:disabled{opacity:.45;cursor:not-allowed}
 .music-volume-hint{display:block;margin-top:7px;color:#c8bbc1;font-size:12px;line-height:1.5}
 @media(max-width:530px){.menu{padding:8px 8px 10px}.panel{padding:18px 12px}.slot{font-size:14px}}
+#dkServerOptions{border-color:#816c4c;text-align:left}
+#dkServerStatus{color:#e2d1b2;font-size:12px;line-height:1.6}
+#dkServerStop:disabled{opacity:.45;cursor:not-allowed}
 </style>
 <noscript><style>.art-loading #home{visibility:visible}</style></noscript>
 </head>
@@ -88,16 +91,23 @@ label{cursor:pointer}
 <input id="musicVolume" type="range" min="0" max="200" step="5" value="200" aria-label="Main menu volume">
 <small id="musicVolumeHint" class="music-volume-hint">100% is the original level. Above 100% boosts the music, with peak limiting.</small>
 </fieldset>
+<fieldset id="dkServerOptions" hidden>
+<legend>Persistent World</legend>
+<p id="dkServerStatus" role="status" aria-live="polite">Checking the local world server...</p>
+<p>Closing Firefox leaves the world running. Use the button below only when you want the world to stop.</p>
+<button id="dkServerStop" class="action" type="button" disabled>SHUT DOWN SERVER</button>
+</fieldset>
 <button class="action secondary back" type="button">BACK</button>
 </section>
 <section class="screen panel" id="quitScreen" hidden>
 <h2>QUIT GAME</h2>
-<p>Browsers do not allow a page to close an ordinary tab. You can close this tab to leave the game.</p>
+<p>Close this tab to leave Demon Killer. Your persistent world will keep running until you stop it from Options.</p>
 <button class="action secondary back" type="button">BACK TO MENU</button>
 </section>
 <p id="notice" class="notice" role="status" aria-live="polite"></p>
 <footer class="menu-footer">DK SOFTWORKS · HOUSE OF CULTURE · ORIGINAL PIXEL ART<br>Choose New Game to register one name, or Continue to reopen its saved temple.</footer>
 </main>
+<script src="./dk-menu-server.js"></script>
 <script>
 (function(){
 'use strict';
@@ -105,6 +115,7 @@ const ART='./assets/art/menu/demon-killer-main-menu-spritesheet.png';
 const SLOTS_KEY='dkSoftworks.demonkiller.characters.v1';
 const ACTIVE_KEY='dkSoftworks.demonkiller.activeCharacter.v1';
 const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
+const SERVER=window.DemonKillerServer||null;
 const $=id=>document.getElementById(id);
 const menuMusic=$('menuMusic');
 const DEFAULT_MENU_VOLUME=200;
@@ -163,7 +174,7 @@ function syncMenuMusic(){
  catch(e){/* A click may be required for audio. */}
 }
 const views=['home','slotsScreen','nameScreen','optionsScreen','quitScreen'];
-let mode='new',chosen=0,atlas=null;
+let mode='new',chosen=0,atlas=null,serverSlots=[null,null,null];
 function show(id){for(const view of views)$(view).hidden=view!==id;$('notice').textContent='';}
 function notice(message){$('notice').textContent=message;}
 function readSlots(){
@@ -175,37 +186,54 @@ function readSlots(){
 }
 function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
 function launch(id){
- try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.22';}
+ if(SERVER){location.href='./test-center.html?dkSlot='+id;return;}
+ try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.23';}
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }
-function openSlots(next){
+async function openSlots(next){
  mode=next;
  $('slotsHeading').textContent=mode==='new'?'CHOOSE AN EMPTY RECORD':'CONTINUE ADVENTURE';
  $('slotsHelp').textContent=mode==='new'?'Choose a record, then enter your name. Existing records require confirmation before replacement.':'Choose a saved name to return to the Forsaken Temple.';
- const slots=readSlots();const root=$('slots');root.replaceChildren();
+ let slots;
+ try{
+   if(SERVER){
+     const records=await SERVER.listCharacters();
+     slots=[1,2,3].map(i=>records[String(i)]||null);
+   }else slots=readSlots();
+ }catch(error){notice('DK Server unavailable: '+error.message);return;}
+ serverSlots=slots;
+ const root=$('slots');root.replaceChildren();
  for(let i=0;i<3;i++){
  const s=slots[i],b=document.createElement('button');b.type='button';b.className='slot';
  const title=document.createElement('span');title.className='slot-name';title.textContent='0'+(i+1)+'  '+(s?s.name:'— EMPTY —');
  const sub=document.createElement('small');sub.textContent=s?(mode==='new'?'Replace this character (confirmation required)':'Continue saved adventure'):(mode==='continue'?'No save in this record':'Create a new adventure');
- b.append(title,sub);b.disabled=mode==='continue'&&!s;b.addEventListener('click',()=>chooseSlot(i));root.append(b);
+ b.append(title,sub);
+ b.disabled=(mode==='continue'&&!s)||(Boolean(SERVER)&&mode==='new'&&Boolean(s));
+ b.addEventListener('click',()=>chooseSlot(i));root.append(b);
  }
  show('slotsScreen');
  if(mode==='continue'&&!slots.some(Boolean))notice('No adventures saved yet. Choose New Game to begin.');
 }
 function chooseSlot(i){
- const slots=readSlots(),previous=slots[i];chosen=i;
+ const slots=SERVER?serverSlots:readSlots(),previous=slots[i];chosen=i;
  if(mode==='continue'){
  if(!previous)return;
  launch(i+1);return;
  }
+ if(SERVER&&previous){notice('That world record is occupied. Choose an empty record.');return;}
  if(previous&&!window.confirm('Replace '+previous.name+' in record '+(i+1)+'? That character will be permanently overwritten.'))return;
  $('chosenSlot').textContent='RECORD '+(i+1);
  $('characterName').value='';show('nameScreen');$('characterName').focus();
 }
-$('nameForm').addEventListener('submit',event=>{
+$('nameForm').addEventListener('submit',async event=>{
  event.preventDefault();
  const name=$('characterName').value.trim().toUpperCase();
  if(!/^[A-Z0-9 _-]{1,8}$/.test(name))return notice('Enter a name of 1 to 8 letters, numbers, spaces, hyphens or underscores.');
+ if(SERVER){
+   try{await SERVER.createCharacter(chosen+1,name);launch(chosen+1);}
+   catch(e){notice('DK Server: '+e.message);}
+   return;
+ }
  try{
  const slots=readSlots();const created=Date.now();
  slots[chosen]={id:chosen+1,name,scene:null,updated:created,

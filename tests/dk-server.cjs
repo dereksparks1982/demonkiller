@@ -6,7 +6,6 @@ const os = require('node:os');
 const path = require('node:path');
 const { createDKServer, loadWorld } = require('../server/dk-server.cjs');
 const { AREA_ID, templeTemplate, makeWorld, validateWorld, worldClock, DAY_MS } = require('../server/world.cjs');
-const TOKEN = 'dk-server-local-owner-token-for-tests-123456789';
 
 async function tempWorld(t) {
   const folder = await fs.mkdtemp(path.join(os.tmpdir(), 'dk-server-m1-'));
@@ -14,9 +13,8 @@ async function tempWorld(t) {
   return folder;
 }
 function objectAt(area, id) { return area.objects.find(item => item.id === id); }
-function auth() { return { authorization: 'Bearer ' + TOKEN }; }
 function post(base, data, headers = {}) {
-  return fetch(base + '/api/v1/characters', { method: 'POST', headers: { 'content-type': 'application/json', ...auth(), ...headers }, body: JSON.stringify(data) });
+  return fetch(base + '/api/v1/characters', { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(data) });
 }
 
 test('approved Forsaken Temple geometry remains unchanged; no premature crystal or old saves', () => {
@@ -56,7 +54,7 @@ test('six-hour day, six-hour night, exact transition boundaries and cycle counts
 test('new server-owned characters persist after restart; world clock never resets', async t => {
   const dir = await tempWorld(t);
   const origin = Date.UTC(2026, 10, 6, 0, 0, 0);
-  const first = await createDKServer({ dataDir: dir, port: 0, now: () => origin, token: TOKEN });
+  const first = await createDKServer({ dataDir: dir, port: 0, now: () => origin });
   t.after(() => first.server.listening ? first.close() : Promise.resolve());
   const base = 'http://127.0.0.1:' + first.address.port;
   const response = await post(base, { slot: 1, name: 'Derek' });
@@ -71,7 +69,7 @@ test('new server-owned characters persist after restart; world clock never reset
     ['protocol', 'mode', 'world_id', 'revision', 'clock', 'area']);
   await first.close();
   const advanced = origin + DAY_MS + 19000;
-  const second = await createDKServer({ dataDir: dir, port: 0, now: () => advanced, token: TOKEN });
+  const second = await createDKServer({ dataDir: dir, port: 0, now: () => advanced });
   t.after(() => second.server.listening ? second.close() : Promise.resolve());
   assert.equal(second.world.clock_anchor_utc, new Date(origin).toISOString());
   assert.equal(second.snapshot().clock.phase, 'night');
@@ -81,7 +79,7 @@ test('new server-owned characters persist after restart; world clock never reset
   assert.equal(saved.world_id, 'dk.world.001');
   assert.equal(saved.revision, 1);
   assert.equal(saved.characters['1'].name, 'DEREK');
-  assert.equal((await (await fetch('http://127.0.0.1:' + second.address.port + '/api/v1/characters/1', { headers: auth() })).json()).character.name, 'DEREK');
+  assert.equal((await (await fetch('http://127.0.0.1:' + second.address.port + '/api/v1/characters/1', )).json()).character.name, 'DEREK');
   await second.close();
 });
 
@@ -99,9 +97,9 @@ test('corrupt or legacy worlds refuse startup without replacement or import', as
   assert.ok(!JSON.parse(await fs.readFile(file, 'utf8')).characters);
 });
 
-test('authenticated server-owned slot creation rejects forged saves and unsafe requests', async t => {
+test('single-player server-owned slot creation rejects forged saves and unsafe requests', async t => {
   const dir = await tempWorld(t);
-  const app = await createDKServer({ dataDir: dir, port: 0, token: TOKEN });
+  const app = await createDKServer({ dataDir: dir, port: 0 });
   t.after(() => app.server.listening ? app.close() : Promise.resolve());
   const base = 'http://127.0.0.1:' + app.address.port;
   const health = await fetch(base + '/api/v1/health');
@@ -116,10 +114,11 @@ test('authenticated server-owned slot creation rejects forged saves and unsafe r
   assert.ok(!('characters' in snapshot), 'Private characters must not leak into world snapshot');
   assert.equal((await (await fetch(base + '/api/v1/clock')).json()).day_real_seconds, 21600);
   assert.equal((await fetch(base + '/')).status, 200);
-  assert.match(await (await fetch(base + '/monitor.js')).text(), /EventSource/);
-  assert.equal((await fetch(base + '/api/v1/characters')).status, 401);
-  assert.equal((await fetch(base + '/api/v1/characters/1')).status, 401);
-  assert.equal((await post(base, { slot: 1, name: 'Elias' }, { authorization: 'Bearer bad' })).status, 401);
+  assert.match(await (await fetch(base + '/')).text(), /DEMON KILLER/);
+  assert.equal((await fetch(base + '/api/v1/characters')).status, 200);
+  assert.equal((await fetch(base + '/api/v1/characters/1')).status, 404);
+  assert.equal((await fetch(base + '/server/data/world.json')).status, 404);
+  assert.equal((await fetch(base + '/monitor.js')).status, 404);
   assert.equal((await post(base, { slot: 1, name: 'Elias' }, { origin: 'https://malicious.example' })).status, 403);
   assert.equal((await post(base, { slot: 1, name: 'Elias', form: 'living' })).status, 422);
   assert.equal((await post(base, { slot: 1, name: 'Elias', client_save: {} })).status, 422);
@@ -134,17 +133,17 @@ test('authenticated server-owned slot creation rejects forged saves and unsafe r
   assert.equal((await post(base, { slot: 1, name: 'Another' })).status, 409);
   assert.equal((await post(base, { slot: 2, name: 'Mary' })).status, 201);
   assert.equal(app.world.revision, 2);
-  const chars = await (await fetch(base + '/api/v1/characters', { headers: auth() })).json();
+  const chars = await (await fetch(base + '/api/v1/characters', )).json();
   assert.equal(chars.characters['1'].name, 'ELIAS');
   assert.equal(chars.characters['2'].name, 'MARY');
-  assert.equal((await fetch(base + '/api/v1/characters/3', { headers: auth() })).status, 404);
+  assert.equal((await fetch(base + '/api/v1/characters/3', )).status, 404);
   assert.equal(JSON.parse(await fs.readFile(path.join(dir, 'world.json'), 'utf8')).revision, 2);
   await app.close();
 });
 
 test('parallel requests cannot overwrite an occupied slot', async t => {
   const dir = await tempWorld(t);
-  const app = await createDKServer({ dataDir: dir, port: 0, token: TOKEN });
+  const app = await createDKServer({ dataDir: dir, port: 0 });
   t.after(() => app.server.listening ? app.close() : Promise.resolve());
   const base = 'http://127.0.0.1:' + app.address.port;
   const codes = (await Promise.all([
@@ -157,17 +156,17 @@ test('parallel requests cannot overwrite an occupied slot', async t => {
 
 test('two writers cannot open one world directory simultaneously', async t => {
   const dir = await tempWorld(t);
-  const app = await createDKServer({ dataDir: dir, port: 0, token: TOKEN });
+  const app = await createDKServer({ dataDir: dir, port: 0 });
   t.after(() => app.server.listening ? app.close() : Promise.resolve());
-  await assert.rejects(createDKServer({ dataDir: dir, port: 0, token: TOKEN }), /already owned/);
+  await assert.rejects(createDKServer({ dataDir: dir, port: 0 }), /already owned/);
   await app.close();
-  const next = await createDKServer({ dataDir: dir, port: 0, token: TOKEN });
+  const next = await createDKServer({ dataDir: dir, port: 0 });
   await next.close();
 });
 
-test('SSE emits public world snapshot and fresh clock without player login', async t => {
+test('SSE emits public world snapshot and fresh clock without the browser present', async t => {
   const dir = await tempWorld(t);
-  const app = await createDKServer({ dataDir: dir, port: 0, tickMs: 250, token: TOKEN });
+  const app = await createDKServer({ dataDir: dir, port: 0, tickMs: 250 });
   t.after(() => app.server.listening ? app.close() : Promise.resolve());
   const res = await fetch('http://127.0.0.1:' + app.address.port + '/api/v1/events');
   assert.equal(res.status, 200);
@@ -183,5 +182,5 @@ test('SSE emits public world snapshot and fresh clock without player login', asy
 
 test('unsafe remote binding denied until full player authentication and TLS', async t => {
   const dir = await tempWorld(t);
-  await assert.rejects(createDKServer({ dataDir: dir, host: '0.0.0.0', port: 0, token: TOKEN }), /loopback/);
+  await assert.rejects(createDKServer({ dataDir: dir, host: '0.0.0.0', port: 0 }), /loopback/);
 });

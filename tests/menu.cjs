@@ -11,6 +11,13 @@ assert(!html.includes('http-equiv="refresh"'));
 assert(!html.includes('id="castle"')&&!html.includes("artCanvas($('castle')")&&!html.includes('.castle{'),
  'The discarded haunted-house decoration must not appear in the main menu');
 assert(html.includes('DK SOFTWORKS · HOUSE OF CULTURE'),'Correct studio branding must be visible');
+assert(html.includes('id="dkServerOptions"')&&html.includes('id="dkServerStop"'),
+ 'Persistent world status and shutdown must stay under Options');
+assert(html.includes('<script src="./dk-menu-server.js"></script>'),
+ 'The main menu must load the local DK Server client');
+assert(html.includes("if(SERVER){location.href='./test-center.html?dkSlot='+id;return;}"),
+ 'The server-mode character launch must use a server record, not a browser save');
+
 assert(html.includes('assets/art/menu/demon-killer-main-menu-spritesheet.png'));
 assert(html.includes('class="art-loading"')&&html.includes('.art-loading #home{visibility:hidden}'),
  'An unfinished text menu must not flash while the sprite sheet loads');

@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.23 / DK Server M3 | 2026-11-06 | Single-player integrated persistent world
+
+- Replaced the password-based local owner flow and separate `/player` dashboard with the **normal Demon Killer main menu** served by the loopback DK Server. No account or password is required to manage the three character records.
+- Added `start-demon-killer.sh`, a Linux launcher that starts DK Server detached, opens the game, reuses the running compatible process, and warns rather than killing an incompatible older server. Closing Firefox does not terminate the persistent world process.
+- Added **Options → Persistent World** with online status, day/night phase, and an explicit **SHUT DOWN SERVER** button. Shutdown is loopback/same-origin controlled and waits for serialized world writes before the host exits.
+- Moved local New Game and Continue to DK Server, without importing browser saves. Extended validated server-side actions for opening completion, cardinal movement, north-door interaction and double-click soul-crystal resurrection. New game records permit names as short as one character. Browser-submitted save snapshots remain forbidden.
+- Removed active authentication endpoints and the obsolete owner-login and separate dashboard files. Previously generated local private identity/token files are unused but not destroyed on update. Restricted game asset serving to allowlisted paths and checked Host, Origin and Fetch-Site without granting CORS.
+- Preserved existing temple geometry, original art, ritual and DK Architect tools. **Not yet complete:** server-authoritative Architect edits, cult data, autonomous NPC/monster behavior, and multiplayer. GitHub Pages remains a standalone preview and cannot itself host the world process.
+- Local M3 server regression tests passed; the Linux launcher was exercised against a real detached Node process, including authenticated-origin-independent shutdown. Browser visual smoke test remains pending.
+
 ## DK Server M2 development preview | 2026-11-06 | Owner sign-in and server-backed New Game / Continue
 
 - Introduced a loopback-only DK Server character-record interface at /player, with first-time owner password setup, sign-in/out, a three-slot New Game form, and Continue reading the authenticated server record. No browser-local save import, client-submitted snapshots, or automatic record overwrite.

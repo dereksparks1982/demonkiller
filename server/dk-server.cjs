@@ -6,8 +6,8 @@ const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { makeWorld, validateWorld, createCharacter, worldClock, AREA_ID } = require('./world.cjs');
-const { createOwnerAuth } = require('./owner-auth.cjs');
+const { makeWorld, validateWorld, createCharacter, playableCharacter, applyCharacterAction, worldClock, AREA_ID } = require('./world.cjs');
+const { localRequestAllowed, serveGame } = require('./local-game.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -46,24 +46,6 @@ async function loadWorld(dataDir, now = Date.now()) {
   return validateWorld(JSON.parse(await fs.readFile(file, 'utf8')));
 }
 
-async function accessToken(dataDir, supplied) {
-  if (supplied !== undefined) {
-    if (typeof supplied !== 'string' || supplied.length < 32) throw new Error('DK Server token needs 32+ characters');
-    return supplied;
-  }
-  const file = path.join(dataDir, 'admin-token');
-  try {
-    const existing = (await fs.readFile(file, 'utf8')).trim();
-    if (existing.length < 32) throw new Error('Invalid DK Server access token');
-    return existing;
-  } catch (error) { if (error.code !== 'ENOENT') throw error; }
-  const fresh = crypto.randomBytes(32).toString('hex');
-  await durableWrite(file, fresh + '\n', { create: true });
-  const loaded = (await fs.readFile(file, 'utf8')).trim();
-  if (loaded.length < 32) throw new Error('Invalid DK Server access token');
-  return loaded;
-}
-
 // A writable state directory may have only one owning process. Stale locks
 // with a dead PID are recoverable after an abrupt crash; ambiguous locks
 // refuse startup instead of risking concurrent writes.
@@ -91,13 +73,6 @@ async function acquireWriterLock(dataDir) {
     }
   }
   throw new Error('Could not acquire DK Server writer lock');
-}
-
-function isAuthorized(req, token) {
-  const authorization = req.headers.authorization || '';
-  const candidate = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-  if (candidate.length !== token.length) return false;
-  return crypto.timingSafeEqual(Buffer.from(candidate), Buffer.from(token));
 }
 
 async function readJSON(req) {
@@ -130,29 +105,21 @@ function sendJSON(res, status, data, method = 'GET') {
 
 async function createDKServer({
   dataDir = path.join(__dirname, 'data'), host = DEFAULT_HOST, port = DEFAULT_PORT,
-  now = () => Date.now(), tickMs = 3000, token
+  now = () => Date.now(), tickMs = 3000
 } = {}) {
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('Invalid server port');
   if (!Number.isInteger(tickMs) || tickMs < 250) throw new Error('Invalid clock broadcast interval');
-  // The admin key is for a local prototype. Remote access will require real auth/TLS.
+  // Local single-player authority. Remote binding is deliberately disabled.
   if (!['127.0.0.1', '::1'].includes(host))
     throw new Error('DK Server M1 binds only to loopback (remote access requires authentication)');
   await fs.mkdir(dataDir, { recursive: true, mode: 0o700 });
   const releaseLock = await acquireWriterLock(dataDir);
-  let secret, world, monitorHTML, monitorJS, monitorCSS, playerHTML, playerJS, playerCSS, ownerAuth;
+  let world;
   try {
-    secret = await accessToken(dataDir, token);
     world = await loadWorld(dataDir, now());
-    monitorHTML = await fs.readFile(path.join(__dirname, 'monitor.html'));
-    monitorJS = await fs.readFile(path.join(__dirname, 'monitor.js'));
-    monitorCSS = await fs.readFile(path.join(__dirname, 'monitor.css'));
-    playerHTML = await fs.readFile(path.join(__dirname, 'player.html'));
-    playerJS = await fs.readFile(path.join(__dirname, 'player.js'));
-    playerCSS = await fs.readFile(path.join(__dirname, 'player.css'));
-    ownerAuth = await createOwnerAuth(dataDir, durableWrite, now);
   } catch (error) { await releaseLock(); throw error; }
   const streams = new Set();
-  let server, writeQueue = Promise.resolve();
+  let server, writeQueue = Promise.resolve(), stopping = false;
   function snapshot() {
     return {
       protocol: 'dk.world.v1', mode: 'server-saves', world_id: world.world_id,
@@ -170,6 +137,16 @@ async function createDKServer({
     writeQueue = pending.catch(() => {});
     return pending;
   }
+  async function saveAction(slot, command) {
+    const pending = writeQueue.then(async () => {
+      const result = applyCharacterAction(world, slot, command);
+      await durableWrite(path.join(dataDir, 'world.json'), JSON.stringify(result.world, null, 2) + '\n');
+      world = result.world;
+      return result;
+    });
+    writeQueue = pending.catch(() => {});
+    return pending;
+  }
   function push(res, event, message) {
     if (res.destroyed || res.writableEnded) return;
     res.write('event: ' + event + '\ndata: ' + JSON.stringify(message) + '\n\n');
@@ -178,34 +155,22 @@ async function createDKServer({
     const url = new URL(req.url, 'http://localhost');
     const method = req.method;
     const write = method !== 'GET' && method !== 'HEAD';
-    if (write && req.headers.origin) {
-      const permitted = 'http://' + req.headers.host;
-      if (req.headers.origin !== permitted) return sendJSON(res, 403, { error: 'Cross-origin writes are not allowed' });
-    }
-    if (url.pathname === '/api/v1/auth/status' && !write)
-      return sendJSON(res, 200, ownerAuth.status(req), method);
-    if (url.pathname === '/api/v1/auth/setup' && method === 'POST' ||
-        url.pathname === '/api/v1/auth/login' && method === 'POST') {
-      let body;
-      try { body = await readJSON(req); }
-      catch (e) { return sendJSON(res, e.status || 400, { error: e.message }); }
-      if (Object.keys(body).join(',') !== 'password')
-        return sendJSON(res, 422, { error: 'Only a password is accepted' });
-      const result = url.pathname.endsWith('setup') ? await ownerAuth.setup(body.password, res)
-        : await ownerAuth.login(body.password, res);
-      return sendJSON(res, result.code, result.body);
-    }
-    if (url.pathname === '/api/v1/auth/logout' && method === 'POST') {
-      ownerAuth.clearSession(req, res);
-      return sendJSON(res, 200, { authenticated: false });
+    if (!localRequestAllowed(req, server.address().port))
+      return sendJSON(res, 403, { error: 'DK Server is local-only; use this game origin' });
+    if (url.pathname === '/api/v1/server/shutdown' && method === 'POST') {
+      if (req.headers['x-dk-control'] !== 'shutdown')
+        return sendJSON(res, 403, { error: 'Use Demon Killer Options to stop the world' });
+      if (stopping) return sendJSON(res, 409, { error: 'Server is already stopping' });
+      stopping = true;
+      sendJSON(res, 202, { stopping: true, message: 'Saving and stopping DK Server' });
+      setImmediate(() => server.emit('dk:shutdown'));
+      return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', online: true }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m3', online: true, background_world: true }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if (url.pathname === '/api/v1/characters' && (method === 'GET' || method === 'HEAD' || method === 'POST')) {
-      if (!isAuthorized(req, secret) && !ownerAuth.authenticated(req))
-        return sendJSON(res, 401, { error: 'DK Server login required' });
       if (method === 'POST') {
         let body;
         try { body = await readJSON(req); }
@@ -223,15 +188,29 @@ async function createDKServer({
           return sendJSON(res, 500, { error: 'Character not saved; see server log' });
         }
       }
-      return sendJSON(res, 200, { characters: world.characters, world_revision: world.revision }, method);
+      return sendJSON(res, 200, { characters: Object.fromEntries(Object.entries(world.characters).map(([k,v])=>[k,playableCharacter(v)])), world_revision: world.revision }, method);
     }
     const match = url.pathname.match(/^\/api\/v1\/characters\/([123])$/);
     if (match && !write) {
-      if (!isAuthorized(req, secret) && !ownerAuth.authenticated(req))
-        return sendJSON(res, 401, { error: 'DK Server login required' });
       const character = world.characters[match[1]];
-      return character ? sendJSON(res, 200, { character, world_revision: world.revision }, method)
+      return character ? sendJSON(res, 200, { character: playableCharacter(character), world_revision: world.revision }, method)
         : sendJSON(res, 404, { error: 'Empty character slot' }, method);
+    }
+    const actionMatch = url.pathname.match(/^\/api\/v1\/characters\/([123])\/actions$/);
+    if (actionMatch && method === 'POST') {
+      let body;
+      try { body = await readJSON(req); }
+      catch (e) { return sendJSON(res, e.status || 400, { error: e.message }); }
+      try {
+        const saved = await saveAction(Number(actionMatch[1]), body);
+        return sendJSON(res, 200, { character: saved.character, world_revision: saved.world.revision });
+      } catch (e) {
+        if (/Invalid|Only valid/.test(e.message)) return sendJSON(res, 422, { error: e.message });
+        if (/already|blocked|not complete|not available|beside/.test(e.message)) return sendJSON(res, 409, { error: e.message });
+        if (/Empty character slot/.test(e.message)) return sendJSON(res, 404, { error: e.message });
+        console.error('DK Server action failed:', e);
+        return sendJSON(res, 500, { error: 'World action was not saved' });
+      }
     }
     if (url.pathname === '/api/v1/events' && !write) {
       if (method === 'HEAD') return sendJSON(res, 405, { error: 'Event stream requires GET' });
@@ -245,20 +224,7 @@ async function createDKServer({
       res.on('close', () => streams.delete(res));
       return;
     }
-    if (['/', '/monitor.js', '/monitor.css', '/player', '/player.js', '/player.css'].includes(url.pathname) && !write) {
-      const js = url.pathname === '/monitor.js' || url.pathname === '/player.js';
-      const css = url.pathname === '/monitor.css' || url.pathname === '/player.css';
-      const player = url.pathname.startsWith('/player');
-      const payload = player ? js ? playerJS : css ? playerCSS : playerHTML :
-        js ? monitorJS : css ? monitorCSS : monitorHTML;
-      res.writeHead(200, {
-        'Content-Type': js ? 'text/javascript; charset=utf-8' : css ? 'text/css; charset=utf-8' : 'text/html; charset=utf-8',
-        'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
-        'Content-Security-Policy': "default-src 'none'; script-src 'self'; connect-src 'self'; style-src 'self'",
-        'Content-Length': payload.length
-      });
-      return method === 'HEAD' ? res.end() : res.end(payload);
-    }
+    if (!write && await serveGame(req, res, url.pathname)) return;
     if (write) {
       res.setHeader('Allow', 'GET, HEAD');
       return sendJSON(res, 405, { error: 'Command not enabled; the server does not accept arbitrary saves' });
@@ -301,17 +267,17 @@ async function createDKServer({
 if (require.main === module) {
   const directory = process.env.DK_SERVER_DATA || path.join(__dirname, 'data');
   const requestedPort = process.env.DK_SERVER_PORT === undefined ? DEFAULT_PORT : Number(process.env.DK_SERVER_PORT);
-  createDKServer({ dataDir: directory, port: requestedPort, token: process.env.DK_SERVER_TOKEN })
+  createDKServer({ dataDir: directory, port: requestedPort })
     .then(instance => {
-      console.log('DK Server M1: http://' + instance.address.address + ':' + instance.address.port + '/');
+      console.log('Demon Killer + DK Server: http://' + instance.address.address + ':' + instance.address.port + '/');
       console.log('World data: ' + path.join(directory, 'world.json'));
-      console.log('Owner token (keep private): ' + (process.env.DK_SERVER_TOKEN ? 'environment setting' : path.join(directory, 'admin-token')));
       let stopping = false;
       const stop = () => {
         if (stopping) return;
         stopping = true;
         instance.close().then(() => process.exit(0), error => { console.error(error); process.exitCode = 1; });
       };
+      instance.server.on('dk:shutdown', stop);
       process.once('SIGINT', stop);
       process.once('SIGTERM', stop);
     })

@@ -72,9 +72,15 @@ function validateWorld(world) {
   for (const [slot, character] of Object.entries(world.characters)) {
     if (!/^[123]$/.test(slot) || !character || character.slot !== Number(slot) ||
         typeof character.name !== 'string' || !/^[A-Z0-9 _-]{1,8}$/.test(character.name) ||
-        character.area_id !== AREA_ID || character.form !== 'ghost' ||
-        character.opening_state !== 'not_started' || !Number.isSafeInteger(character.revision) ||
-        character.revision !== 1 || !Number.isFinite(Date.parse(character.created_at_utc)))
+        character.area_id !== AREA_ID || !['ghost','living'].includes(character.form) ||
+        !['not_started','complete','resurrected'].includes(character.opening_state) ||
+        (character.opening_state === 'resurrected') !== (character.form === 'living') ||
+        (character.x !== undefined && (!Number.isInteger(character.x) || character.x < 0 || character.x > 15)) ||
+        (character.y !== undefined && (!Number.isInteger(character.y) || character.y < 0 || character.y > 15)) ||
+        (character.facing !== undefined && !['north','south','east','west'].includes(character.facing)) ||
+        (character.crystal_spent !== undefined && typeof character.crystal_spent !== 'boolean') ||
+        !Number.isSafeInteger(character.revision) || character.revision < 1 ||
+        !Number.isFinite(Date.parse(character.created_at_utc)))
       throw new Error('Invalid character record in DK Server data');
   }
   const anchor = Date.parse(world.clock_anchor_utc);
@@ -108,12 +114,75 @@ function createCharacter(world, slot, name, now = Date.now()) {
   if (!Number.isFinite(now) || now < 0) throw new Error('Invalid creation timestamp');
   const character = {slot, name: name.trim().toUpperCase(), revision: 1,
     created_at_utc: new Date(now).toISOString(), area_id: AREA_ID,
-    form: 'ghost', opening_state: 'not_started'};
+    form: 'ghost', opening_state: 'not_started', x: 8, y: 12, facing: 'north', crystal_spent: false};
   const next = structuredClone(world);
   next.characters[String(slot)] = character;
   next.revision++;
   validateWorld(next);
   return {world: next, character};
+}
+
+function playableCharacter(character) {
+  return { ...character, x: character.x ?? 8, y: character.y ?? 12,
+    facing: character.facing ?? 'north', crystal_spent: character.crystal_spent ?? false };
+}
+
+function applyCharacterAction(world, slot, command) {
+  if (![1,2,3].includes(slot)) throw new Error('Invalid character slot');
+  if (!command || typeof command !== 'object' || Array.isArray(command) ||
+      !['move','finish_opening','resurrect','toggle_door'].includes(command.action))
+    throw new Error('Invalid character action');
+  const expected = command.action === 'move' ? 'action,direction' : 'action';
+  if (Object.keys(command).sort().join(',') !== expected)
+    throw new Error('Only valid action parameters are accepted');
+  const previous = world.characters[String(slot)];
+  if (!previous) throw new Error('Empty character slot');
+  const next = structuredClone(world);
+  const character = playableCharacter(next.characters[String(slot)]);
+  const door = next.areas[AREA_ID].objects.find(o=>o.id==='temple_north_door');
+  if (command.action === 'finish_opening') {
+    if (character.opening_state !== 'not_started') throw new Error('Opening already completed');
+    character.opening_state = 'complete';
+    if (door) door.open = true;
+  } else if (command.action === 'resurrect') {
+    if (character.form !== 'ghost' || character.opening_state !== 'complete' || character.crystal_spent)
+      throw new Error('Resurrection is not available');
+    if (Math.abs(character.x - 8) + Math.abs(character.y - 7) > 1)
+      throw new Error('Move beside the soul crystal first');
+    character.form = 'living'; character.opening_state = 'resurrected';
+    character.crystal_spent = true; character.x = 8; character.y = 7;
+    character.facing = 'south';
+  } else if(command.action === 'toggle_door') {
+    if (character.opening_state === 'not_started') throw new Error('Opening ritual not complete');
+    if (Math.abs(character.x - 8) + character.y > 1)
+      throw new Error('Move beside the temple door first');
+    if (door) door.open = !door.open;
+  } else {
+    if (character.opening_state === 'not_started') throw new Error('Opening ritual not complete');
+    const moves = {north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]};
+    if (!Object.hasOwn(moves,command.direction)) throw new Error('Invalid movement direction');
+    const [dx,dy] = moves[command.direction];
+    const x=character.x+dx, y=character.y+dy;
+    if (x < 0 || y < 0 || x > 15 || y > 15 ||
+        (next.areas[AREA_ID].walls[y*16+x] && !(x===8 && y===0)))
+      throw new Error('Movement blocked by temple walls');
+    if (character.form === 'living') {
+      const solids = new Set(['altar','braziers','pillar','statue','pew','coffin','chest']);
+      if (next.areas[AREA_ID].objects.some(object =>
+        solids.has(object.type) && x >= object.x && y >= object.y &&
+        x < object.x + (object.type === 'altar' ? 3 : object.type === 'pew' || object.type === 'coffin' ? 2 : 1) &&
+        y < object.y + (object.type === 'altar' || object.type === 'statue' ? 2 : 1)))
+        throw new Error('Movement blocked by a solid object');
+      if (x===8 && y===0 && door && !door.open)
+        throw new Error('Movement blocked by the closed door');
+    }
+    character.x=x; character.y=y; character.facing=command.direction;
+  }
+  character.revision++;
+  next.characters[String(slot)] = character;
+  next.revision++;
+  validateWorld(next);
+  return {world:next,character};
 }
 
 function worldClock(world, now = Date.now()) {
@@ -133,4 +202,4 @@ function worldClock(world, now = Date.now()) {
   };
 }
 
-module.exports = { AREA_ID, GRID_SIZE, TILE_SIZE, DAY_MS, CYCLE_MS, templeTemplate, makeWorld, validateWorld, createCharacter, worldClock };
+module.exports = { playableCharacter, applyCharacterAction, AREA_ID, GRID_SIZE, TILE_SIZE, DAY_MS, CYCLE_MS, templeTemplate, makeWorld, validateWorld, createCharacter, worldClock };

@@ -9,6 +9,9 @@
   // Named character records never replace the independent DK Architect room-save key.
   const CHARACTERS_STORE = 'dkSoftworks.demonkiller.characters.v1';
   const ACTIVE_STORE = 'dkSoftworks.demonkiller.activeCharacter.v1';
+  const SERVER = typeof window !== 'undefined' && window.DemonKillerServer &&
+    new URLSearchParams(window.location.search).has('dkSlot') ? window.DemonKillerServer : null;
+  let serverReady = !SERVER, serverBusy = false, serverLastMove = 0;
   const $ = id => document.getElementById(id);
   const canvas = $('room'), ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -138,7 +141,8 @@
   let cultWorld=null,populationWorld=null,cultNetworkView=null;
   let activeSlot = 0;
   try {
-    const n = Number(localStorage.getItem(ACTIVE_STORE));
+    const n = Number(SERVER ? new URLSearchParams(window.location.search).get('dkSlot') :
+      localStorage.getItem(ACTIVE_STORE));
     if (Number.isInteger(n) && n >= 1 && n <= 3) activeSlot = n;
   } catch (error) { /* Allow direct offline temple use without storage. */ }
   const visual = { x:scene.player.x, y:scene.player.y, queue:[] };
@@ -279,6 +283,12 @@
         if(moveActor(opening.woman,dt,3.8)){
           setTempleDoor(true);
           opening=null;scene.introSeen=true;dirty=true;resetVisual();persistCharacter();
+          if(SERVER){
+            serverBusy=true;
+            SERVER.action(activeSlot,'finish_opening')
+              .catch(error=>{serverReady=false;message('DK Server could not save the opening: '+error.message);})
+              .finally(()=>{serverBusy=false;});
+          }
           message('Double-left-click the crystal to resurrect, or leave as a ghost.');
         }break;
     }
@@ -394,6 +404,18 @@
       speechBubble(opening.woman,'In ash and silence, let one light remain.','#c7ae68');
   }
   function beginResurrection(crystal) {
+    if(SERVER){
+      if(!serverReady||serverBusy)return;
+      serverBusy=true;
+      SERVER.action(activeSlot,'resurrect')
+        .then(()=>beginResurrectionVisual(crystal))
+        .catch(error=>message('DK Server rejected resurrection: '+error.message))
+        .finally(()=>{serverBusy=false;});
+      return;
+    }
+    beginResurrectionVisual(crystal);
+  }
+  function beginResurrectionVisual(crystal) {
     // The specific crystal selected by the valid double-click empties immediately.
     if(crystal&&crystal.type==='crystal'&&!crystal.spent){
       crystal.spent=true;dirty=true;
@@ -433,6 +455,7 @@
     clickDestination = null;
   };
   function characterRecord() {
+    if(SERVER) return null;
     if (!activeSlot) return null;
     try {
       const data = JSON.parse(localStorage.getItem(CHARACTERS_STORE) || 'null');
@@ -442,6 +465,7 @@
     } catch (error) { return null; }
   }
   function persistCharacter() {
+    if(SERVER) return; // Server accepts validated commands, never client scene snapshots.
     const record = characterRecord();
     if (!record) return;
     try {
@@ -454,6 +478,7 @@
     } catch (error) { message('Character save unavailable: ' + error.message); }
   }
   function restoreCharacter() {
+    if(SERVER) return;
     const record = characterRecord();
     if (!record || !record.slot.scene) return;
     try {
@@ -892,6 +917,26 @@
     return Math.abs(dx)>=Math.abs(dy)?(dx>=0?'east':'west'):(dy>=0?'south':'north');
   }
   function step(dx,dy) {
+    if(SERVER){
+      if(!serverReady||serverBusy)return false;
+      if(opening||ritual){message('Wait for the current ritual.');return false;}
+      const nowMs=Date.now();
+      if(nowMs-serverLastMove<160)return false;
+      serverLastMove=nowMs;
+      const direction=dx>0?'east':dx<0?'west':dy>0?'south':'north';
+      serverBusy=true;
+      SERVER.action(activeSlot,'move',{direction})
+        .then(character=>{
+          const p=scene.player;
+          p.x=character.x;p.y=character.y;p.facing=character.facing;
+          visual.queue.push({x:p.x,y:p.y});
+          draw();
+          message((p.form==='ghost'?'Ghost':'Living')+' at '+AREA+' ('+p.x+', '+p.y+').');
+        })
+        .catch(error=>message('DK Server: '+error.message))
+        .finally(()=>{serverBusy=false;});
+      return true;
+    }
     if (opening||ritual) {message('Wait for the opening or resurrection sequence to finish.');return false;}
     // Manual keyboard navigation overrides one-shot pointer travel.
     clickDestination=null;
@@ -922,6 +967,15 @@
     if(obj.type==='braziers'&&p.form==='ghost'){message("The fire doesn't affect me.");return;}
     if(obj.type==='pew'&&p.form==='ghost'){message('Ghosts need no rest.');return;}
     if(obj.type==='door') {
+      if(SERVER){
+        if(serverBusy)return;
+        serverBusy=true;
+        SERVER.action(activeSlot,'toggle_door')
+          .then(()=>{obj.open=!obj.open;dirty=true;draw();message('Iron arch '+(obj.open?'opened':'closed')+'.');})
+          .catch(error=>message('DK Server: '+error.message))
+          .finally(()=>{serverBusy=false;});
+        return;
+      }
       obj.open=!obj.open;dirty=true;draw();persistCharacter();
       message('Iron arch '+(obj.open?'opened':'closed')+'.');return;
     }
@@ -939,6 +993,14 @@
   }
   function moveTowardPointer(dt,target=rightPointer) {
     if(!target||dt<=0)return;
+    if(SERVER){
+      if(!serverReady||serverBusy||opening||ritual||mode!=='walk')return;
+      const dx=target.x-(visual.x+.5)*TILE,dy=target.y-(visual.y+.5)*TILE;
+      if(Math.hypot(dx,dy)<TILE*.42)return;
+      if(Math.abs(dx)>=Math.abs(dy))step(dx>=0?1:-1,0);
+      else step(0,dy>=0?1:-1);
+      return;
+    }
     // A held right-mouse pointer is an EXACT pixel-space target of the
     // character's ground position. No UO-style radius or .35-tile standoff.
     // Preserves the existing hold-to-steer / release-to-stop controls.
@@ -1327,10 +1389,12 @@
     return restored;
   }
   function save() {
+    if(SERVER){message('DK Architect room edits are draft-only. Use Export Room JSON until server edit commands are implemented.');return;}
     try{localStorage.setItem(STORE,JSON.stringify(scene));persistCharacter();dirty=false;loaded=true;draw();message('Temple layout saved under its own Demon Killer test-center key'+(activeSlot?' and named character record':'')+'.');}
     catch(err){message('Browser storage unavailable: '+err.message+'. Use Export Room JSON instead.');}
   }
   function load() {
+    if(SERVER){message('Browser room saves are disabled while DK Server owns the world.');return;}
     try{const raw=localStorage.getItem(STORE);if(!raw)return message('No saved test-center room found.');
       const next=validate(JSON.parse(raw));scene=next;opening=null;ritual=null;rightMouseHeld=false;undoStack=[];redoStack=[];selectedId=null;corner=null;dirty=false;loaded=true;resetVisual();draw();message('Saved temple room loaded.');}
     catch(err){message('Could not load room: '+err.message);}
@@ -1853,9 +1917,38 @@
       });
     renderCultJournal();
   }
-  restoreCharacter();
-  mountCultJournal();
-  if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
-  palette();draw();
-  if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);
+  if(SERVER){
+    (async()=>{
+      try{
+        if(!activeSlot)throw Error('Select a valid character from the main menu.');
+        const [character,serverWorld]=await Promise.all([SERVER.getCharacter(activeSlot),SERVER.world()]);
+        scene=fresh();
+        scene.player={x:character.x,y:character.y,facing:character.facing,form:character.form};
+        scene.introSeen=character.opening_state!=='not_started';
+        if(scene.introSeen){
+          const door=scene.objects.find(o=>o.id==='temple_north_door');
+          if(door)door.open=Boolean(serverWorld.area.objects.find(o=>o.id==='temple_north_door')?.open);
+          scene.objects.push({id:'soul_crystal',type:'crystal',x:8,y:7,r:0,
+            spent:Boolean(character.crystal_spent)});
+        }
+        dirty=false;loaded=true;resetVisual();
+        serverReady=true;
+        mountCultJournal();
+        if(typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
+        palette();draw();
+        if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);
+        if(scene.introSeen)message('DK Server character loaded: '+character.name+'.');
+      }catch(error){
+        serverReady=false;
+        message('DK Server could not load the character: '+error.message+
+          '. Return to the main menu and try again.');
+      }
+    })();
+  }else{
+    restoreCharacter();
+    mountCultJournal();
+    if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
+    palette();draw();
+    if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);
+  }
 })();

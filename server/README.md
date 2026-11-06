@@ -1,55 +1,42 @@
-# DK Server | First persistent-world milestone
+# Demon Killer · Integrated Local DK Server (M3)
 
-**Status: development prototype, milestone 2.** Independently implemented Node.js service, not a RunUO port, a public MMO, or the live game's save authority **yet**. The existing Demon Killer browser client is not connected. The design target is server-owned saves only, with **no legacy browser-save migration**.
+Node.js 20+, no additional npm dependencies and no separate dashboard. The current version is **single-player and local-only**, without passwords, accounts or login screens. Start the game with `./start-demon-killer.sh`; it launches DK Server detached and opens the normal Demon Killer menu. Do not run a separate `/player` page. `/player` now redirects to the menu.
 
-## Start on Linux
+## Process lifecycle
 
-Requires Node.js 20 or later, no npm installation or external game engine.
+- Loopback only: `http://127.0.0.1:8766/`, same origin for game assets and world API.
+- Browser close: does **not** stop the server. Its world clock uses a persistent UTC anchor and continues through restarts.
+- **Options → Persistent World → SHUT DOWN SERVER**: POST a same-origin request with the browser's custom local control header. The host process waits for pending disk writes, closes subscriptions and listener, and releases the single-writer lock.
+- Restart: run `./start-demon-killer.sh` again. The launcher detects a running M3 server and reopens the menu. An older M1/M2 server must be stopped manually once before updating. Logs: `${XDG_STATE_HOME:-$HOME/.local/state}/demon-killer/server.log`.
+- The launcher explicitly opens the browser as part of launching the game. To debug the server in the foreground, run `node server/dk-server.cjs` instead, and then open its local address.
+- Old private `server/data/owner-identity.json` and `admin-token` files, if present from prototype M2, are **not used** in M3. The server does not delete them or your world automatically.
 
-**New player UI:** http://127.0.0.1:8766/player. Set up one private owner password (at least 12 characters) on first visit, then sign in to create, list or continue server-owned character records. The password is stored only as a salted scrypt hash in the private data directory; authenticated browser requests use an HttpOnly SameSite=Strict session cookie. The admin token is never embedded into the web UI. Signing out revokes the session; a server restart requires signing in again.
+## What the server owns now
 
-    node server/dk-server.cjs
+DK Server exclusively writes `server/data/world.json` with durable temporary writes, file sync, atomic rename and a single-writer lock. The browser does **not** upload entire save files. The server validates these character commands:
 
-The default server listens only at http://127.0.0.1:8766/ . Open that address manually to see a read-only world monitor. The server continues after browsers disconnect. Stop with Ctrl+C. To choose a private data directory or port:
+- `GET /api/v1/health`: running status, build `local-m3`.
+- `GET /api/v1/world`: shared public temple snapshot and synchronized day/night clock.
+- `GET /api/v1/clock`: six real hours of day followed by six real hours of night.
+- `GET /api/v1/events`: server-sent world-clock events.
+- `GET /api/v1/characters`: server-owned character records, slots 1–3.
+- `POST /api/v1/characters`: create an empty slot using exactly `{"slot":1,"name":"A"}`. Names may be one character; occupied slots cannot be silently replaced.
+- `GET /api/v1/characters/1`: reload the authoritative record.
+- `POST /api/v1/characters/1/actions`: accept only `{"action":"finish_opening"}`, `{"action":"move","direction":"north"}`, `{"action":"toggle_door"}` or `{"action":"resurrect"}`. The server checks action legitimacy, collision, position, form and object state, persists the result, and only then replies.
+- `POST /api/v1/server/shutdown`: local in-menu control using the custom `X-DK-Control: shutdown` header.
 
-    DK_SERVER_DATA="$HOME/DKLab/dk-server-data" DK_SERVER_PORT=8767 node server/dk-server.cjs
+Public remote clients are not supported. Local requests are restricted by loopback binding, Host/Origin/Fetch-Site checks, without CORS. The custom shutdown header prevents drive-by HTML form submissions. These restrictions do not constitute internet-facing multiplayer security.
 
-World saves go into server/data/world.json by default and are excluded from Git. The first start creates a random admin-token in the same private directory. **Treat this as a secret.** Never publish tokens or world data to GitHub. If you configure DK_SERVER_TOKEN directly, it must be 32 characters or longer.
+## Current boundaries
 
-## Implemented persistence and network endpoints
+No legacy browser saves are imported into the server. The old GitHub Pages preview still has its own isolated, non-authoritative save path; it is **not** part of the live persistent game. DK Architect room edits can still be exported, but server-mode browser room-save buttons are disabled until dedicated server-side edit transactions exist. Cult journal and NPC simulation state still require migration to validated server operations. No automated monster-territory, settlement or NPC daily simulation is claimed yet.
 
-- GET /api/v1/health: local service status.
-- GET /api/v1/world: public read-only temple layout and synchronized world clock. Private character records are omitted.
-- GET /api/v1/clock: server-authoritative cycle with six real hours of day followed by six hours of night.
-- GET /api/v1/events: read-only Server-Sent Events stream for initial world snapshot and repeating clock updates.
-- GET /api/v1/auth/status: whether an owner exists and this browser is signed in.
-- POST /api/v1/auth/setup: first local owner password setup. Refuses duplicate setup.
-- POST /api/v1/auth/login: owner login with rate limiting.
-- POST /api/v1/auth/logout: revoke the browser session.
-- GET /player: server-hosted character selection page; no localStorage save imports.
-- GET /api/v1/characters: authenticated server-owned character slots.
-- POST /api/v1/characters: authenticated creation of a **new** character, accepting exactly {"slot":1,"name":"Name"}. No overwrite, no arbitrary saves, no upload/import.
-- GET /api/v1/characters/1: authenticated read of one character slot.
+The world format is v1 with additive server-owned character fields. Corrupt or unsupported world files are **rejected**, never overwritten automatically. The approved temple remains a 16×16 grid with altar (7,5), north door (8,0), and a soul crystal introduced only by the ritual.
 
-The new character UI authenticates using an HttpOnly local session cookie; the admin-token Bearer header remains a separate local administration API mechanism. **Never embed an admin token in browser JavaScript.** Remote access and client integration require separate player accounts/sessions and TLS first. The service rejects non-loopback binding.
+## Tests
 
-Each accepted character creation is serialized, verified and persisted to a temporary same-directory file, synced, then atomically renamed before an HTTP success response. Startup refuses unknown schema, invalid data and corrupt JSON instead of silently overwriting. A private writer lock prevents two server processes from updating the same directory. Clock phase comes from a persistent UTC anchor and survives restarts.
+```bash
+node --test tests/dk-server.cjs tests/dk-server-local.cjs tests/menu.cjs
+```
 
-Only the approved 16×16 Forsaken Temple template is installed. The altar remains at (7,5), north door at (8,0), and the soul crystal does not exist before the introductory ritual. The temple layout and story in the browser were not modified.
-
-## Local verification
-
-From repository root:
-
-    node --test tests/dk-server.cjs tests/dk-server-auth.cjs
-
-Thirteen tests verify world geometry, six-hour boundaries, restart and persistence, invalid-save refusal, authentication, forged-save rejection, concurrent slot creation, single-writer lock, world event stream and loopback safety. GitHub Actions are **not** required or used for these checks.
-
-## Next engineering milestones
-
-1. Connect the **playable Forsaken Temple** to the already-working DK Server owner session and server-owned New Game / Continue records. The /player screen creates and reopens records now, but **does not launch gameplay yet**; the public GitHub Pages client remains separate. Do not migrate old localStorage saves.
-2. Add a versioned action channel and server-validated movement, collisions, player forms and idempotent resurrection. Never trust client-supplied world state.
-3. Add uniquely identified NPCs, items, relationships, room links, authoritative Architect edit transactions, and durable scheduled events.
-4. Add crash recovery, backups, migrations for future DK Server versions (not old saves), monitoring and multiplayer security before production hosting.
-
-RunUO sources were reviewed as architecture references only. See docs/dk-server-runuo-review.md for exact source paths. No GPL-licensed RunUO game code or assets were copied.
+The server tests cover world geometry, day/night timing, atomic restart saves, collision, no-password character creation, one-character names, action validation, same-origin asset serving and private-file denial, single-writer exclusion, and graceful local shutdown. The menu test checks the established menu and music controls. Run tests locally before committing. No custom GitHub Actions workflow is used.

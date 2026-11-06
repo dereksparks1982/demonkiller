@@ -1,11 +1,11 @@
 {
   "name": "dk-server",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "Demon Killer persistent world and character saving authority pilot",
+  "description": "Single-player Demon Killer persistent world authority and integrated local game host",
   "engines": { "node": ">=20" },
   "scripts": {
     "start": "node dk-server.cjs",
-    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-auth.cjs"
+    "test": "node --test ../tests/dk-server.cjs ../tests/dk-server-local.cjs"
   }
 }

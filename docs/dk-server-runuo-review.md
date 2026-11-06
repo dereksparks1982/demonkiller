@@ -34,3 +34,7 @@ Connect a properly authenticated game client and New Game / Continue to the serv
 ## Milestone 2: browser sign-in without exposing the admin token
 
 A local /player page now configures one owner password (salted scrypt digest stored separately from the world), uses HttpOnly SameSite=Strict session cookies, and reads/creates authenticated character records through DK Server. No browser localStorage character migration or client-side save snapshots are accepted. This is a character-record interface, **not a playable temple migration**: the original public browser game is left unchanged pending authoritative gameplay integration. Tests cover session isolation, parallel setup, guessing lockout, restart sign-in and server-only record storage.
+
+## Milestone 3: single-player integration (current)
+
+The short-lived M2 owner-password and standalone /player prototype described above has been retired. DK Server now hosts Demon Killer's **existing main menu and temple** directly, accepts local single-player character creation and validated gameplay actions without passwords, and exposes graceful shutdown under **Options → Persistent World**. The Linux launcher starts the world process detached, so closing Firefox does not stop the clock. All old browser save imports remain disabled for the local persistent mode. Architect transactions, cult and citizen state, durable NPC simulation and multiplayer are separate future milestones. RunUO remained an architecture reference; no GPL source has been incorporated.

@@ -1,3 +1,7 @@
+## Current implementation (M3, 2026-11-06)
+
+Demon Killer is now hosted by its local loopback DK Server, not a separate /player page. No password or login is required for this deliberately single-player build. The Linux launcher starts the server detached; Firefox can close while the server's world clock continues; the main menu Options includes a deliberate shutdown command. Character creation and temple opening/movement/door/resurrection are persisted as validated server actions. Older browser saves are not imported. Architect edits, cult/NPC autonomous simulation, area conquest and multiplayer remain **planned**, not completed.
+
 # Demon Killer | Persistent World Server Design
 
 **Status:** Design target plus the first implemented DK Server localhost prototype. New-character persistence, local password-based owner sign-in, server-owned New Game/Continue record selection, and a shared world clock work in the separate server; the **playable temple client is not yet connected** and the service is not deployed.  
