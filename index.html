@@ -99,10 +99,12 @@ label{cursor:pointer}
 <legend>Persistent World</legend>
 <p id="dkServerStatus" role="status" aria-live="polite">CHECKING SERVER CONNECTION...</p>
 <p id="dkServerClock">World time: unavailable</p>
+<p id="dkServerSaveStatus">Verified world backups: unavailable</p>
 <div class="dk-world-controls">
 <button id="dkServerStart" class="action" type="button">START SERVER</button>
 <button id="dkServerStop" class="action secondary" type="button" disabled>STOP SERVER</button>
 <button id="dkServerRefresh" class="action secondary" type="button">REFRESH</button>
+<button id="dkServerCheckpoint" class="action secondary" type="button" disabled>SAVE WORLD CHECKPOINT</button>
 </div>
 <small id="dkServerHelp" class="music-volume-hint">The persistent world requires a hosted DK Server. This menu will report whether one is connected.</small>
 </fieldset>
@@ -205,7 +207,7 @@ async function launch(id){
   let outdoor=null;try{outdoor=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.outdoors.preview.v1')||'null');}catch(_){}
   location.href=outdoor&&outdoor.firstCourtyardSeen&&
     ['dk.courtyard.lilith.001','dk.village.001'].includes(outdoor.area_id)?
-    './outdoor.html?v=0.2.34':'./test-center.html?v=0.2.34';
+    './outdoor.html?v=0.2.35':'./test-center.html?v=0.2.35';
 }
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }

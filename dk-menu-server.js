@@ -35,6 +35,12 @@
       return (await post('/api/v1/characters/' + slot + '/actions', {action, ...fields})).character;
     },
     async health() { return request('/api/v1/health'); },
+    async saveStatus() { return request('/api/v1/save/status'); },
+    async checkpoint() {
+      return request('/api/v1/save/checkpoint', {
+        method:'POST',headers:{'X-DK-Control':'checkpoint'}
+      });
+    },
     async serverState() { return request('/api/v1/server/state'); },
     async startWorld() {
       return request('/api/v1/server/start', {
@@ -76,12 +82,15 @@
   const status = $('dkServerStatus'), clock = $('dkServerClock');
   const start = $('dkServerStart'), stop = $('dkServerStop');
   const refreshButton = $('dkServerRefresh'), help = $('dkServerHelp');
+  const checkpoint = $('dkServerCheckpoint'), backupStatus = $('dkServerSaveStatus');
 
   function showOffline(details) {
     status.textContent = details;
     clock.textContent = 'World time: unavailable';
     start.disabled = false;
     stop.disabled = true;
+    checkpoint.disabled = true;
+    backupStatus.textContent='Verified world backups: not connected';
   }
   async function refresh() {
     if (!client) {
@@ -92,8 +101,8 @@
       return;
     }
     try {
-      const [health, worldClock] = await Promise.all([client.health(), client.clock()]);
-      if (health.build !== 'local-m12') throw Error('DK Server needs the latest M4 build');
+      const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
+      if (health.build !== 'local-m13') throw Error('DK Server needs the latest M4 build');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';
@@ -104,6 +113,11 @@
         'Stop Server saves and pauses its clock; Start Server resumes the world.';
       start.disabled = !!worldClock.running;
       stop.disabled = !worldClock.running;
+      checkpoint.disabled = false;
+      backupStatus.textContent = 'Verified world backups: '+saves.backup_count+
+        ' · Saved revision '+saves.primary.revision+
+        (saves.invalid_backups?' · '+saves.invalid_backups+' invalid backups':'')+
+        (saves.last_backup_error?' · BACKUP ERROR':'');
     } catch (error) {
       showOffline('NOT CONNECTED · ' + error.message);
       help.textContent = 'DK Server is unavailable at this game address.';
@@ -136,6 +150,12 @@
       status.textContent = 'PAUSE FAILED · ' + error.message;
       stop.disabled = false;
     }
+  });
+  checkpoint.addEventListener('click',async()=>{
+    if(!client||checkpoint.disabled)return;
+    checkpoint.disabled=true;
+    try{await client.checkpoint();await refresh();}
+    catch(e){backupStatus.textContent='World checkpoint failed: '+e.message;checkpoint.disabled=false;}
   });
   refreshButton.addEventListener('click', refresh);
   document.querySelector('[data-action=options]')?.addEventListener('click', refresh);

@@ -1,4 +1,4 @@
-# DK Server M12 | NPC Possessions, Corpses and World-Time Decay (v0.2.33)
+# DK Server M13 | Verified World Checkpoints (v0.2.35)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m12`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m13`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -141,4 +141,14 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 
 ## v0.2.34 integration correction
 
-The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m12`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m13`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+
+## M13 save-strategy and verification
+
+`server/save-strategy-m13.cjs` provides a dedicated persistence layer inspired architecturally by RunUO's `Server/Persistence/SaveStrategy.cs` and `StandardSaveStrategy.cs`, with all code independently implemented. Existing writes keep the atomic fsync+rename discipline but are now routed through the one-authority save strategy. The module validates the entire world before writing and periodically stores SHA-256-verified checkpoints under the private server data directory's `snapshots/` subfolder. The first verified checkpoint is created at process startup, then generally after 25 meaningful world revisions, on explicit checkpoint request, and when stopping a running process.
+
+Up to **five valid world checkpoints** are retained. Each has a companion `.sha256` checksum file. Invalid or incomplete backups remain observable as errors; the retention routine only deletes excess **validated** checkpoints, never files that cannot be verified. Failed secondary backups are reported but do not turn an already-completed primary world transaction into a misleading failed gameplay request. The backup health result is exposed through `GET /api/v1/save/status`. To request a verified checkpoint from the connected game, use `POST /api/v1/save/checkpoint` with `X-DK-Control: checkpoint`. It is still loopback-only and subject to the existing origin restrictions. Main Menu → Options displays verification status and a Save World Checkpoint control.
+
+**No automatic rollback.** If the main `world.json` cannot be parsed or validated, the original refusal-to-start behavior remains, even when checkpoints exist. Manually authorized world recovery will be implemented separately because choosing an older save without consent would permanently alter a one-life world. This milestone does not include event-journal gap reconciliation or backups of the full unbounded NDJSON event archive.
+
+`tests/save-strategy-m13.cjs` verifies backups, checksums, retention, refusal to overwrite invalid data, non-recovery on corrupt primary and the HTTP status/control boundary. Full test execution still requires a complete source checkout. No new art, MMO requirements or online hosting were introduced.

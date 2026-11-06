@@ -17,6 +17,7 @@ const {reconcile:reconcileEntities,counts:assertEntityCounts,inspect:inspectEnti
 const {build:buildSectorIndex,lookup:sectorLookup}=require('./sectors-m10.cjs');
 const {ensure:ensureScheduler,listing:schedulerListing}=require('./world-scheduler-m11.cjs');
 const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m12.cjs');
+const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -123,8 +124,10 @@ async function createDKServer({
     throw new Error('DK Server M1 binds only to loopback (remote access requires authentication)');
   await fs.mkdir(dataDir, { recursive: true, mode: 0o700 });
   const releaseLock = await acquireWriterLock(dataDir);
+  const snapshots=createSaveStrategy({dataDir,validateWorld,durableWrite,now});
   let world;
   try {
+    await snapshots.init();
     world=await loadWorld(dataDir,now());
     const regionsAdded=ensureRegions(world),livingAdded=ensureLivingWorld(world);
     const resourcesAdded=ensureResources(world);
@@ -148,7 +151,7 @@ async function createDKServer({
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
     if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
-    await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(world,null,2)+'\n');
+    await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
   const streams = new Set();
   let server, writeQueue = Promise.resolve(), stopping = false;
@@ -166,6 +169,11 @@ async function createDKServer({
       revision: world.revision, clock: worldClock(world, now()), area: world.areas[AREA_ID]
     };
   }
+  async function createCheckpoint(){
+    const pending=writeQueue.then(()=>snapshots.save(world,{forceBackup:true}));
+    writeQueue=pending.catch(()=>{});
+    return pending;
+  }
   async function saveRuntimeChange(running) {
     const pending=writeQueue.then(async()=>{
       if(Boolean(world.runtime?.running??true)===running)
@@ -173,7 +181,7 @@ async function createDKServer({
       const tick=advance(world,now(),1440);
       const next=setWorldRunning(tick.world,running,now());
       const milestone=recordWorld(next,running?'started':'paused',next.living.minute);
-      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(next,null,2)+'\n');
+      await snapshots.save(next);
       world=next;
       try{await appendEvents([...tick.events,...(milestone?[milestone]:[])]);}
       catch(e){console.error('World event archive write failed:',e);}
@@ -190,7 +198,7 @@ async function createDKServer({
       const tick=advance(world,now(),180);
       const result=createCharacter(checkpointWorldTime(tick.world,now()),slot,name,now());
       const playerEvent=recordPlayer(result.world,'created',result.character,result.world.living.minute);
-      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      await snapshots.save(result.world);
       world=result.world;
       try{await appendEvents([...tick.events,...(playerEvent?[playerEvent]:[])]);}
       catch(e){console.error('World event archive write failed:',e);}
@@ -207,7 +215,7 @@ async function createDKServer({
       reconcileEntities(result.world);
       assertEntityCounts(result.world);
       const playerEvent=recordPlayer(result.world,command,result.character,result.world.living.minute);
-      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      await snapshots.save(result.world);
       world=result.world;
       try{await appendEvents([...tick.events,...(playerEvent?[playerEvent]:[])]);}
       catch(e){console.error('World event archive write failed:',e);}
@@ -224,7 +232,7 @@ async function createDKServer({
       reconcileEntities(result.world);
       assertEntityCounts(result.world);
       validateWorld(result.world);
-      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      await snapshots.save(result.world);
       world=result.world;
       try{await appendEvents([...tick.events,...(result.events||[result.event])]);}
       catch(e){console.error('World event archive write failed:',e);}
@@ -240,8 +248,7 @@ async function createDKServer({
       reconcileEntities(result.world);
       assertEntityCounts(result.world);
       validateWorld(result.world);
-      await durableWrite(path.join(dataDir,'world.json'),
-        JSON.stringify(result.world,null,2)+'\n');
+      await snapshots.save(result.world);
       world=result.world;
       try{await appendEvents([...tick.events,result.event]);}
       catch(e){console.error('Social event archive write failed:',e);}
@@ -254,7 +261,7 @@ async function createDKServer({
       if(!world.runtime?.running)throw Error('World is paused; press Start Server');
       const tick=advance(world,now(),180);
       const result=collectLetter(tick.world,id);
-      await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(result.world,null,2)+'\n');
+      await snapshots.save(result.world);
       world=result.world;
       try{await appendEvents([...tick.events,result.event]);}
       catch(e){console.error('World event archive write failed:',e);}
@@ -298,7 +305,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m12', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m13', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -311,6 +318,23 @@ async function createDKServer({
       const area=world.areas[areaMatch[1]];
       return area?sendJSON(res,200,{area,revision:world.revision},method):
         sendJSON(res,404,{error:'Unknown region'},method);
+    }
+    if(url.pathname==='/api/v1/save/status'&&!write){
+      return sendJSON(res,200,await snapshots.status(world),method);
+    }
+    if(url.pathname==='/api/v1/save/checkpoint'&&method==='POST'){
+      if(req.headers['x-dk-control']!=='checkpoint')
+        return sendJSON(res,403,{error:'Use the Demon Killer menu to save a checkpoint'});
+      try{
+        const result=await createCheckpoint();
+        if(result.backup_error)
+          return sendJSON(res,503,{error:'World saved, but checkpoint backup failed'});
+        return sendJSON(res,200,{saved:true,revision:result.revision,
+          backup_count:(await snapshots.status(world)).backup_count});
+      }catch(e){
+        console.error('World checkpoint failed:',e);
+        return sendJSON(res,500,{error:'World checkpoint could not be saved'});
+      }
     }
     if(url.pathname==='/api/v1/corpses'&&!write){
       const c=world.characters['1'];
@@ -503,7 +527,7 @@ async function createDKServer({
         const clockElapsed=now()-Date.parse(world.runtime.resumed_at_utc);
         if(!tick.minutes&&clockElapsed<30_000)return;
         const next=checkpointWorldTime(tick.world,now());
-        await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(next,null,2)+'\n');
+        await snapshots.save(next);
         world=next;
         if(tick.events.length){
           try{await appendEvents(tick.events);}
@@ -537,7 +561,7 @@ async function createDKServer({
         const tick=advance(world,now(),1440);
         const next=setWorldRunning(tick.world,false,now());
         const milestone=recordWorld(next,'paused',next.living.minute);
-        await durableWrite(path.join(dataDir,'world.json'),JSON.stringify(next,null,2)+'\n');
+        await snapshots.save(next,{forceBackup:true});
         world=next;
         try{await appendEvents([...tick.events,...(milestone?[milestone]:[])]);}
         catch(e){console.error('World event archive write failed:',e);}

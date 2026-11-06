@@ -50,3 +50,7 @@ Source review of RunUO `Server/Timer.cs` confirmed priorities and server-control
 ## Milestone 12: Mobile possessions and corpse lifetime (v0.2.33)
 
 RunUO's `Server/Mobile.cs`, `Server/Items/Container.cs` and `Scripts/Items/Misc/Corpses/Corpse.cs` illustrated mobile inventories, contained loot, ownership and decay timers. DK Server implements these concepts independently through `server/mobile-assets-m12.cjs`, M10's item serials and sectors, and M11's saved job scheduler. An NPC's backpack and wealth now persist into a physical corpse; looting transfers belongings without duplicating wealth, and unclaimed remains decay only on simulated world time. We have not implemented RunUO's full looting-rights, criminality, notoriety, carving, player corpse or resurrection systems.
+
+## Milestone 13: SaveStrategy and verified world checkpoints (v0.2.35)
+
+RunUO's `Server/Persistence/SaveStrategy.cs`, `StandardSaveStrategy.cs` and `SaveMetrics.cs` demonstrate a separate world persistence pipeline, independent from game objects. Demon Killer now independently implements a validated save strategy that keeps its existing atomic primary write and adds rotating SHA-256-verified world checkpoints and save health metrics. Corrupted primary saves remain blocked from startup until an owner makes an explicit recovery decision. Journal reconciliation, incremental sectors and hosted filesystem durability are follow-on milestones.

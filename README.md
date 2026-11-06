@@ -2,11 +2,20 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.34 | DK Server M12 Integration Fix
+## Current milestone: v0.2.35 | DK Server M13, Verified World Checkpoints
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M13: Preserve the world even if a save goes wrong
+
+- **Managed save strategy:** All authoritative world writes still use a single serialized, fsynced, atomic `world.json`, but now pass through a dedicated persistence module.
+- **Five verified checkpoints:** The server periodically captures SHA-256-verified snapshots containing the full world, identities, possessions, NPC history, scheduler and current character. Automatic checkpoints follow meaningful world revisions; a new one is also created at startup and clean shutdown.
+- **Corruption detection:** Snapshot files have independent SHA-256 sidecars and are validated against the actual world schema. The oldest verified checkpoints are rotated out after five; invalid backups are reported, not silently adopted.
+- **No involuntary rollback:** A damaged primary world still refuses startup. The service reports recoverable checkpoints but does not select an older history or reset the player's only life without an explicit recovery decision.
+- **Options menu:** The connected game shows the count of verified world backups and offers **Save World Checkpoint**. The public GitHub Pages preview reports that no server is connected rather than claiming that backups exist.
+- **Future scalability:** Event-log reconciliation, incremental sector snapshots, cold storage and hosted volumes are separate follow-up milestones. This build does not establish online server hosting.
 
 ### M12: An NPC's possessions outlive them
 

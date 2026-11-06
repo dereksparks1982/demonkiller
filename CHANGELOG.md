@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.35 / DK Server M13 | 2026-11-06 | Verified world save checkpoints
+
+- Extracted authoritative saves into `server/save-strategy-m13.cjs` while keeping the existing single-writer queue and fsynced atomic world-file replacement. The strategy validates state before writing.
+- Created automatically managed checkpoints with SHA-256 sidecar verification, schema validation and retention of five valid copies. Backups are created on startup/shutdown and at significant revision intervals.
+- Added read-only `GET /api/v1/save/status` with primary save validity and verified/invalid backup counts, plus an explicit loopback-only `POST /api/v1/save/checkpoint` action.
+- Integrated backup health and Save World Checkpoint into Options. The public GitHub Pages preview still reports no connected backend and does not attempt to fabricate a save.
+- Preserved the one-life safety rule: a damaged `world.json` refuses startup even with valid older checkpoints, and no automatic world reset or history rollback occurs.
+- Added `tests/save-strategy-m13.cjs` regression contracts for snapshot creation, checksums, corruption, revision intervals, retention and HTTP inspection. Full Node suite must run against the complete repository checkout.
+- RunUO's save strategy was used only for architectural inspiration; no GPL code was copied. No new artwork or hosted server deployment.
+
 ## v0.2.34 | 2026-11-06 | M12 server integration correction
 
 - Fixed the M12 release missing its `server/dk-server.cjs` mobile-assets integration. Ensures NPC backpacks at startup and publishes both nearby corpses and read-only corpse markers to the actual server routes.

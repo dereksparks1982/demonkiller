@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M13 (v0.2.35)
+
+Persistent world saves now flow through an independent `server/save-strategy-m13.cjs`. The main world snapshot remains atomic and crash conscious (private temporary file, fsync, rename, directory sync), with up to five retained, SHA-256-verified backup snapshots of the entire authoritative state. Checkpoints are created after significant revisions, on startup, on clean server shutdown and on user request. The server offers read-only save-health inspection and a checkpoint command through the same local-only origin-restricted interface. Secondary backup failure is not misreported as a failed completed game-state transaction.
+
+One-life preservation is explicit: old checkpoints **are never automatically restored** over a corrupted or incompatible primary world, and no new world is silently created in its place. A future admin recovery milestone will require manual selection and provenance verification. The NDJSON event archive remains separate from these snapshot backups; journal reconciliation and incremental backups remain future architecture work. This does not change the persistent server's lack of web hosting.
+
 ## Implemented milestone: DK Server M12 (v0.2.33)
 
 Individual NPCs now have durable personal containers and items, separate from the player's backpack and business inventory. `server/mobile-assets-m12.cjs` owns NPC backpack identities and corpse records. On NPC death from starvation or monster combat, coins are taken out of the living NPC record and placed inside a corpse at the actual map tile, while personal items keep their M10 serials. The one living character can recover nearby NPC possessions through the existing authoritative gameplay endpoint. Bodies are registered in M10 sectors and expire after 720 running world minutes via a fifth M11 scheduler job, without ghost/remote/item-forgery exploits. Corpse decay while the server is deliberately paused does not occur.
