@@ -87,6 +87,19 @@
   const visual = { x:scene.player.x, y:scene.player.y, queue:[] };
   let rightMouseHeld = false, rightPointer = null, lastFrameTime = 0;
   let opening = null, ritual = null;
+  // Slow, irregular flicker uses the two approved gold crystal frames.
+  // This is only presentation state; unused soul crystals stay full.
+  let crystalBright = true, crystalFlickerTime = 1.2;
+  function updateCrystalFlicker(dt) {
+    if(!scene.objects.some(o=>o.type==='crystal'&&!o.spent))return false;
+    crystalFlickerTime-=dt;
+    if(crystalFlickerTime>0)return false;
+    crystalFlickerTime=.9+Math.random()*2.3;
+    const next=Math.random()<.5;
+    const changed=next!==crystalBright;
+    crystalBright=next;
+    return changed;
+  }
 
   // All cutscene actors are ephemeral; room geometry and saved editor objects stay separate.
   const CULT_POSITIONS=[[2,4],[13,4],[2,8],[13,8],[4,12],[11,12],[5,3],[10,3]];
@@ -322,7 +335,11 @@
     if(p==='kneel')
       speechBubble(opening.woman,'In ash and silence, let one light remain.','#c7ae68');
   }
-  function beginResurrection() {
+  function beginResurrection(crystal) {
+    // The specific crystal selected by the valid double-click empties immediately.
+    if(crystal&&crystal.type==='crystal'&&!crystal.spent){
+      crystal.spent=true;dirty=true;
+    }
     const p=scene.player;
     rightMouseHeld=false;resetVisual();
     ritual={phase:'spirit',time:0,fromX:visual.x,fromY:visual.y,visual:{x:visual.x,y:visual.y}};
@@ -337,8 +354,6 @@
       ritual.visual.y=ritual.fromY+(5.55-ritual.fromY)*e;
       if (t>=1) {
         scene.player.form='living';
-        const crystal=scene.objects.find(o=>o.type==='crystal'&&!o.spent);
-        if (crystal) crystal.spent=true;
         const landing=[[8,7],[9,7],[7,7],[8,8],[9,8],[7,8]].find(([x,y])=>canStand(x,y,'living'));
         if (landing) {scene.player.x=landing[0];scene.player.y=landing[1];}
         else {scene.player.x=scene.spawn.x;scene.player.y=scene.spawn.y;repairPlayer();}
@@ -503,6 +518,22 @@
     return readyImage('temple/walls/'+name+'_'+face+'.png');
   }
   function art(g,o) {
+    // A soul crystal occupies a tile for interaction, but its visible crystal is
+    // far smaller than the 32x32 player. Never stretch it to fill the whole tile.
+    if(o.type==='crystal'){
+      const filename=o.spent?'crystal_silver_depleted.png'
+        :'crystal_gold_'+(crystalBright?'bright':'dim')+'.png';
+      const picture=readyImage('crystals/'+filename);
+      const crystalSize=24,offset=(TILE-crystalSize)/2;
+      if(picture){
+        g.drawImage(picture,o.x*TILE+offset,o.y*TILE+offset,crystalSize,crystalSize);
+      }else{
+        // Small emergency fallback, never the former oversized purple crystal.
+        const color=o.spent?'#b4b4bd':crystalBright?'#ffdf54':'#a38325';
+        pixel(g,color,o.x*TILE+13,o.y*TILE+10,6,13);
+      }
+      return;
+    }
     const picture=objectImage(o),size=dims(o);
     // Approved newer torch-and-flame artwork from the original temple asset sheet.
     if(o.type==='braziers'){
@@ -528,16 +559,6 @@
         pixel(g,'#81414d',19,16,w-38,h-37);pixel(g,'#b56677',25,22,w-50,3);
         pixel(g,'#1b161c',w/2-17,h/2-8,34,16);pixel(g,'#d1a1a4',w/2-3,h/2-3,6,6);
         for(let i=0;i<3;i++)pixel(g,'#c16870',26+i*33,49,6,3);
-        break;
-      case 'crystal':
-        if (!o.spent) {
-          g.shadowColor='#a5a1ff';g.shadowBlur=17;pixel(g,'#6f538b',8,9,16,16);g.shadowBlur=0;
-          pixel(g,'#9c82d0',13,3,6,5);pixel(g,'#b7a6fb',10,9,13,6);
-          pixel(g,'#eee3ff',15,6,4,4);pixel(g,'#765b9f',10,15,13,8);
-          pixel(g,'#5b477b',13,23,7,5);pixel(g,'#d1bcff',6,16,3,3);
-        } else {
-          pixel(g,'#44374b',9,14,14,9);pixel(g,'#87778b',14,13,4,4);
-        }
         break;
       case 'braziers':
         pixel(g,'#62525a',5,23,22,7);pixel(g,'#28212b',9,17,14,10);
@@ -755,7 +776,7 @@
     if(obj.type==='crystal'&&!obj.spent&&p.form==='ghost') {
       // A normal click inspects; only a deliberate double click resurrects.
       if (!doubleClick) {message('A glowing gold crystal.');return;}
-      beginResurrection();draw();return;
+      beginResurrection(obj);draw();return;
     }
     message(CATALOG[obj.type].label+(obj.type==='crystal'&&obj.spent?' (spent)':'')+'.');
   }
@@ -805,6 +826,7 @@
   function advanceFrame(now) {
     const dt=lastFrameTime?Math.max(0,Math.min((now-lastFrameTime)/1000,.06)):0;
     lastFrameTime=now;
+    const crystalChanged=updateCrystalFlicker(dt);
     if(opening){updateOpening(dt);draw();requestAnimationFrame(advanceFrame);return;}
     if(ritual){updateResurrection(dt);draw();requestAnimationFrame(advanceFrame);return;}
     if(rightMouseHeld&&mode==='walk'&&rightPointer){
@@ -821,6 +843,7 @@
       }
       draw();
     }
+    if(crystalChanged)draw();
     requestAnimationFrame(advanceFrame);
   }
   function idFor(type){serial+=1;return type+'_'+Date.now().toString(36)+'_'+serial.toString(36);}

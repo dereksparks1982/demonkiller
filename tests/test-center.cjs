@@ -36,6 +36,10 @@ assert(js.includes("const STORE = 'dkSoftworks.demonkiller.testCenter.v1'"));
 assert(!js.includes('dkSoftworks.testCenter.room.v1'),'Must not reuse C&C test save key');
 assert(!js.includes('ccRoomLayoutV1'),'Must not access Capital & Consequence career keys');
 assert(css.includes('image-rendering:pixelated'),'Pixel artwork should remain crisp');
+assert.match(js,/crystalSize=24/,'Crystals render smaller than the 32px player');
+assert.match(js,/crystal_gold_.*crystalBright/,'Active crystals alternate only approved gold frames');
+assert.match(js,/crystal_silver_depleted\.png/,'Spent crystal must use static silver asset');
+assert.match(js,/beginResurrection\(obj\);draw\(\);return;/,'Double-click must consume the interacted crystal');
 // One 3 × 2 altar footprint is shared between the starter room and DK Architect.
 assert.match(js,/altar:\s*\{[^}]*w:\s*3,\s*h:\s*2/,'Architect altar must be three by two tiles');
 assert.match(js,/\{ id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 \}/,'Starter altar stays centered on north aisle');
@@ -117,6 +121,8 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.match(get('lifeState').textContent,/GHOST/,'Several single clicks never resurrect');
   await dblclick(8,7);
   assert.match(get('status').textContent,/The crystal answers/,'Double-click begins resurrection');
+  assert.match(js,/crystal\.spent=true;dirty=true;/,
+    'The targeted crystal becomes silver immediately when resurrection begins');
   assert.match(get('lifeState').textContent,/GHOST/,'Resurrection is not instantaneous');
   tickFrames(130);
   assert.match(get('lifeState').textContent,/RESURRECTED/);

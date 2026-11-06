@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.10 development preview | 2026-11-05 | Approved soul crystals
+
+- Split the exact owner-uploaded two-row "Glowing and Dull Pixel Crystals.png" master into 19 separately named 32×32 transparent game sprites: nine colors with bright/dim frames, one static silver depleted sprite.
+- The Forsaken Temple gold crystal draws at 24×24 within its 32×32 interaction tile; its actual colored silhouette is smaller still.
+- While unspent, the bright/dim gold image changes on a slow, irregular schedule. Refusing the crystal preserves this behavior.
+- On a successful ghost double-left-click, only that selected crystal turns to silver immediately. Resurrection timing, choice, and all other gameplay/Architect geometry stay the same.
+- Crystal source splitting is reproducible through a narrowly scoped, one-time GitHub Actions extraction. Browser visual acceptance is still pending.
+
+
 ## v0.2.9 development preview | 2026-11-05 | Pointed dialogue tails
 
 - Replaced the shared 9×9 rectangular dialogue stub and detached bottom line with a longer, 26-pixel tapered pointer.
