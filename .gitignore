@@ -1,0 +1,2 @@
+# Local DK Server world snapshots contain mutable state; never commit them.
+/server/data/

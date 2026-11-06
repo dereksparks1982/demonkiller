@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## DK Server M1 development preview | 2026-11-06 | RunUO-inspired persistence foundation
+
+- Added independent Linux **DK Server** under server/, with an original Node.js implementation. RunUO's World, SaveStrategy, entity and timer systems were inspected as design references; no GPL C# or UO assets copied.
+- Server creates the approved 16×16 Forsaken Temple state, owns a durable world clock (six real hours of day, six real hours of night), and stores new character records with synchronized writes before acknowledging creation.
+- Private authenticated localhost-only character-create/read endpoints reject forged save snapshots, bad inputs, cross-origin writes and duplicate slots. Server data and admin token stay out of Git. Two processes cannot write the same world directory.
+- World snapshot, health, clock and read-only event stream power a small DK Server status page. Bad or unknown-version world data refuses startup rather than resetting; no migration of old browser saves.
+- **Not yet connected to the browser game.** Current client-local save behavior has not been disabled or promoted to the new authority. Next step is authenticated New Game/Continue integration and authoritative player actions, then safe retirement of old browser saving.
+- Nine native Node regression tests passed locally. No GitHub Actions tests were started; existing gameplay, intro, temple graphics, DK Architect, and audio remain unchanged. Development preview pending owner acceptance.
+
 ## v0.2.22 development preview | 2026-11-06 | Architect editing and character-only skill rust
 
 - Main menu music: clear music toggle, persistent 0–200% volume slider (100% = unamplified track), Web Audio amplification with peak-reducing dynamics processing, and graceful unamplified fallback. Default 200% honors the louder-menu request. Older on/off preferences remain valid; tests updated. Temple audio unchanged.

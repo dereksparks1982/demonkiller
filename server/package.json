@@ -1,0 +1,11 @@
+{
+  "name": "dk-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Demon Killer persistent world and character saving authority pilot",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node dk-server.cjs",
+    "test": "node --test ../tests/dk-server.cjs"
+  }
+}
