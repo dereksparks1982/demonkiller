@@ -239,20 +239,21 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   await click(1,6);
   const wallTool=get('tool');wallTool.value='wallLine';
   await wallTool.emit('change',{target:wallTool});
-  await click(1,7);await click(4,7);
+  // The test's freshly placed altar occupies (4,6)-(6,7), so use open row 8.
+  await click(1,8);await click(4,8);
   await get('save').emit('click');
   const wallLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   assert.equal(wallLayout.walls[6*16+1],1,'Wall brush creates connected wall cells');
   assert.equal(wallLayout.wallStyles[6*16+1],'moss','Wall finish survives room Save');
   for(let x=1;x<=4;x++){
-    assert.equal(wallLayout.walls[7*16+x],1,'Straight-run wall is complete');
-    assert.equal(wallLayout.wallStyles[7*16+x],'moss','Straight-run retains palette finish');
+    assert.equal(wallLayout.walls[8*16+x],1,'Straight-run wall is complete');
+    assert.equal(wallLayout.wallStyles[8*16+x],'moss','Straight-run retains palette finish');
   }
   wallTool.value='wallErase';await wallTool.emit('change',{target:wallTool});
-  await click(1,7);await get('save').emit('click');
+  await click(1,8);await get('save').emit('click');
   const erasedLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
-  assert.equal(erasedLayout.walls[7*16+1],0,'Dedicated wall eraser clears wall geometry');
-  assert.equal(erasedLayout.wallStyles[7*16+1],'clean','Erased wall loses its former finish');
+  assert.equal(erasedLayout.walls[8*16+1],0,'Dedicated wall eraser clears wall geometry');
+  assert.equal(erasedLayout.wallStyles[8*16+1],'clean','Erased wall loses its former finish');
 
   const invalid=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   invalid.area_id='other.world';
