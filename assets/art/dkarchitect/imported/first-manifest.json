@@ -1,0 +1,4868 @@
+{
+  "schema": 1,
+  "source": "https://0x72.itch.io/16x16-dungeon-tileset",
+  "sha256": "4749333cf50b35c025d889bc9ae63e61b101c5f1d226ce742bdc6106a01cf984",
+  "atlas": "./assets/art/dkarchitect/imported/ox72-first-game-atlas.png",
+  "entries": {
+    "ox72i_black": {
+      "name": "Black",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          0,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_box": {
+      "name": "Box",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          17,
+          0,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_boxes_stacked": {
+      "name": "Boxes Stacked",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          34,
+          0,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_chest_closed": {
+      "name": "Chest Closed",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          51,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_chest_golden_closed": {
+      "name": "Chest Golden Closed",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          68,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_chest_golden_open_empty": {
+      "name": "Chest Golden Open Empty",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          85,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_chest_golden_open_full": {
+      "name": "Chest Golden Open Full",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          102,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_chest_open_empty": {
+      "name": "Chest Open Empty",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          119,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_chest_open_full": {
+      "name": "Chest Open Full",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          136,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_column": {
+      "name": "Column",
+      "pack": "ox72i",
+      "category": "structure",
+      "frames": [
+        [
+          153,
+          0,
+          16,
+          48
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 96,
+      "footprint": [
+        1,
+        3
+      ]
+    },
+    "ox72i_column_wall": {
+      "name": "Column Wall",
+      "pack": "ox72i",
+      "category": "structure",
+      "frames": [
+        [
+          170,
+          0,
+          16,
+          48
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 96,
+      "footprint": [
+        1,
+        3
+      ]
+    },
+    "ox72i_darkness_bottom": {
+      "name": "Darkness Bottom",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          187,
+          0,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_darkness_left": {
+      "name": "Darkness Left",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          220,
+          0,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_darkness_right": {
+      "name": "Darkness Right",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          253,
+          0,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_darkness_top": {
+      "name": "Darkness Top",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          286,
+          0,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_door_closed": {
+      "name": "Door Closed",
+      "pack": "ox72i",
+      "category": "structure",
+      "frames": [
+        [
+          319,
+          0,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_door_left": {
+      "name": "Door Left",
+      "pack": "ox72i",
+      "category": "structure",
+      "frames": [
+        [
+          352,
+          0,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_door_open": {
+      "name": "Door Open",
+      "pack": "ox72i",
+      "category": "structure",
+      "frames": [
+        [
+          369,
+          0,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_door_right": {
+      "name": "Door Right",
+      "pack": "ox72i",
+      "category": "structure",
+      "frames": [
+        [
+          402,
+          0,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_edge_bricks": {
+      "name": "Edge Bricks",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          419,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_e": {
+      "name": "Edge E",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          436,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_n": {
+      "name": "Edge N",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          453,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_ne": {
+      "name": "Edge Ne",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          470,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_ns": {
+      "name": "Edge Ns",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          487,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_nse": {
+      "name": "Edge Nse",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          504,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_nsw": {
+      "name": "Edge Nsw",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          521,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_nw": {
+      "name": "Edge Nw",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          538,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_nwe": {
+      "name": "Edge Nwe",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          555,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_s": {
+      "name": "Edge S",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          572,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_se": {
+      "name": "Edge Se",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          589,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_single": {
+      "name": "Edge Single",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          606,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_single_crack": {
+      "name": "Edge Single Crack",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          623,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_sw": {
+      "name": "Edge Sw",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          640,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_swe": {
+      "name": "Edge Swe",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          657,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_w": {
+      "name": "Edge W",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          674,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_edge_we": {
+      "name": "Edge We",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          691,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_big_blue": {
+      "name": "Flask Big Blue",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          708,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_big_green": {
+      "name": "Flask Big Green",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          718,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_big_red": {
+      "name": "Flask Big Red",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          728,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_big_yellow": {
+      "name": "Flask Big Yellow",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          738,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_blue": {
+      "name": "Flask Blue",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          748,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_green": {
+      "name": "Flask Green",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          758,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_red": {
+      "name": "Flask Red",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          768,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_flask_yellow": {
+      "name": "Flask Yellow",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          778,
+          0,
+          9,
+          11
+        ]
+      ],
+      "fps": 0,
+      "width": 18,
+      "height": 22,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_edge_1": {
+      "name": "Floor Edge 1",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          788,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_edge_2": {
+      "name": "Floor Edge 2",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          805,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_edge_3": {
+      "name": "Floor Edge 3",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          822,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_blue_basin": {
+      "name": "Floor Gargoyle Blue Basin",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          839,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_blue_puddle": {
+      "name": "Floor Gargoyle Blue Puddle",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          856,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_green_basin": {
+      "name": "Floor Gargoyle Green Basin",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          873,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_green_puddle": {
+      "name": "Floor Gargoyle Green Puddle",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          890,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_mid_blue_left": {
+      "name": "Floor Gargoyle Mid Blue Left",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          907,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_mid_blue_right": {
+      "name": "Floor Gargoyle Mid Blue Right",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          924,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_mid_green_left": {
+      "name": "Floor Gargoyle Mid Green Left",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          941,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_mid_green_right": {
+      "name": "Floor Gargoyle Mid Green Right",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          958,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_mid_red_left": {
+      "name": "Floor Gargoyle Mid Red Left",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          975,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_mid_red_right": {
+      "name": "Floor Gargoyle Mid Red Right",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          992,
+          0,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_red_basin": {
+      "name": "Floor Gargoyle Red Basin",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          0,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_gargoyle_red_puddle": {
+      "name": "Floor Gargoyle Red Puddle",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          17,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_ladder": {
+      "name": "Floor Ladder",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          34,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_light": {
+      "name": "Floor Light",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          51,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_e": {
+      "name": "Floor Mud E",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          68,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_mid_1": {
+      "name": "Floor Mud Mid 1",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          85,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_mid_2": {
+      "name": "Floor Mud Mid 2",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          102,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_n_1": {
+      "name": "Floor Mud N 1",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          119,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_n_2": {
+      "name": "Floor Mud N 2",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          136,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_ne": {
+      "name": "Floor Mud Ne",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          153,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_nw": {
+      "name": "Floor Mud Nw",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          170,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_s_1": {
+      "name": "Floor Mud S 1",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          187,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_s_2": {
+      "name": "Floor Mud S 2",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          204,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_se": {
+      "name": "Floor Mud Se",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          221,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_sw": {
+      "name": "Floor Mud Sw",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          238,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_mud_w": {
+      "name": "Floor Mud W",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          255,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_plain": {
+      "name": "Floor Plain",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          272,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_1": {
+      "name": "Floor Stain 1",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          289,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_2": {
+      "name": "Floor Stain 2",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          306,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_3": {
+      "name": "Floor Stain 3",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          323,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_e": {
+      "name": "Floor Stain E",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          340,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_goo": {
+      "name": "Floor Stain Goo",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          357,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_n": {
+      "name": "Floor Stain N",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          374,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_ne": {
+      "name": "Floor Stain Ne",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          391,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_nw": {
+      "name": "Floor Stain Nw",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          408,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_floor_stain_w": {
+      "name": "Floor Stain W",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          425,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_gargoyle_mid_top_left": {
+      "name": "Gargoyle Mid Top Left",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          442,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_gargoyle_mid_top_right": {
+      "name": "Gargoyle Mid Top Right",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          459,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_gargoyle_top_1": {
+      "name": "Gargoyle Top 1",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          476,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_gargoyle_top_2": {
+      "name": "Gargoyle Top 2",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          493,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_hand": {
+      "name": "Hand",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          510,
+          49,
+          4,
+          4
+        ]
+      ],
+      "fps": 0,
+      "width": 8,
+      "height": 8,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_hand_big": {
+      "name": "Hand Big",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          515,
+          49,
+          5,
+          5
+        ]
+      ],
+      "fps": 0,
+      "width": 10,
+      "height": 10,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_hand_small": {
+      "name": "Hand Small",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          521,
+          49,
+          3,
+          3
+        ]
+      ],
+      "fps": 0,
+      "width": 6,
+      "height": 6,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_hero_basic": {
+      "name": "Hero Basic",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          525,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_bat": {
+      "name": "Monster Bat",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          542,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_bies": {
+      "name": "Monster Bies",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          559,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_chort": {
+      "name": "Monster Chort",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          576,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_dark_knight": {
+      "name": "Monster Dark Knight",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          593,
+          49,
+          16,
+          21
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 42,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_monster_demon": {
+      "name": "Monster Demon",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          610,
+          49,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_monster_demonolog": {
+      "name": "Monster Demonolog",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          643,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_air": {
+      "name": "Monster Elemental Air",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          660,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_air_small": {
+      "name": "Monster Elemental Air Small",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          677,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_earth": {
+      "name": "Monster Elemental Earth",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          694,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_earth_small": {
+      "name": "Monster Elemental Earth Small",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          711,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_fire": {
+      "name": "Monster Elemental Fire",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          728,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_fire_small": {
+      "name": "Monster Elemental Fire Small",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          745,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_gold_short": {
+      "name": "Monster Elemental Gold Short",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          762,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_gold_tall": {
+      "name": "Monster Elemental Gold Tall",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          779,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_goo": {
+      "name": "Monster Elemental Goo",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          796,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_goo_small": {
+      "name": "Monster Elemental Goo Small",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          813,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_plant": {
+      "name": "Monster Elemental Plant",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          830,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_plant_small": {
+      "name": "Monster Elemental Plant Small",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          847,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_water": {
+      "name": "Monster Elemental Water",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          864,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_elemental_water_small": {
+      "name": "Monster Elemental Water Small",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          881,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_goblin": {
+      "name": "Monster Goblin",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          898,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_imp": {
+      "name": "Monster Imp",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          915,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_necromancer": {
+      "name": "Monster Necromancer",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          932,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_ogre": {
+      "name": "Monster Ogre",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          949,
+          49,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_monster_orc": {
+      "name": "Monster Orc",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          982,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_orc_armored": {
+      "name": "Monster Orc Armored",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          999,
+          49,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_orc_masked": {
+      "name": "Monster Orc Masked",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          0,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_orc_shaman": {
+      "name": "Monster Orc Shaman",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          17,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_orc_veteran": {
+      "name": "Monster Orc Veteran",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          34,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_rokita": {
+      "name": "Monster Rokita",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          51,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_skelet": {
+      "name": "Monster Skelet",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          68,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_tentackle": {
+      "name": "Monster Tentackle",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          85,
+          82,
+          32,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 64,
+      "footprint": [
+        2,
+        2
+      ]
+    },
+    "ox72i_monster_wogol": {
+      "name": "Monster Wogol",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          118,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_zombie": {
+      "name": "Monster Zombie",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          135,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_zombie_green": {
+      "name": "Monster Zombie Green",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          152,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_zombie_short": {
+      "name": "Monster Zombie Short",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          169,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_zombie_small": {
+      "name": "Monster Zombie Small",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          186,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_monster_zombie_tall": {
+      "name": "Monster Zombie Tall",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          203,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_barbarian": {
+      "name": "Npc Barbarian",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          220,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_dwarf": {
+      "name": "Npc Dwarf",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          237,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_dwarf_2": {
+      "name": "Npc Dwarf 2",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          254,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_elf": {
+      "name": "Npc Elf",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          271,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_elf_2": {
+      "name": "Npc Elf 2",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          288,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_knight_blue": {
+      "name": "Npc Knight Blue",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          305,
+          82,
+          16,
+          20
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 40,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_npc_knight_green": {
+      "name": "Npc Knight Green",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          322,
+          82,
+          16,
+          20
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 40,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_npc_knight_yellow": {
+      "name": "Npc Knight Yellow",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          339,
+          82,
+          16,
+          20
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 40,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_npc_mage": {
+      "name": "Npc Mage",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          356,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_merchant": {
+      "name": "Npc Merchant",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          373,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_merchant_2": {
+      "name": "Npc Merchant 2",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          390,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_paladin": {
+      "name": "Npc Paladin",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          407,
+          82,
+          16,
+          20
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 40,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_npc_sage": {
+      "name": "Npc Sage",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          424,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_trickster": {
+      "name": "Npc Trickster",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          441,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_wizzard": {
+      "name": "Npc Wizzard",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          458,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_npc_wrestler": {
+      "name": "Npc Wrestler",
+      "pack": "ox72i",
+      "category": "npcs",
+      "frames": [
+        [
+          475,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_e": {
+      "name": "Pit E",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          492,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_n": {
+      "name": "Pit N",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          509,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_ne": {
+      "name": "Pit Ne",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          526,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_nw": {
+      "name": "Pit Nw",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          543,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_s": {
+      "name": "Pit S",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          560,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_se": {
+      "name": "Pit Se",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          577,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_sw": {
+      "name": "Pit Sw",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          594,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_pit_w": {
+      "name": "Pit W",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          611,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_skull": {
+      "name": "Skull",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          628,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_stairs_bottom": {
+      "name": "Stairs Bottom",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          645,
+          82,
+          32,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 32,
+      "footprint": [
+        2,
+        1
+      ]
+    },
+    "ox72i_stairs_mid": {
+      "name": "Stairs Mid",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          678,
+          82,
+          32,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 32,
+      "footprint": [
+        2,
+        1
+      ]
+    },
+    "ox72i_stairs_top": {
+      "name": "Stairs Top",
+      "pack": "ox72i",
+      "category": "floor",
+      "frames": [
+        [
+          711,
+          82,
+          32,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 64,
+      "height": 32,
+      "footprint": [
+        2,
+        1
+      ]
+    },
+    "ox72i_torch_1": {
+      "name": "Torch 1",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          744,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_2": {
+      "name": "Torch 2",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          759,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_3": {
+      "name": "Torch 3",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          774,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_4": {
+      "name": "Torch 4",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          789,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_5": {
+      "name": "Torch 5",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          804,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_6": {
+      "name": "Torch 6",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          819,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_7": {
+      "name": "Torch 7",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          834,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_8": {
+      "name": "Torch 8",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          849,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_torch_no_flame": {
+      "name": "Torch No Flame",
+      "pack": "ox72i",
+      "category": "furniture",
+      "frames": [
+        [
+          864,
+          82,
+          14,
+          23
+        ]
+      ],
+      "fps": 0,
+      "width": 28,
+      "height": 46,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_waepon_katana": {
+      "name": "Waepon Katana",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          879,
+          82,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_wall_center": {
+      "name": "Wall Center",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          896,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_drain_gate": {
+      "name": "Wall Drain Gate",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          913,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_flag_blue": {
+      "name": "Wall Flag Blue",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          930,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_flag_green": {
+      "name": "Wall Flag Green",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          947,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_flag_red": {
+      "name": "Wall Flag Red",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          964,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_flag_yellow": {
+      "name": "Wall Flag Yellow",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          981,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_front": {
+      "name": "Wall Front",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          998,
+          82,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_front_left": {
+      "name": "Wall Front Left",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          0,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_front_right": {
+      "name": "Wall Front Right",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          17,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_blue_1": {
+      "name": "Wall Gargoyle Blue 1",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          34,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_blue_2": {
+      "name": "Wall Gargoyle Blue 2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          51,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_green_1": {
+      "name": "Wall Gargoyle Green 1",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          68,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_green_2": {
+      "name": "Wall Gargoyle Green 2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          85,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_mid_blue_left": {
+      "name": "Wall Gargoyle Mid Blue Left",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          102,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_mid_blue_right": {
+      "name": "Wall Gargoyle Mid Blue Right",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          119,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_mid_green_left": {
+      "name": "Wall Gargoyle Mid Green Left",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          136,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_mid_green_right": {
+      "name": "Wall Gargoyle Mid Green Right",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          153,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_mid_red_left": {
+      "name": "Wall Gargoyle Mid Red Left",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          170,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_mid_red_right": {
+      "name": "Wall Gargoyle Mid Red Right",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          187,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_red_1": {
+      "name": "Wall Gargoyle Red 1",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          204,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gargoyle_red_2": {
+      "name": "Wall Gargoyle Red 2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          221,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_goo": {
+      "name": "Wall Goo",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          238,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_gratings": {
+      "name": "Wall Gratings",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          255,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_inner_e": {
+      "name": "Wall Inner E",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          272,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_inner_ne": {
+      "name": "Wall Inner Ne",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          289,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_inner_nw": {
+      "name": "Wall Inner Nw",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          306,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_inner_se": {
+      "name": "Wall Inner Se",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          323,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_inner_sw": {
+      "name": "Wall Inner Sw",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          340,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_inner_w": {
+      "name": "Wall Inner W",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          357,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_left": {
+      "name": "Wall Left",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          374,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_missing_brick_1": {
+      "name": "Wall Missing Brick 1",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          391,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_missing_brick_2": {
+      "name": "Wall Missing Brick 2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          408,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_e": {
+      "name": "Wall Outer E",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          425,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_e2": {
+      "name": "Wall Outer E2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          442,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_n": {
+      "name": "Wall Outer N",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          459,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_ne": {
+      "name": "Wall Outer Ne",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          476,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_nw": {
+      "name": "Wall Outer Nw",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          493,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_se": {
+      "name": "Wall Outer Se",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          510,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_sw": {
+      "name": "Wall Outer Sw",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          527,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_w": {
+      "name": "Wall Outer W",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          544,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outer_w2": {
+      "name": "Wall Outer W2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          561,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_outline_1": {
+      "name": "Wall Outline 1",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          578,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_wall_outline_2": {
+      "name": "Wall Outline 2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          595,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_wall_outline_left": {
+      "name": "Wall Outline Left",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          612,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_wall_outline_right": {
+      "name": "Wall Outline Right",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          629,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_wall_pipe_1": {
+      "name": "Wall Pipe 1",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          646,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_pipe_2": {
+      "name": "Wall Pipe 2",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          663,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_pipe_small": {
+      "name": "Wall Pipe Small",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          680,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_right": {
+      "name": "Wall Right",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          697,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_top_center": {
+      "name": "Wall Top Center",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          714,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_top_left": {
+      "name": "Wall Top Left",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          731,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_wall_top_right": {
+      "name": "Wall Top Right",
+      "pack": "ox72i",
+      "category": "wall",
+      "frames": [
+        [
+          748,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_weapon_bomb": {
+      "name": "Weapon Bomb",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          765,
+          115,
+          16,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_weapon_chopper": {
+      "name": "Weapon Chopper",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          782,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_dagger_golden": {
+      "name": "Weapon Dagger Golden",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          799,
+          115,
+          8,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 16,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_weapon_dagger_long": {
+      "name": "Weapon Dagger Long",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          808,
+          115,
+          7,
+          19
+        ]
+      ],
+      "fps": 0,
+      "width": 14,
+      "height": 38,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_dagger_silver": {
+      "name": "Weapon Dagger Silver",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          816,
+          115,
+          8,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 16,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_weapon_dagger_small": {
+      "name": "Weapon Dagger Small",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          825,
+          115,
+          8,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 16,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_weapon_dagger_steel": {
+      "name": "Weapon Dagger Steel",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          834,
+          115,
+          8,
+          16
+        ]
+      ],
+      "fps": 0,
+      "width": 16,
+      "height": 32,
+      "footprint": [
+        1,
+        1
+      ]
+    },
+    "ox72i_weapon_hammer": {
+      "name": "Weapon Hammer",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          843,
+          115,
+          8,
+          19
+        ]
+      ],
+      "fps": 0,
+      "width": 16,
+      "height": 38,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_katana_silver": {
+      "name": "Weapon Katana Silver",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          852,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_silver_topaz": {
+      "name": "Weapon Silver Topaz",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          869,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sledgehammer": {
+      "name": "Weapon Sledgehammer",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          886,
+          115,
+          16,
+          48
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 96,
+      "footprint": [
+        1,
+        3
+      ]
+    },
+    "ox72i_weapon_sword_big": {
+      "name": "Weapon Sword Big",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          903,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_black": {
+      "name": "Weapon Sword Black",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          920,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_emerald": {
+      "name": "Weapon Sword Emerald",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          937,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_golden": {
+      "name": "Weapon Sword Golden",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          954,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_green": {
+      "name": "Weapon Sword Green",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          971,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_red": {
+      "name": "Weapon Sword Red",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          988,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_ruby": {
+      "name": "Weapon Sword Ruby",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          1005,
+          115,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_rusty": {
+      "name": "Weapon Sword Rusty",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          0,
+          164,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_silver": {
+      "name": "Weapon Sword Silver",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          17,
+          164,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_small": {
+      "name": "Weapon Sword Small",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          34,
+          164,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_steel": {
+      "name": "Weapon Sword Steel",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          51,
+          164,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_topaz": {
+      "name": "Weapon Sword Topaz",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          68,
+          164,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    },
+    "ox72i_weapon_sword_wooden": {
+      "name": "Weapon Sword Wooden",
+      "pack": "ox72i",
+      "category": "items",
+      "frames": [
+        [
+          85,
+          164,
+          16,
+          32
+        ]
+      ],
+      "fps": 0,
+      "width": 32,
+      "height": 64,
+      "footprint": [
+        1,
+        2
+      ]
+    }
+  }
+}
