@@ -21,15 +21,19 @@
   };
   const WALL_FINISHES = {
     clean:{label:'Clean stone',color:'#796672'},
+    dirty:{label:'Weathered / dirty stone',color:'#62554d'},
     moss:{label:'Moss-covered',color:'#636e4e'},
     cracked:{label:'Cracked masonry',color:'#67545f'},
     broken:{label:'Broken masonry',color:'#483b42'}
   };
   const WALL_TILE_PIECES=(()=>{
     const pieces={};
-    const shapes=['straight','corner','t','cross','end'];
+    // All physical building blocks are orthographic with standardized 12px joins.
+    // The 220 files are generated and edge-validated by the wall art build.
+    const shapes=['straight','corner','t','cross','end','pillar','arch',
+      'window','buttress','ruin','curve'];
     const faces=['north','east','south','west'];
-    const finishes=['clean','moss','cracked','broken'];
+    const finishes=['clean','dirty','moss','cracked','broken'];
     for(const shape of shapes)for(const face of faces)for(const finish of finishes){
       const key='wall_'+shape+'_'+face+(finish==='clean'?'':'_'+finish);
       const label=shape==='t'?'T-junction':shape==='cross'?'Cross/post':shape[0].toUpperCase()+shape.slice(1);
@@ -567,15 +571,20 @@
     const on=(a,b)=>inside(a,b)&&!!scene.walls[index(a,b)];
     const n=on(x,y-1),e=on(x+1,y),s=on(x,y+1),w=on(x-1,y);
     const count=Number(n)+Number(e)+Number(s)+Number(w);
+    // Faces now describe true cardinal exit geometry in the new top-down pack.
+    // north corner = N+E; east corner = E+S; south corner = S+W;
+    // west corner = W+N. Straight north = E+W; east = N+S.
     let name='wall_cross',face='north';
-    if(count<=1) {
-      name='wall_end';face=n?'east':e?'north':s?'west':w?'south':'north';
+    if(count===0){
+      name='wall_pillar';
+    }else if(count===1){
+      name='wall_end';face=n?'north':e?'east':s?'south':'west';
     }else if(count===2){
       if(n&&s){name='wall_straight';face='east';}
       else if(e&&w){name='wall_straight';face='north';}
       else{
         name='wall_corner';
-        face=n&&e?'south':e&&s?'north':s&&w?'east':'west';
+        face=n&&e?'north':e&&s?'east':s&&w?'south':'west';
       }
     }else if(count===3){
       name='wall_t';face=!n?'north':!e?'east':!s?'south':'west';
@@ -936,14 +945,15 @@
   }
   function moveTowardPointer(dt) {
     if(!rightPointer||dt<=0)return;
-    // Unlike keyboard navigation, the held mouse directly moves the rendered
-    // character in sub-tile increments. Four static facings, no walk cycles.
+    // A held right-mouse pointer is an EXACT pixel-space target of the
+    // character's ground position. No UO-style radius or .35-tile standoff.
+    // Preserves the existing hold-to-steer / release-to-stop controls.
     visual.queue.length=0;
     const dx=rightPointer.x-(visual.x+.5)*TILE;
     const dy=rightPointer.y-(visual.y+.5)*TILE;
     const pixels=Math.hypot(dx,dy);
-    if(pixels<=TILE*.55)return;
-    const tilesToTravel=Math.min(pixels/TILE-.35,(pixels>4*TILE?5.6:3.1)*dt);
+    if(pixels<=0.01)return;
+    const tilesToTravel=Math.min(pixels/TILE,(pixels>4*TILE?5.6:3.1)*dt);
     if(tilesToTravel<=0)return;
     const ax=dx/pixels*tilesToTravel,ay=dy/pixels*tilesToTravel;
     const legal=(x,y)=>{

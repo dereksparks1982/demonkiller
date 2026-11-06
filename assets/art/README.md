@@ -4,7 +4,7 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 
 ## Directory layout
 
-- `temple/walls/`: owner-approved stone wall master atlas, 80 extracted directional/wear tiles for straight walls, corners, T joins, crossing/post nodes and ends (clean, moss, cracked, broken). All 80 can now be selected individually from the floating DK Architect's horizontal wall palette; four auto-join variants remain available.
+- `temple/walls/`: historical source atlas preserved; the live transparent orthographic atlas `Demon_Killer_Orthographic_Seamless_Wall_Atlas.png` and its 220 individual 32×32 PNG components replace the 80 mismatched cropped pieces. 11 shapes × 4 directions × 5 finishes, exact 12px joining edge profiles, with 5 automatic finish choices in DK Architect. Regenerate and verify using `scripts/build-dk-topdown-walls.py`; source JSON in `wall-ortho-manifest.json`.
 - `temple/floors/`: floor tile styles and floor variations.
 - `temple/doors/`: door graphics and states.
 - `temple/furniture/`: furnishings and movable objects.

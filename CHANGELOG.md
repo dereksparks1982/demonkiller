@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.18 development preview | 2026-11-06 | Exact cursor and seamless orthographic wall artwork
+
+- Replaced the intentionally short-stopping mouse steering movement (17.6px dead zone plus another 0.35-tile standoff) with exact pixel-space clamped movement. The player no longer halts within a halo around the held right-mouse pointer. Existing left-click-to-interact, hold-to-steer and release-to-stop controls remain unchanged. Blocked destinations remain blocked.
+- Replaced the earlier 80 heuristic-cropped wall tiles with **220 transparent 32×32 top-down original pixel-art variants**, generated from a fixed geometric junction mask. The archived approved master image remains untouched.
+- 11 modular shapes (straight, corner, T, cross, end, pillar, arch, window, buttress, ruin, curve), each available in four cardinal orientations and five finishes: clean, dirty, mossy, cracked and broken. The 640×352 master has transparent background and no text.
+- Generated sprites have standardized 12px cardinal edge profiles verified pixel-by-pixel in GitHub Actions before the files are committed. Rewrote automatic joining orientation rules to match exact north/east/south/west geometry, including the isolated-pillar case.
+- DK Architect's scrollable tile palette now exposes five auto-join finishes and 220 exact component choices. Existing wallVariants, collision grid, room saves and brush/undo systems remain compatible.
+- No change to canon, temple layout, resurrection, character sizes or UO-inspired interface proportions. Browser visual acceptance pending.
+
+
 ## v0.2.17 development preview | 2026-11-05 | Accurate approved UO-style stone and gold framing
 
 - Rendered the horizontal tile browser's real old-stone window border as nine-slice Canvas regions from the exact approved UI master image (coordinates within the original file). No synthetic border art is substituted.

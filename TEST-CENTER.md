@@ -47,3 +47,8 @@ The test covers the grid, resurrection, ability to reach the north arch without 
 - `index.html`: original-sprite menu with three named save records, loading into the existing Forsaken Temple screen.
 
 We will improve the **existing** sacrificial temple instead of opening new areas until DK Architect is ready.
+
+
+### Exact pointer and rebuilt masonry (v0.2.18)
+
+The held right mouse steers to the **exact pointer coordinate** (no 17.6px dead zone or .35-tile standoff); releasing still stops immediately. Left-click remains interaction only. Collision and blocked north door are unchanged. In Architect Mode, the 32px orthographic wall palette contains five automatic textures and 220 individually selectable transparent modular pieces. Corners, straights, T joins and ends use identical 12px edge connectors; do not reintroduce angled/isometric wall art or hidden opaque tile backgrounds.

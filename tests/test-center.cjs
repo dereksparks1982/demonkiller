@@ -76,16 +76,24 @@ for(const file of crystalFiles){
   assert.equal(buffer.readUInt32BE(20),32,'Crystal sprite must use 32px tile height');
 }
 const wallsFolder=path.join(root,'assets/art/temple/walls');
-const wallNames=fs.readdirSync(wallsFolder).filter(f=>/^wall_(straight|corner|t|cross|end)_(north|east|south|west)(_(moss|cracked|broken))?\.png$/.test(f));
-assert.equal(wallNames.length,80,'Twenty original approved wall poses have four finish choices each');
-for(const shape of ['straight','corner','t','cross','end'])for(const facing of ['north','east','south','west'])
-  for(const suffix of ['','_moss','_cracked','_broken']){
+const wallShapes=['straight','corner','t','cross','end','pillar','arch','window','buttress','ruin','curve'];
+const wallNames=fs.readdirSync(wallsFolder).filter(f=>/^wall_.*\.png$/.test(f));
+assert.equal(wallNames.length,220,'Eleven seam-fit wall shapes in four directions and five finishes');
+for(const shape of wallShapes)for(const facing of ['north','east','south','west'])
+  for(const suffix of ['','_dirty','_moss','_cracked','_broken']){
     const file='wall_'+shape+'_'+facing+suffix+'.png';
     const data=fs.readFileSync(path.join(wallsFolder,file));
     assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','Wall PNG signature');
     assert.equal(data.readUInt32BE(16),32,'Wall tile width');
     assert.equal(data.readUInt32BE(20),32,'Wall tile height');
+    assert.equal(data[25],6,'Every replacement wall sprite uses transparent RGBA PNG format');
   }
+const wallAtlas=fs.readFileSync(path.join(wallsFolder,'Demon_Killer_Orthographic_Seamless_Wall_Atlas.png'));
+assert.equal(wallAtlas.readUInt32BE(16),640,'Transparent master atlas width');
+assert.equal(wallAtlas.readUInt32BE(20),352,'Transparent master atlas height');
+const wallManifest=JSON.parse(fs.readFileSync(path.join(wallsFolder,'wall-ortho-manifest.json'),'utf8'));
+assert.equal(wallManifest.tile_count,220,'Master atlas and individual tiles remain in sync');
+assert.deepEqual([...wallManifest.finishes],['clean','dirty','moss','cracked','broken']);
 assert(html.includes('id="wallBrush"')&&html.includes('id="wallLineButton"')&&
   html.includes('id="wallOutlineButton"')&&html.includes('id="assetSearch"'),
   'Pandora-style construction controls must be in the Architect panel');
@@ -103,10 +111,11 @@ assert.match(js,/ctx\.drawImage\(picture,x,y,bodyWidth,bodyHeight\)/,'Lying body
 const events={}, noop=()=>{};
 const previewOutlines=[],spokenLines=[],filledPaths=[];
 let activePath=[];
+let lastPlayerTranslation={x:null,y:null};
 const graphics={fillRect:noop,strokeRect:(...args)=>previewOutlines.push(args),fillText:(text,x,y)=>spokenLines.push({text,x,y}),clearRect:noop,
   beginPath:()=>{activePath=[];},moveTo:(x,y)=>activePath.push({x,y}),lineTo:(x,y)=>activePath.push({x,y}),
   closePath:noop,fill:()=>filledPaths.push(activePath.slice()),stroke:noop,save:noop,restore:noop,
-  translate:noop,rotate:noop,scale:noop};
+  translate:(x,y)=>{lastPlayerTranslation={x,y};},rotate:noop,scale:noop};
 class Element {
   constructor(id){this.id=id;this.textContent='';this.value='';this.files=[];this.children=[];
     this.style={};this.selectedOptions=[{textContent:id}];
@@ -222,6 +231,17 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.notEqual(moved,stopped,'Diagonal right mouse follows cursor');
   await room.emit('mouseup',{button:2});
 
+  // Regression: pointer targets under 18px away must still be reached
+  // exactly; the old movement system refused to enter this inner circle.
+  await get('new').emit('click');tickFrames(1800);
+  await room.emit('mousedown',{button:2,clientX:8*32+26,clientY:12*32+20,preventDefault:noop});
+  tickFrames(40);
+  assert(Math.abs(lastPlayerTranslation.x-(8*32+10))<0.03,
+    'Player reaches exact clicked X, without the old half-tile dead zone');
+  assert(Math.abs(lastPlayerTranslation.y-(12*32+4))<0.03,
+    'Player reaches exact clicked Y, without the old half-tile dead zone');
+  await room.emit('mouseup',{button:2});
+
   await get('editMode').emit('click');
   assert.equal(get('modeLabel').textContent,'ARCHITECT MODE');
   const initial=Number(get('objectCount').textContent);
@@ -256,9 +276,9 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   // Pandora-inspired wall texture palette, one-step wall lines and saved styles.
   const wallCategory=get('category');wallCategory.value='walls';
   await wallCategory.emit('change',{target:wallCategory});
-  assert.equal(get('palette').children.length,84,
-    'Four auto-joining wall finishes plus all 80 approved exact wall tiles');
-  await get('palette').children[1].emit('click'); // Moss from the original wall atlas.
+  assert.equal(get('palette').children.length,225,
+    'Five auto-join finishes and 220 exact-fit top-down wall tiles');
+  await get('palette').children[2].emit('click'); // Moss from the new wall set.
   await click(1,6);
   const wallTool=get('tool');wallTool.value='wallLine';
   await wallTool.emit('change',{target:wallTool});
@@ -273,7 +293,7 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
     assert.equal(wallLayout.wallStyles[8*16+x],'moss','Straight-run retains palette finish');
   }
   // Hand-selected art remains exact even when adjacent walls connect differently.
-  const exactEntry=get('palette').children[4]; // first individually picked straight tile
+  const exactEntry=get('palette').children[5]; // first individual straight tile
   await exactEntry.emit('click');
   await click(5,8);
   await get('save').emit('click');
