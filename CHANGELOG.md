@@ -1,5 +1,17 @@
 # Demon Killer Changelog
 
+## v0.2.21 development preview | 2026-11-06 | Real creator-built dungeon construction sets
+
+- Added 243 named transparent sprites from 0x72's **original 16x16 Dungeon Tileset v5**, verified byte-for-byte against both owner-provided copies and its official itch.io download.
+- Kept 0x72 Dungeon Tileset II v1.7, Pixel_Poem's 2D Pixel Dungeon Asset Pack v2.0, and Pixel_Poem's Enemy Animations Set in creator-attributed game atlases. All four packs are now exposed through the UO-inspired DK Architect categories.
+- Replaced the rejected wall renderer with separate **0x72 Original** and **0x72 Dungeon II** automatic wall systems. The original artist's matching base, front, outer edge and corner pieces are combined by wall neighborhood instead of inventing new corners. Individual walls from either pack and Pixel_Poem remain independently selectable, without pretending that different sets auto-connect.
+- Removed 106 discarded hand-cropped DK wall pieces, 5 old wall-brush textures, both rejected source wall masters, obsolete wall scripts and one unnecessary inspection workflow from the playable branch. Retained historical versions through Git history.
+- Added pack IDs per wall cell (`wallPacks`), exact custom wall IDs (`wallVariants`), and imported floor tile IDs (`floorArt`). Old local saves load with the new wall system and drop invalid unjoinable wallPiece objects.
+- Added indexed imported sprites, multi-tile object placement previews, collision overrides, undo/redo support, validated object IDs, and live visual animation for NPC and enemy art. No AI, attack logic or loot behavior is implied by animated artwork.
+- No gameplay story, temple layout, multiplayer/server state or approved UO-inspired toolbar geometry changed. Updated tests and technical docs; public README remains a game description and web-player link only.
+- Visual corner approval in the live browser remains pending.
+
+
 ## v0.2.20 development preview | 2026-11-06 | Original wall sheet extraction, Architect scrolling and clean README
 
 - Split the owner-uploaded `Demon Killer Stone Wall Tileset.png` into 106 individual original-pixel transparent PNG sprites, categorized into structures, corners, straight runs, mossy stone, ruins, curves, pillars and fortified sections; source sha256 and source rectangles recorded in the generated manifest.
