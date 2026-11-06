@@ -88,6 +88,7 @@
     const wallStyles = Array(COUNT).fill('clean');
     const wallVariants=Array(COUNT).fill(null);
     const wallPacks=Array(COUNT).fill('ox72i');
+    const wallRotations=Array(COUNT).fill(0);
     const floorArt=Array(COUNT).fill(null);
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       if (x === 0 || y === 0 || x === N-1 || y === N-1) {
@@ -103,7 +104,7 @@
     return {
       schema: 1, area_id: AREA, tile_size: TILE, width: N, height: N,
       introSeen: false,
-      floor, walls, wallStyles, wallVariants, wallPacks, floorArt,
+      floor, walls, wallStyles, wallVariants, wallPacks, wallRotations, floorArt,
       objects: [
         { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:false },
         { id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 },
@@ -1011,18 +1012,19 @@
       if(!scene.wallStyles)scene.wallStyles=Array(COUNT).fill('clean');
       if(!scene.wallVariants)scene.wallVariants=Array(COUNT).fill(null);
       if(!scene.wallPacks)scene.wallPacks=Array(COUNT).fill('ox72i');
+      if(!scene.wallRotations)scene.wallRotations=Array(COUNT).fill(0);
       for(const [x,y] of cells){
         if(!inside(x,y))continue;
         const i=index(x,y);
         if(erase){
           if(scene.walls[i]){
             scene.walls[i]=0;scene.wallStyles[i]='clean';scene.wallVariants[i]=null;
-            scene.wallPacks[i]='ox72i';
+            scene.wallPacks[i]='ox72i';scene.wallRotations[i]=0;
           }
         }else if(!objectAt(x,y)){
           scene.walls[i]=1;scene.wallStyles[i]='clean';
           scene.wallPacks[i]=validWallPack(selectedWallPack)?selectedWallPack:'ox72i';
-          scene.wallVariants[i]=selectedWallAsset;
+          scene.wallVariants[i]=selectedWallAsset;scene.wallRotations[i]=0;
         }
       }
     },(erase?'Removed':'Painted '+WALL_FINISHES[wallFinish].label)+' wall tiles ('+cells.length+' selected).');
@@ -1070,7 +1072,16 @@
       draw();return;
     }
     if(tool==='rotate'){
-      if(!here)return message('Choose an existing object to rotate.');
+      if(!here&&scene.walls[i]&&scene.wallVariants?.[i]){
+        transact(()=>{
+          if(!scene.wallRotations)scene.wallRotations=Array(COUNT).fill(0);
+          scene.wallRotations[i]=(scene.wallRotations[i]+1)%4;
+        },'Rotated the manually selected wall component.');
+        selectedId=null;draw();return;
+      }
+      if(!here)return message(scene.walls[i]
+        ?'Automatic corners follow connected walls. Select a manual wall component to rotate.'
+        :'Choose an existing object or manual wall to rotate.');
       const candidate={...here,r:((here.r||0)+1)%4};
       if(!canPlace(candidate,here.id))return message('Cannot rotate into an occupied space.');
       transact(()=>{here.r=candidate.r;},'Rotated '+CATALOG[here.type].label+'.');
@@ -1087,6 +1098,8 @@
           scene.walls[i]=0;
           if(scene.wallStyles)scene.wallStyles[i]='clean';
           if(scene.wallVariants)scene.wallVariants[i]=null;
+          if(scene.wallPacks)scene.wallPacks[i]='ox72i';
+          if(scene.wallRotations)scene.wallRotations[i]=0;
         }
       },'Removed '+(here?CATALOG[here.type].label:'wall')+' at ('+x+', '+y+').');selectedId=null;return;
     }
@@ -1268,6 +1281,10 @@
     if('wallPacks' in data&&(!Array.isArray(data.wallPacks)||
       data.wallPacks.length!==COUNT||!data.wallPacks.every(validWallPack)))
       throw Error('Invalid wall pack reference.');
+    if('wallRotations' in data&&(!Array.isArray(data.wallRotations)||
+      data.wallRotations.length!==COUNT||
+      !data.wallRotations.every(v=>Number.isInteger(v)&&v>=0&&v<4)))
+      throw Error('Invalid individual wall facing.');
     if('floorArt' in data&&(!Array.isArray(data.floorArt)||data.floorArt.length!==COUNT||
       !data.floorArt.every(v=>v===null||VENDOR[v]?.category==='floor')))
       throw Error('Unknown imported floor artwork.');
@@ -1278,6 +1295,7 @@
       throw Error('Unknown manual wall artwork.');
     const restored=clone(data);
     restored.wallPacks=restored.wallPacks||Array(COUNT).fill('ox72i');
+    restored.wallRotations=restored.wallRotations||Array(COUNT).fill(0);
     restored.floorArt=restored.floorArt||Array(COUNT).fill(null);
     restored.wallStyles=restored.wallStyles||Array(COUNT).fill('clean');
     restored.wallVariants=(restored.wallVariants||Array(COUNT).fill(null)).map(
@@ -1582,12 +1600,15 @@
   for(const artNode of document.querySelectorAll?.('[data-uo-art]')||[]){
     const dimensions=UI_RECTS[artNode.dataset.uoArt];if(!dimensions)continue;
     const [x,y,w,h,scale]=dimensions;
+    // Fit the entire painted button inside its narrow rail, including borders.
+    const fitted=artNode.closest?.('.uo-right-controls')?.classList?.contains('uo-right-controls')?
+      .44:scale;
     artNode.style.backgroundImage='url("'+UI_ATLAS+'")';
-    artNode.style.backgroundSize=(2172*scale)+'px '+(724*scale)+'px';
-    artNode.style.backgroundPosition=(-x*scale)+'px '+(-y*scale)+'px';
+    artNode.style.backgroundSize=(2172*fitted)+'px '+(724*fitted)+'px';
+    artNode.style.backgroundPosition=(-x*fitted)+'px '+(-y*fitted)+'px';
     artNode.style.backgroundRepeat='no-repeat';
-    artNode.style.width=Math.ceil(w*scale)+'px';
-    artNode.style.height=Math.ceil(h*scale)+'px';
+    artNode.style.width=Math.ceil(w*fitted)+'px';
+    artNode.style.height=Math.ceil(h*fitted)+'px';
   }
 
   // Nine-slice border sampled from the owner-approved window frame in the

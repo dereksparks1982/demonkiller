@@ -81,7 +81,13 @@
   }
   function drawWall(g,scene,x,y,time=0){
     const k=y*16+x,custom=scene.wallVariants?.[k],e=entries[custom];
-    if(e&&e.category==='wall')return draw(g,custom,x*32,y*32,32,32,time);
+    if(e&&e.category==='wall'){
+      const turn=scene.wallRotations?.[k]||0;
+      if(!turn)return draw(g,custom,x*32,y*32,32,32,time);
+      g.save();g.translate(x*32+16,y*32+16);g.rotate(turn*Math.PI/2);
+      const painted=draw(g,custom,-16,-16,32,32,time);
+      g.restore();return painted;
+    }
     const pack=scene.wallPacks?.[k]==='ox72'?'ox72':'ox72i';
     const on=(tx,ty)=>tx>=0&&ty>=0&&tx<16&&ty<16&&
       scene.walls[ty*16+tx]&&(scene.wallPacks?.[ty*16+tx]||'ox72i')===pack;
