@@ -50,7 +50,11 @@ label{cursor:pointer}
 @media(max-width:530px){.menu{padding:8px 8px 10px}.panel{padding:18px 12px}.slot{font-size:14px}}
 #dkServerOptions{border-color:#816c4c;text-align:left}
 #dkServerStatus{color:#e2d1b2;font-size:12px;line-height:1.6}
-#dkServerStop:disabled{opacity:.45;cursor:not-allowed}
+#dkServerStop:disabled,#dkServerStart:disabled{opacity:.45;cursor:not-allowed}
+#dkServerClock{color:#d9bb86;font-weight:bold}
+.dk-world-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:4px}
+.dk-world-controls button{margin:4px}
+#dkServerOptions small{display:block}
 </style>
 <noscript><style>.art-loading #home{visibility:visible}</style></noscript>
 </head>
@@ -69,7 +73,7 @@ label{cursor:pointer}
 </section>
 <section class="screen panel" id="slotsScreen" hidden aria-label="Character save slots">
 <h2 id="slotsHeading">SELECT A RECORD</h2>
-<p id="slotsHelp">Three records. One character per adventure.</p>
+<p id="slotsHelp">One character. One life.</p>
 <div id="slots" class="slots"></div>
 <button class="action secondary back" type="button">BACK</button>
 </section>
@@ -91,21 +95,26 @@ label{cursor:pointer}
 <input id="musicVolume" type="range" min="0" max="200" step="5" value="200" aria-label="Main menu volume">
 <small id="musicVolumeHint" class="music-volume-hint">100% is the original level. Above 100% boosts the music, with peak limiting.</small>
 </fieldset>
-<fieldset id="dkServerOptions" hidden>
+<fieldset id="dkServerOptions">
 <legend>Persistent World</legend>
-<p id="dkServerStatus" role="status" aria-live="polite">Checking the local world server...</p>
-<p>Closing Firefox leaves the world running. Use the button below only when you want the world to stop.</p>
-<button id="dkServerStop" class="action" type="button" disabled>SHUT DOWN SERVER</button>
+<p id="dkServerStatus" role="status" aria-live="polite">CHECKING SERVER CONNECTION...</p>
+<p id="dkServerClock">World time: unavailable</p>
+<div class="dk-world-controls">
+<button id="dkServerStart" class="action" type="button">START SERVER</button>
+<button id="dkServerStop" class="action secondary" type="button" disabled>STOP SERVER</button>
+<button id="dkServerRefresh" class="action secondary" type="button">REFRESH</button>
+</div>
+<small id="dkServerHelp" class="music-volume-hint">The persistent world requires a hosted DK Server. This menu will report whether one is connected.</small>
 </fieldset>
 <button class="action secondary back" type="button">BACK</button>
 </section>
 <section class="screen panel" id="quitScreen" hidden>
 <h2>QUIT GAME</h2>
-<p>Close this tab to leave Demon Killer. Your persistent world will keep running until you stop it from Options.</p>
+<p>Close this tab to leave Demon Killer. An online persistent world keeps running after you leave; the browser-only preview cannot run a world server.</p>
 <button class="action secondary back" type="button">BACK TO MENU</button>
 </section>
 <p id="notice" class="notice" role="status" aria-live="polite"></p>
-<footer class="menu-footer">DK SOFTWORKS · HOUSE OF CULTURE · ORIGINAL PIXEL ART<br>Choose New Game to register one name, or Continue to reopen its saved temple.</footer>
+<footer class="menu-footer">DK SOFTWORKS · HOUSE OF CULTURE · ORIGINAL PIXEL ART<br>One character · one life. In the web preview, saves remain browser-only until DK Server hosting is connected.</footer>
 </main>
 <script src="./dk-menu-server.js"></script>
 <script>
@@ -174,45 +183,45 @@ function syncMenuMusic(){
  catch(e){/* A click may be required for audio. */}
 }
 const views=['home','slotsScreen','nameScreen','optionsScreen','quitScreen'];
-let mode='new',chosen=0,atlas=null,serverSlots=[null,null,null];
+let mode='new',chosen=0,atlas=null,serverSlots=[null];
 function show(id){for(const view of views)$(view).hidden=view!==id;$('notice').textContent='';}
 function notice(message){$('notice').textContent=message;}
 function readSlots(){
  try{const data=JSON.parse(localStorage.getItem(SLOTS_KEY)||'null');
- if(data&&data.version===1&&Array.isArray(data.slots))return [0,1,2].map(i=>{
+ if(data&&data.version===1&&Array.isArray(data.slots))return [0].map(i=>{
  const s=data.slots[i];return s&&s.id===i+1&&typeof s.name==='string'&&s.name.length>0?s:null;});
  }catch(e){notice('Saved records could not be read.');}
- return [null,null,null];
+ return [null];
 }
 function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
 function launch(id){
  if(SERVER){location.href='./test-center.html?dkSlot='+id;return;}
- try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.23';}
+ try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.24';}
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }
 async function openSlots(next){
  mode=next;
- $('slotsHeading').textContent=mode==='new'?'CHOOSE AN EMPTY RECORD':'CONTINUE ADVENTURE';
- $('slotsHelp').textContent=mode==='new'?'Choose a record, then enter your name. Existing records require confirmation before replacement.':'Choose a saved name to return to the Forsaken Temple.';
+ $('slotsHeading').textContent=mode==='new'?'BEGIN YOUR ONE LIFE':'CONTINUE ADVENTURE';
+ $('slotsHelp').textContent=mode==='new'?'Register your one character. An existing life cannot be overwritten.':'Continue your one existing character.';
  let slots;
  try{
    if(SERVER){
      const records=await SERVER.listCharacters();
-     slots=[1,2,3].map(i=>records[String(i)]||null);
+     slots=[1].map(i=>records[String(i)]||null);
    }else slots=readSlots();
  }catch(error){notice('DK Server unavailable: '+error.message);return;}
  serverSlots=slots;
  const root=$('slots');root.replaceChildren();
- for(let i=0;i<3;i++){
+ for(let i=0;i<1;i++){
  const s=slots[i],b=document.createElement('button');b.type='button';b.className='slot';
  const title=document.createElement('span');title.className='slot-name';title.textContent='0'+(i+1)+'  '+(s?s.name:'— EMPTY —');
- const sub=document.createElement('small');sub.textContent=s?(mode==='new'?'Replace this character (confirmation required)':'Continue saved adventure'):(mode==='continue'?'No save in this record':'Create a new adventure');
+ const sub=document.createElement('small');sub.textContent=s?(mode==='new'?'Already occupied: use Continue':'Continue saved adventure'):(mode==='continue'?'No character has started yet':'Begin your character’s life');
  b.append(title,sub);
- b.disabled=(mode==='continue'&&!s)||(Boolean(SERVER)&&mode==='new'&&Boolean(s));
+ b.disabled=(mode==='continue'&&!s)||(mode==='new'&&Boolean(s));
  b.addEventListener('click',()=>chooseSlot(i));root.append(b);
  }
  show('slotsScreen');
- if(mode==='continue'&&!slots.some(Boolean))notice('No adventures saved yet. Choose New Game to begin.');
+ if(mode==='continue'&&!slots.some(Boolean))notice('No character yet. Choose New Game to begin.');
 }
 function chooseSlot(i){
  const slots=SERVER?serverSlots:readSlots(),previous=slots[i];chosen=i;
@@ -220,8 +229,7 @@ function chooseSlot(i){
  if(!previous)return;
  launch(i+1);return;
  }
- if(SERVER&&previous){notice('That world record is occupied. Choose an empty record.');return;}
- if(previous&&!window.confirm('Replace '+previous.name+' in record '+(i+1)+'? That character will be permanently overwritten.'))return;
+ if(previous){notice('One life already exists. Choose Continue to resume it.');return;}
  $('chosenSlot').textContent='RECORD '+(i+1);
  $('characterName').value='';show('nameScreen');$('characterName').focus();
 }

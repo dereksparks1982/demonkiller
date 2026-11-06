@@ -11,8 +11,10 @@ assert(!html.includes('http-equiv="refresh"'));
 assert(!html.includes('id="castle"')&&!html.includes("artCanvas($('castle')")&&!html.includes('.castle{'),
  'The discarded haunted-house decoration must not appear in the main menu');
 assert(html.includes('DK SOFTWORKS · HOUSE OF CULTURE'),'Correct studio branding must be visible');
-assert(html.includes('id="dkServerOptions"')&&html.includes('id="dkServerStop"'),
- 'Persistent world status and shutdown must stay under Options');
+assert(html.includes('id="dkServerOptions"')&&html.includes('id="dkServerStart"')&&html.includes('id="dkServerStop"'),
+ 'Persistent world Start, Stop, and status must stay under Options');
+assert(!html.includes('id="dkServerOptions" hidden'), 'Persistent World must be visible on the public webpage');
+assert(html.includes('id="dkServerClock"'), 'World clock status must exist even while disconnected');
 assert(html.includes('<script src="./dk-menu-server.js"></script>'),
  'The main menu must load the local DK Server client');
 assert(html.includes("if(SERVER){location.href='./test-center.html?dkSlot='+id;return;}"),
@@ -92,7 +94,7 @@ assert.equal(audio.state,'running');
 assert.equal(get('menuMusic').paused,false,'Menu should request music when enabled');
 actions.new.emit('click');
 assert.equal(get('slotsScreen').hidden,false);
-assert.equal(get('slots').children.length,3,'Three name records');
+assert.equal(get('slots').children.length,1,'Only one character slot is shown');
 get('slots').children[0].emit('click');
 assert.equal(get('nameScreen').hidden,false);
 get('characterName').value='derek';
@@ -102,13 +104,13 @@ assert.equal(record.slots[0].name,'DEREK');
 assert.equal(saved.get('dkSoftworks.demonkiller.activeCharacter.v1'),'1');
 assert.equal(location.href,'./test-center.html?v='+version);
 actions.continue.emit('click');
-assert.equal(get('slots').children[1].disabled,true);
+assert.equal(get('slots').children[0].disabled,false,'Existing character can Continue');
 get('slots').children[0].emit('click');
 assert.equal(location.href,'./test-center.html?v='+version);
-window.confirm=()=>false;
 actions.new.emit('click');
+assert.equal(get('slots').children[0].disabled,true,'The single occupied character slot cannot be replaced');
 get('slots').children[0].emit('click');
-assert.equal(get('slotsScreen').hidden,false,'Canceled overwrite is non-destructive');
+assert.equal(get('slotsScreen').hidden,false,'Occupied life cannot be overwritten');
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.characters.v1')).slots[0].name,'DEREK');
 actions.options.emit('click');assert.equal(get('optionsScreen').hidden,false);
 assert(html.includes('Play main menu music')&&!html.includes('Play music when available'));
@@ -131,4 +133,4 @@ assert.equal(get('musicVolume').disabled,false);
 assert.equal(AudioContext.instances.length,1,'Music toggling must not duplicate audio nodes');
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).musicEnabled,true);
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).volumePercent,200);
-console.log('PASS: Demon Killer menu, amplified audio, saved slider, limiter, named records, Continue, overwrite guard, options.');
+console.log('PASS: Demon Killer menu, amplified audio, saved slider, limiter, single life, Continue, occupied-slot guard, persistent-world options.');

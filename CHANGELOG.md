@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.24 | 2026-11-06 | Visible Persistent World options on the public webpage
+
+- Fixed the public GitHub Pages menu hiding the entire Persistent World section; it now always appears under Options alongside Music.
+- Added **Start Server**, **Stop Server**, **Refresh**, world server connection status and a day/night clock status. The existing local server is detected accurately and its graceful Stop action remains available.
+- On GitHub Pages, the section transparently reports **Not Connected** and explains that an actual hosted DK Server has not been deployed; the Start button explains the missing host rather than issuing fake network requests. No password or separate player dashboard was added.
+- Main menu now displays **one character slot** and prevents New Game from overwriting an existing character's life. The public preview's older browser save data remains isolated from server records pending a hosted backend.
+- Added regression checks for visible server controls, single-slot behavior, public offline status, zero imaginary requests, and locally connected Stop Server operation. No persistent cloud hosting is claimed.
+
 ## v0.2.23 / DK Server M3 | 2026-11-06 | Single-player integrated persistent world
 
 - Replaced the password-based local owner flow and separate `/player` dashboard with the **normal Demon Killer main menu** served by the loopback DK Server. No account or password is required to manage the three character records.

@@ -1,3 +1,7 @@
+## Public website UI status (v0.2.24, 2026-11-06)
+
+The GitHub Pages Options screen always exposes **Persistent World** with Start Server, Stop Server, Refresh, world status and day/night status. Without a genuine hosted backend, the public page must show **Not Connected** and must not invent state changes or pretend browser localStorage can simulate a continuous server. The existing loopback process can be stopped through the actual menu control. Cloud hosting, secure single-player administration, hosted start/stop supervision and full NPC simulation are **not deployed yet**. The public preview's browser saves remain separate. The menu offers one character slot and no overwrite.
+
 ## Current implementation (M3, 2026-11-06)
 
 Demon Killer is now hosted by its local loopback DK Server, not a separate /player page. No password or login is required for this deliberately single-player build. The Linux launcher starts the server detached; Firefox can close while the server's world clock continues; the main menu Options includes a deliberate shutdown command. Character creation and temple opening/movement/door/resurrection are persisted as validated server actions. Older browser saves are not imported. Architect edits, cult/NPC autonomous simulation, area conquest and multiplayer remain **planned**, not completed.
