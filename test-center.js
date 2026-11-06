@@ -1518,6 +1518,38 @@
     artNode.style.width=Math.ceil(w*scale)+'px';
     artNode.style.height=Math.ceil(h*scale)+'px';
   }
+
+  // Nine-slice border sampled from the owner-approved window frame in the
+  // transparent master. The stones retain their original pixelwork at every
+  // viewport width; there is no painted CSS imitation over the art browser.
+  const frameCanvas=$('uoFrameSkin'),frameHost=frameCanvas.parentElement;
+  if(frameCanvas&&frameHost&&typeof Image!=='undefined'){
+    const frameTexture=new Image();
+    const paintApprovedFrame=()=>{
+      if(!frameTexture.complete||!frameTexture.naturalWidth)return;
+      const w=Math.max(120,Math.round(frameHost.clientWidth||800)),
+        h=Math.max(72,Math.round(frameHost.clientHeight||105));
+      if(frameCanvas.width!==w)frameCanvas.width=w;
+      if(frameCanvas.height!==h)frameCanvas.height=h;
+      const g=frameCanvas.getContext('2d');if(!g)return;
+      g.imageSmoothingEnabled=false;g.clearRect(0,0,w,h);
+      const sx=[517,517+50,517+1333-50],sw=[50,1333-100,50],
+        sy=[62,62+48,62+237-48],sh=[48,237-96,48];
+      const dx=[0,24,w-24],dw=[24,Math.max(0,w-48),24],
+        dy=[0,20,h-20],dh=[20,Math.max(0,h-40),20];
+      for(let row=0;row<3;row++)for(let col=0;col<3;col++)
+        g.drawImage(frameTexture,sx[col],sy[row],sw[col],sh[row],
+          dx[col],dy[row],dw[col],dh[row]);
+    };
+    frameTexture.onload=paintApprovedFrame;
+    frameTexture.src=UI_ATLAS;
+    if(typeof ResizeObserver!=='undefined'){
+      new ResizeObserver(paintApprovedFrame).observe(frameHost);
+    }else if(typeof window!=='undefined'){
+      window.addEventListener('resize',paintApprovedFrame);
+    }
+  }
+
   function updateUoButtonState(){
     const map={uoSelect:'select',uoMove:'select',uoPlace:'place',
       uoWallBrush:'wall',uoRoom:'wallRectangle',uoFloor:'floor',

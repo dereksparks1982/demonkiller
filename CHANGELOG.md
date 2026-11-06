@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.17 development preview | 2026-11-05 | Accurate approved UO-style stone and gold framing
+
+- Rendered the horizontal tile browser's real old-stone window border as nine-slice Canvas regions from the exact approved UI master image (coordinates within the original file). No synthetic border art is substituted.
+- Replaced the flat CSS command-strip approximation with the approved original gold six-button bar from the same image, aligning the existing Backup/Restore/Sync/Clear/Commit/Revert labels to its wells.
+- Retained compact responsive CSS fallbacks only where the full decorative bar cannot fit on narrow/mobile viewports. The actual approved tool-button and DK-banner sprites are unchanged.
+- No editor behavior, temple geometry, story events or room saves were altered by this visual-only enhancement. In-browser appearance still requires owner acceptance.
+
+
 ## v0.2.16 development preview | 2026-11-05 | Full approved wall-parts browser
 
 - Expanded the horizontal Ultima Online-style wall tile browser from four automatic-join finish buttons to 84 art choices: four auto-join finishes plus all 80 original approved wall piece variants (straight, corner, T, post/cross, end × four facings × four finishes).

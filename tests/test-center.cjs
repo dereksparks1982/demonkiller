@@ -31,6 +31,10 @@ assert(html.includes('id="uoLevelUp" disabled')||html.includes('id="uoLevelUp" t
   'Unimplemented multiple building levels must remain disabled');
 assert(css.includes('Medieval%20Architect%20UI%20Sprite%20Sheet.png'),
   'UO toolbar must use the approved owner-uploaded artwork, not plain dark UI');
+assert(html.includes('id="uoFrameSkin"')&&js.includes('paintApprovedFrame'),
+  'Horizontal stone border must be rendered from approved UI atlas');
+assert(css.includes('background-position:-16.8px -318.4px'),
+  'Gold six-command bar must be cropped from approved owner sheet');
 assert(js.includes('UI_ATLAS=')&&js.includes('data-uo-art')&&
   js.includes('uoHouseToolbar.v2'),'Approved sprite atlas and new layout preference key required');
 

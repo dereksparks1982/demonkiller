@@ -248,3 +248,41 @@ footer span:first-child{color:#bb8a9d}
  .uo-tool-grid{grid-template-columns:repeat(6,39px);grid-template-rows:repeat(2,36px)}
  .uo-left-tools{min-height:85px}
 }
+
+/* The approved horizontal window and six golden command wells, not CSS copies. */
+.uo-architect .uo-upper{grid-template-columns:220px minmax(0,1fr) 48px}
+.uo-architect .uo-sprite-frame{position:relative;background:#151117;border:0;box-shadow:none}
+.uo-architect .uo-frame-skin{position:absolute;inset:0;z-index:0;width:100%;height:100%;
+  pointer-events:none;image-rendering:pixelated}
+.uo-architect .uo-sprite-frame>.uo-scroll,
+.uo-architect .uo-sprite-frame>.uo-palette-viewport{position:relative;z-index:1}
+.uo-architect .uo-command-frame{
+ width:min(854px,100%);height:61px;min-height:61px;border:0;border-radius:0;box-shadow:none;
+ background-color:transparent;background-image:var(--uo-sheet);background-repeat:no-repeat;
+ background-size:1737.6px 579.2px;background-position:-16.8px -318.4px;
+ image-rendering:pixelated
+}
+.uo-architect .uo-command-bar{width:calc(100% - 67px);height:44px;gap:0;padding:0}
+.uo-architect .uo-command-bar button{
+ border:0;background:transparent;box-shadow:none;border-radius:4px;
+ min-height:0;height:42px;min-width:0;padding:0 1px;color:#f6d69b;
+ font:bold 12px Georgia,serif;text-shadow:1px 2px #100807
+}
+.uo-architect .uo-command-bar button:not(:disabled):hover,
+.uo-architect .uo-command-bar button:not(:disabled):focus-visible{
+ background:#c6a0642c;outline:2px solid #f6d38a;outline-offset:-2px
+}
+.uo-architect .uo-command-bar button:disabled{background:transparent;box-shadow:none}
+@media(max-width:960px){
+ .uo-architect .uo-upper{grid-template-columns:220px minmax(0,1fr) 42px}
+ .uo-architect .uo-command-frame{
+  background-image:none;background:linear-gradient(#75562d,#44331f);
+  border:2px ridge #b78646;border-radius:9px;width:100%;height:47px;min-height:47px}
+ .uo-architect .uo-command-bar{width:100%;height:40px;padding:0 4px;gap:3px}
+ .uo-architect .uo-command-bar button{height:37px;border:1px solid #a7834f;background:#29201b;
+  box-shadow:inset 0 1px #af8556;font-size:10px}
+}
+@media(max-width:600px){
+ .uo-architect .uo-upper{grid-template-columns:1fr 39px}
+ .uo-architect .uo-command-bar button{font-size:9px}
+}
