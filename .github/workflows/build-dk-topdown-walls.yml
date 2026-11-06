@@ -1,0 +1,30 @@
+name: Create exact-fit top-down DK wall sprites
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/build-dk-topdown-walls.py
+      - .github/workflows/build-dk-topdown-walls.yml
+permissions:
+  contents: write
+jobs:
+  generate-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install image tooling
+        run: python -m pip install --quiet Pillow==11.3.0
+      - name: Create and validate all transparent tiles
+        run: python scripts/build-dk-topdown-walls.py
+      - name: Publish original 32px wall set
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/art/temple/walls/wall_*.png assets/art/temple/walls/Demon_Killer_Orthographic_Seamless_Wall_Atlas.png assets/art/temple/walls/wall-ortho-manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish 220 seamless transparent top-down wall sprites"
+            git push origin HEAD:main
+          fi
