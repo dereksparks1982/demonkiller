@@ -4,7 +4,7 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 
 ## Directory layout
 
-- `temple/walls/`: straight walls, corners, junctions, end caps, and facing variants.
+- `temple/walls/`: owner-approved stone wall master atlas, 80 extracted directional/wear tiles for straight walls, corners, T joins, crossing/post nodes and ends (clean, moss, cracked, broken).
 - `temple/floors/`: floor tile styles and floor variations.
 - `temple/doors/`: door graphics and states.
 - `temple/furniture/`: furnishings and movable objects.
@@ -16,6 +16,14 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 - `characters/cult-leader/`: approved cult leader sheet with four cardinal views.
 - `characters/devil/`: approved Devil sheet with four cardinal views.
 - `shared/`: images reusable across areas.
+
+## Approved temple masonry and Architect wall tools (2026-11-05)
+
+- Keep `temple/walls/Dungeon Temple Wall Tile Atlas(1).png` unmodified as the authoritative approved wall set. It includes straight runs, corners, junctions, posts, arches, windows, cracks, moss and rubble.
+- `scripts/split-approved-walls.py` extracts 80 static transparent 32×32 game-sized sprites from this atlas without inventing new artwork. For each of five connected wall shapes (straight, corner, T, cross/post, end), there are four facing directions and four wear levels (clean, moss, cracked, broken).
+- Original clean runtime filenames `wall_{shape}_{direction}.png` are replaced by approved pixels. Wear variants append `_moss`, `_cracked` or `_broken` before `.png`.
+- DK Architect presents the wall finishes in a searchable asset palette and provides paint/drag, straight-run, room-outline and erase tools. Wall styles are optional per-cell scene data; wall geometry, collision and the temple's northern doorway remain unchanged. Arches and window artwork remain in the original atlas for a future separately authorized placement pass.
+- Matching damaged/clean/dirty floor artwork is planned next, not included in this wall change.
 
 ## Approved soul crystal sprites (2026-11-05)
 

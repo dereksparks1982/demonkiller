@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.11 development preview | 2026-11-05 | Approved masonry + Pandora-inspired Architect
+
+- Replaced the old 20 wall graphics with 80 extracted sprite variants sourced from the owner-approved Dungeon Temple Wall Tile Atlas: straight, corner, T, intersection/post and end in four directions and clean/moss/cracked/broken treatments.
+- Used original source pixels with nearest-neighbor downscaling and cardinal rotations, never new wall imagery; master atlas stays unchanged.
+- Added wall paint/drag, axis-aligned straight runs, rectangular room outlines, wall eraser, wall-style selection and searchable art browser within the existing DK Architect sidebar.
+- Wall finishes are per-cell room data and survive save/load/export/import/undo/redo; old room JSON gains default clean finishes when loaded. The original binary wall geometry and collision system remain untouched.
+- Initial temple perimeter uses restrained deterministic clean, moss, cracked and broken finishes without moving a single wall, door, altar, NPC or character.
+- No new floor art yet; matching clean/worn/dirty/cracked/broken floor atlas is next for review. Browser visual acceptance remains pending.
+
+
 ## v0.2.10 development preview | 2026-11-05 | Approved soul crystals
 
 - Split the exact owner-uploaded two-row "Glowing and Dull Pixel Crystals.png" master into 19 separately named 32×32 transparent game sprites: nine colors with bright/dim frames, one static silver depleted sprite.

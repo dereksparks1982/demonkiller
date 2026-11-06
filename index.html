@@ -123,7 +123,7 @@ function readSlots(){
 }
 function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
 function launch(id){
- try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.10';}
+ try{localStorage.setItem(ACTIVE_KEY,String(id));location.href='./test-center.html?v=0.2.11';}
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }
 function openSlots(next){

@@ -19,6 +19,12 @@
     sigil: { label: 'Blood-Rune Tile', color: '#45313c' },
     cracked: { label: 'Cracked Stone', color: '#42414a' }
   };
+  const WALL_FINISHES = {
+    clean:{label:'Clean stone',color:'#796672'},
+    moss:{label:'Moss-covered',color:'#636e4e'},
+    cracked:{label:'Cracked masonry',color:'#67545f'},
+    broken:{label:'Broken masonry',color:'#483b42'}
+  };
   const CATALOG = {
     altar: { label: 'Sacrificial Altar', category: 'relics', w: 3, h: 2, solid: true },
     crystal: { label: 'Soul Crystal', category: 'relics', w: 1, h: 1, solid: false },
@@ -33,7 +39,7 @@
     chest: { label: 'Reliquary Chest', category: 'furniture', w: 1, h: 1, solid: true }
   };
   const GROUPS = { relics: 'Relics & Ritual', structure: 'Gothic Structure',
-    furniture: 'Furniture & Props', floors: 'Stone Floors' };
+    furniture: 'Furniture & Props', floors: 'Stone Floors',walls:'Walls & Masonry' };
   const clone = value => JSON.parse(JSON.stringify(value));
   const index = (x, y) => y * N + x;
   const inside = (x, y) => Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < N && y < N;
@@ -46,17 +52,22 @@
   function fresh() {
     const walls = Array(COUNT).fill(0);
     const floor = Array(COUNT).fill('stone');
+    const wallStyles = Array(COUNT).fill('clean');
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-      if (x === 0 || y === 0 || x === N-1 || y === N-1) walls[index(x,y)] = 1;
+      if (x === 0 || y === 0 || x === N-1 || y === N-1) {
+        walls[index(x,y)] = 1;
+        const wear=(x*13+y*17)%13;
+        wallStyles[index(x,y)]=wear===0?'broken':wear===3?'cracked':wear===6?'moss':'clean';
+      }
       if ((x + y) % 7 === 0) floor[index(x,y)] = 'cracked';
       if (x >= 5 && x <= 10 && y >= 4 && y <= 9) floor[index(x,y)] = 'dark';
       if ((x === 7 || x === 8) && y >= 7 && y <= 10) floor[index(x,y)] = 'sigil';
     }
-    walls[index(8,0)] = 0;
+    walls[index(8,0)] = 0;wallStyles[index(8,0)]='clean';
     return {
       schema: 1, area_id: AREA, tile_size: TILE, width: N, height: N,
       introSeen: false,
-      floor, walls,
+      floor, walls, wallStyles,
       objects: [
         { id:'temple_north_door', type:'door', x:8, y:0, r:0, open:false },
         { id:'sacrifice_altar', type:'altar', x:7, y:5, r:0 },
@@ -76,6 +87,8 @@
       current = 'crystal', selectedId = null, corner = null, hover = null,
       previewRotation = 0,
       dirty = false, loaded = false, undoStack = [], redoStack = [], serial = 0;
+  // Pandora-style architect wall brush state. Wall types do not change tile geometry.
+  let wallFinish='clean',wallStroke=null,skipWallClick=false;
   const Cult=typeof DemonKillerCult!=='undefined'?DemonKillerCult:null;
   const Population=typeof DemonKillerPopulation!=='undefined'?DemonKillerPopulation:null;
   let cultWorld=null,populationWorld=null,cultNetworkView=null;
@@ -515,7 +528,9 @@
     }else if(count===3){
       name='wall_t';face=!n?'north':!e?'east':!s?'south':'west';
     }
-    return readyImage('temple/walls/'+name+'_'+face+'.png');
+    const finish=scene.wallStyles?.[index(x,y)]||'clean';
+    const path='temple/walls/'+name+'_'+face;
+    return (finish==='clean'?null:readyImage(path+'_'+finish+'.png'))||readyImage(path+'.png');
   }
   function art(g,o) {
     // A soul crystal occupies a tile for interaction, but its visible crystal is
@@ -703,40 +718,64 @@
     $('lifeState').style.color=scene.player.form==='ghost'?'#b9c6f4':'#f5b7bb';
     $('objectCount').textContent=String(scene.objects.length);
     const o=objectAtId(selectedId);
-    $('itemInfo').textContent=o?CATALOG[o.type].label+' ('+o.x+', '+o.y+')':'None';
+    const wallAt=hover&&scene.walls[index(hover.x,hover.y)];
+    $('itemInfo').textContent=o?CATALOG[o.type].label+' ('+o.x+', '+o.y+')'
+      :wallAt?'Wall: '+(scene.wallStyles?.[index(hover.x,hover.y)]||'clean')+' ('+hover.x+', '+hover.y+')':'None';
     $('saveState').textContent=dirty?'Unsaved edits':loaded?'Saved layout':'Starter scene';
     $('modeLabel').textContent=mode==='walk'?'WALK MODE':'ARCHITECT MODE';
     $('coordTop').textContent=hover?'X '+hover.x+' · Y '+hover.y:'16 × 16 · 32 PX';
     $('selectedTool').textContent=tool.toUpperCase();
+    if(wallStroke&&mode==='edit'){
+      ctx.save();ctx.globalAlpha=.32;ctx.fillStyle='#efc68c';
+      for(const tile of wallStroke.cells)ctx.fillRect((tile%N)*TILE,(Math.floor(tile/N))*TILE,TILE,TILE);
+      ctx.restore();
+    }
     $('walkMode').classList.toggle('active',mode==='walk');$('editMode').classList.toggle('active',mode==='edit');
     $('walkMode').setAttribute('aria-pressed',String(mode==='walk'));$('editMode').setAttribute('aria-pressed',String(mode==='edit'));
   }
   function palette() {
     const list=$('palette');list.replaceChildren();$('paletteTitle').textContent=GROUPS[category];
-    const entries=category==='floors'?Object.entries(FLOOR):Object.entries(CATALOG).filter(([,a])=>a.category===category);
+    const all=category==='walls'?Object.entries(WALL_FINISHES)
+      :category==='floors'?Object.entries(FLOOR)
+      :Object.entries(CATALOG).filter(([,a])=>a.category===category);
+    const query=$('assetSearch').value.trim().toLowerCase();
+    const entries=all.filter(([name,entry])=>(name+' '+entry.label).toLowerCase().includes(query));
     for(const [key,entry] of entries){
-      const b=document.createElement('button');b.type='button';b.className=current===key?'active':'';
+      const b=document.createElement('button');b.type='button';
+      b.className=(category==='walls'?wallFinish===key:current===key)?'active':'';
       const mini=document.createElement('canvas');mini.width=32;mini.height=32;mini.setAttribute('aria-hidden','true');
       const c=mini.getContext('2d');c.imageSmoothingEnabled=false;
       if(category==='floors'){
         c.fillStyle=entry.color;c.fillRect(0,0,32,32);
         c.strokeStyle='#8e6676';c.strokeRect(2,2,28,28);
-        if(key==='sigil'){c.fillStyle='#bf748e';c.fillRect(15,8,3,16);c.fillRect(9,15,16,3);}
+        if(key==='sigil'){c.fillStyle='#bf748e';c.fillRect(15,8,3,16);c.fillRect(9,15,16,2);}
+      }else if(category==='walls'){
+        const name='temple/walls/wall_straight_north'+(key==='clean'?'':'_'+key)+'.png';
+        const image=readyImage(name);
+        if(image&&typeof c.drawImage==='function')c.drawImage(image,0,0,32,32);
+        else{c.fillStyle=entry.color;c.fillRect(3,7,26,18);c.strokeStyle='#201921';c.strokeRect(3,7,26,18);}
       }else{
         const base=CATALOG[key];c.scale(1/base.w,1/base.h);art(c,{type:key,x:0,y:0,r:0,open:false});
       }
       const span=document.createElement('span');span.textContent=entry.label;
       b.append(mini,span);b.addEventListener('click',()=>{
-        current=key;previewRotation=0;if(category==='floors'&&tool==='place')$('tool').value=tool='floor';
-        if(category!=='floors'&&tool==='floor')$('tool').value=tool='place';
+        if(category==='walls'){
+          wallFinish=key;tool='wall';$('tool').value=tool;
+        }else{
+          current=key;previewRotation=0;
+          if(category==='floors'&&tool==='place')$('tool').value=tool='floor';
+          if(category!=='floors'&&(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle'].includes(tool)))
+            $('tool').value=tool='place';
+        }
         palette();draw();message('Selected '+entry.label+'. Click a grid coordinate in Architect Mode.');
       });list.append(b);
     }
+    $('wallFinishLabel').textContent='WALL FINISH · '+WALL_FINISHES[wallFinish].label.toUpperCase();
   }
   function setMode(next) {
     rightMouseHeld=false;
     resetVisual();
-    mode=next;selectedId=null;corner=null;
+    mode=next;selectedId=null;corner=null;wallStroke=null;skipWallClick=false;
     draw();message(next==='edit'?'Architect Mode active. Every tile and object has an exact grid address.':opening?'Opening scene is still playing.':ritual?'The resurrection ritual is still playing.':'Walk Mode active. Single-click the soul crystal to inspect; double-left-click to resurrect, or remain a ghost.');
     canvas.focus({preventScroll:true});
   }
@@ -847,9 +886,28 @@
     requestAnimationFrame(advanceFrame);
   }
   function idFor(type){serial+=1;return type+'_'+Date.now().toString(36)+'_'+serial.toString(36);}
+  function paintWallCells(cells,erase=false){
+    return transact(()=>{
+      if(!scene.wallStyles)scene.wallStyles=Array(COUNT).fill('clean');
+      for(const [x,y] of cells){
+        if(!inside(x,y))continue;
+        const i=index(x,y);
+        if(erase){
+          if(scene.walls[i]){scene.walls[i]=0;scene.wallStyles[i]='clean';}
+        }else if(!objectAt(x,y)){
+          scene.walls[i]=1;scene.wallStyles[i]=wallFinish;
+        }
+      }
+    },(erase?'Removed':'Painted '+WALL_FINISHES[wallFinish].label)+' wall tiles ('+cells.length+' selected).');
+  }
   function applyEdit(x,y){
     const here=objectAt(x,y),i=index(x,y);
     if(tool==='pick'){
+      if(scene.walls[i]&&!here){
+        wallFinish=scene.wallStyles?.[i]||'clean';category='walls';tool='wall';
+        $('category').value=category;$('tool').value=tool;palette();draw();
+        message('Eyedropper: '+WALL_FINISHES[wallFinish].label+' wall.');return;
+      }
       if(here){current=here.type;category=CATALOG[here.type].category;tool='place';$('category').value=category;$('tool').value=tool;palette();draw();message('Eyedropper: '+CATALOG[here.type].label);}
       else{current=scene.floor[i];category='floors';tool='floor';$('category').value=category;$('tool').value=tool;palette();draw();message('Eyedropper: '+FLOOR[current].label);}
       return;
@@ -870,14 +928,23 @@
     if(tool==='erase'){
       transact(()=>{
         if(here)scene.objects=scene.objects.filter(o=>o.id!==here.id);
-        else if(scene.walls[i])scene.walls[i]=0;
+        else if(scene.walls[i]){scene.walls[i]=0;if(scene.wallStyles)scene.wallStyles[i]='clean';}
       },'Removed '+(here?CATALOG[here.type].label:'wall')+' at ('+x+', '+y+').');selectedId=null;return;
     }
-    if(tool==='wall'){
-      transact(()=>{
-        if(here)return;
-        scene.walls[i]=scene.walls[i]?0:1;
-      },'Toggled stone wall at ('+x+', '+y+').');return;
+    if(tool==='wall'||tool==='wallErase'){
+      paintWallCells([[x,y]],tool==='wallErase');return;
+    }
+    if(tool==='wallLine'||tool==='wallRectangle'){
+      if(!corner){corner={x,y};draw();message('First wall corner ('+x+', '+y+'). Choose the second point.');return;}
+      if(tool==='wallLine'&&x!==corner.x&&y!==corner.y){
+        message('Straight wall runs cannot be diagonal. Choose a point in the same row or column.');return;
+      }
+      const cells=[],left=Math.min(corner.x,x),right=Math.max(corner.x,x),
+        top=Math.min(corner.y,y),bottom=Math.max(corner.y,y);
+      for(let yy=top;yy<=bottom;yy++)for(let xx=left;xx<=right;xx++){
+        if(tool==='wallLine'||xx===left||xx===right||yy===top||yy===bottom)cells.push([xx,yy]);
+      }
+      paintWallCells(cells);corner=null;draw();return;
     }
     if(tool==='door'){
       if(!here||here.type!=='door')return message('Choose a doorway tile to toggle its open/closed state.');
@@ -966,7 +1033,12 @@
     if(!['ghost','living'].includes(data.player.form)||!['north','south','east','west'].includes(data.player.facing))
       throw Error('Unknown player state.');
     if ('introSeen' in data && typeof data.introSeen!=='boolean')throw Error('Invalid intro completion flag.');
-    return clone(data);
+    if('wallStyles' in data && (!Array.isArray(data.wallStyles)||data.wallStyles.length!==COUNT||
+      !data.wallStyles.every(v=>Object.hasOwn(WALL_FINISHES,v))))
+      throw Error('Invalid wall finish records.');
+    const restored=clone(data);
+    if(!restored.wallStyles)restored.wallStyles=Array(COUNT).fill('clean');
+    return restored;
   }
   function save() {
     try{localStorage.setItem(STORE,JSON.stringify(scene));persistCharacter();dirty=false;loaded=true;draw();message('Temple layout saved under its own Demon Killer test-center key'+(activeSlot?' and named character record':'')+'.');}
@@ -995,6 +1067,7 @@
   }
   canvas.addEventListener('click',e=>{
     if(e.button && e.button!==0)return;
+    if(mode==='edit'&&skipWallClick){skipWallClick=false;return;}
     const p=mouseTile(e);if(!p)return;
     if(mode==='edit')applyEdit(p.x,p.y);else interactAt(p.x,p.y);
     canvas.focus({preventScroll:true});
@@ -1007,6 +1080,11 @@
   });
   canvas.addEventListener('contextmenu',e=>{if(mode==='walk')e.preventDefault();});
   canvas.addEventListener('mousedown',e=>{
+    if(mode==='edit'&&e.button===0&&(tool==='wall'||tool==='wallErase')){
+      const p=mouseTile(e);
+      if(p){wallStroke={type:tool,cells:new Set([index(p.x,p.y)])};hover=p;draw();}
+      return;
+    }
     if(mode==='walk'&&e.button===2){
       e.preventDefault();rightPointer=pointerPosition(e);
       // Keyboard tween queues must not delay held-mouse movement.
@@ -1033,10 +1111,22 @@
     }
     draw();
   }
-  canvas.addEventListener('mouseup',e=>{if(e.button===2)stopRightMovement();});
+  function completeWallStroke(){
+    if(!wallStroke)return;
+    const stroke=wallStroke;wallStroke=null;
+    const cells=[...stroke.cells].map(i=>[i%N,Math.floor(i/N)]);
+    paintWallCells(cells,stroke.type==='wallErase');skipWallClick=true;
+  }
+  canvas.addEventListener('mouseup',e=>{
+    if(e.button===2)stopRightMovement();
+    if(e.button===0)completeWallStroke();
+  });
   if(typeof window!=='undefined'){
-    window.addEventListener('mouseup',e=>{if(e.button===2)stopRightMovement();});
-    window.addEventListener('blur',stopRightMovement);
+    window.addEventListener('mouseup',e=>{
+      if(e.button===2)stopRightMovement();
+      if(e.button===0)completeWallStroke();
+    });
+    window.addEventListener('blur',()=>{stopRightMovement();wallStroke=null;skipWallClick=false;});
   }
   canvas.addEventListener('wheel',e=>{
     if(mode!=='edit'||tool!=='place'||!CATALOG[current])return;
@@ -1047,6 +1137,9 @@
   canvas.addEventListener('mousemove',e=>{
     if(mode==='walk'){rightPointer=pointerPosition(e);return;}
     const p=mouseTile(e);if(!p)return;
+    if(wallStroke){
+      wallStroke.cells.add(index(p.x,p.y));hover=p;draw();return;
+    }
     if(!hover||p.x!==hover.x||p.y!==hover.y){hover=p;draw();}
   });
   canvas.addEventListener('mouseleave',()=>{hover=null;stopRightMovement();draw();});
@@ -1067,13 +1160,33 @@
   });
   $('walkMode').addEventListener('click',()=>setMode('walk'));
   $('editMode').addEventListener('click',()=>setMode('edit'));
-  $('tool').addEventListener('change',e=>{tool=e.target.value;corner=null;selectedId=null;draw();message('Architect tool: '+e.target.selectedOptions[0].textContent+'.');});
+  $('tool').addEventListener('change',e=>{
+    tool=e.target.value;corner=null;selectedId=null;wallStroke=null;
+    if(['wall','wallErase','wallLine','wallRectangle'].includes(tool)){
+      category='walls';$('category').value=category;palette();
+    }
+    draw();message('Architect tool: '+e.target.selectedOptions[0].textContent+'.');
+  });
   $('category').addEventListener('change',e=>{
-    category=e.target.value;previewRotation=0;current=category==='floors'?'stone':Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
-    if(category==='floors'){tool='floor';$('tool').value=tool;}
-    else if(['floor','fill','rectangle'].includes(tool)){tool='place';$('tool').value=tool;}
+    category=e.target.value;previewRotation=0;$('assetSearch').value='';
+    if(category==='floors'){current='stone';tool='floor';$('tool').value=tool;}
+    else if(category==='walls'){tool='wall';$('tool').value=tool;}
+    else {
+      current=Object.keys(CATALOG).find(k=>CATALOG[k].category===category);
+      if(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle'].includes(tool)){
+        tool='place';$('tool').value=tool;
+      }
+    }
     palette();draw();
   });
+  $('assetSearch').addEventListener('input',palette);
+  for(const [id,action] of [['wallBrush','wall'],['wallLineButton','wallLine'],
+      ['wallOutlineButton','wallRectangle'],['wallEraseButton','wallErase']]){
+    $(id).addEventListener('click',()=>{
+      tool=action;category='walls';$('category').value=category;$('tool').value=tool;
+      corner=null;wallStroke=null;palette();draw();message('Wall tool: '+action+'.');
+    });
+  }
   $('rotate').addEventListener('click',rotateSelected);
   $('duplicate').addEventListener('click',duplicateSelected);
   $('remove').addEventListener('click',deleteSelected);

@@ -91,7 +91,10 @@
         <option value="floor">Paint floor</option>
         <option value="fill">Fill floor region</option>
         <option value="rectangle">Floor rectangle (two corners)</option>
-        <option value="wall">Place / Remove wall</option>
+        <option value="wall">Wall brush · place / repaint</option>
+        <option value="wallLine">Straight wall run · two points</option>
+        <option value="wallRectangle">Room walls · outline rectangle</option>
+        <option value="wallErase">Remove wall tiles</option>
         <option value="door">Toggle door</option>
         <option value="spawn">Set player spawn</option>
         <option value="pick">Eyedropper</option>
@@ -102,7 +105,17 @@
         <option value="structure">Gothic Structure</option>
         <option value="furniture">Furniture &amp; Props</option>
         <option value="floors">Stone Floors</option>
+        <option value="walls">Walls &amp; Masonry</option>
       </select>
+      <div class="wall-builder-tools" role="group" aria-label="Pandora-style wall construction">
+        <button id="wallBrush" type="button">Wall Brush</button>
+        <button id="wallLineButton" type="button">Straight Run</button>
+        <button id="wallOutlineButton" type="button">Room Outline</button>
+        <button id="wallEraseButton" type="button">Erase Walls</button>
+      </div>
+      <small class="wall-finish-label" id="wallFinishLabel">WALL FINISH · CLEAN STONE</small>
+      <label for="assetSearch">Find art or finish</label>
+      <input id="assetSearch" type="search" placeholder="Search original assets…" autocomplete="off">
       <div class="palette-head"><strong id="paletteTitle">Relics &amp; Ritual</strong><small id="selectedTool">PLACE</small></div>
       <div class="palette" id="palette" aria-label="Original Demon Killer art palette"></div>
       <div class="button-grid">
@@ -144,17 +157,17 @@
       <div class="help">
         <h3>IN THE TEMPLE</h3>
         <p><strong>Opening:</strong> Watch the leader's sacrifice, Devil encounter, and Lilith's prayer. The crystal does not exist until Lilith places it. <strong>Walk:</strong> after the opening, hold right mouse to move and aim farther away to run. Left-click nearby objects to inspect. WASD / arrow keys also move. Ghosts pass through furnishings. Single-click the soul crystal to inspect; double-left-click to resurrect. Walking across it does nothing.</p>
-        <p><strong>Build:</strong> choose Architect Mode, select art and click its grid coordinate. Select/Move uses two clicks. R rotates; Delete erases; Ctrl+Z undoes.</p>
+        <p><strong>Build:</strong> Pandora-inspired DK Architect has original tile thumbnails, searchable assets, a drag wall brush, straight wall runs, room-outline walls, wall eraser and clean/mossy/cracked/broken masonry. No wall placement changes the underlying 16×16 temple plan. Floor brush, selection, rotation and undo/redo remain available.</p>
         <p><strong>Exit:</strong> the northern doorway is a connection marker only. The courtyard is not yet built.</p>
       </div>
     </aside>
   </div>
-  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.10</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
+  <footer><span>DEMON KILLER · ACTIVE DEVELOPMENT v0.2.11</span><span>Original sprites · isolated browser saves · engine-free · <a href="./index.html" class="menu-link">MAIN MENU</a></span></footer>
 </main>
 <script src="./cult-system.js" defer></script>
 <script src="./citizen-population.js" defer></script>
 <script src="./cult-network.js" defer></script>
-<script src="./temple-music.js?v=0.2.10" defer></script>
-<script src="./test-center.js?v=0.2.10" defer></script>
+<script src="./temple-music.js?v=0.2.11" defer></script>
+<script src="./test-center.js?v=0.2.11" defer></script>
 </body>
 </html>
