@@ -79,38 +79,38 @@ for(const file of crystalFiles){
   assert.equal(buffer.readUInt32BE(16),32,'Crystal sprite must use 32px tile width');
   assert.equal(buffer.readUInt32BE(20),32,'Crystal sprite must use 32px tile height');
 }
-const wallPartsFolder=path.join(root,'assets/art/dkarchitect/walls');
-const wallSource=path.join(root,'assets/art/temple/Demon Killer Stone Wall Tileset.png');
-assert(fs.existsSync(wallSource),'Retain the owner-uploaded wall art master');
-const wallPartFiles=fs.readdirSync(wallPartsFolder).filter(f=>/^dk_wall_.*\.png$/.test(f));
-assert.equal(wallPartFiles.length,106,'All 106 user-provided wall shapes split into individual transparent sprites');
-const wallManifest=JSON.parse(fs.readFileSync(path.join(wallPartsFolder,'manifest.json'),'utf8'));
-assert.equal(wallManifest.piece_count,106,'Generated crop manifest must describe every piece');
-assert.deepEqual([...wallManifest.grid_finishes],['clean','dirty','moss','cracked','broken']);
-assert.equal(Object.keys(wallManifest.pieces).length,106,'No missing or phantom wall-piece labels');
-for(const [id,part] of Object.entries(wallManifest.pieces)){
-  assert.equal(part.safeToAutotile,false,'Unverified corners cannot masquerade as seamless 32px autotiles');
-  const data=fs.readFileSync(path.join(wallPartsFolder,part.filename));
-  assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','Wall-piece PNG signature');
-  assert.equal(data.readUInt32BE(16),part.width,'Preserve exact original cropped width');
-  assert.equal(data.readUInt32BE(20),part.height,'Preserve exact original cropped height');
-  assert.equal(data[25],6,'All original wall cutouts must have transparent RGBA format');
-  assert(part.w>=1&&part.h>=1,'Every individual piece has a buildable tile footprint');
+const first=JSON.parse(read('assets/art/dkarchitect/imported/first-manifest.json'));
+const combined=JSON.parse(read('assets/art/dkarchitect/imported/manifest.json'));
+assert.equal(Object.keys(first.entries).length,243,'All 243 original 0x72 assets included');
+assert(Object.keys(combined.entries).length>=380,'Dungeon II and both Pixel_Poem packs included');
+for(const key of ['ox72i_wall_center','ox72i_wall_outer_nw','ox72i_wall_outer_se'])
+  assert(first.entries[key],'Original 0x72 matching wall components must exist');
+for(const key of ['ox72_wall_top_left','ox72_wall_top_right','ox72_wall_mid'])
+  assert(combined.entries[key],'Dungeon II corner and straight wall components must exist');
+assert(combined.entries['pixelpoem_enemies-vampire_attack'].frames.length>=10,
+  'Pixel_Poem enemy animation contains its original multi-frame sequence');
+for(const atlas of ['ox72-first-game-atlas.png','dk-imported-game-atlas.png']){
+  const png=fs.readFileSync(path.join(root,'assets/art/dkarchitect/imported',atlas));
+  assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a','Approved atlas PNG signature');
 }
-for(const finish of wallManifest.grid_finishes){
-  const data=fs.readFileSync(path.join(wallPartsFolder,'grid_wall_'+finish+'.png'));
-  assert.equal(data.readUInt32BE(16),32,'Grid masonry must be 32x32');
-  assert.equal(data.readUInt32BE(20),32,'Grid masonry must be 32x32');
-}
-assert(!fs.existsSync(path.join(root,'assets/art/temple/walls/wall_straight_north.png')),
-  'Rejected synthetic wall pieces must not remain selectable or active');
-assert(!fs.existsSync(path.join(root,'.github/workflows/build-dk-topdown-walls.yml')),
-  'Obsolete wall generator Actions must not run again');
+assert(!fs.existsSync(path.join(root,'assets/art/dkarchitect/walls')),
+  'All rejected owner-created wall sheets must be removed from active assets');
+assert(!fs.existsSync(path.join(root,'assets/art/temple/walls/Dungeon Temple Wall Tile Atlas(1).png')),
+  'Historical non-joinable master must not remain on live main');
+assert(!fs.existsSync(path.join(root,'.github/workflows/import-ox72-first-dungeon-once.yml')),
+  'One-time original 0x72 importer must remove its temporary workflow');
+assert(html.includes('dk-dungeon-art.js')&&
+  html.includes('assets/art/dkarchitect/imported/first-catalog.js')&&
+  html.includes('assets/art/dkarchitect/imported/catalog.js'),
+  'All four creator packs must load before Architect gameplay');
+const dungeonRuntime=read('dk-dungeon-art.js');
+assert(dungeonRuntime.includes('drawAutoFirst')&&dungeonRuntime.includes('drawAutoSecond'),
+  'Both creator-defined auto-wall construction methods must exist');
 assert(html.includes('id="wallBrush"')&&html.includes('id="wallLineButton"')&&
   html.includes('id="wallOutlineButton"')&&html.includes('id="assetSearch"'),
   'Pandora-style construction controls must be in the Architect panel');
-assert.match(js,/scene\.wallStyles\?\.\[index\(x,y\)\]/,
-  'Wall texture lookup follows the cell, not the old one-style wall atlas');
+assert(js.includes('wallPacks')&&js.includes('floorArt'),
+  'Room save state supports distinct compatible wall sets and imported floors');
 assert.match(js,/crystalSize=24/,'Crystals render smaller than the 32px player');
 assert.match(js,/crystal_gold_.*crystalBright/,'Active crystals alternate only approved gold frames');
 assert.match(js,/crystal_silver_depleted\.png/,'Spent crystal must use static silver asset');
@@ -157,7 +157,9 @@ const tickFrames=count=>{for(let i=0;i<count;i++){
 }};
 const sandbox={document,localStorage,Blob,URL,setTimeout,Date,console,requestAnimationFrame,
   window:{addEventListener:noop}};
-vm.runInNewContext(read('assets/art/dkarchitect/walls/catalog.js'),sandbox,{filename:'catalog.js',timeout:3000});
+vm.runInNewContext(read('assets/art/dkarchitect/imported/first-catalog.js'),sandbox,{filename:'first-catalog.js',timeout:3000});
+vm.runInNewContext(read('assets/art/dkarchitect/imported/catalog.js'),sandbox,{filename:'catalog.js',timeout:3000});
+vm.runInNewContext(dungeonRuntime,sandbox,{filename:'dk-dungeon-art.js',timeout:3000});
 vm.runInNewContext(js,sandbox,{filename:'test-center.js',timeout:3000});
 const key=code=>{for(const fn of events.keydown??[])fn({key:code,
   ctrlKey:false,metaKey:false,target:{tagName:'BODY'},preventDefault:noop});};
@@ -296,14 +298,14 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   // Pandora-inspired wall texture palette, one-step wall lines and saved styles.
   const wallCategory=get('category');wallCategory.value='walls';
   await wallCategory.emit('change',{target:wallCategory});
-  assert.equal(get('palette').children.length,111,
-    'Five verified masonry swatches and 106 original wall cutouts');
+  assert(get('palette').children.length>165,
+    'Matching 0x72 original and Dungeon II systems plus Pixel_Poem tiles are browseable');
   const strip=get('uoPaletteViewport');strip.scrollLeft=0;
   await strip.emit('wheel',{deltaY:120,deltaX:0,deltaMode:0,cancelable:true,preventDefault:noop});
   assert.equal(strip.scrollLeft,120,'Wheel over art browser moves the horizontal scroll position');
   await strip.emit('wheel',{deltaY:-40,deltaX:0,deltaMode:0,cancelable:true,preventDefault:noop});
   assert.equal(strip.scrollLeft,80,'Reverse wheel returns toward earlier sprites');
-  await get('palette').children[2].emit('click'); // Moss from the new wall set.
+  await get('palette').children[0].emit('click'); // Auto wall: 0x72 original.
   await click(1,6);
   const wallTool=get('tool');wallTool.value='wallLine';
   await wallTool.emit('change',{target:wallTool});
@@ -312,27 +314,29 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   await get('save').emit('click');
   const wallLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   assert.equal(wallLayout.walls[6*16+1],1,'Wall brush creates connected wall cells');
-  assert.equal(wallLayout.wallStyles[6*16+1],'moss','Wall finish survives room Save');
+  assert.equal(wallLayout.wallPacks[6*16+1],'ox72i','Original wall set survives room Save');
   for(let x=1;x<=4;x++){
     assert.equal(wallLayout.walls[8*16+x],1,'Straight-run wall is complete');
-    assert.equal(wallLayout.wallStyles[8*16+x],'moss','Straight-run retains palette finish');
+    assert.equal(wallLayout.wallPacks[8*16+x],'ox72i','Straight-run retains the matching creator set');
   }
-  // Independent authored wall pieces are placeable and persist without
-  // pretending to be automatic tile connectors.
-  const exactEntry=get('palette').children[5];
-  await exactEntry.emit('click');
-  await click(5,8);
-  await get('save').emit('click');
+  // The second 0x72 pack is selectable without combining different wall sets.
+  const firstManual=get('palette').children[2]; // first independent creator wall tile
+  await get('palette').children[1].emit('click');
+  await click(5,8);await get('save').emit('click');
+  const secondRoom=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(secondRoom.wallPacks[8*16+5],'ox72',
+    'Dungeon II wall cells retain their own pack identity');
+  await firstManual.emit('click');
+  await click(6,8);await get('save').emit('click');
   const manual=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
-  const authored=manual.objects.find(o=>o.type==='wallPiece'&&o.x===5&&o.y===8);
-  assert(authored&&authored.wallPieceId==='dk_wall_structures_01',
-    'Approved wall section must retain its original crop ID in the room save');
+  assert(manual.wallVariants[8*16+6]?.startsWith('ox72i_'),
+    'Hand-picked original 0x72 tile retains its validated identifier');
   const invalidWall=structuredClone(manual);
-  invalidWall.objects.find(o=>o.type==='wallPiece').wallPieceId='secret-wall-without-approval';
+  invalidWall.wallVariants[8*16+6]='secret-wall-without-approval';
   get('import').files=[{size:8000,text:async()=>JSON.stringify(invalidWall)}];
   await get('import').emit('change',{target:get('import')});
   assert.match(get('status').textContent,/Import rejected/,
-    'Unknown individual wall-part ID must be rejected on import');
+    'Unknown wall IDs cannot be injected through save imports');
   wallTool.value='wallErase';await wallTool.emit('change',{target:wallTool});
   await click(1,8);await get('save').emit('click');
   const erasedLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
