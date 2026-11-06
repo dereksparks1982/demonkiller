@@ -806,70 +806,72 @@
       if(document.activeElement!==$(id))$(id).value=String(value);
   }
   function palette() {
-    const list=$('palette');list.replaceChildren();$('paletteTitle').textContent=GROUPS[category];
-    const all=category==='walls'?
-        [...Object.entries(WALL_FINISHES),...Object.entries(WALL_PIECES)]
-      :category==='floors'?Object.entries(FLOOR)
-      :category==='library'?Object.entries(ARCHITECT_SPRITES)
-      :Object.entries(CATALOG).filter(([,a])=>a.category===category);
+    const list=$('palette');list.replaceChildren();
+    $('paletteTitle').textContent=GROUPS[category];
+    const all=category==='walls'
+      ?[...Object.entries(AUTO_WALLS),...vendorCategory('wall')]
+      :category==='floors'
+        ?[...Object.entries(FLOOR),...vendorCategory('floor')]
+        :category==='library'?Object.entries(ARCHITECT_SPRITES)
+        :[...Object.entries(CATALOG).filter(([,v])=>v.category===category&&v!==CATALOG.imported),
+          ...vendorCategory(category)];
     const query=$('assetSearch').value.trim().toLowerCase();
-    const entries=all.filter(([name,entry])=>(name+' '+entry.label).toLowerCase().includes(query));
+    const entries=all.filter(([key,e])=>
+      (key+' '+nameOf(e)+' '+(e.pack||'')).toLowerCase().includes(query));
     for(const [key,entry] of entries){
+      const imported=VENDOR[key],auto=AUTO_WALLS[key];
       const b=document.createElement('button');b.type='button';
-      b.className=(category==='walls'?
-          (selectedWallPiece?selectedWallPiece===key:wallFinish===key)
-        :category==='library'?selectedSprite===key:current===key)?'active':'';
-      const mini=document.createElement('canvas');mini.width=32;mini.height=32;mini.setAttribute('aria-hidden','true');
+      b.className=category==='walls'
+        ?((auto&&!selectedWallAsset&&selectedWallPack===auto.pack)||
+          selectedWallAsset===key?'active':'')
+        :category==='floors'
+          ?((imported&&selectedFloorAsset===key)||(!imported&&!selectedFloorAsset&&current===key)?'active':'')
+          :((imported&&selectedImportedId===key)||(!imported&&
+            (category==='library'?selectedSprite===key:current===key))?'active':'');
+      const mini=document.createElement('canvas');mini.width=32;mini.height=32;
+      mini.setAttribute('aria-hidden','true');
       const c=mini.getContext('2d');c.imageSmoothingEnabled=false;
-      if(category==='floors'){
+      if(imported)DUNGEON.draw(c,key,0,0,32,32,0,0);
+      else if(auto)DUNGEON.draw(c,auto.pack==='ox72'?'ox72_wall_mid':
+        'ox72i_wall_center',0,0,32,32,0,0);
+      else if(category==='floors'){
         c.fillStyle=entry.color;c.fillRect(0,0,32,32);
-        c.strokeStyle='#8e6676';c.strokeRect(2,2,28,28);
-        if(key==='sigil'){c.fillStyle='#bf748e';c.fillRect(15,8,3,16);c.fillRect(9,15,16,2);}
-      }else if(category==='walls'){
-        const part=WALL_PIECES[key];
-        const name=part?'dkarchitect/walls/'+part.filename
-          :'dkarchitect/walls/grid_wall_'+key+'.png';
-        const image=readyImage(name);
-        if(image&&typeof c.drawImage==='function'){
-          if(part){
-            const scale=Math.min(32/part.width,32/part.height);
-            const w=Math.max(1,Math.round(part.width*scale)),h=Math.max(1,Math.round(part.height*scale));
-            c.drawImage(image,Math.floor((32-w)/2),Math.floor((32-h)/2),w,h);
-          }else c.drawImage(image,0,0,32,32);
-        }else{
-          c.fillStyle=entry.color||'#776f64';c.fillRect(3,7,26,18);
-          c.strokeStyle='#201921';c.strokeRect(3,7,26,18);
-        }
       }else if(category==='library'){
         art(c,{type:'scenery',spriteId:key,x:0,y:0,r:0});
       }else{
-        const base=CATALOG[key];c.scale(1/base.w,1/base.h);art(c,{type:key,x:0,y:0,r:0,open:false});
+        const base=CATALOG[key];c.save();c.scale(1/base.w,1/base.h);
+        art(c,{type:key,x:0,y:0,r:0,open:false});c.restore();
       }
-      const span=document.createElement('span');span.textContent=entry.label;
-      b.append(mini,span);b.addEventListener('click',()=>{
+      const span=document.createElement('span');span.textContent=nameOf(entry);
+      b.append(mini,span);
+      b.addEventListener('click',()=>{
         if(category==='walls'){
-          if(Object.hasOwn(WALL_PIECES,key)){
-            selectedWallPiece=key;current='wallPiece';
-            tool='place';previewRotation=0;
-          }else{
-            selectedWallPiece=null;wallFinish=key;tool='wall';
+          if(auto){
+            selectedWallPack=auto.pack;selectedWallAsset=null;tool='wall';
+          }else if(imported&&imported.width<=32&&imported.height<=32){
+            selectedWallPack=imported.pack;selectedWallAsset=key;tool='wall';
+          }else if(imported){
+            current='imported';selectedImportedId=key;tool='place';
           }
-          $('tool').value=tool;
+        }else if(category==='floors'){
+          selectedFloorAsset=imported?key:null;current=imported?'stone':key;tool='floor';
+        }else if(imported){
+          current='imported';selectedImportedId=key;tool='place';
         }else{
           current=category==='library'?'scenery':key;
           if(category==='library')selectedSprite=key;
-          previewRotation=0;
-          if(category==='floors'&&tool==='place')$('tool').value=tool='floor';
-          if(category!=='floors'&&(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle','paste'].includes(tool)))
-            $('tool').value=tool='place';
+          if(['floor','fill','rectangle','wall','wallErase','wallLine','wallRectangle','paste'].includes(tool))
+            tool='place';
         }
-        palette();draw();message('Selected '+entry.label+'. Click a grid coordinate in Architect Mode.');
-      });list.append(b);
+        previewRotation=0;corner=null;$('tool').value=tool;
+        palette();draw();message('Selected '+nameOf(entry)+'. Click a tile in Architect Mode.');
+      });
+      list.append(b);
     }
-    $('wallFinishLabel').textContent=selectedWallPiece
-      ?'INDEPENDENT PIECE · '+WALL_PIECES[selectedWallPiece].label.toUpperCase()
-      :'SEAMLESS GRID STONE · '+WALL_FINISHES[wallFinish].label.toUpperCase();
-    $('uoAssetCount').textContent=entries.length+' TILES';
+    $('wallFinishLabel').textContent=selectedWallAsset
+      ?'MANUAL · '+nameOf(VENDOR[selectedWallAsset]).toUpperCase()
+      :'AUTO WALL · '+(selectedWallPack==='ox72'?'0X72 DUNGEON II':'0X72 ORIGINAL');
+    $('uoAssetCount').textContent=entries.length+' ASSETS';
   }
   function setMode(next) {
     rightMouseHeld=false;
