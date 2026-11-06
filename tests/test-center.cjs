@@ -53,6 +53,22 @@ for(const file of crystalFiles){
   assert.equal(buffer.readUInt32BE(16),32,'Crystal sprite must use 32px tile width');
   assert.equal(buffer.readUInt32BE(20),32,'Crystal sprite must use 32px tile height');
 }
+const wallsFolder=path.join(root,'assets/art/temple/walls');
+const wallNames=fs.readdirSync(wallsFolder).filter(f=>/^wall_(straight|corner|t|cross|end)_(north|east|south|west)(_(moss|cracked|broken))?\.png$/.test(f));
+assert.equal(wallNames.length,80,'Twenty original approved wall poses have four finish choices each');
+for(const shape of ['straight','corner','t','cross','end'])for(const facing of ['north','east','south','west'])
+  for(const suffix of ['','_moss','_cracked','_broken']){
+    const file='wall_'+shape+'_'+facing+suffix+'.png';
+    const data=fs.readFileSync(path.join(wallsFolder,file));
+    assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','Wall PNG signature');
+    assert.equal(data.readUInt32BE(16),32,'Wall tile width');
+    assert.equal(data.readUInt32BE(20),32,'Wall tile height');
+  }
+assert(html.includes('id="wallBrush"')&&html.includes('id="wallLineButton"')&&
+  html.includes('id="wallOutlineButton"')&&html.includes('id="assetSearch"'),
+  'Pandora-style construction controls must be in the Architect panel');
+assert.match(js,/scene\.wallStyles\?\.\[index\(x,y\)\]/,
+  'Wall texture lookup follows the cell, not the old one-style wall atlas');
 assert.match(js,/crystalSize=24/,'Crystals render smaller than the 32px player');
 assert.match(js,/crystal_gold_.*crystalBright/,'Active crystals alternate only approved gold frames');
 assert.match(js,/crystal_silver_depleted\.png/,'Spent crystal must use static silver asset');
@@ -214,6 +230,29 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   assert.equal(layout.objects.find(o=>o.x===2&&o.y===5).r,1,'Placed sprite keeps wheel rotation');
   await get('inspect').emit('click');
   assert.match(get('status').textContent,/ACCESS CHECK/);
+
+  // Pandora-inspired wall texture palette, one-step wall lines and saved styles.
+  const wallCategory=get('category');wallCategory.value='walls';
+  await wallCategory.emit('change',{target:wallCategory});
+  assert.equal(get('palette').children.length,4,'Four approved masonry finishes in asset browser');
+  await get('palette').children[1].emit('click'); // Moss from the original wall atlas.
+  await click(1,6);
+  const wallTool=get('tool');wallTool.value='wallLine';
+  await wallTool.emit('change',{target:wallTool});
+  await click(1,7);await click(4,7);
+  await get('save').emit('click');
+  const wallLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(wallLayout.walls[6*16+1],1,'Wall brush creates connected wall cells');
+  assert.equal(wallLayout.wallStyles[6*16+1],'moss','Wall finish survives room Save');
+  for(let x=1;x<=4;x++){
+    assert.equal(wallLayout.walls[7*16+x],1,'Straight-run wall is complete');
+    assert.equal(wallLayout.wallStyles[7*16+x],'moss','Straight-run retains palette finish');
+  }
+  wallTool.value='wallErase';await wallTool.emit('change',{target:wallTool});
+  await click(1,7);await get('save').emit('click');
+  const erasedLayout=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
+  assert.equal(erasedLayout.walls[7*16+1],0,'Dedicated wall eraser clears wall geometry');
+  assert.equal(erasedLayout.wallStyles[7*16+1],'clean','Erased wall loses its former finish');
 
   const invalid=JSON.parse(saved.get('dkSoftworks.demonkiller.testCenter.v1'));
   invalid.area_id='other.world';
