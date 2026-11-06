@@ -751,7 +751,8 @@
           :{id:'__architect_preview__',type:current,x:hover.x,y:hover.y,
             r:previewRotation,open:true,spent:false,
             ...(current==='scenery'?{spriteId:selectedSprite}:{}),
-            ...(current==='wallPiece'?{wallPieceId:selectedWallPiece}:{})};
+            ...(current==='imported'?{assetId:selectedImportedId,
+              solidOverride:['wall','structure'].includes(VENDOR[selectedImportedId]?.category)}:{})};
         const [pw,ph]=dims(preview);
         const allowed=canPlace(preview);
         ctx.save();ctx.globalAlpha=allowed?.58:.32;
@@ -1009,16 +1010,19 @@
     return transact(()=>{
       if(!scene.wallStyles)scene.wallStyles=Array(COUNT).fill('clean');
       if(!scene.wallVariants)scene.wallVariants=Array(COUNT).fill(null);
+      if(!scene.wallPacks)scene.wallPacks=Array(COUNT).fill('ox72i');
       for(const [x,y] of cells){
         if(!inside(x,y))continue;
         const i=index(x,y);
         if(erase){
           if(scene.walls[i]){
             scene.walls[i]=0;scene.wallStyles[i]='clean';scene.wallVariants[i]=null;
+            scene.wallPacks[i]='ox72i';
           }
         }else if(!objectAt(x,y)){
-          scene.walls[i]=1;scene.wallStyles[i]=wallFinish;
-          scene.wallVariants[i]=null;
+          scene.walls[i]=1;scene.wallStyles[i]='clean';
+          scene.wallPacks[i]=validWallPack(selectedWallPack)?selectedWallPack:'ox72i';
+          scene.wallVariants[i]=selectedWallAsset;
         }
       }
     },(erase?'Removed':'Painted '+WALL_FINISHES[wallFinish].label)+' wall tiles ('+cells.length+' selected).');
@@ -1027,8 +1031,8 @@
     const here=objectAt(x,y),i=index(x,y);
     if(tool==='pick'){
       if(scene.walls[i]&&!here){
-        wallFinish=scene.wallStyles?.[i]||'clean';
-        selectedWallPiece=null;
+        wallFinish='clean';selectedWallAsset=scene.wallVariants?.[i]||null;
+        selectedWallPack=scene.wallPacks?.[i]||'ox72i';
         category='walls';tool='wall';
         $('category').value=category;$('tool').value=tool;palette();draw();
         message('Eyedropper: '+WALL_FINISHES[wallFinish].label+' wall.');return;
@@ -1036,12 +1040,17 @@
       if(here){
         current=here.type;category=CATALOG[here.type].category;tool='place';
         if(here.type==='scenery')selectedSprite=here.spriteId;
-        if(here.type==='wallPiece')selectedWallPiece=here.wallPieceId;
+        if(here.type==='imported')selectedImportedId=here.assetId;
         $('category').value=category;$('tool').value=tool;
         palette();draw();message('Eyedropper: '+(here.type==='scenery'?
           ARCHITECT_SPRITES[here.spriteId].label:CATALOG[here.type].label));
       }
-      else{current=scene.floor[i];category='floors';tool='floor';$('category').value=category;$('tool').value=tool;palette();draw();message('Eyedropper: '+FLOOR[current].label);}
+      else{
+        current=scene.floor[i];selectedFloorAsset=scene.floorArt?.[i]||null;
+        category='floors';tool='floor';$('category').value=category;$('tool').value=tool;
+        palette();draw();message('Eyedropper: '+(selectedFloorAsset?
+          VENDOR[selectedFloorAsset].name:FLOOR[current].label));
+      }
       return;
     }
     if(tool==='select'){
@@ -1092,17 +1101,22 @@
     }
     if(tool==='floor'||tool==='fill'||tool==='rectangle'){
       const floor=Object.hasOwn(FLOOR,current)?current:'stone';
+      if(!scene.floorArt)scene.floorArt=Array(COUNT).fill(null);
+      const floorAsset=selectedFloorAsset;
       if(tool==='rectangle'&&!corner){corner={x,y};draw();message('First corner ('+x+', '+y+'). Choose the opposite corner.');return;}
       transact(()=>{
-        if(tool==='floor')scene.floor[i]=floor;
+        if(tool==='floor'){scene.floor[i]=floor;scene.floorArt[i]=floorAsset;}
         else if(tool==='rectangle'){
           for(let yy=Math.min(corner.y,y);yy<=Math.max(corner.y,y);yy++)
-            for(let xx=Math.min(corner.x,x);xx<=Math.max(corner.x,x);xx++)scene.floor[index(xx,yy)]=floor;
+            for(let xx=Math.min(corner.x,x);xx<=Math.max(corner.x,x);xx++){
+              scene.floor[index(xx,yy)]=floor;scene.floorArt[index(xx,yy)]=floorAsset;
+            }
         }else{
           const old=scene.floor[i];if(old===floor)return;
           const queue=[[x,y]],seen=new Set([i]);
           for(let q=0;q<queue.length;q++){
             const [px,py]=queue[q];scene.floor[index(px,py)]=floor;
+            scene.floorArt[index(px,py)]=floorAsset;
             for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
               const nx=px+dx,ny=py+dy,k=index(nx,ny);
               if(inside(nx,ny)&&!seen.has(k)&&scene.floor[k]===old){seen.add(k);queue.push([nx,ny]);}
@@ -1125,7 +1139,10 @@
       if(!CATALOG[current])return message('Choose a relic, structure or prop from the palette.');
       const obj={id:idFor(current),type:current,x,y,r:previewRotation};
       if(current==='scenery')obj.spriteId=selectedSprite;
-      if(current==='wallPiece')obj.wallPieceId=selectedWallPiece;
+      if(current==='imported'){
+        obj.assetId=selectedImportedId;
+        obj.solidOverride=['wall','structure'].includes(VENDOR[selectedImportedId]?.category);
+      }
       if(current==='door')obj.open=true;
       if(current==='crystal')obj.spent=false;
       transact(()=>{if(canPlace(obj))scene.objects.push(obj);},'Placed '+CATALOG[current].label+' at ('+x+', '+y+').');return;
