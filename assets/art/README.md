@@ -17,9 +17,11 @@ This directory holds original game artwork for Demon Killer and DK Architect.
 - `characters/devil/`: approved Devil sheet with four cardinal views.
 - `shared/`: images reusable across areas.
 
-## Future soul-crystal colour variants (not yet built)
+## Approved soul crystal sprites (2026-11-05)
 
-The owner requests one consistent multi-colour **soul crystal sprite sheet**, preserving the approved Gothic pixel style and 32 × 32 tile convention. Different crystal colours will signify different things in gameplay, but the exact colour meanings are not approved yet. This is a documented art request, **not permission to generate or integrate assets**. See [Soul colours, death shrouds, and soul crystals](../../docs/soul-colours-death-shrouds-and-crystals.md).
+The exact owner-uploaded original master sheet is preserved as `crystals/Glowing and Dull Pixel Crystals.png`. It contains ten crystal colors in two rows, bright above and dim below. The repo now includes 19 separate transparent 32 × 32 PNG sprites extracted from that sheet, not new drawings: gold, red, orange, yellow, green, cyan, blue, purple, and pink each have `_bright` and `_dim` files. The bright silver crystal appears once as `crystal_silver_depleted.png`. No silver animation is used.
+
+In the Forsaken Temple, the gold crystal stays bright/dim flickering at irregular intervals while unused. A successful double-left-click starts resurrection and immediately changes that particular crystal to permanent silver. The graphic is drawn into 24 × 24 pixels centered within its 32 × 32 interaction tile, with a smaller actual silhouette. Source extraction can be reproduced with `scripts/split-approved-crystals.py`; the original master is never altered. Additional soul-color meanings remain undecided; do not invent them.
 
 ## Artwork conventions
 

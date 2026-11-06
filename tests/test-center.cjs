@@ -36,6 +36,23 @@ assert(js.includes("const STORE = 'dkSoftworks.demonkiller.testCenter.v1'"));
 assert(!js.includes('dkSoftworks.testCenter.room.v1'),'Must not reuse C&C test save key');
 assert(!js.includes('ccRoomLayoutV1'),'Must not access Capital & Consequence career keys');
 assert(css.includes('image-rendering:pixelated'),'Pixel artwork should remain crisp');
+const crystalFolder=path.join(root,'assets/art/crystals');
+const variants=['gold','red','orange','yellow','green','cyan','blue','purple','pink'];
+const crystalFiles=fs.readdirSync(crystalFolder).filter(f=>/^crystal_.*\.png$/.test(f));
+assert.equal(crystalFiles.length,19,'Nine colored bright/dim crystals and one depleted silver');
+for(const color of variants)for(const brightness of ['bright','dim']){
+  const pathname=path.join(crystalFolder,'crystal_'+color+'_'+brightness+'.png');
+  assert(fs.existsSync(pathname),'Missing approved crystal sprite: '+pathname);
+}
+assert(!fs.existsSync(path.join(crystalFolder,'crystal_silver_dim.png')),
+  'Depleted silver crystal stays static and has no dim animation');
+for(const file of crystalFiles){
+  const buffer=fs.readFileSync(path.join(crystalFolder,file));
+  assert.equal(buffer.subarray(0,8).toString('hex'),'89504e470d0a1a0a',
+    'Crystal sprite must be a PNG: '+file);
+  assert.equal(buffer.readUInt32BE(16),32,'Crystal sprite must use 32px tile width');
+  assert.equal(buffer.readUInt32BE(20),32,'Crystal sprite must use 32px tile height');
+}
 assert.match(js,/crystalSize=24/,'Crystals render smaller than the 32px player');
 assert.match(js,/crystal_gold_.*crystalBright/,'Active crystals alternate only approved gold frames');
 assert.match(js,/crystal_silver_depleted\.png/,'Spent crystal must use static silver asset');
