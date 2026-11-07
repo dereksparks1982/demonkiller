@@ -47,7 +47,7 @@ test('bank refuses remote transactions, forged quantities, closed hours and ghos
 });
 test('dropped goods remain in the outdoor world and are collectible once',()=>{
  let w=fixture(),c=w.characters['1'];
- c.area_id=R.COURT;c.x=20;c.y=30;
+ c.area_id=R.COURT;c.x=20;c.y=30;syncAll(w);
  const drop=G.apply(w,{action:'drop_item',item_type:'herbs',quantity:4});
  assert.equal(drop.character.inventory.herbs,6);
  const pile=Object.values(drop.world.living.storage.ground)[0];
@@ -60,7 +60,7 @@ test('dropped goods remain in the outdoor world and are collectible once',()=>{
  assert.throws(()=>G.apply(taken.world,{action:'pick_up',drop_id:pile.id}),/Move beside/);
 });
 test('ground goods decay by simulated world minute, not real time',()=>{
- const w=fixture(),c=w.characters['1'];c.area_id=R.COURT;c.x=20;c.y=30;
+ const w=fixture(),c=w.characters['1'];c.area_id=R.COURT;c.x=20;c.y=30;syncAll(w);
  const dropped=G.apply(w,{action:'drop_item',item_type:'herbs',quantity:2}).world;
  const events=[];
  Storage.tick(dropped,359,events);
