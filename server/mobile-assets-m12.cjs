@@ -25,7 +25,7 @@ function ensure(world){
  }
  const asset=l.mobile_assets;
  for(const corpse of Object.values(asset.corpses))
-  if(Decay.migrate(corpse))changed=true;
+  if(Decay.migrate(corpse,l.minute))changed=true;
  for(const npc of Object.values(l.npcs)){
   if(asset.npcs[npc.id])continue;
   let bagId=null;
