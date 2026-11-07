@@ -120,7 +120,7 @@
     }
     try {
       const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
-      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<29) throw Error('DK Server needs M29 or later');
+      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<30) throw Error('DK Server needs M30 or later');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';
