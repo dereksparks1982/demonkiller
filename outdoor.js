@@ -182,6 +182,43 @@ function drawTerrainMarks(){
   ctx.restore();
  }
 }
+// M30 graves and carrion animals are saved world objects, rendered beneath
+// characters without changing the approved collision or walking system.
+function drawBurials(){
+ for(const grave of Object.values(living?.burials||{})){
+  if(grave.area_id!==area.area_id)continue;
+  const x=grave.x*TILE,y=grave.y*TILE;
+  px('#40372f',x+4,y+21,25,8);
+  px(grave.stage==='fresh'?'#645246':'#524b43',x+8,y+16,18,8);
+  px('#746d67',x+12,y+9,10,14);
+  px('#ac9f8e',x+13,y+10,8,2);
+  if(grave.stage==='overgrown'){
+   px('#46613b',x+7,y+20,5,4);px('#536945',x+24,y+22,5,6);
+   px('#52683d',x+15,y+27,10,3);
+  }else if(grave.stage==='settled'){
+   px('#837b6e',x+19,y+22,4,2);
+  }
+ }
+}
+function drawScavengers(){
+ for(const animal of Object.values(living?.scavengers||{})){
+  if(animal.area_id!==area.area_id)continue;
+  const x=animal.x*TILE,y=animal.y*TILE;
+  if(animal.kind==='raven'){
+   px('#22232d',x+9,y+13,16,10);
+   px('#33343e',x+6,y+14,7,6);
+   px('#bf9c69',x+23,y+17,5,3);
+   px('#171922',x+10,y+23,2,4);px('#171922',x+19,y+23,2,4);
+  }else if(animal.kind==='rat'){
+   px('#655657',x+8,y+20,15,7);
+   px('#8e7972',x+9,y+18,5,4);
+   px('#b0867c',x+22,y+25,7,2);
+  }else{
+   px('#32313a',x+12,y+21,8,6);px('#695e55',x+10,y+20,3,4);
+   px('#695e55',x+21,y+20,3,4);
+  }
+ }
+}
 function drawCorpses(){
  for(const body of Object.values(living?.mobile_assets?.corpses||{})){
   if(body.area_id!==area.area_id)continue;
@@ -237,6 +274,16 @@ function lootCorpse(){
  const body=closestCorpse();
  if(!body)return message('Move beside a fallen resident to recover their belongings.');
  return takeAction('loot_corpse',{corpse_id:body.id});
+}
+function buryCorpse(){
+ if(!SERVER)return message('Burial requires the local DK Server.');
+ const corpse=Object.values(living?.mobile_assets?.corpses||{}).find(b=>
+  b.kind==='npc'&&b.area_id===player.area_id&&
+  Math.abs(b.x-player.x)+Math.abs(b.y-player.y)<=1);
+ if(!corpse)return message('Move beside a human body before pressing B.');
+ if(!window.confirm('Bury '+corpse.name+'? Any possessions still on the body will be buried and cannot be recovered.'))
+  return;
+ takeAction('bury_corpse',{corpse_id:corpse.id});
 }
 function nearestCreature(){
  return Object.values(living?.combat?.creatures||{}).filter(n=>n.alive&&
@@ -497,7 +544,9 @@ function draw(){
  for(const o of area.objects)drawObject(o);
  drawResources();
  drawTerrainMarks();
+ drawBurials();
  drawCorpses();
+ drawScavengers();
  drawNpcs();
  drawMonsters();
  drawGroundItems();
@@ -519,6 +568,12 @@ function actorAt(x,y){
  const body=Object.values(living?.mobile_assets?.corpses||{}).find(c=>
   c.area_id===area.area_id&&c.x===x&&c.y===y);
  if(body)return {body};
+ const grave=Object.values(living?.burials||{}).find(g=>
+  g.area_id===area.area_id&&g.x===x&&g.y===y);
+ if(grave)return {grave};
+ const scavenger=Object.values(living?.scavengers||{}).find(v=>
+  v.area_id===area.area_id&&v.x===x&&v.y===y);
+ if(scavenger)return {scavenger};
  const ground=Object.values(living?.storage?.ground||{}).find(d=>
   d.area_id===area.area_id&&d.x===x&&d.y===y);
  if(ground)return {ground};
@@ -789,6 +844,10 @@ async function toggleDoor(){
 }
 function inspect(x,y,doubleClick){
  const item=actorAt(x,y);if(!item)return message('Nothing notable here.');
+ if(item.grave)return message(item.grave.name+
+  ' rests beneath a '+item.grave.stage+' grave. The stone remains in the world.');
+ if(item.scavenger)return message('A '+item.scavenger.kind+
+  ' has come to feed among the remains.');
  if(item.body){
   const body=item.body,stage=(body.stage||'fresh').replaceAll('_',' ');
   const kind=body.kind==='monster'?'demon':'person';
@@ -798,7 +857,8 @@ function inspect(x,y,doubleClick){
    return takeAction('loot_corpse',{corpse_id:body.id});
   return message((kind==='demon'?'Demon remains: ':body.name+': ')+
    stage+' remains anchored here. '+(accessible?
-    'Double-click to recover belongings.':'Nothing remains to loot.'));
+    'Double-click to recover belongings. B buries the body if you have tools.':
+    'Nothing remains to loot. B can bury a human body.'));
  }
  if(item.ground){
   if(doubleClick&&SERVER)return takeAction('pick_up',{drop_id:item.ground.id});
@@ -912,7 +972,9 @@ canvas.addEventListener('click',e=>{if(e.button!==0)return;const p=targetTile(e)
 canvas.addEventListener('dblclick',e=>{if(e.button!==0)return;const p=targetTile(e);if(p)inspect(p.x,p.y,true);});
 document.addEventListener('keydown',e=>{
  const tag=e.target?.tagName;
- if(tag==='INPUT'||tag==='TEXTAREA'||tag==='BUTTON')return;
+ if(e.ctrlKey||e.altKey||e.metaKey)return;
+ if(tag==='INPUT'||tag==='TEXTAREA'||tag==='BUTTON'||tag==='SELECT'||e.target?.isContentEditable)return;
+ if(e.key.toLowerCase()==='b'&&!e.repeat){e.preventDefault();buryCorpse();return;}
  const dir={ArrowUp:'north',w:'north',ArrowDown:'south',s:'south',
   ArrowLeft:'west',a:'west',ArrowRight:'east',d:'east'}[e.key.length===1?e.key.toLowerCase():e.key];
  if(dir){e.preventDefault();step(dir);}
