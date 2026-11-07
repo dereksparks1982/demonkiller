@@ -28,10 +28,10 @@ function build(world){
       area_id:c.area_id,x:c.x??8,y:c.y??12});
   for(const n of Object.values(world.living?.npcs||{}))if(n.alive)
     add({kind:'npc',id:n.id,serial:serialFor('npc:'+n.id),name:n.name,
-      area_id:n.area_id,x:n.x,y:n.y,role:n.role,status:n.status});
+      area_id:n.area_id,x:n.x,y:n.y,role:n.role,status:n.status,alive:true});
   for(const n of Object.values(world.living?.combat?.creatures||{}))if(n.alive)
     add({kind:'monster',id:n.id,serial:serialFor('monster:'+n.id),
-      area_id:n.area_id,x:n.x,y:n.y,health:n.health});
+      area_id:n.area_id,x:n.x,y:n.y,health:n.health,alive:true});
   for(const [area_id,a] of Object.entries(world.areas||{}))
     for(const o of a.objects||[])add({kind:'fixture',id:o.id,
       serial:serialFor('fixture:'+area_id+':'+o.id),type:o.type,
