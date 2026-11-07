@@ -5,6 +5,8 @@ const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:pa
 const W=require('../server/world.cjs'),G=require('../server/gameplay.cjs');
 const E=require('../server/entity-registry-m10.cjs');
 const MOBILE=require('../server/mobile-assets-m12.cjs');
+const HOUSING=require('../server/housing-m17.cjs');
+const VENDORS=require('../server/vendors-m18.cjs');
 const R=require('../server/regions.cjs');
 const {createDKServer}=require('../server/dk-server.cjs');
 const NOW=Date.UTC(2026,10,6);
@@ -87,6 +89,11 @@ test('M9 worlds migrate without deleting their inventory or any NPC history',()=
  delete w.living.mobile_assets;
  assert.equal(E.reconcile(w),true);
  assert.equal(MOBILE.ensure(w),true);
+ // Restore the later containers in dependency order, exactly as server
+ // startup does when a legacy world has not been fully upgraded.
+ assert.equal(HOUSING.ensure(w),true);
+ assert.equal(VENDORS.ensure(w),true);
+ assert.equal(E.reconcile(w),true);
  assert.equal(w.characters['1'].inventory.herbs,old);
  assert.equal(w.living.npcs.baker.name,npc);
  assert.equal(E.reconcile(w),false);
