@@ -147,5 +147,5 @@ test('M31 read-only sector endpoints obey the player location, validate input an
  assert.equal((await fetch(base+'/api/v1/sectors/interest?cursor=wrong')).status,422);
  assert.equal((await fetch(base+'/api/v1/sectors/chunk?area='+encodeURIComponent(R.COURT)+'&sx=0&sy=0')).status,422);
  assert.equal((await fetch(base+'/api/v1/sectors/chunk?area='+encodeURIComponent(R.VILLAGE)+'&sx=99&sy=1')).status,422);
- assert.equal((await fetch(base+'/api/v1/sectors/interest',{method:'POST',headers:{'content-type':'application/json'},body:'{}'})).status,404);
+ assert.equal((await fetch(base+'/api/v1/sectors/interest',{method:'POST',headers:{'content-type':'application/json'},body:'{}'})).status,405);
 });
