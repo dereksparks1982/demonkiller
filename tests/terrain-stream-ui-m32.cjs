@@ -27,6 +27,12 @@ test('M32 streaming path downloads manifest and chunks without fetching full map
  assert.match(code,/if\(area\.streamed&&f===null\)/);
  assert.match(code,/prefetchTerrain\(\)/);
  assert.match(code,/setInterval\(refreshSectorInterest,1750\)/);
+ assert.match(code,/async function recoverFullTerrain\(session\)/);
+ assert.match(code,/if\(\+\+terrainFailures>=3\)void recoverFullTerrain\(session\)/);
+ const recovering=code.slice(code.indexOf('async function recoverFullTerrain('),
+  code.indexOf('function checkTerrainFetch('));
+ assert(!recovering.includes('resetVisual()'),'fallback must not interrupt walking animation');
+ assert(!recovering.includes('location.href'),'fallback must not reload the scene');
 });
 test('M32 local-server allowlist includes the exact streamed module but not source code',()=>{
  const src=read('server/local-game.cjs');
