@@ -31,6 +31,8 @@ const {ensure:ensureMobileAI,listing:npcAIListing}=require('./mobile-ai-m21.cjs'
 const {ensure:ensureHarvest,listing:harvestListing}=require('./npc-harvest-m22.cjs');
 const {ensure:ensureSuccession,listing:successionListing}=require('./npc-succession-m23.cjs');
 const {ensure:ensureCaravans,listing:caravanListing}=require('./caravan-logistics-m24.cjs');
+const {ensure:ensureScavengers}=require('./scavengers-m30.cjs');
+const {ensure:ensureBurials}=require('./burials-m30.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -166,6 +168,8 @@ async function createDKServer({
     const harvestAdded=ensureHarvest(world);
     const successionAdded=ensureSuccession(world);
     const caravanAdded=ensureCaravans(world);
+    const scavengersAdded=ensureScavengers(world);
+    const burialsAdded=ensureBurials(world);
     assertEntityCounts(world);
     // A stopped world stays frozen. No NPC catch-up or world time is simulated
     // during an intentional server shutdown or an offline host restart.
@@ -173,7 +177,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -347,7 +351,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m29', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m30', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -444,6 +448,7 @@ async function createDKServer({
         storage:{ground:l.storage?.ground||{}},
         mobile_assets:{corpses:l.mobile_assets?.corpses||{},
           terrain_marks:l.mobile_assets?.terrain_marks||{}},
+        scavengers:l.scavengers?.visitors||{},burials:l.burials?.records||{},
         pending_mail:l.mail.outbound.length,latest_events:l.events.slice(-30),
         last_event_sequence:l.event_sequence,world_running:worldClock(world,now()).running,
         world_revision:world.revision},method);
