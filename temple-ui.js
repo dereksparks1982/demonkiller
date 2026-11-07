@@ -16,7 +16,7 @@ host.innerHTML=`
  <header class="dk-uo-head"><strong>BACKPACK</strong><button type="button" data-close="templeBag" aria-label="Close backpack">×</button></header>
  <p id="templeGold">0 GOLD</p><div id="templeItems" class="dk-uo-items"></div>
 </section>`;
-document.body.append(...host.childNodes);
+while(host.firstChild)document.body.appendChild(host.firstChild);
 const paper=$('templePaper'),bag=$('templeBag');
 let layer=30,latest='';
 function toggle(win){win.hidden=!win.hidden;if(!win.hidden){win.style.zIndex=String(++layer);update();}}
