@@ -117,10 +117,10 @@ test('M33 character deletion resets only character visit history, not any world 
 });
 test('M33 read-only streaming-cell API reflects saved player location and is retained on restart',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m33-'));
- t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true});});
  const w=sample();await fs.writeFile(path.join(dir,'world.json'),JSON.stringify(w));
  const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
- t.after(async()=>{if(app.server.listening)await app.close();});
+ 
  const base='http://127.0.0.1:'+app.address.port;
  const r=await fetch(base+'/api/v1/streaming-cells');
  assert.equal(r.status,200);
