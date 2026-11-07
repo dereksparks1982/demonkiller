@@ -19,6 +19,7 @@ const {ensure:ensureScheduler,listing:schedulerListing}=require('./world-schedul
 const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m12.cjs');
 const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
 const {deleteCharacter}=require('./character-lifecycle-m26.cjs');
+const {backpack:readBackpack}=require('./item-interactions-m27.cjs');
 const {publicRecord:publicSkills}=require('./skills-m14.cjs');
 const {ensure:ensureLaw,listing:lawListing}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,current:currentDistrict}=require('./region-policies-m16.cjs');
@@ -346,7 +347,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m26', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m27', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -425,6 +426,10 @@ async function createDKServer({
         spatialCache=buildSectorIndex(world);
       const result=sectorLookup(spatialCache,c.area_id,c.x??8,c.y??12,radius);
       return sendJSON(res,200,{...result,revision:world.revision},method);
+    }
+    if(url.pathname==='/api/v1/inventory'&&!write){
+      if(!world.characters['1'])return sendJSON(res,404,{error:'No character exists'},method);
+      return sendJSON(res,200,readBackpack(world),method);
     }
     if(url.pathname==='/api/v1/entities/items'&&!write){
       const c=world.characters['1'];
