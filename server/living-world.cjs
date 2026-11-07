@@ -10,6 +10,7 @@ const {tick:combatTick}=require('./combat-m8.cjs');
 const {tick:storageTick}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,runMinute:runScheduled}=require('./world-scheduler-m11.cjs');
+const {npcSenseDue}=require('./sector-interest-m31.cjs');
 const {ensure:ensureMobileAssets,onDeath:recordMobileDeath}=require('./mobile-assets-m12.cjs');
 const {ensure:ensureLaw,tick:lawTick}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,syncNpcTransitions}=require('./region-policies-m16.cjs');
@@ -129,7 +130,7 @@ function minuteTick(world,m,generated){
  CARAVAN.plan(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
-  if(m%5===0)NPCAI.sense(world,n,m,generated);
+  if(npcSenseDue(world,n,m))NPCAI.sense(world,n,m,generated);
   const state=world.living.npc_ai?.brains[n.id]?.mode||'work';
   const desired=NPCAI.destination(world,n)||npcDestination(n,m,world);
   const status=state==='flee'?'fleeing':state==='defend'?'defending':
