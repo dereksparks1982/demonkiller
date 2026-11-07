@@ -83,15 +83,18 @@ function event(world,minute,type,details){
   return e;
 }
 function onPlayerMove(world,previous){
-  ensure(world);
   const c=world.characters?.['1'];
   if(!c)return [];
   const old=regionAt(world,previous.area_id,previous.x??8,previous.y??12);
   const next=regionAt(world,c.area_id,c.x??8,c.y??12);
+  // ensure() records the first visit to a new district. Do not count it
+  // again just because movement also crossed a district boundary.
+  const recorded=Boolean(world.living?.region_history?.records?.[next.id]);
+  ensure(world);
   c.region_id=next.id;
   if(old.id===next.id)return [];
   const minute=world.living.minute;
-  track(world,next.id,minute,true);
+  if(recorded)track(world,next.id,minute,true);
   return [
     event(world,minute,'player.region.exit',{slot:1,from:old.id,to:next.id,
       from_name:old.name,to_name:next.name,area_id:old.area_id}),
