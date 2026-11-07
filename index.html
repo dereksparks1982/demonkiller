@@ -199,10 +199,19 @@ function readSlots(){
 function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
 function eraseLocalCharacter(){for(const key of [SLOTS_KEY,ACTIVE_KEY,'dkSoftworks.demonkiller.outdoors.preview.v1','dkSoftworks.demonkiller.testCenter.v1','dkSoftworks.demonkiller.architectLocalBackup.v1'])localStorage.removeItem(key);}
 $('deleteSave').addEventListener('click',async()=>{
- if(SERVER){notice('This server does not expose character deletion yet. Browser data cannot delete server-owned characters.');return;}
- const record=readSlots()[0];if(!record){notice('There is no saved character to delete.');return;}
- if(!window.confirm('Permanently delete '+record.name+' and its browser save? This cannot be undone.'))return;
- eraseLocalCharacter();await openSlots('new');notice('Saved character deleted. You can begin a new life.');
+ let record;
+ try{record=SERVER?((await SERVER.listCharacters())['1']||null):readSlots()[0];}
+ catch(error){notice('Could not read character: '+error.message);return;}
+ if(!record){notice('There is no saved character to delete.');return;}
+ if(!window.confirm('Permanently delete '+record.name+' and their belongings? The world will remain. This cannot be undone.'))return;
+ const button=$('deleteSave');button.disabled=true;
+ try{
+  if(SERVER)await SERVER.deleteCharacter(1,record.name);
+  eraseLocalCharacter();
+  await openSlots('new');
+  notice('Character deleted. The persistent world was preserved.');
+ }catch(error){notice('Delete failed: '+error.message);}
+ finally{button.disabled=false;}
 });
 // The retired browser prototype save is discarded once when this interface first opens.
 const UO_MIGRATION='dkSoftworks.demonkiller.uoReset.v1';
