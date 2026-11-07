@@ -48,6 +48,10 @@ function bury(world,command){
  // Buried items are sequestered with the dead, never awarded to the player.
  // The existing corpse container and its serials are retired atomically.
  clearBag(next,body);
+ // Carrion animals depart as soon as the body is buried; do not leave
+ // transient scavengers hovering over a new grave until the next timer.
+ for(const [id,animal] of Object.entries(l.scavengers?.visitors||{}))
+  if(animal.corpse_id===body.id)delete l.scavengers.visitors[id];
  const id='grave_'+(++l.burials.sequence);
  const grave={id,corpse_id:body.id,npc_id:body.npc_id,name:body.name,
   area_id:body.area_id,x:body.x,y:body.y,
