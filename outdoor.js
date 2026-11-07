@@ -987,5 +987,6 @@ async function begin(){
 // Read-only access for the classic UI; server-owned gameplay stays authoritative.
 window.DKOutdoorState=()=>({player,gameplay,serverConnected:!!SERVER});
 
+window.addEventListener('dk-inventory-updated',()=>{if(SERVER)refreshGameplay();});
 begin();
 })();
