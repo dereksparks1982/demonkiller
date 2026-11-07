@@ -25,8 +25,7 @@ $('templeDeleteSave').addEventListener('click',async()=>{
 
 let layer=30,latest='';
 function toggle(win){win.hidden=!win.hidden;if(!win.hidden){win.style.zIndex=String(++layer);update();}}
-$('templePaperButton').addEventListener('click',()=>toggle(paper));
-$('templeBagButton').addEventListener('click',()=>toggle(bag));
+// P and I are keyboard-only controls while playing.
 for(const button of document.querySelectorAll('[data-close]'))button.addEventListener('click',()=>{$(button.dataset.close).hidden=true;});
 document.addEventListener('keydown',e=>{
  if(e.ctrlKey||e.altKey||e.metaKey||e.repeat)return;
