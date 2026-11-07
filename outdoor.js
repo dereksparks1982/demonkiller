@@ -14,6 +14,8 @@ const TILE=32,VIEW=20;
 const images=new Map();
 let area=null,world=null,player=null,living=null,gameplay=null,social=null,law=null,housing=null,busy=false,rightHeld=false;
 let pointer=null,camera={x:0,y:0},lastMove=0,lastDraw=0,animStart=0;
+const visual={x:0,y:0,queue:[]};
+function resetVisual(){if(player){visual.x=player.x;visual.y=player.y;visual.queue.length=0;}}
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
 function image(path){
  if(images.has(path))return images.get(path);
@@ -34,17 +36,20 @@ function previewArea(id){
  return template();
 }
 async function loadArea(id){
+ const changed=!area||area.area_id!==id;
  area=SERVER?(await SERVER.area(id)).area:previewArea(id);
  if(!area||!area.floor||area.floor.length!==area.width*area.height)
   throw Error('Invalid region geometry');
+ if(changed)resetVisual();
  $('areaName').textContent=title();
  const door=area.objects.find(o=>o.id==='courtyard_temple_door');
  if(door){if(SERVER)doorOpen=!!door.open;else door.open=doorOpen;}
  draw();
 }
 function viewCamera(){
- camera.x=Math.max(0,Math.min(area.width-VIEW,Math.round(player.x-VIEW/2)));
- camera.y=Math.max(0,Math.min(area.height-VIEW,Math.round(player.y-VIEW/2)));
+ // Follow the interpolated actor, not the next authoritative tile.
+ camera.x=Math.max(0,Math.min(area.width-VIEW,visual.x-VIEW/2));
+ camera.y=Math.max(0,Math.min(area.height-VIEW,visual.y-VIEW/2));
 }
 function px(color,x,y,w,h){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
 function floor(x,y){
@@ -428,11 +433,14 @@ function draw(){
  viewCamera();
  ctx.imageSmoothingEnabled=false;ctx.setTransform(1,0,0,1,0,0);
  ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.save();ctx.translate(-camera.x*TILE,-camera.y*TILE);
- for(let y=camera.y;y<Math.min(area.height,camera.y+VIEW);y++)
-  for(let x=camera.x;x<Math.min(area.width,camera.x+VIEW);x++)floor(x,y);
- for(let y=camera.y;y<Math.min(area.height,camera.y+VIEW);y++)
-  for(let x=camera.x;x<Math.min(area.width,camera.x+VIEW);x++)
+ ctx.save();ctx.translate(-Math.round(camera.x*TILE),-Math.round(camera.y*TILE));
+ const left=Math.floor(camera.x),top=Math.floor(camera.y);
+ const right=Math.min(area.width,Math.ceil(camera.x+VIEW));
+ const bottom=Math.min(area.height,Math.ceil(camera.y+VIEW));
+ for(let y=top;y<bottom;y++)
+  for(let x=left;x<right;x++)floor(x,y);
+ for(let y=top;y<bottom;y++)
+  for(let x=left;x<right;x++)
    if(area.walls[y*area.width+x])drawWall(x,y);
  for(const o of area.objects)drawObject(o);
  drawResources();
@@ -444,10 +452,11 @@ function draw(){
  drawHouseSigns();
  const spriteGroup=player.form==='ghost'?'ghost':'human';
  const pImg=ready('characters/'+spriteGroup+'/'+spriteGroup+'_'+player.facing+'.png');
- if(pImg)ctx.drawImage(pImg,player.x*TILE,player.y*TILE,TILE,TILE);
+ const drawX=Math.round(visual.x*TILE),drawY=Math.round(visual.y*TILE);
+ if(pImg)ctx.drawImage(pImg,drawX,drawY,TILE,TILE);
  else{
-  px('#342b30',player.x*TILE+9,player.y*TILE+20,14,10);
-  px(player.form==='ghost'?'#bbc6ed':'#b4826b',player.x*TILE+9,player.y*TILE+8,14,14);
+  px('#342b30',drawX+9,drawY+20,14,10);
+  px(player.form==='ghost'?'#bbc6ed':'#b4826b',drawX+9,drawY+8,14,14);
  }
  ctx.restore();
  $('characterStatus').textContent=player.form.toUpperCase()+' · ('+player.x+', '+player.y+
@@ -476,8 +485,8 @@ function actorAt(x,y){
 function targetTile(e){
  const r=canvas.getBoundingClientRect();
  if(!r.width||!r.height)return null;
- const x=camera.x+Math.floor((e.clientX-r.left)/r.width*VIEW);
- const y=camera.y+Math.floor((e.clientY-r.top)/r.height*VIEW);
+ const x=Math.floor(camera.x+(e.clientX-r.left)/r.width*VIEW);
+ const y=Math.floor(camera.y+(e.clientY-r.top)/r.height*VIEW);
  return x<0||y<0||x>=area.width||y>=area.height?null:{x,y};
 }
 function packText(c){
@@ -674,6 +683,9 @@ function returnTemple(){
 }
 async function step(direction){
  if(busy||lilithPhase==='playing')return;
+ const stamp=Date.now();
+ if(stamp-lastMove<165)return;
+ lastMove=stamp;
  const delta={north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]}[direction];
  if(!delta)return;
  const x=player.x+delta[0],y=player.y+delta[1];
@@ -687,6 +699,7 @@ async function step(direction){
    if(oldDistrict!==player.region_id)refreshDistrict();
    if(area.objects.some(o=>o.type==='house'&&o.door&&Math.abs(o.door.x-player.x)+Math.abs(o.door.y-player.y)<=6))refreshHousing();
    if(area.area_id!==player.area_id)await loadArea(player.area_id);
+   else visual.queue.push({x:player.x,y:player.y});
    persistPreview();
   }catch(e){message('Movement blocked: '+e.message);}
   finally{busy=false;}
@@ -699,6 +712,7 @@ async function step(direction){
    await loadArea(player.area_id);
   }else if(R.traversable(area,x,y,player.form)){
    player.x=x;player.y=y;player.facing=direction;
+   visual.queue.push({x,y});
   }else return message('A wall or object blocks the way.');
   persistPreview();
  }
@@ -782,19 +796,24 @@ async function openBank(){
   $('bankPanel').hidden=false;
  }catch(e){message(e.message);}
 }
+function pointerPosition(e){
+ const r=canvas.getBoundingClientRect();
+ if(!r.width||!r.height)return null;
+ return {x:(e.clientX-r.left)/r.width*VIEW,y:(e.clientY-r.top)/r.height*VIEW};
+}
 function pointerMove(){
  if(!rightHeld||!pointer||busy||!player||!area)return;
- const dx=pointer.x-player.x,dy=pointer.y-player.y;
- if(!dx&&!dy)return;
+ // Cursor stays screen-relative as the camera follows the moving character.
+ const dx=camera.x+pointer.x-(visual.x+.5);
+ const dy=camera.y+pointer.y-(visual.y+.5);
+ if(Math.hypot(dx,dy)<.4)return;
  const direction=Math.abs(dx)>=Math.abs(dy)?
   dx>0?'east':'west':dy>0?'south':'north';
- const stamp=Date.now();
- if(stamp-lastMove<165)return;lastMove=stamp;
  step(direction);
 }
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
-canvas.addEventListener('mousedown',e=>{if(e.button===2){e.preventDefault();pointer=targetTile(e);rightHeld=true;canvas.focus();}});
-canvas.addEventListener('mousemove',e=>{if(rightHeld)pointer=targetTile(e);});
+canvas.addEventListener('mousedown',e=>{if(e.button===2){e.preventDefault();pointer=pointerPosition(e);rightHeld=true;canvas.focus();}});
+canvas.addEventListener('mousemove',e=>{if(rightHeld)pointer=pointerPosition(e);});
 document.addEventListener('mouseup',e=>{if(e.button===2)rightHeld=false;});
 window.addEventListener('blur',()=>{rightHeld=false;});
 canvas.addEventListener('click',e=>{if(e.button!==0)return;const p=targetTile(e);if(p)inspect(p.x,p.y,false);canvas.focus();});
@@ -852,8 +871,27 @@ $('buyButton').addEventListener('click',()=>trade(true));
 $('sellButton').addEventListener('click',()=>trade(false));
 $('depositButton').addEventListener('click',()=>takeAction('bank_deposit',{amount:1}));
 $('withdrawButton').addEventListener('click',()=>takeAction('bank_withdraw',{amount:1}));
+function advanceVisual(dt){
+ if(!visual.queue.length)return;
+ const target=visual.queue[0];
+ const dx=target.x-visual.x,dy=target.y-visual.y;
+ const distance=Math.hypot(dx,dy);
+ const travel=Math.min(distance,6.2*dt);
+ if(distance<=.001||travel>=distance){
+  visual.x=target.x;visual.y=target.y;visual.queue.shift();
+ }else{
+  visual.x+=dx/distance*travel;
+  visual.y+=dy/distance*travel;
+ }
+}
 function frame(now){
- if(now-lastDraw>=60){pointerMove();if(area)draw();lastDraw=now;}
+ if(now-lastDraw>=16){
+  const dt=lastDraw?Math.min((now-lastDraw)/1000,.06):0;
+  pointerMove();
+  advanceVisual(dt);
+  if(area)draw();
+  lastDraw=now;
+ }
  requestAnimationFrame(frame);
 }
 async function begin(){
