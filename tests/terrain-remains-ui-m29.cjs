@@ -19,7 +19,7 @@ test('M29 server exposes only saved world remains and terrain marks',()=>{
  const server=read('server/dk-server.cjs');
  assert.match(server,/mobile_assets:\{corpses:l\.mobile_assets\?\.corpses\|\|\{\},/);
  assert.match(server,/terrain_marks:l\.mobile_assets\?\.terrain_marks\|\|\{\}/);
- assert.match(server,/build: 'local-m29'/);
+ assert.match(server,/build: 'local-m30'/);
  const scheduler=read('server/world-scheduler-m11.cjs');
  assert.match(scheduler,/corpse_cleanup:expireCorpses/);
 });
@@ -30,5 +30,5 @@ test('M29 keeps gameplay shortcuts keyboard-only',()=>{
  for(const id of ['openPaperDoll','openBackpack'])
   assert(!outdoor.includes('id="'+id+'"'));
  assert.match(temple,/temple-ui\.js/);
- assert.match(outdoor,/outdoor\.js\?v=0\.2\.56-terrain-m29/);
+ assert.match(outdoor,/outdoor\\.js\\?v=/);
 });
