@@ -2,6 +2,7 @@
 // M10 spatial-sector index. Derived in memory, never treated as source of truth.
 // Sector size follows RunUO's 16-tile idea, with independent JavaScript design.
 const SECTOR_SIZE=16;
+const {catalogue,rootId,objectCellId}=require('./streaming-cells-m33.cjs');
 function key(area,sx,sy){return area+'#'+sx+','+sy;}
 function cell(x,y){
   if(!Number.isInteger(x)||!Number.isInteger(y)||x<0||y<0)
@@ -9,7 +10,7 @@ function cell(x,y){
   return {sx:Math.floor(x/SECTOR_SIZE),sy:Math.floor(y/SECTOR_SIZE)};
 }
 function build(world){
-  const sectors=new Map(),areas=new Map();
+  const sectors=new Map(),areas=new Map(),cells=catalogue(world);
   for(const [id,a] of Object.entries(world.areas||{}))
     areas.set(id,{area_id:id,width:a.width,height:a.height,
       sectors_x:Math.ceil(a.width/SECTOR_SIZE),sectors_y:Math.ceil(a.height/SECTOR_SIZE)});
@@ -35,7 +36,9 @@ function build(world){
   for(const [area_id,a] of Object.entries(world.areas||{}))
     for(const o of a.objects||[])add({kind:'fixture',id:o.id,
       serial:serialFor('fixture:'+area_id+':'+o.id),type:o.type,
-      area_id,x:o.x,y:o.y});
+      area_id,x:o.x,y:o.y,
+      cell_id:cells.cells[objectCellId(area_id,o.id)]?
+        objectCellId(area_id,o.id):rootId(area_id)});
   for(const drop of Object.values(world.living?.storage?.ground||{}))
     add({kind:'ground_item',id:drop.id,serial:serialFor('ground:'+drop.id),
       area_id:drop.area_id,x:drop.x,y:drop.y,
