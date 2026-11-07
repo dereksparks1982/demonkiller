@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),G=require('../server/gameplay.cjs');
@@ -10,6 +11,7 @@ function fixture(){
  world=W.createCharacter(world,1,'ELIAS',ORIGIN).world;
  const c=world.characters['1'];
  c.area_id=R.COURT;c.x=30;c.y=30;c.form='living';c.opening_state='resurrected';
+ syncAll(world);
  return world;
 }
 function monsterFixture(count=1){
