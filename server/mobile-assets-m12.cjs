@@ -251,4 +251,4 @@ function validate(world){
  }
  return true;
 }
-module.exports={DECAY,MAX_CORPSES,MAX_MARKS,MARK_LIFETIME,ensure,onDeath,onCreatureDeath,read,loot,expire,validate};
+module.exports={DECAY,MAX_CORPSES,MAX_MARKS,MARK_LIFETIME,ensure,onDeath,onCreatureDeath,clearBag,read,loot,expire,validate};
