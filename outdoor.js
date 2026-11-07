@@ -17,6 +17,20 @@ let pointer=null,camera={x:0,y:0},lastMove=0,lastDraw=0,animStart=0;
 const visual={x:0,y:0,queue:[]};
 function resetVisual(){if(player){visual.x=player.x;visual.y=player.y;visual.queue.length=0;}}
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
+const cellShells=window.DKStreamingCellShells?.create({maxShells:256})||null;
+let cellViewPending=false;
+async function refreshCellView(){
+ if(!SERVER||!area||!cellShells||cellViewPending)return;
+ cellViewPending=true;
+ const areaId=area.area_id;
+ try{
+  const view=await SERVER.streamingCells();
+  if(area?.area_id===areaId&&view.area_id===areaId)
+   cellShells.setCellView(view);
+ }catch(_){/* The legacy renderer remains available. */}
+ finally{cellViewPending=false;}
+}
+
 // M31: nearby entities arrive through bounded server-sector deltas.
 // This is client display state only; the server remains authoritative.
 let sectorView=null,sectorCursor=null,sectorPolling=false,sectorErrors=0;
@@ -141,11 +155,12 @@ async function loadArea(id){
  area=nextArea;
  if(!area||!area.floor||area.floor.length!==area.width*area.height)
   throw Error('Invalid region geometry');
- if(changed){resetVisual();sectorView=null;sectorCursor=null;}
+ if(changed){resetVisual();sectorView=null;sectorCursor=null;cellShells?.reset();}
  $('areaName').textContent=title();
  const door=area.objects.find(o=>o.id==='courtyard_temple_door');
  if(door){if(SERVER)doorOpen=!!door.open;else door.open=doorOpen;}
  draw();
+ if(SERVER)void refreshCellView();
 }
 function viewCamera(){
  // Follow the interpolated actor, not the next authoritative tile.
@@ -646,7 +661,11 @@ function draw(){
  for(let y=top;y<bottom;y++)
   for(let x=left;x<right;x++)
    if(area.walls[y*area.width+x])drawWall(x,y);
- for(const o of area.objects)drawObject(o);
+ // Reuse lightweight object shells. Their source objects remain the
+ // same authoritative area records, including live door and gate state.
+ const visibleObjects=cellShells?
+  cellShells.visible(area,camera,VIEW):area.objects;
+ for(const o of visibleObjects)drawObject(o);
  drawResources();
  drawTerrainMarks();
  drawBurials();
@@ -1167,6 +1186,7 @@ async function begin(){
    await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors(),refreshNpcCommerce(),refreshWorkshops(),refreshNpcAI(),refreshNpcHarvest(),refreshNpcSuccession(),refreshCaravans()]);
    await refreshSectorInterest();
    setInterval(refreshSectorInterest,1750);
+   setInterval(refreshCellView,4500);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
    setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);setInterval(refreshWorkshops,15000);setInterval(refreshNpcAI,10000);setInterval(refreshNpcHarvest,15000);setInterval(refreshNpcSuccession,15000);setInterval(refreshCaravans,15000);
   }else{
