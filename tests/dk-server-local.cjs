@@ -22,7 +22,7 @@ test('one local Demon Killer game, no password, no external dashboard or exposed
  assert.match(html,/SHUT DOWN SERVER/);
  assert.equal((await fetch(base+'/dk-menu-server.js')).status,200);
  const health=await (await fetch(base+'/api/v1/health')).json();
- assert.equal(health.build,'local-m31');
+ assert.equal(health.build,'local-m32');
  assert.equal(health.background_world,true);
  assert.equal((await fetch(base+'/player',{redirect:'manual'})).status,302);
  assert.equal((await fetch(base+'/api/v1/auth/status')).status,404);
