@@ -199,7 +199,7 @@ function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({versio
 async function launch(id){
  if(SERVER){
    await SERVER.startWorld();
-   location.href='./test-center.html?dkSlot='+id+'&walk=continuous1;
+   location.href='./test-center.html?dkSlot='+id+'&walk=continuous1';
    return;
  }
  try{
