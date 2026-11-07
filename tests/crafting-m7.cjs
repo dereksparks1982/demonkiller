@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),Craft=require('../server/crafting-m7.cjs');
@@ -12,6 +13,7 @@ function fixture(){
  c.area_id=R.COURT;c.x=30;c.y=30;c.form='living';c.opening_state='resurrected';
  c.inventory.wood=3;c.inventory.herbs=3;c.inventory.produce=3;
  c.inventory.bread=2;c.inventory.ore=3;
+ syncAll(w);
  return w;
 }
 test('M7 new characters and upgraded characters have stable survival and gear records',()=>{
