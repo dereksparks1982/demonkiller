@@ -50,3 +50,5 @@ h2{font-size:16px;letter-spacing:1px;color:#f0c579;border-bottom:1px solid #6d59
 .bag-item:disabled{opacity:1}.bag-symbol{font-size:23px;line-height:1.2}.bag-count{position:absolute;right:3px;bottom:1px;color:#f5d587}
 .bag-help{padding-top:10px;font-size:11px;color:#cbb8a9}
 @media(max-width:650px){.head nav{gap:4px}.head nav button,.head nav a{font-size:10px;padding:6px}.head small{display:none}.world-app{padding:4px}.uo-window{top:70px}.backpack-window{top:100px}}
+
+.delete-save-button{display:block;margin:12px auto 0;padding:7px 12px;background:#3b252c;border:1px solid #8f5c61;color:#e1b9b6;font-size:11px}.delete-save-button:hover{background:#63313d}
