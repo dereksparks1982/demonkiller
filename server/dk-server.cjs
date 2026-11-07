@@ -442,7 +442,8 @@ async function createDKServer({
         territories:l.territories,traveling_camps:l.traveling_camps,
         combat:{creatures:l.combat?.creatures||{},drops:l.combat?.drops||{}},
         storage:{ground:l.storage?.ground||{}},
-        mobile_assets:{corpses:l.mobile_assets?.corpses||{}},
+        mobile_assets:{corpses:l.mobile_assets?.corpses||{},
+          terrain_marks:l.mobile_assets?.terrain_marks||{}},
         pending_mail:l.mail.outbound.length,latest_events:l.events.slice(-30),
         last_event_sequence:l.event_sequence,world_running:worldClock(world,now()).running,
         world_revision:world.revision},method);
