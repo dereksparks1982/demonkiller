@@ -2,21 +2,7 @@
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const host=document.createElement('div');
-host.innerHTML=`
-<div class="dk-quick-buttons"><button id="templePaperButton" type="button">P · CHARACTER</button><button id="templeBagButton" type="button">I · BACKPACK</button></div>
-<section id="templePaper" class="dk-uo-window" hidden role="dialog" aria-modal="false" aria-label="Paper doll">
- <header class="dk-uo-head"><strong>PAPER DOLL</strong><button type="button" data-close="templePaper" aria-label="Close character">×</button></header>
- <div class="dk-uo-figure"><canvas id="templePortrait" width="128" height="160" aria-label="Character sprite"></canvas>
- <div><strong id="templeCharacterName">ADVENTURER</strong><p id="templeCharacterForm">GHOST</p></div></div>
- <div class="dk-uo-slots"><span>HEAD</span><span>NECK</span><span>HAND</span><span>CHEST</span><span>BACK</span><span>RING</span><span>LIGHT</span><span>FEET</span></div>
- <p id="templeCharacterStats">Character information</p>
-</section>
-<section id="templeBag" class="dk-uo-window dk-uo-bag" hidden role="dialog" aria-modal="false" aria-label="Backpack">
- <header class="dk-uo-head"><strong>BACKPACK</strong><button type="button" data-close="templeBag" aria-label="Close backpack">×</button></header>
- <p id="templeGold">0 GOLD</p><div id="templeItems" class="dk-uo-items"></div>
-</section>`;
-while(host.firstChild)document.body.appendChild(host.firstChild);
+// Temple windows are declared in the HTML so shortcuts work on initial load.
 const paper=$('templePaper'),bag=$('templeBag');
 let layer=30,latest='';
 function toggle(win){win.hidden=!win.hidden;if(!win.hidden){win.style.zIndex=String(++layer);update();}}
