@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),G=require('../server/gameplay.cjs');
@@ -17,6 +18,7 @@ function fixture(witness=true){
    guard.x=victim.x;guard.y=victim.y;guard.area_id=R.VILLAGE;}
  victim.alive=false;
  const corpse=MOBILE.onDeath(w,victim,0,[]);
+ syncAll(w);
  return {w,corpse};
 }
 test('M15 migrates old world state and validates guarded-region justice records',()=>{
