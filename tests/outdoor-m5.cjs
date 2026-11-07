@@ -45,7 +45,7 @@ test('temple door is double-click to toggle, walking into open door changes regi
  const js=read('test-center.js');
  assert.match(js,/if\(!doubleClick\)\{/);
  assert.match(js,/function leaveTemple\(\)/);
- assert.match(js,/location\.href='\.\/outdoor\.html'/);
+ assert.match(js,/location\.href='\.\/outdoor\.html\?walk=continuous1'/);
  assert.match(js,/character\.area_id!==AREA/);
  assert.match(js,/gate\?\.open/);
  const html=read('test-center.html');
