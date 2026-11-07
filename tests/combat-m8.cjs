@@ -21,6 +21,7 @@ function monsterFixture(count=1){
  const creature=Object.values(world.living.combat.creatures)[0];
  assert(creature,'An imp was spawned');
  const c=world.characters['1'];c.x=creature.x;c.y=creature.y;
+ syncAll(world);
  return {world,creature,events};
 }
 test('M8 combat state validates and upgrades older world saves',()=>{
