@@ -18,6 +18,7 @@ const {ensure:ensureVendors,validate:validateVendors}=require('./vendors-m18.cjs
 const {ensure:ensureNpcCommerce,validate:validateNpcCommerce}=require('./npc-commerce-m19.cjs');
 const {ensure:ensureWorkshops,validate:validateWorkshops}=require('./workshops-m20.cjs');
 const {ensure:ensureMobileAI,validate:validateMobileAI}=require('./mobile-ai-m21.cjs');
+const {ensure:ensureHarvest,validate:validateHarvest}=require('./npc-harvest-m22.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -92,6 +93,7 @@ function makeWorld(now = Date.now()) {
   ensureNpcCommerce(result);
   ensureWorkshops(result);
   ensureMobileAI(result);
+  ensureHarvest(result);
   return result;
 }
 
@@ -167,6 +169,7 @@ function validateWorld(world) {
   validateNpcCommerce(world);
   validateWorkshops(world);
   validateMobileAI(world);
+  validateHarvest(world);
   return world;
 }
 

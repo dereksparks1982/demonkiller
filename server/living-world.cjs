@@ -15,6 +15,8 @@ const {ensure:ensureLaw,tick:lawTick}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,syncNpcTransitions}=require('./region-policies-m16.cjs');
 const NPCCOMMERCE=require('./npc-commerce-m19.cjs');
 const NPCAI=require('./mobile-ai-m21.cjs');
+const NPCHARVEST=require('./npc-harvest-m22.cjs');
+const {location:shopLocation}=require('./vendors-m18.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -87,6 +89,8 @@ function npcDestination(n,minute,world){
      w.wanted_until_minute>=minute&&w.detained_until_minute<minute)
    return {area_id:VILLAGE,x:p.x,y:p.y};
  }
+ const harvesting=NPCHARVEST.destination(world,n);
+ if(harvesting)return harvesting;
  const shopperDestination=NPCCOMMERCE.destination(world,n);
  if(shopperDestination)return shopperDestination;
  if(n.role==='caravan'||n.role==='escort'){
@@ -118,6 +122,7 @@ function minuteTick(world,m,generated){
  regenerate(world,m,generated);
  socialTick(world,m,generated);
  craftTick(world,m,generated);
+ NPCHARVEST.plan(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
   if(m%5===0)NPCAI.sense(world,n,m,generated);
@@ -148,10 +153,14 @@ function minuteTick(world,m,generated){
    }
   }
  }
+ NPCHARVEST.process(world,m,generated);
  if(m%15===0){
   for(const shop of Object.values(living.businesses)){
    const occupied=living.territories[shop.area_id]?.control!=='settlers';
-   const open=day&&!occupied&&living.npcs[shop.owner_id]?.alive&&
+   const employee=living.npcs[shop.owner_id],at=shopLocation(world,shop);
+   const staffed=employee?.alive&&employee.area_id===shop.area_id&&
+     Math.abs(employee.x-at.x)+Math.abs(employee.y-at.y)<=6;
+   const open=day&&!occupied&&staffed&&
      living.npc_ai?.brains[shop.owner_id]?.mode!=='flee';
    if(shop.open!==open){
     shop.open=!!open;
@@ -214,6 +223,7 @@ function advance(world,now=Date.now(),limit=180){
  ensureDistricts(next);
  NPCCOMMERCE.ensure(next);
  NPCAI.ensure(next);
+ NPCHARVEST.ensure(next);
  for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
   minuteTick(next,m,events);
  next.living.minute+=count;

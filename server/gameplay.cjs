@@ -19,7 +19,8 @@ const NODES=[
  ['courtyard_wood',COURT,19,12,'wood',5],
  ['village_herbs',VILLAGE,85,71,'herbs',8],
  ['village_ore',VILLAGE,90,57,'ore',5],
- ['village_wood',VILLAGE,20,62,'wood',8]
+ ['village_wood',VILLAGE,20,62,'wood',8],
+ ['village_produce',VILLAGE,80,73,'produce',8]
 ];
 function ensureProgress(character){
  if(!character)return false;

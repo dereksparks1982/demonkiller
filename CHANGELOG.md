@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.44 / DK Server M22 | 2026-11-06 | NPC harvesting, finite resources and shop deliveries
+
+- Added saved NPC harvesting goals that take real market, herbalist and smithy workers to actual resource patches, collect a unit, and return to their storefront with a persistent M10 item serial.
+- Added a finite village produce patch on an existing walkable grass tile. Workers consume shared, regenerating resource-node units also used by the player, and deposit real goods into vendor containers only after physical travel.
+- Market produce and courtyard herbs increase available merchandise; blacksmith ore/wood goes to existing M20 workshop ingredient stock, not magically converted to finished products.
+- Updated shop hours to close when a living shopkeeper is physically absent and to respect monster occupation and M21 fleeing. Saved harvesting pauses safely during threats and resumes when workers recover.
+- Added read-only nearby work-trip reporting in `GET /api/v1/npc-harvest`, outdoor status text, non-destructive old-save migration, and `tests/npc-harvest-m22.cjs` regression contracts.
+- Focused checks passed for resource depletion, real item serial custody, physical delivery and consistent shop counts. Full Node/browser integration testing remains outstanding.
+- No hosted server, MMO, engine, new art or player permadeath was introduced.
+
 ## v0.2.43 / DK Server M21 | 2026-11-06 | Persistent NPC flight, guard defense and recovery
 
 - Implemented independently authored RunUO-inspired mobile AI behavior modes with saved NPC identities, current threats and 30-world-minute recovery timers.

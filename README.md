@@ -2,7 +2,17 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.43 | DK Server M21, Persistent NPC Intelligence
+## Current milestone: v0.2.44 | DK Server M22, Physical NPC Resource Harvesting
+
+### M22: Raw materials move through the world
+
+- **Physical NPC gathering:** The village market worker, courtyard herbalist and blacksmith now leave their businesses to collect goods from actual resource patches. The new produce plot occupies a walkable 128×128 village tile; its limited output regenerates using the existing resource rules.
+- **Individual item identity:** Each harvested resource becomes a fresh M10 serial inside the worker's NPC backpack. The NPC physically travels back to the shop to deliver that **same item** into its registered M18 vendor container. Nodes lose one resource and shops gain exactly one item, with a permanent dated history record.
+- **A working supply chain:** Market produce and courtyard herbs replenish their own shops, while the blacksmith carries real ore and wood into his storeroom for M20's ingredient-consuming tool recipe. Goods are not instantly conjured at the store counter by these NPC trips.
+- **Real shop hours:** The shop is open only while its living owner is physically near the actual storefront, the district is safe, and working hours permit it. During gathering trips, the shop closes until its owner returns.
+- **Pauses and danger:** NPC trips survive saved-world restarts and deliberate server stops. M21's flee and defend modes take precedence, so NPCs suspend harvesting when imps threaten them and resume later.
+- **Read-only client status:** `GET /api/v1/npc-harvest` reports totals and nearby ongoing trips, with an outdoor status indicator. No new art, third-party engine or additional character slots were introduced.
+- **Limits:** Wholesale supplier deliveries still exist, and this is not a complete farming/mining economy. Production, NPC transport, hereditary ownership and full RunUO harvesting rules will continue expanding in later builds.
 
 ### M21: Civilians flee and guards defend
 

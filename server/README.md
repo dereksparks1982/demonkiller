@@ -1,4 +1,4 @@
-# DK Server M21 | Persistent NPC Intelligence (v0.2.43)
+# DK Server M22 | Physical NPC Harvesting and Deliveries (v0.2.44)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -232,3 +232,13 @@ After the threat disappears, NPCs recover for thirty running world minutes and t
 `GET /api/v1/npc-ai` is read-only and discloses only NPCs within ten cardinal tiles of the character, not the entire map. The outdoor sidebar presents fleeing/defending counts. `tests/mobile-ai-m21.cjs` covers migration, physical escape, guards, calm-time return, save persistence, bounded reads, corruption and HTTP method restrictions. Focused JS module checks and earlier M19-world integration passed; the complete Node/browser suites were not run in a full checkout.
 
 RunUO's `Scripts/Mobiles/AI/BaseAI.cs` supplies architectural inspiration only; no GPL code is included. The public GitHub Pages site still cannot host a persistent server.
+
+## M22 real resource paths and item custody
+
+`server/npc-harvest-m22.cjs` creates a saved collection/delivery goal for three existing residents: the Village Market Vendor (new produce plot), Traveling Herbalist (existing courtyard herbs) and Blacksmith (existing ore/wood patches). Goals survive world saves and may span several world days. All routes use the existing cardinal `npc-navigation-m6.cjs` pathfinder with real area sizes, walls and collisions. Resources are harvested only while physically within one tile, decrement the shared finite M5 resource patch, and create an M10 item entity in the worker's own M12 backpack. Delivery requires being within one tile of that business's real door and transfers the **same serial** to the existing M18 vendor stock container. Stock counters and item records stay reconciled; ore and wood become M20 workshop input rather than magically finished tools.
+
+The source node is shared with player gathering. A new `village_produce` resource patch is initialized at (80,73) in the Village's existing 128×128 scene (a checked walkable grass tile). Producer work is suspended whenever the M21 NPC AI is fleeing, defending, recovering or the territory is monster-occupied. Store opening rules now require the owner to be alive, safe, within six tiles of the registered storefront, and operating in daylight. The existing M20 workshop recipe still requires its worker within four tiles. Scheduled wholesale purchases remain separate and are not advertised as physically gathered supplies.
+
+`GET /api/v1/npc-harvest` is read-only and reports saved harvesting/delivery counts and player-nearby goals, not hidden distant locations. `tests/npc-harvest-m22.cjs` includes M21 migration, finite resources, item custody, smithy raw material inputs, danger interruption, world time simulation and HTTP method checks. A focused JavaScript physical item transfer test passed; the full Node and browser suites remain unrun in this environment.
+
+No RunUO GPL code was reused; the design was independently informed by Ultima Online's resource harvesting and vendor stock systems. The public GitHub Pages preview still cannot run an always-on server.

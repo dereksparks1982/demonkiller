@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M22 (v0.2.44)
+
+The first RunUO-inspired NPC harvesting jobs use actual M5 resource nodes, M6 physical travel, M10 serial identities, M12 personal backpacks and M18 vendor storerooms. Workers physically gather and deliver finite goods: the herbalist collects courtyard herbs; the market vendor collects produce from a new verified walkable village patch; the blacksmith carries ore and wood back to the smithy for M20 workshop inputs. Resource counters and world item identities remain reconciled during each harvest and delivery transaction. Goals persist and can span world days; M21 combat alarm states pause collection. Businesses no longer operate when their living proprietor is physically absent.
+
+The design remains engine-free single player, with no copy of RunUO GPL source. Wholesale supplies are still abstract and the world has no online hosted server; full trade-route logistics and additional professions are future work.
+
 ## Implemented milestone: DK Server M21 (v0.2.43)
 
 A separate saved mobile AI layer now holds each NPC's local behavior state. The five-world-minute simulation loop senses nearby imps, lets civilians flee along legal cardinal tiles, and directs guards/escorts toward threats for the existing combat simulation. Following thirty threat-free simulated minutes, the NPC resumes its original home/shop/travel schedule. Fleeing shop owners close business temporarily, and physical NPC shoppers defer purchases until safe. Migration is non-destructive and world-time based, with dated history records. The read-only NPC intelligence endpoint reports nearby residents only.

@@ -86,3 +86,7 @@ RunUO `Scripts/Engines/Craft/DefBlacksmithy.cs` and `DefCooking.cs` illustrate r
 ## Milestone 21: Mobile AI states (v0.2.43)
 
 Reviewed RunUO `Scripts/Mobiles/AI/BaseAI.cs` for its separate Wander, Combat, Guard and Flee action modes. DK Server M21 independently introduces persistent work, flee, defend, recover and dead states with actual threat sensing and world-grid escape destinations. Village guards react to live threats, civilians retreat, and businesses reflect the danger. This is still a small foundation, not RunUO's complete behavior tree or pet/creature order system.
+
+## Milestone 22: Harvesting and item custody (v0.2.44)
+
+RunUO's `Scripts/Engines/Harvest/Mining.cs` and harvesting architecture inform the physical source → worker backpack → vendor storeroom loop. Demon Killer's independent JavaScript now has persistent collection trips using actual collision, finite node availability, M10 item serials, M12 NPC containers and M20 paid workshops. Village produce is a real resource patch, not an automatically materialized merchant output. Full professions, harvesting tools, material grades and traveling supply chains remain future slices.
