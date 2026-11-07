@@ -11,7 +11,7 @@ const PROVISIONS=Object.freeze({
  guard:'tools',caretaker:'herbs',courier:'bread',caravan:'produce',
  escort:'tools',tavern:'meals',herbalist:'herbs'
 });
-const DECAY=720,MAX_CORPSES=1024; // M12 legacy expiry retained for old save validation
+const DECAY=720,MAX_CORPSES=1024,MAX_MARKS=1024,MARK_LIFETIME=2880; // M12 legacy expiry for old saves
 function allocate(reg){
  if(!Number.isSafeInteger(reg.next_serial))throw Error('Invalid registry serial counter');
  return 'ent_'+reg.next_serial++;
@@ -21,9 +21,10 @@ function ensure(world){
  const l=world.living,r=world.entity_registry;
  let changed=false;
  if(!l.mobile_assets){
-  l.mobile_assets={schema:1,sequence:0,npcs:{},corpses:{}};changed=true;
+  l.mobile_assets={schema:1,sequence:0,npcs:{},corpses:{},terrain_marks:{}};changed=true;
  }
  const asset=l.mobile_assets;
+ if(!asset.terrain_marks){asset.terrain_marks={};changed=true;}
  for(const corpse of Object.values(asset.corpses))
   if(Decay.migrate(corpse,l.minute))changed=true;
  for(const npc of Object.values(l.npcs)){
@@ -165,11 +166,29 @@ function loot(world,command){
  validate(next);
  return {world:next,character:c,event:notices.at(-1)||e,events:[e,...notices]};
 }
+function leaveTrace(world,corpse,minute){
+ const m=world.living.mobile_assets;
+ if(!m.terrain_marks)m.terrain_marks={};
+ const ids=Object.keys(m.terrain_marks);
+ if(ids.length>=MAX_MARKS){
+  ids.sort((a,b)=>m.terrain_marks[a].created_minute-m.terrain_marks[b].created_minute||
+    a.localeCompare(b));
+  delete m.terrain_marks[ids[0]];
+ }
+ const id='mark_'+(++m.sequence);
+ m.terrain_marks[id]={id,area_id:corpse.area_id,x:corpse.x,y:corpse.y,
+  kind:corpse.species==='demon'?'ash':'stain',
+  created_minute:minute,expires_minute:minute+MARK_LIFETIME};
+}
 function expire(world,minute,out){
  const state=world.living.mobile_assets;if(!state)return;
+ for(const [id,mark] of Object.entries(state.terrain_marks||{}))
+  if(minute>=mark.expires_minute)delete state.terrain_marks[id];
  for(const corpse of Object.values(state.corpses)){
   if(Decay.expired(corpse,minute)){
-   clearBag(world,corpse);delete state.corpses[corpse.id];
+   clearBag(world,corpse);
+   leaveTrace(world,corpse,minute);
+   delete state.corpses[corpse.id];
    out.push(record(world,minute,'corpse.decayed',
     corpse.name+'\'s remains returned to the earth.',
     {corpse_id:corpse.id,area_id:corpse.area_id}));
@@ -201,6 +220,19 @@ function validate(world){
      (n.death_minute!==null&&(!Number.isSafeInteger(n.death_minute)||n.death_minute<0)))
      throw Error('Invalid NPC inventory identity');
  }
+ const marks=m.terrain_marks||{};
+ if(Array.isArray(marks)||Object.keys(marks).length>MAX_MARKS)
+  throw Error('Invalid terrain-remains layer');
+ for(const [id,mark] of Object.entries(marks)){
+  const area=world.areas[mark?.area_id];
+  if(!/^mark_[1-9][0-9]*$/.test(id)||mark.id!==id||!area||
+    !Number.isInteger(mark.x)||!Number.isInteger(mark.y)||
+    mark.x<0||mark.y<0||mark.x>=area.width||mark.y>=area.height||
+    !['stain','ash'].includes(mark.kind)||
+    !Number.isSafeInteger(mark.created_minute)||mark.created_minute<0||
+    mark.expires_minute!==mark.created_minute+MARK_LIFETIME)
+   throw Error('Invalid decomposed terrain mark');
+ }
  for(const [id,c] of Object.entries(m.corpses)){
   const a=world.areas[c?.area_id];
   const legacy=c.stage===undefined;
@@ -219,4 +251,4 @@ function validate(world){
  }
  return true;
 }
-module.exports={DECAY,MAX_CORPSES,ensure,onDeath,onCreatureDeath,read,loot,expire,validate};
+module.exports={DECAY,MAX_CORPSES,MAX_MARKS,MARK_LIFETIME,ensure,onDeath,onCreatureDeath,read,loot,expire,validate};
