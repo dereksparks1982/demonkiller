@@ -38,9 +38,10 @@ test('M32 initial prefetch loads the whole viewport ring before gameplay',async(
  assert.equal(s.stats().loaded,6,'at the western edge the ring has six sectors');
  assert(s.has(0,16));
  assert(s.has(16,16));
- assert(s.has(32,32));
+ assert(s.has(16,32));
+ assert.equal(s.has(32,32),false,'the first ring must not fetch two sectors ahead');
  const source=w.areas[R.VILLAGE];
- for(const layer of STREAM.LAYERS)for(let y=16;y<48;y++)for(let x=0;x<48;x++){
+ for(const layer of STREAM.LAYERS)for(let y=16;y<48;y++)for(let x=0;x<32;x++){
   assert.deepEqual(area[layer][y*128+x],source[layer][y*128+x]);
  }
  assert.equal(area.floor[90*128+90],null,'distant chunk not downloaded');
