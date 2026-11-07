@@ -3,6 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),R=require('../server/regions.cjs');
 const CELLS=require('../server/streaming-cells-m33.cjs');
+const REGIONS=require('../server/region-policies-m16.cjs');
 const {deleteCharacter}=require('../server/character-lifecycle-m26.cjs');
 const {createDKServer}=require('../server/dk-server.cjs');
 const NOW=Date.UTC(2026,10,7,18);
@@ -76,6 +77,7 @@ test('M33 streaming views expose only current root, nearby building shells, and 
  const w=sample();const c=w.characters['1'];
  Object.assign(c,{form:'living',opening_state:'resurrected',
   area_id:R.VILLAGE,x:54,y:103});
+ c.region_id=REGIONS.regionAt(w,c.area_id,c.x,c.y).id;
  CELLS.ensure(w);
  const v=CELLS.streamingView(w);
  assert.equal(v.current_cell,CELLS.rootId(R.VILLAGE));
