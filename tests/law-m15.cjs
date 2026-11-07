@@ -118,14 +118,15 @@ test('Remote, fake, paused and ghost fines are rejected by server authority',()=
 });
 test('Read-only law status and fine payment survive server restart',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m15-law-'));
- t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true});});
  const {w,corpse}=fixture(true);
  const stolen=G.apply(w,{action:'loot_corpse',corpse_id:corpse.id}).world;
  Object.assign(stolen.characters['1'],{x:54,y:103});
+ syncAll(stolen);
  stolen.living.businesses.village_bank.open=true;
  await fs.writeFile(path.join(dir,'world.json'),JSON.stringify(stolen));
  const app=await createDKServer({dataDir:dir,port:0,now:()=>TIME});
- t.after(()=>app.server.listening?app.close():Promise.resolve());
+
  const base='http://127.0.0.1:'+app.address.port;
  const status=await fetch(base+'/api/v1/law');
  assert.equal(status.status,200);
