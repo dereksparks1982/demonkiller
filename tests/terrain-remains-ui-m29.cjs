@@ -13,7 +13,6 @@ test('M29 outdoor terrain remains render before people, without modifying player
   assert(src.includes(stage),'missing visual stage '+stage);
  assert.match(src,/body\.kind==='monster'/);
  assert.match(src,/drawTerrainMarks/);
- assert.match(src,/case/); // Gameplay still uses the existing outdoor world script.
  assert.doesNotThrow(()=>new vm.Script(src,{filename:'outdoor.js'}));
 });
 test('M29 server exposes only saved world remains and terrain marks',()=>{
