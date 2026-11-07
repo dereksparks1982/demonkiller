@@ -1,4 +1,4 @@
-# DK Server M16 | Priority Districts and Jurisdiction Boundaries (v0.2.38)
+# DK Server M17 | Houses, Deeds and Persistent Ownership (v0.2.39)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m16`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m17`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -141,7 +141,7 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 
 ## v0.2.34 integration correction
 
-The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m16`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m17`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
 
 ## M13 save-strategy and verification
 
@@ -182,3 +182,15 @@ Further RunUO-like work must add theft of ordinary objects, guard reporting dial
 M15 saves receive `world.living.region_history` on startup and preserve character, business, crime, skill, NPC and item records. Character actions update `region_id` and persist `player.region.enter`/`player.region.exit` events, including through the temple door. Every world minute, the living-world simulator compares NPC locations against their previous district and saves one `npc.region.enter` event for each crossing, even if the player is logged out. The preexisting server event archive receives player crossing events through the same serialized write path. District history stays in the checkpointed world snapshot. Validation rejects fake or mismatched district IDs.
 
 `GET /api/v1/region/current` returns the one current character's official district and the saved visit counts; there is no region-modification endpoint. The outdoor UI displays guarded/occupied/housing metadata. The existing M15 law code now consults tile-specific guarded status for corpse witnesses, wanted guard intervention and fine payment. This is the foundation for later distinct laws, property and dynamic guard jurisdictions, not a claim of full RunUO region scripting. `tests/districts-m16.cjs` adds policy, migration, event, entity-identity, validation and HTTP regression contracts. Full Node/browser integration testing still needs a complete checked-out project.
+
+## M17: Physical house deeds and secured goods
+
+`server/housing-m17.cjs` independently implements housing ownership inspired by RunUO `Scripts/Multis/BaseHouse.cs`, `Scripts/Multis/HouseSign.cs` and `Scripts/Regions/HouseRegion.cs` without copying their GPL code. Exactly ten real, variable-footprint `house` objects already present in the Courtyard and Village become saved title records. A record stores its original exterior ID, area, bounds, actual front-door tile, sale price, lawful owner (NPC/player/estate/vacant), private/public sign policy and immutable storage ID. Existing M16 worlds migrate these fields without altering exterior dimensions, NPC identities, item serials or character state.
+
+Eight homes begin NPC-owned; two Courtyard homes are vacant. The one living player may buy **one** vacant home while at its doorway, if funds and the housing district allow. Purchases transfer price from the player to the Village Bank's business funds. Sales transfer half the price from that bank to the character, only if the home container has no goods and the bank has sufficient coins. Public/private access can be toggled by the owner. No client-supplied price, ledger transfer, title or interior state is trusted.
+
+Every house has a distinct `house_store` container (64 total item capacity) in M10's entity registry. The existing `POST /api/v1/gameplay` `move_item` action can accept a destination `home_storage_<house_id>`, or retrieve an owned stored item into the backpack. Items retain their same M10 serial; partial transfers split stacks only by the existing rules. Server-side physical proximity and the deed owner are checked before reading or moving house contents. The container remains at the exterior door because **actual interiors have not been built yet**.
+
+`POST /api/v1/gameplay` also supports `{"action":"buy_house","house_id":"courtyard_house_se"}`, `{"action":"sell_house","house_id":"courtyard_house_se"}`, and `{"action":"set_house_public","house_id":"courtyard_house_se","public":true}`. `GET /api/v1/housing` exposes only nearby title summaries and the player's known home. NPC deaths update a house title to an unsettled estate, rather than deleting the building, automatically selling it or transferring it to an invented heir. This is groundwork for future wills, family ownership, estate courts and house interiors, not a completed property-trading MMO.
+
+`tests/housing-m17.cjs` covers old-save migration, original building dimensions, real money conservation, item serial identity, locked house access, one-home cap, corpse-to-estate transition and persisted HTTP deeds. Functional module checks passed; complete Node/browser suites require a full repository checkout and remain unverified. House icons are primitive original Canvas signs; no third-party sprites are introduced.

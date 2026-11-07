@@ -66,3 +66,7 @@ RunUO `Server/Region.cs`, `Scripts/Regions/GuardedRegion.cs` and `Scripts/Misc/N
 ## Milestone 16: Overlapping districts and region events (v0.2.38)
 
 RunUO `Server/Region.cs` demonstrates overlapping priority regions, location-based entry/exit hooks and local rules. `Scripts/Regions/GuardedRegion.cs` supplies guarded-region architecture. M16 independently models these concepts for Demon Killer's existing three variable-sized areas, using canonical district IDs and world-saved visit history. These policies integrate with the M15 crime system without copying any RunUO GPL implementation; actual UO region event scripting and housing deeds remain unimplemented.
+
+## Milestone 17: House signs, deeds and ownership (v0.2.39)
+
+RunUO `Scripts/Multis/BaseHouse.cs`, `Scripts/Multis/HouseSign.cs` and `Scripts/Regions/HouseRegion.cs` show how property ownership, signed public/private status and secure containers interact with region rules. Our `server/housing-m17.cjs` independently applies these architectural ideas to the actual ten existing house exteriors and the M16 housing districts. Purchases use real gold balances, M10 serials persist through house storage, and NPC deaths preserve titles as estates. We have not copied GPL C# and have not introduced UO-style freeform house placement or full interior lock-down, access lists and housing decay.

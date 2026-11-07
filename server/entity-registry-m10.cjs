@@ -56,9 +56,10 @@ function targets(world,registry){
     add(VAULT,type,amount);
   for(const d of Object.values(world.living?.storage?.ground||{}))
     add(d.id,d.item,d.quantity);
-  // Chests and NPC backpacks have no M9 count mirror; their serials are canonical.
+  // NPC backpacks and house stores have no M9 count mirror; serials are canonical.
   for(const item of Object.values(registry.items))
-    if(item.parent===CHEST||registry.containers[item.parent]?.kind==='npc_pack')
+    if(item.parent===CHEST||['npc_pack','house_store'].includes(
+      registry.containers[item.parent]?.kind))
       want.set(item.parent+'|'+item.type,
         (want.get(item.parent+'|'+item.type)||0)+item.amount);
   return want;
@@ -186,9 +187,9 @@ function validate(world){
     byParent[item.parent]=(byParent[item.parent]||0)+item.amount;
   }
   for(const [id,c] of Object.entries(r.containers)){
-    if(!c||c.id!==id||!['pack','bank','equip','chest','npc_pack'].includes(c.kind)||
+    if(!c||c.id!==id||!['pack','bank','equip','chest','npc_pack','house_store'].includes(c.kind)||
       !Number.isInteger(c.capacity)||c.capacity<1||c.capacity>500||
-      (c.kind==='chest'&&(!world.areas?.[c.area_id]||
+      (['chest','house_store'].includes(c.kind)&&(!world.areas?.[c.area_id]||
         !Number.isInteger(c.x)||!Number.isInteger(c.y)||
         c.x<0||c.y<0||c.x>=world.areas[c.area_id].width||
         c.y>=world.areas[c.area_id].height)))
@@ -211,13 +212,24 @@ function chestAllowed(world,c){
   if(!chest||chest.area_id!==c.area_id||!near(c,chest.x,chest.y,2))
     throw Error('Move beside the village chest');
 }
+function homeAllowed(world,c,id){
+  const home=Object.values(world.living.housing?.records||{})
+    .find(h=>h.storage_id===id);
+  if(!home||home.owner?.kind!=='player'||home.owner.slot!==1||
+     c.area_id!==home.area_id||!near(c,home.door_x,home.door_y,2))
+    throw Error('Your secure house storage is locked or out of reach');
+}
 function inspect(world){
   const r=world.entity_registry,c=world.characters['1'];
   if(!r||!c)return {items:[],containers:[],revision:world.revision};
   const allowed=new Set([PACK,HAND,LIGHT]);
-  if(c.form==='living'&&c.area_id===VILLAGE){
-    if(near(c,54,103,3)&&world.living.businesses.village_bank?.open)allowed.add(VAULT);
-    try{chestAllowed(world,c);allowed.add(CHEST);}catch(_){}
+  if(c.form==='living'){
+    if(c.area_id===VILLAGE){
+      if(near(c,54,103,3)&&world.living.businesses.village_bank?.open)allowed.add(VAULT);
+      try{chestAllowed(world,c);allowed.add(CHEST);}catch(_){}
+    }
+    for(const home of Object.values(world.living.housing?.records||{}))
+      try{homeAllowed(world,c,home.storage_id);allowed.add(home.storage_id);}catch(_){}
   }
   return {items:Object.values(r.items).filter(i=>allowed.has(i.parent))
     .map(i=>({...i})).sort((a,b)=>Number(a.serial.slice(4))-Number(b.serial.slice(4))),
@@ -232,7 +244,8 @@ function transfer(world,command){
   const qty=command.quantity;
   if(!Number.isSafeInteger(qty)||qty<1||qty>20)
     throw Error('Invalid transfer quantity');
-  if(![PACK,VAULT,HAND,LIGHT,CHEST,'ground'].includes(command.destination))
+  if(![PACK,VAULT,HAND,LIGHT,CHEST,'ground'].includes(command.destination)&&
+     world.entity_registry?.containers?.[command.destination]?.kind!=='house_store')
     throw Error('Invalid destination container');
   if(!world.runtime?.running)throw Error('World is paused');
   const next=structuredClone(world);reconcile(next);
@@ -247,9 +260,13 @@ function transfer(world,command){
   const sourceDrop=next.living.storage.ground[src];
   if(src===VAULT||destination===VAULT)bankAllowed(next,c);
   if(src===CHEST||destination===CHEST)chestAllowed(next,c);
+  const srcHome=r.containers[src]?.kind==='house_store';
+  const dstHome=r.containers[destination]?.kind==='house_store';
+  if(srcHome)homeAllowed(next,c,src);
+  if(dstHome)homeAllowed(next,c,destination);
   if(sourceDrop&&(sourceDrop.area_id!==c.area_id||!near(c,sourceDrop.x,sourceDrop.y,1)))
     throw Error('Move beside the ground item');
-  if(![PACK,VAULT,HAND,LIGHT,CHEST].includes(src)&&!sourceDrop)
+  if(![PACK,VAULT,HAND,LIGHT,CHEST].includes(src)&&!srcHome&&!sourceDrop)
     throw Error('The item cannot be moved from that container');
   if(destination==='ground'&&(![COURT,VILLAGE].includes(c.area_id)||
      !traversable(next.areas[c.area_id],c.x,c.y,'living')))
@@ -265,6 +282,9 @@ function transfer(world,command){
   if(destination===CHEST&&
     Object.values(r.items).filter(i=>i.parent===CHEST).reduce((sum,i)=>sum+i.amount,0)+qty>r.containers[CHEST].capacity)
     throw Error('The chest is full');
+  if(dstHome&&Object.values(r.items).filter(i=>i.parent===destination)
+      .reduce((sum,i)=>sum+i.amount,0)+qty>r.containers[destination].capacity)
+    throw Error('House storage is full');
   if(destination===HAND&&(type!=='tools'||qty!==1||c.crafting.hand))
     throw Error('You cannot equip that item in your hand');
   if(destination===LIGHT&&(type!=='torches'||qty!==1||c.crafting.light))

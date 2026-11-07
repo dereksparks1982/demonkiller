@@ -58,7 +58,7 @@ test('local running DK Server is detected and can be stopped from Options', asyn
   const fetch=async(route,opts={})=>{
     calls.push({route,opts});
     return {ok:true,status:200,async json(){
-      if(route==='/api/v1/health')return {build:'local-m16',online:true};
+      if(route==='/api/v1/health')return {build:'local-m17',online:true};
       if(route==='/api/v1/clock')return {phase:'day',running:true,seconds_until_transition:1200};
       if(route==='/api/v1/server/stop')return {running:false};
       throw Error('Unexpected route '+route);

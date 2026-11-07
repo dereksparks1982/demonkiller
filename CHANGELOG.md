@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.39 / DK Server M17 | 2026-11-06 | Existing house deeds and persistent property
+
+- Added server-owned titles, prices, ownership, home storage and sign access metadata for the existing four Courtyard and six Village house exteriors, preserving actual original building dimensions.
+- Eight resident-owned homes and two initially vacant Courtyard homes. The single player may acquire one deed in person for actual saved gold, sell an empty house back for half value when the bank has funds, and toggle public/private title access.
+- Added 64-item secure house containers to the existing persistent item registry, including owner and cardinal proximity checks. Whole item stacks retain their stable serial identities during movement between pack and home.
+- NPC housing titles now enter unsettled estates on owner death. No invented heirs or automatic home destruction. Kept existing NPC backpack and corpse persistence intact.
+- Added `GET /api/v1/housing`, three allowlisted title transactions through the existing gameplay endpoint, an outdoor property panel and simple original pixel house signs.
+- Added `tests/housing-m17.cjs` contracts and updated versioned docs. Functional module tests verified gold conservation, identity stability, resale safeguards, access control and estate transition. Full Node/browser integration remains unverified.
+- Referenced RunUO house/region architecture only as design inspiration; no GPL code copied. Remains single-player with no hosted browser backend or complete house interiors.
+
 ## v0.2.38 / DK Server M16 | 2026-11-06 | Priority districts and world location history
 
 - Added a server-owned priority district registry across the existing variable-sized temple, courtyard and village. Regions include Lilith's willow, temple grounds, four village districts and residential fallbacks with housing and guarded metadata.

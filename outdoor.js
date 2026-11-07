@@ -12,7 +12,7 @@ const PREVIEW_KEY='dkSoftworks.demonkiller.outdoors.preview.v1';
 const TEMPLE_SAVE='dkSoftworks.demonkiller.characters.v1';
 const TILE=32,VIEW=20;
 const images=new Map();
-let area=null,world=null,player=null,living=null,gameplay=null,social=null,law=null,busy=false,rightHeld=false;
+let area=null,world=null,player=null,living=null,gameplay=null,social=null,law=null,housing=null,busy=false,rightHeld=false;
 let pointer=null,camera={x:0,y:0},lastMove=0,lastDraw=0,animStart=0;
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
 function image(path){
@@ -193,6 +193,16 @@ function attack(){const n=nearestCreature();if(!n)return message('Move beside a 
  return takeAction('attack',{target_id:n.id});}
 function loot(){const d=nearestLoot();if(!d)return message('Move beside a loot pile first.');
  return takeAction('loot',{drop_id:d.id});}
+function drawHouseSigns(){
+ if(!area)return;
+ for(const house of area.objects){
+  if(house.type!=='house'||!house.door)continue;
+  const x=house.door.x*TILE,y=house.door.y*TILE;
+  px('#4a3023',x+20,y+6,3,16);
+  px('#927048',x+15,y+3,14,10);
+  px('#d6b883',x+17,y+5,9,2);
+ }
+}
 function drawChest(){
  if(!area||area.area_id!==R.VILLAGE)return;
  const x=54*TILE,y=105*TILE;
@@ -242,6 +252,50 @@ async function chestGoods(destination,source){
   if(!selected)return message('No accessible matching stack. Reduce the quantity or move beside the chest.');
   await takeAction('move_item',{serial:selected.serial,quantity:order.quantity,destination});
  }catch(e){message('Chest access: '+e.message);}
+}
+function currentHouse(){
+ if(!housing||!player)return null;
+ return housing.houses.filter(h=>h.area_id===player.area_id&&
+  Math.abs(player.x-h.door_x)+Math.abs(player.y-h.door_y)<=2)
+  .sort((a,b)=>(Math.abs(player.x-a.door_x)+Math.abs(player.y-a.door_y))-
+    (Math.abs(player.x-b.door_x)+Math.abs(player.y-b.door_y)))[0]||null;
+}
+async function refreshHousing(){
+ if(!SERVER)return;
+ try{
+  housing=await SERVER.housing();
+  const here=currentHouse();
+  const mine=housing.houses.find(h=>h.owner?.kind==='player');
+  $('houseStatus').textContent=here?
+    'House '+here.id+' · '+(here.owner?.kind==='player'?'YOUR DEED':
+      here.owner?.kind==='npc'?'Resident-owned':here.owner?.kind==='estate'?
+      'Property in probate':'VACANT')+
+    ' · '+here.price+' gold · '+(here.public?'Public':'Private'):
+    mine?'Your home: '+mine.id+' · Visit its doorway to manage goods.':
+    'No house beside you. Visit a house doorway to view its deed.';
+ }catch(e){$('houseStatus').textContent='Property registry unavailable.';}
+}
+async function houseAction(action){
+ const h=currentHouse();
+ if(!h)return message('Stand beside a house doorway first.');
+ if(action==='set_house_public')await takeAction(action,{house_id:h.id,public:!h.public});
+ else await takeAction(action,{house_id:h.id});
+ await refreshHousing();
+}
+async function houseGoods(direction){
+ const h=currentHouse();
+ if(!h||h.owner?.kind!=='player')return message('You must own this house and stand beside its door.');
+ if(!SERVER||busy)return;
+ const order=itemOrder();if(!order)return;
+ try{
+  const inventory=await SERVER.items();
+  const src=direction==='store'?'pack_1':h.storage_id;
+  const item=inventory.items.find(i=>i.parent===src&&i.type===order.item_type&&i.amount>=order.quantity);
+  if(!item)return message('No matching accessible item stack of that quantity.');
+  await takeAction('move_item',{serial:item.serial,quantity:order.quantity,
+    destination:direction==='store'?h.storage_id:'pack_1'});
+  await refreshHousing();
+ }catch(e){message('House storage unavailable: '+e.message);}
 }
 async function refreshDistrict(){
  if(!SERVER||!player)return;
@@ -305,6 +359,7 @@ function draw(){
  drawCorpses();
  drawGroundItems();
  drawChest();
+ drawHouseSigns();
  const spriteGroup=player.form==='ghost'?'ghost':'human';
  const pImg=ready('characters/'+spriteGroup+'/'+spriteGroup+'_'+player.facing+'.png');
  if(pImg)ctx.drawImage(pImg,player.x*TILE,player.y*TILE,TILE,TILE);
@@ -548,6 +603,7 @@ async function step(direction){
    const oldDistrict=player.region_id;
    player=next;
    if(oldDistrict!==player.region_id)refreshDistrict();
+   if(area.objects.some(o=>o.type==='house'&&o.door&&Math.abs(o.door.x-player.x)+Math.abs(o.door.y-player.y)<=6))refreshHousing();
    if(area.area_id!==player.area_id)await loadArea(player.area_id);
    persistPreview();
   }catch(e){message('Movement blocked: '+e.message);}
@@ -671,6 +727,11 @@ document.addEventListener('keydown',e=>{
 $('showBank').addEventListener('click',openBank);
 $('skillName').addEventListener('change',refreshSkills);
 $('payFine').addEventListener('click',payFine);
+$('buyHouse').addEventListener('click',()=>houseAction('buy_house'));
+$('sellHouse').addEventListener('click',()=>houseAction('sell_house'));
+$('houseAccess').addEventListener('click',()=>houseAction('set_house_public'));
+$('homeStore').addEventListener('click',()=>houseGoods('store'));
+$('homeTake').addEventListener('click',()=>houseGoods('take'));
 $('skillApply').addEventListener('click',()=>
  takeAction('skill_lock',{skill:$('skillName').value,lock:$('skillLock').value}));
 $('closeBank').addEventListener('click',()=>{$('bankPanel').hidden=true;});
@@ -724,9 +785,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -748,7 +809,8 @@ async function begin(){
    $('sectorStatus').textContent='The sector index requires DK Server.';
     $('scheduleStatus').textContent='World timers require DK Server.';
     $('districtStatus').textContent='District policy requires DK Server.';
-   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake'])
+   $('houseStatus').textContent='House deeds and secure storage require DK Server.';
+   for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake','buyHouse','sellHouse','houseAccess','homeStore','homeTake'])
      $(id).disabled=true;
   }
   if(firstVisit){

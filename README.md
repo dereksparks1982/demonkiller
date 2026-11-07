@@ -2,7 +2,18 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.38 | DK Server M16, Districts and Jurisdictions
+## Current milestone: v0.2.39 | DK Server M17, House Deeds and Property
+
+### M17: Existing buildings are durable property
+
+- The **four existing courtyard houses and six village houses** retain their actual rectangular tile footprints. They now have server-owned deeds, lawful owners, prices, door locations, public/private signs and fixed secure storage. No replacement one-tile buildings or unapproved interiors were created.
+- Eight existing houses belong to known living residents. Two courtyard houses start vacant and may be purchased, if the one living character has enough earned gold and stands beside the proper doorway. Only one player-owned house is permitted, and settlement occupation prevents new deeds.
+- Buying transfers the actual deed price from the player's wallet to the Village Bank's business ledger; selling transfers half that price back **only after secure home storage is empty**. The bank must be able to fund the buyback, so no gold is conjured into existence.
+- House storage uses M10's **same persistent item serials** when goods move between backpack and house. Remote access, forgery, another owner's goods, and overcapacity are rejected.
+- Resident death transfers that property's title to a preserved **unsettled estate**. The deceased's personal belongings still follow M12 corpse rules. Heirs, inheritance, selling estates and entering house interiors are planned later.
+- Existing exteriors receive basic original pixel house signs; the outdoor UI can inspect, buy, sell and manage ownership while connected to DK Server. The public GitHub Pages preview does not fabricate an online server.
+
+
 
 ### M16: Real districts inside each independent map
 

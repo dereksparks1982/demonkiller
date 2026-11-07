@@ -3,6 +3,7 @@
 // RunUO-informed item/mobile ownership, written independently.
 const {COURT,VILLAGE}=require('./regions.cjs');
 const {PACK,reconcile}=require('./entity-registry-m10.cjs');
+const {onNpcDeath:enterHousingEstate}=require('./housing-m17.cjs');
 const LAW=require('./law-m15.cjs');
 const PROVISIONS=Object.freeze({
  bank:'bread',bakery:'bread',smithy:'tools',market:'produce',
@@ -53,6 +54,7 @@ function onDeath(world,npc,minute,out){
  const e=record(world,minute,'npc.corpse',npc.name+' left a body and possessions.',
    {npc_id:npc.id,corpse_id:id,area_id:npc.area_id});
  out.push(e);
+ enterHousingEstate(world,npc,minute,out);
  return corpse;
 }
 function record(world,minute,type,text,details={}){

@@ -63,6 +63,7 @@
     async items() { return request('/api/v1/entities/items'); },
     async schedule() { return request('/api/v1/schedule'); },
     async region() { return request('/api/v1/region/current'); },
+    async housing() { return request('/api/v1/housing'); },
     async corpses() { return request('/api/v1/corpses'); },
     async nearby(radius=8) { return request('/api/v1/nearby?radius='+encodeURIComponent(radius)); },
     async social() { return request('/api/v1/social'); },
@@ -105,7 +106,7 @@
     }
     try {
       const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
-      if (health.build !== 'local-m16') throw Error('DK Server needs the latest M4 build');
+      if (health.build !== 'local-m17') throw Error('DK Server needs the latest M4 build');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';
