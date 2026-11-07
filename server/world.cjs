@@ -21,6 +21,8 @@ const {ensure:ensureMobileAI,validate:validateMobileAI}=require('./mobile-ai-m21
 const {ensure:ensureHarvest,validate:validateHarvest}=require('./npc-harvest-m22.cjs');
 const {ensure:ensureSuccession,validate:validateSuccession}=require('./npc-succession-m23.cjs');
 const {ensure:ensureCaravans,validate:validateCaravans}=require('./caravan-logistics-m24.cjs');
+const {ensure:ensureScavengers,validate:validateScavengers}=require('./scavengers-m30.cjs');
+const {ensure:ensureBurials,validate:validateBurials}=require('./burials-m30.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -98,6 +100,8 @@ function makeWorld(now = Date.now()) {
   ensureHarvest(result);
   ensureSuccession(result);
   ensureCaravans(result);
+  ensureScavengers(result);
+  ensureBurials(result);
   return result;
 }
 
@@ -176,6 +180,8 @@ function validateWorld(world) {
   validateHarvest(world);
   validateSuccession(world);
   validateCaravans(world);
+  validateScavengers(world);
+  validateBurials(world);
   return world;
 }
 
