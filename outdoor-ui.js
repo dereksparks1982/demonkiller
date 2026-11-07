@@ -127,14 +127,18 @@ function refresh(force=false){
   }
   if(!pack.length){const empty=document.createElement('p');empty.textContent=s.serverConnected?'Your backpack is empty.':'Inventory available when DK Server is connected.';empty.style.gridColumn='1 / -1';box.append(empty);}
  }
- const equipped=p.crafting||{},other=JSON.stringify([p.name,p.form,p.crafting,p.skills]);
+ const equipped=p.crafting||{},other=JSON.stringify([p.name,p.form,p.crafting,p.skills,remote?.equipment]);
  if(force||other!==lastFigure){
   lastFigure=other;drawFigure();$('paperName').textContent=p.name||'ADVENTURER';
   $('paperForm').textContent=(p.form||'living').toUpperCase();
   document.querySelectorAll('.equip-slot').forEach(node=>{
-   const k=node.dataset.equip;const value=equipped[k]||null;
+   const k=node.dataset.equip,gear=remote?.equipment?.[k]||null;
+   const value=gear?.type||equipped[k]||null;
    node.textContent=value?k.toUpperCase()+': '+value:k.toUpperCase();
    node.classList.toggle('filled',Boolean(value));
+   node.dataset.serial=gear?.serial||'';
+   node.draggable=Boolean(gear?.serial&&s.serverConnected);
+   node.title=gear?.serial?'Double-click to remove. Drag onto backpack to unequip.':'';
   });
   $('paperStats').textContent='HEALTH '+(equipped.health??'—')+'  HUNGER '+(equipped.hunger??'—')+'  ENERGY '+(equipped.energy??'—');
  }
@@ -148,10 +152,40 @@ for(const slot of document.querySelectorAll('.equip-slot')){
   const item=remote?.backpack.find(i=>i.serial===serial);
   if(!item)return;
   if((slot.dataset.equip==='hand'&&item.type==='tools')||
-     (slot.dataset.equip==='light'&&item.type==='torches'))itemAction('use_item',{serial});
+     (slot.dataset.equip==='light'&&item.type==='torches'))itemAction('equip_item',{serial});
   else $('bagHelp').textContent='That item cannot be equipped in this slot.';
  });
 }
+// Equipment has an immutable identity: unequip that actual item, not
+// whichever item type happens to be first in the backpack.
+for(const slot of document.querySelectorAll('.equip-slot')){
+ slot.addEventListener('dblclick',()=>{if(slot.dataset.serial)itemAction('unequip_item',{serial:slot.dataset.serial});});
+ slot.addEventListener('dragstart',event=>{
+  if(!slot.dataset.serial){event.preventDefault();return;}
+  event.dataTransfer.setData('text/plain',slot.dataset.serial);
+ });
+}
+const bagCanvas=$('bagItems');
+bagCanvas.addEventListener('dragover',event=>{
+ if(Array.from(event.dataTransfer.types||[]).includes('text/plain'))event.preventDefault();
+});
+bagCanvas.addEventListener('drop',event=>{
+ const serial=event.dataTransfer.getData('text/plain');
+ const equipped=Object.values(remote?.equipment||{}).some(item=>item?.serial===serial);
+ if(!equipped)return;
+ event.preventDefault();
+ itemAction('unequip_item',{serial});
+});
+const gameCanvas=$('world');
+gameCanvas?.addEventListener('dragover',event=>{
+ if(Array.from(event.dataTransfer.types||[]).includes('text/plain'))event.preventDefault();
+});
+gameCanvas?.addEventListener('drop',event=>{
+ const serial=event.dataTransfer.getData('text/plain');
+ if(!remote?.backpack.some(item=>item.serial===serial))return;
+ event.preventDefault();
+ itemAction('move_stack',{serial,destination:'ground'});
+});
 setInterval(refreshServerBag,3500);setInterval(refresh,850);
 refreshServerBag();refresh(true);
 })();
