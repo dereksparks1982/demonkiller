@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),R=require('../server/regions.cjs');
@@ -9,7 +10,7 @@ const NOW=Date.UTC(2026,10,7,18);
 function sample(){
  const w=W.createCharacter(W.makeWorld(NOW),1,'ELIAS',NOW).world;
  const c=w.characters['1'];c.area_id=R.VILLAGE;c.x=15;c.y=31;
- E.reconcile(w);E.counts(w);W.validateWorld(w);
+ syncAll(w);E.reconcile(w);E.counts(w);W.validateWorld(w);
  return w;
 }
 test('M31 variable-size areas use the established 16 by 16 sector grid',()=>{
