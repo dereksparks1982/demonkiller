@@ -5,7 +5,7 @@
 <body>
 <main class="world-app">
  <header class="head"><div><h1>DEMON KILLER</h1><small>DK SOFTWORKS · THE LIVING WORLD</small></div>
- <nav><button id="openPaperDoll" type="button" title="Paper doll (P)">P · CHARACTER</button><button id="openBackpack" type="button" title="Backpack (I)">I · BACKPACK</button><a href="./index.html">MAIN MENU</a></nav></header>
+ <nav><a href="./index.html">MAIN MENU</a></nav></header>
  <div class="layout"><section class="world-pane"><div class="world-title"><strong id="areaName">OUTDOOR REGION</strong>
  <span id="worldStatus">Loading world...</span></div>
  <canvas id="world" width="640" height="640" tabindex="0" aria-label="Overhead world, cardinal directions only"></canvas>
@@ -129,8 +129,7 @@
  if(!doll||!bag)return;
  let top=40;
  function toggle(node){node.hidden=!node.hidden;if(!node.hidden)node.style.zIndex=String(++top);}
- document.getElementById('openPaperDoll').addEventListener('click',()=>toggle(doll));
- document.getElementById('openBackpack').addEventListener('click',()=>toggle(bag));
+
  document.querySelectorAll('[data-close-window]').forEach(b=>b.addEventListener('click',()=>{
   document.getElementById(b.dataset.closeWindow).hidden=true;
   document.getElementById('world')?.focus({preventScroll:true});
