@@ -112,6 +112,7 @@ test('M29 killed imps leave a demon corpse without consuming monster loot',()=>{
  assert(monster);
  const p=w.characters['1'];
  Object.assign(p,{area_id:monster.area_id,x:monster.x,y:monster.y});
+ syncAll(w);
  monster.health=1;
  const before=Object.keys(w.living.mobile_assets.corpses).length;
  const result=C.apply(w,{action:'attack',target_id:monster.id},START);
