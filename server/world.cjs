@@ -23,6 +23,7 @@ const {ensure:ensureSuccession,validate:validateSuccession}=require('./npc-succe
 const {ensure:ensureCaravans,validate:validateCaravans}=require('./caravan-logistics-m24.cjs');
 const {ensure:ensureScavengers,validate:validateScavengers}=require('./scavengers-m30.cjs');
 const {ensure:ensureBurials,validate:validateBurials}=require('./burials-m30.cjs');
+const {ensure:ensureCells,validate:validateCells,onPlayerMove:cellMove}=require('./streaming-cells-m33.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -102,6 +103,7 @@ function makeWorld(now = Date.now()) {
   ensureCaravans(result);
   ensureScavengers(result);
   ensureBurials(result);
+  ensureCells(result);
   return result;
 }
 
@@ -182,6 +184,7 @@ function validateWorld(world) {
   validateCaravans(world);
   validateScavengers(world);
   validateBurials(world);
+  validateCells(world);
   return world;
 }
 
@@ -199,6 +202,7 @@ function createCharacter(world, slot, name, now = Date.now()) {
   next.characters[String(slot)] = character;
   reconcileEntities(next);
   ensureDistricts(next);
+  ensureCells(next);
   next.revision++;
   validateWorld(next);
   return {world: next, character};
@@ -291,9 +295,10 @@ function applyCharacterAction(world, slot, command) {
   character.revision++;
   next.characters[String(slot)] = character;
   const districtEvents=onPlayerMove(next,previous);
+  const cellEvents=cellMove(next,previous);
   next.revision++;
   validateWorld(next);
-  return {world:next,character,events:districtEvents};
+  return {world:next,character,events:[...districtEvents,...cellEvents]};
 }
 
 function worldClock(world, now = Date.now()) {
