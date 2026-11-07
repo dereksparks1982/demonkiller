@@ -30,6 +30,12 @@
   const client = isLocal ? Object.freeze({
     async listCharacters() { return (await request('/api/v1/characters')).characters; },
     async createCharacter(slot, name) { return (await post('/api/v1/characters', {slot, name})).character; },
+    async deleteCharacter(slot,name) {
+      return request('/api/v1/characters/' + slot, {
+        method:'DELETE',headers:{'Content-Type':'application/json','X-DK-Control':'delete-character'},
+        body:JSON.stringify({name,confirm:'DELETE'})
+      });
+    },
     async getCharacter(slot) { return (await request('/api/v1/characters/' + slot)).character; },
     async action(slot, action, fields = {}) {
       return (await post('/api/v1/characters/' + slot + '/actions', {action, ...fields})).character;
