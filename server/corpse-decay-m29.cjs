@@ -23,6 +23,7 @@ function configure({kind='npc',species='human',area_id,minute=0,preserved=false}
  const schedule=SPECIES[species].map(x=>Math.floor(x*ENVIRONMENTS[climate]));
  return {kind,species,environment:climate,preserved,looted:false,
    stage:'fresh',last_stage_minute:minute,
+   disturbed:false,scavenger_visits:0,
    expires_minute:preserved?null:minute+schedule[5]};
 }
 function schedule(c){
@@ -45,12 +46,18 @@ function view(c,minute){
  const i=STAGES.indexOf(stage);
  return {stage,kind:c.kind,species:c.species,environment:c.environment,
   preserved:c.preserved,looted:c.looted,
+  disturbed:!!c.disturbed,scavenger_visits:c.scavenger_visits||0,
   age_minutes:now,expires_minute:c.expires_minute,
   next_stage_minute:i<STAGES.length-1?c.created_minute+times[i+1]:null,
   can_search:i<4&&!c.looted&&Boolean(c.bag_id||c.coins)};
 }
 function migrate(c,minute=c.created_minute){
- if(c.stage!==undefined)return false;
+ if(c.stage!==undefined){
+  let changed=false;
+  if(c.disturbed===undefined){c.disturbed=false;changed=true;}
+  if(c.scavenger_visits===undefined){c.scavenger_visits=0;changed=true;}
+  return changed;
+ }
  // Old M12 corpses expired after 720 minutes. Preserve their deaths,
  // backpack identities, loot state, and coordinates during M29 migration.
  const cfg=configure({kind:'npc',species:'human',area_id:c.area_id,
@@ -65,6 +72,9 @@ function validate(c,minute){
    !Object.hasOwn(SPECIES,c.species)||
    !Object.hasOwn(ENVIRONMENTS,c.environment)||
    typeof c.preserved!=='boolean'||typeof c.looted!=='boolean'||
+   (c.disturbed!==undefined&&typeof c.disturbed!=='boolean')||
+   (c.scavenger_visits!==undefined&&(!Number.isSafeInteger(c.scavenger_visits)||
+     c.scavenger_visits<0||c.scavenger_visits>2))||
    !STAGES.includes(c.stage)||
    !Number.isSafeInteger(c.last_stage_minute)||
    c.last_stage_minute<c.created_minute||c.last_stage_minute>minute||
