@@ -8,6 +8,7 @@ const STORAGE=require('./storage-m9.cjs');
 const ENTITIES=require('./entity-registry-m10.cjs');
 const ITEMS=require('./item-interactions-m27.cjs');
 const MOBILE=require('./mobile-assets-m12.cjs');
+const BURIALS=require('./burials-m30.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const LAW=require('./law-m15.cjs');
 const HOUSING=require('./housing-m17.cjs');
@@ -89,6 +90,7 @@ function apply(world,command,now=Date.now()){
  if(command?.action==='pay_fine')return LAW.payFine(world,command);
  if(command?.action==='skill_lock')return SKILLS.applyLock(world,command);
  if(command?.action==='loot_corpse')return MOBILE.loot(world,command);
+ if(command?.action==='bury_corpse')return BURIALS.bury(world,command);
  if(command?.action==='move_item')return ENTITIES.transfer(world,command);
  if(['use_item','split_stack','combine_stacks','move_stack','equip_item','unequip_item'].includes(command?.action))return ITEMS.take(world,command);
  if(['bank_store','bank_take','drop_item','pick_up'].includes(command?.action))return STORAGE.apply(world,command);
