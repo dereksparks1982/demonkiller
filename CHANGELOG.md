@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.47 / DK Server M25 | 2026-11-06 | Persistent caravan manifests
+
+- Added a bounded server-owned manifest history for actual merchant journeys with unique trip IDs, cargo serials, simulated purchase/finish minutes and delivered/interrupted status.
+- Older M24 worlds and active trips migrate idempotently; existing merchandise, merchant money, world events and cargo identities remain unchanged.
+- Caravan status returns up to three completed or interrupted trip summaries without exposing the location of a distant active merchant.
+- Added four focused regression tests covering successful delivery, interruption, old-save migration and invalid shipment records. Checked manifest transitions and fixed a duplicate-created-on-start bug before release.
+- No changes to movement, item transfers, shop prices, player character slots, original pixel art or hosting.
+
 ## v0.2.46 / DK Server M24 | 2026-11-06 | Physical merchant caravans between settlements
 
 - Implemented an independent, server-owned caravan job for the existing wandering merchant and escort. The merchant navigates from Village Market to Courtyard Market through cardinal tile routes and actual region portals.

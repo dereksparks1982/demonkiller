@@ -128,3 +128,52 @@ test('HTTP caravan status is read-only and hides distant merchant location',asyn
   headers:{'Content-Type':'application/json'},body:'{}'})).status,405);
  await app.close();
 });
+
+test('M25 persists a unique manifest through physical purchase and delivery',()=>{
+ const w=fixture(),l=w.living,n=l.npcs[C.MERCHANT],escort=l.npcs[C.ESCORT];
+ const {cargo}=buy(w),record=l.caravans.manifests[0],serial=cargo.cargo_serial;
+ assert.equal(record.status,'carrying');
+ assert.equal(record.cargo_serial,serial);
+ assert.equal(record.purchased_minute,65);
+ const spot=V.location(w,l.businesses[C.DEST]);
+ for(const a of [n,escort]){a.area_id=R.COURT;a.x=spot.x;a.y=spot.y;}
+ l.businesses[C.DEST].open=true;
+ D.syncNpcTransitions(w,70,[]);
+ C.process(w,70,[]);
+ assert.equal(record.status,'delivered');
+ assert.equal(record.ended_minute,70);
+ assert.equal(record.cargo_serial,serial);
+ assert.equal(C.listing(w).recent_shipments[0].id,record.id);
+ W.validateWorld(w);
+});
+test('M25 records interruption without deleting carried item IDs',()=>{
+ const w=fixture(),{cargo}=buy(w),events=[];
+ w.living.npcs[C.ESCORT].alive=false;
+ C.process(w,70,events);
+ const record=w.living.caravans.manifests[0];
+ assert.equal(record.status,'interrupted');
+ assert.equal(record.ended_minute,70);
+ assert.equal(record.cargo_serial,cargo.cargo_serial);
+ assert(w.entity_registry.items[cargo.cargo_serial]);
+ W.validateWorld(w);
+});
+test('M25 upgrades an in-progress M24 journey once, preserving its cargo',()=>{
+ const w=fixture(),{cargo}=buy(w);
+ const serial=cargo.cargo_serial;
+ delete cargo.manifest_id;delete w.living.caravans.manifests;
+ delete w.living.caravans.manifest_sequence;
+ assert.equal(C.ensure(w),true);
+ assert.equal(C.ensure(w),false);
+ assert.equal(w.living.caravans.manifests.length,1);
+ assert.equal(w.living.caravans.manifests[0].cargo_serial,serial);
+ W.validateWorld(w);
+});
+test('M25 refuses forged manifest histories and never leaks distant live locations',()=>{
+ const w=fixture();
+ C.plan(w,60,[]);
+ const s=w.living.caravans;
+ assert.equal(C.listing(w).nearby_caravan,null);
+ assert(!JSON.stringify(C.listing(w)).includes('"x"'));
+ s.manifests[0].status='delivered';
+ assert.throws(()=>C.validate(w),/Invalid trade manifest/);
+});

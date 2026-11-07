@@ -4,14 +4,16 @@
 const {VILLAGE,COURT}=require('./regions.cjs');
 const {location,total,CAPACITY}=require('./vendors-m18.cjs');
 const {reconcile,counts}=require('./entity-registry-m10.cjs');
+const MANIFEST=require('./caravan-manifests-m25.cjs');
 const SOURCE='village_market',DEST='courtyard_market';
 const MERCHANT='caravan_trader',ESCORT='caravan_guard',TYPE='produce';
 const QTY=2,BUY_PRICE=4,SALE_PRICE=6,LIFETIME=2160,COOLDOWN=180;
 function ensure(world){
  if(!world.living)throw Error('Caravan trade requires a world');
- if(world.living.caravans)return false;
+ if(world.living.caravans)return MANIFEST.ensure(world.living.caravans);
  world.living.caravans={schema:1,active:null,purchased:0,delivered:0,
   last_trip_minute:null,profit:0,abandoned:0};
+ MANIFEST.ensure(world.living.caravans);
  return true;
 }
 function dist(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);}
@@ -52,6 +54,7 @@ function plan(world,minute,out){
  s.active={merchant_id:MERCHANT,escort_id:ESCORT,phase:'to_source',
   source_id:SOURCE,dest_id:DEST,item_type:TYPE,quantity:QTY,
   started_minute:minute,expires_minute:minute+LIFETIME,cargo_serial:null};
+ MANIFEST.start(s,s.active);
  event(world,minute,'caravan.planned','The wandering merchant prepared a supply caravan.',
   {npc_id:MERCHANT,escort_id:ESCORT,from:SOURCE,to:DEST,area_id:VILLAGE},out);
 }
@@ -71,6 +74,7 @@ function destination(world,n){
 function cancel(world,minute,out,reason){
  const s=world.living.caravans,goal=s?.active;
  if(!goal)return;
+ MANIFEST.update(s,goal,'interrupted',minute,{reason});
  s.active=null;s.abandoned++;s.last_trip_minute=minute;
  event(world,minute,'caravan.interrupted','A merchant caravan was interrupted.',
   {reason,area_id:world.living.npcs[MERCHANT]?.area_id||VILLAGE,
@@ -111,6 +115,7 @@ function process(world,minute,out){
   n.coins-=BUY_PRICE;shop.coins+=BUY_PRICE;shop.sales+=QTY;
   shop.stock-=QTY;s.purchased+=QTY;g.cargo_serial=serial;
   g.phase='to_destination';
+  MANIFEST.update(s,g,'carrying',minute,{serial});
   reconcile(world);counts(world);
   event(world,minute,'caravan.purchased',
    'The wandering merchant paid for real produce at the Village Market.',
@@ -132,6 +137,7 @@ function process(world,minute,out){
   shop.coins-=SALE_PRICE;shop.expenses+=SALE_PRICE;
   n.coins+=SALE_PRICE;
   s.delivered+=QTY;s.profit+=SALE_PRICE-BUY_PRICE;
+  MANIFEST.update(s,g,'delivered',minute);
   s.last_trip_minute=minute;s.active=null;
   reconcile(world);counts(world);
   event(world,minute,'caravan.delivered',
@@ -148,6 +154,7 @@ function validate(world){
     !Number.isSafeInteger(s.abandoned)||s.abandoned<0||
     (s.last_trip_minute!==null&&(!Number.isSafeInteger(s.last_trip_minute)||s.last_trip_minute<0)))
    throw Error('Invalid caravan logistics');
+ MANIFEST.validate(s);
  const g=s.active;
  if(g!==null){
   if(!g||g.merchant_id!==MERCHANT||g.escort_id!==ESCORT||
@@ -168,6 +175,7 @@ function listing(world){
  return {minute:world.living?.minute||0,revision:world.revision,
   purchased:s?.purchased||0,delivered:s?.delivered||0,
   merchant_profit:s?.profit||0,interrupted:s?.abandoned||0,
+  recent_shipments:MANIFEST.recent(s),
   nearby_caravan:nearby&&s?.active?{merchant_name:n.name,phase:s.active.phase,
    goods:s.active.phase==='to_destination'?TYPE:null,
    escort_alive:!!world.living.npcs[ESCORT]?.alive}:null};

@@ -113,7 +113,7 @@
     }
     try {
       const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
-      if (health.build !== 'local-m24') throw Error('DK Server needs the latest M4 build');
+      if (health.build !== 'local-m25') throw Error('DK Server needs the latest M4 build');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';

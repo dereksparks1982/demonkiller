@@ -2,7 +2,15 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.46 | DK Server M24, Physical Guarded Trade Caravans
+## Current milestone: v0.2.47 | DK Server M25, Caravan Manifests
+
+### M25: Durable caravan shipment records
+
+- Each real caravan gets a unique trip ID and a saved manifest recording its origin, destination, commodity, quantity and actual cargo-item serial.
+- Manifests move through **planned**, **carrying**, **delivered**, or **interrupted** states. A successful purchase and final delivery are recorded with their simulated world minutes; an interruption records the reason without deleting the merchant's cargo.
+- The registry keeps the most recent 64 journeys. Existing M24 saves, including shipments already underway, migrate without changing stock, money or item identity. Repeated migration never invents a duplicate journey.
+- The existing read-only caravan status endpoint now includes up to three **closed shipment summaries** with no distant merchant coordinates. No new menus, artwork, trading prices or movement rules.
+- This is deliberately a small slice. The complete server test suite still needs a full Node checkout.
 
 ### M24: A wandering merchant carries real goods between settlements
 

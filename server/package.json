@@ -1,8 +1,8 @@
 {
   "name": "dk-server",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "private": true,
-  "description": "DK Server M24: physical guarded merchant caravans and cross-region commodity exchange",
+  "description": "DK Server M25: persistent merchant shipment manifests, unique trip IDs and bounded trade history",
   "engines": {
     "node": ">=20"
   },
