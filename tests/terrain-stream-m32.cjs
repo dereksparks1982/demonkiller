@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),R=require('../server/regions.cjs');
@@ -10,6 +11,7 @@ function world(){
  const w=W.createCharacter(W.makeWorld(NOW),1,'ELIAS',NOW).world;
  w.characters['1'].area_id=R.VILLAGE;
  w.characters['1'].x=15;w.characters['1'].y=31;
+ syncAll(w);
  return w;
 }
 function client(world,additional={}){
