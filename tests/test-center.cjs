@@ -275,8 +275,10 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   tickFrames(40);
   assert.equal(get('position').textContent,'(8, 12)',
     'Clicking within the current grid tile never moves the logical player');
-  assert.equal(lastPlayerTranslation.x,8*32);
-  assert.equal(lastPlayerTranslation.y,12*32);
+  // Continuous walking interpolates the visual sprite within a 32px tile.
+  // Assert that the logical tile stays fixed without demanding pixel snapping.
+  assert(lastPlayerTranslation.x>=8*32&&lastPlayerTranslation.x<9*32);
+  assert(lastPlayerTranslation.y>=12*32&&lastPlayerTranslation.y<13*32);
   await room.emit('mouseup',{button:2});
 
   await get('editMode').emit('click');
