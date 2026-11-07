@@ -28,7 +28,7 @@ function build(world){
       area_id:c.area_id,x:c.x??8,y:c.y??12});
   for(const n of Object.values(world.living?.npcs||{}))if(n.alive)
     add({kind:'npc',id:n.id,serial:serialFor('npc:'+n.id),name:n.name,
-      area_id:n.area_id,x:n.x,y:n.y});
+      area_id:n.area_id,x:n.x,y:n.y,role:n.role,status:n.status});
   for(const n of Object.values(world.living?.combat?.creatures||{}))if(n.alive)
     add({kind:'monster',id:n.id,serial:serialFor('monster:'+n.id),
       area_id:n.area_id,x:n.x,y:n.y,health:n.health});
@@ -42,7 +42,9 @@ function build(world){
       type:drop.item,quantity:drop.quantity});
   for(const corpse of Object.values(world.living?.mobile_assets?.corpses||{}))
     add({kind:'corpse',id:corpse.id,serial:serialFor('corpse:'+corpse.id),
-      name:corpse.name,area_id:corpse.area_id,x:corpse.x,y:corpse.y});
+      name:corpse.name,area_id:corpse.area_id,x:corpse.x,y:corpse.y,
+      stage:corpse.stage||'fresh',species:corpse.species||'human',
+      looted:!!corpse.looted,kind_of_remains:corpse.kind||'npc'});
   for(const grave of Object.values(world.living?.burials?.records||{}))
     add({kind:'grave',id:grave.id,serial:serialFor('grave:'+grave.id),
       name:grave.name,stage:grave.stage,area_id:grave.area_id,x:grave.x,y:grave.y});
@@ -82,4 +84,4 @@ function lookup(index,area_id,x,y,radius=8){
   return {area_id,origin:{x,y},radius,sector:{...cell(x,y)},
     sectors_x:a.sectors_x,sectors_y:a.sectors_y,entities};
 }
-module.exports={SECTOR_SIZE,cell,build,lookup};
+module.exports={SECTOR_SIZE,key,cell,build,lookup};
