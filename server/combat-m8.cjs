@@ -4,7 +4,7 @@
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
 const SKILLS=require('./skills-m14.cjs');
-const {onDeath:recordMobileDeath}=require('./mobile-assets-m12.cjs');
+const {onDeath:recordMobileDeath,onCreatureDeath:recordMonsterRemains}=require('./mobile-assets-m12.cjs');
 const MAX_CREATURES=48,MAX_DROPS=2048;
 function seed(){return {schema:1,sequence:0,creatures:{},drops:{}};}
 function ensure(world){
@@ -73,8 +73,9 @@ function dead(world,creature,minute,events){
   gold:2+creature.id.length%5,item:creature.id.length%2===0?'herbs':'ore',
   dropped_minute:minute};
  delete s.creatures[creature.id];
+ const corpse=recordMonsterRemains(world,creature,minute,events);
  events.push(event(world,minute,'monster.defeated','An imp was defeated.',
-  {creature_id:creature.id,drop_id:id,area_id:creature.area_id}));
+  {creature_id:creature.id,drop_id:id,corpse_id:corpse?.id||null,area_id:creature.area_id}));
  const terr=world.living.territories[creature.area_id];
  if(terr?.control==='monsters'&&!Object.values(s.creatures).some(c=>c.alive&&c.area_id===creature.area_id)){
   terr.control='settlers';terr.threat=2;terr.last_raid=minute;
