@@ -168,6 +168,20 @@ function drawMonsters(){
 }
 // M29 remains are static terrain features. They never participate in
 // movement collision and always use the same 32px Zelda-era pixel scale.
+function drawTerrainMarks(){
+ for(const mark of Object.values(living?.mobile_assets?.terrain_marks||{})){
+  if(mark.area_id!==area.area_id)continue;
+  const x=mark.x*TILE,y=mark.y*TILE;
+  const age=Math.max(0,(living.minute||0)-mark.created_minute);
+  const fade=Math.max(0,1-age/2880);
+  if(fade<=0)continue;
+  ctx.save();ctx.globalAlpha=Math.max(.12,Math.min(.65,fade*.65));
+  px(mark.kind==='ash'?'#2b2631':'#3d322f',x+5,y+23,24,6);
+  px(mark.kind==='ash'?'#5b454b':'#645248',x+8,y+20,13,3);
+  px(mark.kind==='ash'?'#444049':'#79694e',x+20,y+26,5,2);
+  ctx.restore();
+ }
+}
 function drawCorpses(){
  for(const body of Object.values(living?.mobile_assets?.corpses||{})){
   if(body.area_id!==area.area_id)continue;
@@ -482,6 +496,7 @@ function draw(){
    if(area.walls[y*area.width+x])drawWall(x,y);
  for(const o of area.objects)drawObject(o);
  drawResources();
+ drawTerrainMarks();
  drawCorpses();
  drawNpcs();
  drawMonsters();
