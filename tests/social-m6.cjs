@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),S=require('../server/social-m6.cjs');
@@ -15,6 +16,7 @@ function fixture(){
  baker.x=87;baker.y=101;baker.area_id=VILLAGE;
  world.living.businesses.village_bakery.open=true;
  c.inventory.wood=4;
+ syncAll(world);
  return world;
 }
 test('M6 social state loads in new worlds; validated backward-compatible upgrade',()=>{
