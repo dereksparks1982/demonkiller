@@ -49,8 +49,10 @@ function catalogue(world){
      doorway:o.door?{x:o.door.x,y:o.door.y}:null};
     cells[root].children.push(id);
    }
-   if(typeof o.link==='string'&&roots[o.link]){
-    const edge={id:area_id+':'+o.id,from:root,to:roots[o.link],
+   const target=typeof o.link==='string'?o.link:
+    area_id===TEMPLE&&o.id==='temple_north_door'?COURT:null;
+   if(target&&roots[target]){
+    const edge={id:area_id+':'+o.id,from:root,to:roots[target],
      area_id,object_id:o.id,at:{x:o.x,y:o.y},
      open:o.open!==false,kind:o.type==='gate'?'gate':'door'};
     links.push(edge);
