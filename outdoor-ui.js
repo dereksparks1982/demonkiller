@@ -117,7 +117,7 @@ function refresh(force=false){
    if(serial){
     b.draggable=true;b.dataset.serial=serial;b.dataset.type=name;
     b.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',serial));
-    b.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/plain'))e.preventDefault();});
+    b.addEventListener('dragover',e=>{if(Array.from(e.dataTransfer.types||[]).includes('text/plain'))e.preventDefault();});
     b.addEventListener('drop',e=>{
      e.preventDefault();const from=e.dataTransfer.getData('text/plain');
      if(from&&from!==serial)itemAction('combine_stacks',{source_serial:from,target_serial:serial});
@@ -142,7 +142,7 @@ function refresh(force=false){
  if(journal&&journal!==lastJournal){lastJournal=journal;$('hudJournal').textContent=journal;}
 }
 for(const slot of document.querySelectorAll('.equip-slot')){
- slot.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/plain'))e.preventDefault();});
+ slot.addEventListener('dragover',e=>{if(Array.from(e.dataTransfer.types||[]).includes('text/plain'))e.preventDefault();});
  slot.addEventListener('drop',e=>{
   e.preventDefault();const serial=e.dataTransfer.getData('text/plain');
   const item=remote?.backpack.find(i=>i.serial===serial);
