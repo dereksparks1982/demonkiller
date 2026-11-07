@@ -1,4 +1,4 @@
-# DK Server M18 | Physical Vendor Merchandise (v0.2.40)
+# DK Server M19 | Physical NPC Customers and Food (v0.2.41)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m18`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m19`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -141,7 +141,7 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 
 ## v0.2.34 integration correction
 
-The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m18`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m19`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
 
 ## M13 save-strategy and verification
 
@@ -204,3 +204,13 @@ The existing `buy` gameplay action lowers a vendor's primary-product count and r
 At world initialization or migration, `ensureVendors` creates the five merchant containers; M10 reconciliation instantiates or reconciles their actual commodity quantities before validation and durable save. World-minute restocking is limited by the vendor's total occupied storage capacity. The legacy background customer sale simulation still represents **offscreen customer demand** and does not yet create an item for a specific NPC recipient. Physical trade from NPC to NPC, supply shipments, vendor provenance, warehousing, markup and per-item store pricing will be independent later milestones.
 
 `GET /api/v1/vendors` returns current-area nearby merchant stock summaries only, and the outdoor sidebar displays the closest store's available products and secondary goods. Clients cannot mutate vendor stock through the read endpoint or transfer from a store as though it were their own bank. `tests/vendors-m18.cjs` covers migration, commodity separation, item serials, capacity, restocking and HTTP durability; module-level integration tests passed. The complete Node/browser suite remains to be run against a full checkout.
+
+## M19: Actual autonomous customer transactions
+
+`server/npc-commerce-m19.cjs` independently adds saved shopping goals and a server-owned item transfer engine to DK Server. On a world-time cadence, eligible shoppers (currently village guards and wandering caravan NPCs) choose a nearby, open food merchant they can afford. Their existing M6 cardinal pathfinding takes them to the real storefront. The sale occurs **only when the NPC arrives**, the vendor is open, the business has physical M18 merchandise, and the NPC has enough coins and backpack capacity. One item serial passes from the vendor stock container to that NPC's M12 personal pack, splitting an existing stack if necessary. The payment moves from NPC coins into business coins with no fabricated money, and the transaction is dated in the authoritative event journal as `business.trade` with buyer ID, vendor ID and item serial.
+
+The old M5 periodic anonymous business sales are removed. Existing shop-open/close calculations and M11 scheduled supplier restocking continue, now supporting real NPC customer transactions instead of assuming an invisible customer buys goods every quarter hour. NPC survival no longer spends a coin to reduce hunger without providing food; `npc.food.eaten` events represent actual consumed `bread`, `produce`, `meals` or `rations` from personal inventory. World state, shopping goals, item transfers and food remain in the same single-writer checkpointed snapshot. `GET /api/v1/npc-commerce` provides a read-only summary of completed purchases and active shoppers; the outdoor UI displays it.
+
+`tests/npc-commerce-m19.cjs` covers world migration, NPC movement to a store, physical purchase and coin conservation, provenance of the item serial, food consumption without extra money, no remote purchases, world pause and persistence through server restart. A combined 90-minute world simulation confirmed a live North Guard purchase at the Village Market, with real produce in his backpack. The complete Node/browser suite is still unverified in a full checkout.
+
+**Limits:** Only selected existing residents plan these shopping trips. Suppliers remain abstract scheduled deliveries, not yet physically represented cargo. Not all customers, food sources, professions or relationships are fully simulated. No change to single-player character slots, engine-free rendering or online hosting.

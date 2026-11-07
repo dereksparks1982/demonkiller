@@ -74,3 +74,7 @@ RunUO `Scripts/Multis/BaseHouse.cs`, `Scripts/Multis/HouseSign.cs` and `Scripts/
 ## Milestone 18: Vendor-owned stock (v0.2.40)
 
 RunUO `Scripts/Mobiles/Vendors/BaseVendor.cs` and `Scripts/Mobiles/Vendors/SBInfo/SBInfo.cs` distinguish merchandise lists and buy/sell logic from personal NPC possessions. Demon Killer now independently gives each merchandise shop its own persistent stock container, with M10 item IDs, typed secondary goods, actual player trades and bounded supplier restocking. The bank remains a financial service. Individual autonomous customer transfers and supplier cargo are not yet simulated.
+
+## Milestone 19: Real mobile/vendor transactions (v0.2.41)
+
+RunUO's mobile inventory and BaseVendor selling systems inspired the transition from abstract shop-sale counters to actual transactions with a living NPC buyer. Eligible DK Server customers navigate cardinally to a real open storefront, pay personal coins and receive a persistent item in their backpack. Hunger uses owned food rather than silently consuming money. All work is independently implemented in JavaScript; no GPL C# copied. Wider NPC customer roles and physical supply networks remain future slices.

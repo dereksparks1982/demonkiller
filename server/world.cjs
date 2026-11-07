@@ -15,6 +15,7 @@ const {ensure:ensureLaw,validate:validateLaw}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,validate:validateDistricts,onPlayerMove}=require('./region-policies-m16.cjs');
 const {ensure:ensureHousing,validate:validateHousing}=require('./housing-m17.cjs');
 const {ensure:ensureVendors,validate:validateVendors}=require('./vendors-m18.cjs');
+const {ensure:ensureNpcCommerce,validate:validateNpcCommerce}=require('./npc-commerce-m19.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -86,6 +87,7 @@ function makeWorld(now = Date.now()) {
   ensureHousing(result);
   ensureVendors(result);
   reconcileEntities(result);
+  ensureNpcCommerce(result);
   return result;
 }
 
@@ -158,6 +160,7 @@ function validateWorld(world) {
   validateDistricts(world);
   validateHousing(world);
   validateVendors(world);
+  validateNpcCommerce(world);
   return world;
 }
 

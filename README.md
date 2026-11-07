@@ -2,7 +2,18 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.40 | DK Server M18, Physical Merchant Stock
+## Current milestone: v0.2.41 | DK Server M19, NPC Customers and Real Meals
+
+### M19: Customers exist in the world
+
+- Selected wandering residents and village guards now plan trips to shops and **walk along the actual cardinal grid** to the storefront. An NPC must arrive at an open merchant, have enough coins and have room in their personal backpack to purchase goods.
+- Server-authored purchases transfer the actual price from the NPC's own saved wallet into the shop's business ledger. The merchant loses one real product; the buyer receives a **persistent item serial** in their individual M12 backpack. A full transfer preserves the existing serial, and a partial transfer creates a new serial for the split item.
+- The prior automatic, unnamed background sales have been replaced by these actual customer transactions for merchandise shops. The permanent world journal records the buyer, business, item serial, unit count and revenue.
+- NPC hunger no longer silently spends coins to provide imaginary meals. A resident must possess real bread, produce, meals or rations and consumes it from their own backpack to reduce hunger.
+- Saved shopping goals, purchases and food consumption continue whenever the DK Server world clock is running, even with no webpage open; Stop Server freezes them like all other world activity.
+- The outdoor sidebar can show real NPC purchases and shopping trips. Future slices will broaden shopping to more NPC types, wandering camp merchants, complete production supply chains and physical wages.
+
+
 
 ### M18: A shop has actual goods, not just a stock number
 

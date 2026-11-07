@@ -1,3 +1,11 @@
+## Implemented milestone: DK Server M19 (v0.2.41)
+
+The world no longer removes merchandise and generates coins for anonymous, non-existent customers every 15 minutes. `server/npc-commerce-m19.cjs` tracks some existing NPC residents as genuine customers. They receive saved shopping plans, follow existing cardinal navigation to the nearest open food vendor, and pay from actual personal money once within range. A real item from the M18 business stock container transfers into the NPC's M12 personal backpack, preserving or splitting its M10 serial as appropriate. The buyer's coins fall by the purchase price, the shop's coins rise by the same amount, and event history records an authentic buyer and item ID.
+
+Likewise, NPC hunger is now satisfied only by consuming a food item that the NPC possesses. The previous M5 shortcut that subtracted a coin to reduce hunger without food is removed. World time controls these purchases and food use while the server runs, independently of browser presence; deliberate server stop suspends them. The new read-only `GET /api/v1/npc-commerce` and the outdoor sidebar expose actual activity.
+
+This is one active shopping subsystem, not complete UO-level NPC autonomy. Future work must represent supply shipments, more varied vendor customers, player-run businesses, NPC employment and inheritance, true local markets, and all required NPC goods and equipment.
+
 ## Implemented milestone: DK Server M18 (v0.2.40)
 
 Each of the five genuine merchandise businesses now has a private, persistent `vendor_stock` item container at its existing storefront. Existing primary stock migrates without reset, secondary purchased goods become type-specific `business.other_stock`, and M10 item serials track stock as it moves between a vendor and the single player's physical backpack. A smithy buying ore no longer converts the ore into tools. Real money changes hands under the existing economy, and M11 restocking respects a 500-item total physical storeroom capacity.

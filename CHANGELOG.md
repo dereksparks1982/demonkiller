@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.41 / DK Server M19 | 2026-11-06 | Physical NPC customers and meals
+
+- Replaced anonymous automatic merchandise sales with real NPC shopping goals, cardinal storefront travel and server-authoritative arrival/purchase checks. NPCs must be alive, physically nearby, funded and equipped with sufficient personal pack space.
+- Shop purchases debit NPC coins, credit the business, reduce real M18 vendor merchandise and transfer a persistent M10 item serial to that NPC's M12 backpack. Shop history records buyer, vendor, item and payment.
+- NPC survival no longer burns coins to make hunger disappear. A real food item must be consumed from the personal backpack, with a dated `npc.food.eaten` event, or hunger continues increasing.
+- Shopping goals and purchase history persist as `world.living.npc_trade`. The world clock controls all movement and purchasing, and Stop Server freezes the process.
+- Added read-only `GET /api/v1/npc-commerce`, outdoor customer activity status and `tests/npc-commerce-m19.cjs` regression contracts. Functional 90-minute server module simulation passed with a real guard buying produce. Full Node/browser suites are still pending.
+- Continued independent RunUO-inspired mobile/vendor architecture without copying GPL code or claiming the static website runs a hosted persistent world.
+
 ## v0.2.40 / DK Server M18 | 2026-11-06 | Physical merchant merchandise
 
 - Migrated five merchant primary-product stocks into individually identified M10 persistent merchandise containers without changing existing shop locations or NPC personal backpacks. Financial-service banking remains distinct from ordinary retail.

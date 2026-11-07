@@ -13,6 +13,7 @@ const {ensure:ensureScheduler,runMinute:runScheduled}=require('./world-scheduler
 const {ensure:ensureMobileAssets,onDeath:recordMobileDeath}=require('./mobile-assets-m12.cjs');
 const {ensure:ensureLaw,tick:lawTick}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,syncNpcTransitions}=require('./region-policies-m16.cjs');
+const NPCCOMMERCE=require('./npc-commerce-m19.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -85,6 +86,8 @@ function npcDestination(n,minute,world){
      w.wanted_until_minute>=minute&&w.detained_until_minute<minute)
    return {area_id:VILLAGE,x:p.x,y:p.y};
  }
+ const shopperDestination=NPCCOMMERCE.destination(world,n);
+ if(shopperDestination)return shopperDestination;
  if(n.role==='caravan'||n.role==='escort'){
   const away=(Math.floor(minute/240)%2===0);
   return away?{area_id:COURT,x:n.role==='caravan'?46:45,y:27}:
@@ -129,7 +132,7 @@ function minuteTick(world,m,generated){
   if(m%30===0){
    n.hunger=Math.min(100,n.hunger+1);
    n.energy=Math.max(0,Math.min(100,n.energy+(day?-1:3)));
-   if(n.hunger>=70&&n.coins>=1){n.hunger-=24;n.coins--; }
+   NPCCOMMERCE.consume(world,n,m,generated);
    if(n.hunger===100)n.health=Math.max(0,n.health-1);
    generated.push(event(living,m,'npc.needs',
       n.name+' needs were updated.',{npc_id:n.id,health:n.health,
@@ -150,17 +153,11 @@ function minuteTick(world,m,generated){
     generated.push(event(living,m,'business.hours',
      shop.name+(open?' opened.':' closed.'),{business_id:shop.id,area_id:shop.area_id}));
    }
-   if(!open||shop.stock<=0||shop.product==='bank')continue;
-   const sold=1+Math.floor(rng(living)*4),actual=Math.min(sold,shop.stock);
-   shop.stock-=actual;shop.sales+=actual;
-   const price=shop.product==='tools'?8:shop.product==='meals'?4:2;
-   shop.coins+=actual*price;
-   shop.expenses+=1;shop.coins-=1;
-   generated.push(event(living,m,'business.trade',
-    shop.name+' sold '+actual+' '+shop.product+'.',
-    {business_id:shop.id,area_id:shop.area_id,units:actual,revenue:actual*price}));
+
   }
  }
+ NPCCOMMERCE.plan(world,m,generated);
+ NPCCOMMERCE.purchase(world,m,generated);
  if(m%60===0){
   for(const terr of Object.values(living.territories)){
    const roll=rng(living);
@@ -210,6 +207,7 @@ function advance(world,now=Date.now(),limit=180){
  ensureMobileAssets(next);
  ensureLaw(next);
  ensureDistricts(next);
+ NPCCOMMERCE.ensure(next);
  for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
   minuteTick(next,m,events);
  next.living.minute+=count;
