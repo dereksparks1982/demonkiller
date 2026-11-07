@@ -17,6 +17,43 @@ let pointer=null,camera={x:0,y:0},lastMove=0,lastDraw=0,animStart=0;
 const visual={x:0,y:0,queue:[]};
 function resetVisual(){if(player){visual.x=player.x;visual.y=player.y;visual.queue.length=0;}}
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
+// M31: nearby entities arrive through bounded server-sector deltas.
+// This is client display state only; the server remains authoritative.
+let sectorView=null,sectorCursor=null,sectorPolling=false,sectorErrors=0;
+function nearbyDisplay(kind,fallback){
+ const view=sectorView;
+ if(!view||!area||!player||view.area_id!==area.area_id||
+    Math.abs(player.x-view.origin.x)>12||
+    Math.abs(player.y-view.origin.y)>12)return fallback;
+ const entries=[...view.entities.values()].filter(x=>x.kind===kind);
+ if(kind==='scavenger')return entries.map(x=>({...x,kind:x.type}));
+ return entries;
+}
+async function refreshSectorInterest(){
+ if(!SERVER||!player||sectorPolling||!area)return;
+ sectorPolling=true;
+ const requestArea=area.area_id;
+ try{
+  const state=await SERVER.sectorInterest(sectorCursor,24);
+  if(!area||state.area_id!==area.area_id||requestArea!==area.area_id){
+   sectorView=null;sectorCursor=null;return;
+  }
+  if(state.reset||!sectorView||sectorView.area_id!==state.area_id)
+   sectorView={area_id:state.area_id,origin:state.origin,
+    entities:new Map(),sectors:[]};
+  sectorView.origin=state.origin;
+  sectorView.sectors=state.sectors;
+  for(const key of state.removed)sectorView.entities.delete(key);
+  for(const entry of state.upsert)
+   sectorView.entities.set(entry.kind+':'+entry.id,entry);
+  sectorCursor=state.cursor;sectorErrors=0;
+  draw();
+ }catch(error){
+  sectorErrors++;
+  if(sectorErrors>=2){sectorView=null;sectorCursor=null;}
+ }finally{sectorPolling=false;}
+}
+
 function image(path){
  if(images.has(path))return images.get(path);
  const img=new Image();img.src='./assets/art/'+path;img.onload=draw;
@@ -40,7 +77,7 @@ async function loadArea(id){
  area=SERVER?(await SERVER.area(id)).area:previewArea(id);
  if(!area||!area.floor||area.floor.length!==area.width*area.height)
   throw Error('Invalid region geometry');
- if(changed)resetVisual();
+ if(changed){resetVisual();sectorView=null;sectorCursor=null;}
  $('areaName').textContent=title();
  const door=area.objects.find(o=>o.id==='courtyard_temple_door');
  if(door){if(SERVER)doorOpen=!!door.open;else door.open=doorOpen;}
@@ -135,7 +172,7 @@ function drawObject(o){
 }
 function drawNpcs(){
  if(!living)return;
- for(const n of Object.values(living.npcs||{})){
+ for(const n of nearbyDisplay('npc',Object.values(living.npcs||{}))){
   if(!n.alive||n.area_id!==area.area_id)continue;
   const x=n.x*TILE,y=n.y*TILE;
   px('#1d1b24',x+10,y+24,12,6);
@@ -153,7 +190,7 @@ function drawNpcs(){
 }
 function drawMonsters(){
  if(!living?.combat)return;
- for(const n of Object.values(living.combat.creatures||{})){
+ for(const n of nearbyDisplay('monster',Object.values(living.combat.creatures||{}))){
   if(!n.alive||n.area_id!==area.area_id)continue;
   const x=n.x*TILE,y=n.y*TILE;
   px('#201920',x+9,y+24,15,5);px('#793348',x+10,y+13,13,13);
@@ -185,7 +222,7 @@ function drawTerrainMarks(){
 // M30 graves and carrion animals are saved world objects, rendered beneath
 // characters without changing the approved collision or walking system.
 function drawBurials(){
- for(const grave of Object.values(living?.burials||{})){
+ for(const grave of nearbyDisplay('grave',Object.values(living?.burials||{}))){
   if(grave.area_id!==area.area_id)continue;
   const x=grave.x*TILE,y=grave.y*TILE;
   px('#40372f',x+4,y+21,25,8);
@@ -201,7 +238,7 @@ function drawBurials(){
  }
 }
 function drawScavengers(){
- for(const animal of Object.values(living?.scavengers||{})){
+ for(const animal of nearbyDisplay('scavenger',Object.values(living?.scavengers||{}))){
   if(animal.area_id!==area.area_id)continue;
   const x=animal.x*TILE,y=animal.y*TILE;
   if(animal.kind==='raven'){
@@ -220,7 +257,7 @@ function drawScavengers(){
  }
 }
 function drawCorpses(){
- for(const body of Object.values(living?.mobile_assets?.corpses||{})){
+ for(const body of nearbyDisplay('corpse',Object.values(living?.mobile_assets?.corpses||{}))){
   if(body.area_id!==area.area_id)continue;
   const x=body.x*TILE,y=body.y*TILE;
   const monster=body.kind==='monster'||body.species==='demon';
@@ -1060,6 +1097,8 @@ async function begin(){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
    await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors(),refreshNpcCommerce(),refreshWorkshops(),refreshNpcAI(),refreshNpcHarvest(),refreshNpcSuccession(),refreshCaravans()]);
+   await refreshSectorInterest();
+   setInterval(refreshSectorInterest,1750);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
    setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);setInterval(refreshWorkshops,15000);setInterval(refreshNpcAI,10000);setInterval(refreshNpcHarvest,15000);setInterval(refreshNpcSuccession,15000);setInterval(refreshCaravans,15000);
   }else{
