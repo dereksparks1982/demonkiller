@@ -75,6 +75,7 @@ label{cursor:pointer}
 <h2 id="slotsHeading">SELECT A RECORD</h2>
 <p id="slotsHelp">One character. One life.</p>
 <div id="slots" class="slots"></div>
+<button id="deleteSave" class="action secondary" type="button">DELETE SAVED CHARACTER</button>
 <button class="action secondary back" type="button">BACK</button>
 </section>
 <section class="screen panel" id="nameScreen" hidden aria-label="Name registration">
@@ -196,6 +197,19 @@ function readSlots(){
  return [null];
 }
 function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
+function eraseLocalCharacter(){for(const key of [SLOTS_KEY,ACTIVE_KEY,'dkSoftworks.demonkiller.outdoors.preview.v1','dkSoftworks.demonkiller.testCenter.v1','dkSoftworks.demonkiller.architectLocalBackup.v1'])localStorage.removeItem(key);}
+$('deleteSave').addEventListener('click',async()=>{
+ if(SERVER){notice('This server does not expose character deletion yet. Browser data cannot delete server-owned characters.');return;}
+ const record=readSlots()[0];if(!record){notice('There is no saved character to delete.');return;}
+ if(!window.confirm('Permanently delete '+record.name+' and its browser save? This cannot be undone.'))return;
+ eraseLocalCharacter();await openSlots('new');notice('Saved character deleted. You can begin a new life.');
+});
+// The retired browser prototype save is discarded once when this interface first opens.
+const UO_MIGRATION='dkSoftworks.demonkiller.uoReset.v1';
+try{if(localStorage.getItem(UO_MIGRATION)!=='1'){
+ eraseLocalCharacter();localStorage.setItem(UO_MIGRATION,'1');
+}}catch(_){}
+
 async function launch(id){
  if(SERVER){
    await SERVER.startWorld();
