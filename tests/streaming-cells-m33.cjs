@@ -3,6 +3,8 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),R=require('../server/regions.cjs');
 const CELLS=require('../server/streaming-cells-m33.cjs');
+const SECTORS=require('../server/sectors-m10.cjs');
+const INTEREST=require('../server/sector-interest-m31.cjs');
 const REGIONS=require('../server/region-policies-m16.cjs');
 const {deleteCharacter}=require('../server/character-lifecycle-m26.cjs');
 const {createDKServer}=require('../server/dk-server.cjs');
@@ -136,4 +138,21 @@ test('M33 read-only streaming-cell API reflects saved player location and is ret
   assert.equal(again.world.living.streaming_cells.records[CELLS.rootId(R.TEMPLE)].visits,1);
   W.validateWorld(again.world);
  }finally{await again.close();}
+});
+
+test('M33 existing sector stream points into the parent Streaming Cell hierarchy',()=>{
+ const w=sample();
+ const index=SECTORS.build(w);
+ const fixtures=[...index.sectors.values()].flat().filter(o=>o.kind==='fixture');
+ const courtTemple=fixtures.find(o=>o.id==='temple_exterior');
+ const villageBank=fixtures.find(o=>o.id==='village_bank');
+ assert.equal(courtTemple.cell_id,CELLS.objectCellId(R.COURT,'temple_exterior'));
+ assert.equal(villageBank.cell_id,CELLS.objectCellId(R.VILLAGE,'village_bank'));
+ const inTemple=INTEREST.nearbySectors(w);
+ assert.equal(inTemple.streaming_cell_id,CELLS.rootId(R.TEMPLE));
+ w.characters['1'].area_id=R.VILLAGE;w.characters['1'].x=64;w.characters['1'].y=126;
+ const manifest=INTEREST.terrainManifest(w,{area_id:R.VILLAGE});
+ assert.equal(manifest.streaming_cell_id,CELLS.rootId(R.VILLAGE));
+ const chunk=INTEREST.terrainChunk(w,{area_id:R.VILLAGE,sx:4,sy:7});
+ assert.equal(chunk.streaming_cell_id,CELLS.rootId(R.VILLAGE));
 });
