@@ -801,15 +801,47 @@ function pointerPosition(e){
  if(!r.width||!r.height)return null;
  return {x:(e.clientX-r.left)/r.width*VIEW,y:(e.clientY-r.top)/r.height*VIEW};
 }
-function pointerMove(){
- if(!rightHeld||!pointer||busy||!player||!area)return;
- // Cursor stays screen-relative as the camera follows the moving character.
+function pointerMove(dt){
+ if(!rightHeld||!pointer||busy||!player||!area||dt<=0)return;
+ // The cursor is screen-relative as the camera follows the character.
  const dx=camera.x+pointer.x-(visual.x+.5);
  const dy=camera.y+pointer.y-(visual.y+.5);
- if(Math.hypot(dx,dy)<.4)return;
+ const distance=Math.hypot(dx,dy);
+ if(distance<.08)return;
  const direction=Math.abs(dx)>=Math.abs(dy)?
   dx>0?'east':'west':dy>0?'south':'north';
- step(direction);
+ if(SERVER){
+  // The saved world validates discrete steps. Those are rendered smoothly.
+  step(direction);
+  return;
+ }
+ // In the browser preview, RMB walking is genuinely continuous. The
+ // authoritative tile address changes only when the visual centre crosses
+ // into the next grid cell. No diagonal movement, snaps, or step timer.
+ if(visual.queue.length)return;
+ const speed=distance>4?5.6:3.1;
+ let ax=0,ay=0;
+ if(Math.abs(dx)>=Math.abs(dy))ax=Math.sign(dx)*Math.min(Math.abs(dx),speed*dt);
+ else ay=Math.sign(dy)*Math.min(Math.abs(dy),speed*dt);
+ const nx=visual.x+ax,ny=visual.y+ay;
+ const tx=Math.round(nx),ty=Math.round(ny);
+ if(tx!==player.x||ty!==player.y){
+  const link=R.portal(previewWorld(),area.area_id,tx,ty);
+  if(link?.blocked){message('The temple door is closed. Double-click to open it.');return;}
+  if(link){
+   rightHeld=false;
+   player={...player,...link};
+   if(player.area_id===R.TEMPLE){returnTemple();return;}
+   loadArea(player.area_id);
+   persistPreview();
+   return;
+  }
+  if(!R.traversable(area,tx,ty,player.form))return;
+  player.x=tx;player.y=ty;
+  persistPreview();
+ }
+ visual.x=nx;visual.y=ny;
+ player.facing=direction;
 }
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('mousedown',e=>{if(e.button===2){e.preventDefault();pointer=pointerPosition(e);rightHeld=true;canvas.focus();}});
@@ -887,7 +919,7 @@ function advanceVisual(dt){
 function frame(now){
  if(now-lastDraw>=16){
   const dt=lastDraw?Math.min((now-lastDraw)/1000,.06):0;
-  pointerMove();
+  pointerMove(dt);
   advanceVisual(dt);
   if(area)draw();
   lastDraw=now;
