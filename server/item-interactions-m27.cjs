@@ -114,7 +114,7 @@ function take(world,command){
   source.amount-=qty;
   const created='ent_'+r.next_serial++;
   r.items[created]={serial:created,kind:'item',type:source.type,amount:qty,
-    parent:R.PACK,created_minute:next.living.minute};
+    parent:source.parent,created_minute:next.living.minute};
   type='item.split';text='A backpack stack was divided.';
   eventFields={source_serial:source.serial,new_serial:created,quantity:qty};
  }else{
