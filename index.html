@@ -207,7 +207,7 @@ async function launch(id){
   let outdoor=null;try{outdoor=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.outdoors.preview.v1')||'null');}catch(_){}
   location.href=outdoor&&outdoor.firstCourtyardSeen&&
     ['dk.courtyard.lilith.001','dk.village.001'].includes(outdoor.area_id)?
-    './outdoor.html?v=0.2.44':'./test-center.html?v=0.2.44';
+    './outdoor.html?v=0.2.45':'./test-center.html?v=0.2.45';
 }
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }

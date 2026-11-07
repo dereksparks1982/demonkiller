@@ -90,3 +90,7 @@ Reviewed RunUO `Scripts/Mobiles/AI/BaseAI.cs` for its separate Wander, Combat, G
 ## Milestone 22: Harvesting and item custody (v0.2.44)
 
 RunUO's `Scripts/Engines/Harvest/Mining.cs` and harvesting architecture inform the physical source → worker backpack → vendor storeroom loop. Demon Killer's independent JavaScript now has persistent collection trips using actual collision, finite node availability, M10 item serials, M12 NPC containers and M20 paid workshops. Village produce is a real resource patch, not an automatically materialized merchant output. Full professions, harvesting tools, material grades and traveling supply chains remain future slices.
+
+## Milestone 23: Spawn entries and permanent NPC succession (v0.2.45)
+
+RunUO's `Scripts/Regions/Spawning/SpawnEntry.cs` and `Scripts/Engines/Spawner/Spawner.cs` showed why settlement population must be separate from a particular mobile's lifespan. Demon Killer implements a **non-resurrection** variant for ten important jobs: when a resident dies, a bounded world-time hiring process can appoint a different character if safe territory and real business funds permit it. The previous person, corpse and assets remain part of the simulation, and shops/harvesters/courier jobs follow newly assigned living holders. No RunUO code was copied, and a full civilian population/estate or MMO spawning system remains future work.

@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M23 (v0.2.45)
+
+Settlements now track **posts rather than permanent immortal NPC holders**. The ten fixed occupations have a saved current holder; a worker's death vacates their job without resurrecting or deleting that individual. M11 schedules a recruitment check every 120 running world minutes. After at least a 120-minute vacancy and only in a safe settled territory, the paying business may hire a new NPC for 12 real coins. Every successor starts with their own serial identity, personal inventory, AI brain, home location and district, while the deceased retains their corpse, possessions and history. Existing merchant stock and economic ledgers remain associated with the business, not the person.
+
+M18/20 owner resolution, M22 source harvesting and M11 courier deliveries now follow the **current** proprietor or courier. Recruitment is funded, bounded to 96 NPC records, idempotent and saved with the authoritative world snapshot and event archive. The connected game exposes local-only appointment information. The public GitHub Pages page is still a browser preview and cannot run these timers independently.
+
 ## Implemented milestone: DK Server M22 (v0.2.44)
 
 The first RunUO-inspired NPC harvesting jobs use actual M5 resource nodes, M6 physical travel, M10 serial identities, M12 personal backpacks and M18 vendor storerooms. Workers physically gather and deliver finite goods: the herbalist collects courtyard herbs; the market vendor collects produce from a new verified walkable village patch; the blacksmith carries ore and wood back to the smithy for M20 workshop inputs. Resource counters and world item identities remain reconciled during each harvest and delivery transaction. Goals persist and can span world days; M21 combat alarm states pause collection. Businesses no longer operate when their living proprietor is physically absent.

@@ -49,9 +49,10 @@ function pickNode(world,n,rule){
 function plan(world,minute,events){
  if(minute%15!==0)return;
  ensure(world);const s=world.living.npc_harvest;
- for(const [npcId,rule] of Object.entries(HARVESTERS)){
+ for(const [postId,rule] of Object.entries(HARVESTERS)){
+  const npcId=world.living.businesses[rule.shop_id]?.owner_id||postId;
   // Allow the early village marketplace customer cycle before its owner leaves.
-  if(npcId==='market_vendor'&&minute<120)continue;
+  if(postId==='market_vendor'&&minute<120)continue;
   if(s.goals[npcId]||minute<(s.last_trip[npcId]??-1000)+15)continue;
   const n=world.living.npcs[npcId],node=pickNode(world,n,rule);
   if(!node||!world.entity_registry?.containers?.['npc_pack_'+npcId])continue;
@@ -128,9 +129,12 @@ function validate(world){
   !Number.isSafeInteger(s.delivered)||s.delivered<0||s.delivered>s.collected)
   throw Error('Invalid NPC harvesting state');
  for(const [id,g] of Object.entries(s.goals)){
-  if(!HARVESTERS[id]||!world.living.npcs[id]||!g||g.npc_id!==id||
+  const approved=Object.entries(HARVESTERS).some(([founder,rule])=>
+   rule.shop_id===g?.shop_id&&
+   (id===founder||world.living.businesses[g.shop_id]?.owner_id===id));
+  if(!world.living.npcs[id]||!g||g.npc_id!==id||
+   !approved||
    !world.living.resources?.[g.node_id]||
-   g.shop_id!==HARVESTERS[id].shop_id||
    !['to_node','to_shop'].includes(g.phase)||
    g.item_type!==world.living.resources[g.node_id].type||
    !Number.isSafeInteger(g.accepted_minute)||g.accepted_minute<0||
@@ -139,7 +143,7 @@ function validate(world){
    throw Error('Invalid NPC harvest goal');
  }
  for(const [id,minute] of Object.entries(s.last_trip))
-  if(!HARVESTERS[id]||!Number.isSafeInteger(minute)||minute<0)
+  if(!world.living.npcs[id]||!Number.isSafeInteger(minute)||minute<0)
    throw Error('Invalid NPC harvest trip date');
  return true;
 }

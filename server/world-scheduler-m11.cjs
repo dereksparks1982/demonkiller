@@ -6,13 +6,15 @@ const {COURT,VILLAGE}=require('./regions.cjs');
 const {expire:expireCorpses}=require('./mobile-assets-m12.cjs');
 const {merchandises,total:vendorTotal,CAPACITY:VENDOR_CAPACITY}=require('./vendors-m18.cjs');
 const {run:workshopRun,RECIPES:WORKSHOP_RECIPES}=require('./workshops-m20.cjs');
+const {run:recruitResident}=require('./npc-succession-m23.cjs');
 const JOBS=Object.freeze({
   postal_dispatch:{every:1,priority:0},
   camp_rotation:{every:90,priority:1},
   shop_restock:{every:120,priority:1},
   guard_payroll:{every:360,priority:2},
   corpse_cleanup:{every:60,priority:2},
-  workshop_batch:{every:120,priority:0}
+  workshop_batch:{every:120,priority:0},
+  vacancy_recruitment:{every:120,priority:2}
 });
 const MAX_JOBS=2048,MAX_PER_MINUTE=128;
 function future(minute,interval){
@@ -77,7 +79,7 @@ function event(world,minute,type,text,details={}){
 }
 function postal(world,minute,out){
   const l=world.living;
-  const courier=l.npcs.courier;
+  const courier=l.npcs[l.succession?.posts?.courier?.holder_id||'courier'];
   if(!courier?.alive||courier.area_id!==VILLAGE||
     Math.abs(courier.x-54)+Math.abs(courier.y-103)>3)return;
   for(let i=l.mail.outbound.length-1;i>=0;i--){
@@ -130,7 +132,8 @@ function payroll(world,minute,out){
 }
 const HANDLERS=Object.freeze({
   postal_dispatch:postal,camp_rotation:camp,shop_restock:restock,guard_payroll:payroll,
-  corpse_cleanup:expireCorpses,workshop_batch:workshopRun
+  corpse_cleanup:expireCorpses,workshop_batch:workshopRun,
+  vacancy_recruitment:recruitResident
 });
 function runMinute(world,minute,out){
   ensure(world);

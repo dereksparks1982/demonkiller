@@ -1,5 +1,16 @@
 # Demon Killer Changelog
 
+## v0.2.45 / DK Server M23 | 2026-11-06 | NPC succession and vacancy recruitment
+
+- Added server-owned, validated settlement posts for ten essential village and courtyard roles. Each post remembers its current occupant, vacancy and appointment history. Existing M22 worlds migrate without resetting businesses, corpses or inventories.
+- Added a seventh persistent scheduler job every 120 world minutes. Recruitment waits at least 120 world minutes after a death, respects monster-held territory and NPC-count limits, and transfers 12 real coins from the supporting business into the new resident's wallet.
+- New replacements are distinct NPCs with their own immutable world identities, M12 backpacks, M16 district records, M21 behavior and starting locations; dead predecessors, possessions, history and corpses remain unchanged.
+- The live owner of the affected business changes without duplicating its stock. The shop closes until the new owner reaches its actual counter.
+- Updated M22 harvesting to resolve the *current* blacksmith, market vendor and herbalist by business owner ID, and M11's courier delivery to use the current post holder.
+- Added nearby-only `GET /api/v1/npc-succession` status and outdoor worker-appointment reporting. Updated M11 scheduler tests and added focused M23 regression tests.
+- Isolated JS checks passed for funded recruitment, identity uniqueness, repeat-hire prevention, forgery rejection, and successor market harvesting through real item serials. The full checkout Node integration suite has **not** yet been executed.
+- RunUO spawner and spawn-entry behavior was studied for architectural guidance only. No GPL sources or artworks, extra character slot or public server hosting were added.
+
 ## v0.2.44 / DK Server M22 | 2026-11-06 | NPC harvesting, finite resources and shop deliveries
 
 - Added saved NPC harvesting goals that take real market, herbalist and smithy workers to actual resource patches, collect a unit, and return to their storefront with a persistent M10 item serial.

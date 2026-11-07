@@ -2,7 +2,18 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.44 | DK Server M22, Physical NPC Resource Harvesting
+## Current milestone: v0.2.45 | DK Server M23, Settlement Succession and Vacant Posts
+
+### M23: Settlements can replace their dead workers
+
+- **Persistent civic and business posts:** Ten roles, including banker, baker, smith, market keeper, innkeeper, herbalist, guards, courier and courtyard caretaker, belong to settlements rather than immortal NPC IDs. Each post remembers its current holder and hiring history.
+- **Death remains permanent for that resident:** If an NPC dies, their existing identity, body, possessions, home history and final events remain intact. After at least 120 running world minutes, the settlement may appoint a **new** NPC with a different permanent ID.
+- **Hiring costs real money:** The relevant shop or village bank must pay 12 existing coins into the recruit's pocket. Recruitment stops if the business is broke, the territory is overrun by monsters or the limited population cap is reached.
+- **Real handover:** The business's owner ID changes without wiping its customer history or existing merchandise. The new employee begins with a separate personal pack, a saved behavior record, physical home coordinates, and their own NPC identity. Shops remain closed until the new owner physically reaches the counter.
+- **Dynamic production:** M22 resource harvesting uses the *current* market, herb or smithy proprietor rather than hard-coding the first NPC. Their replacement can resume carrying finite resources from actual map patches into business stock. M11 bank mail likewise follows the current courier.
+- **RunUO reference:** Region spawners inspired the independent timed-vacancy architecture, not direct RunUO code. These are newly hired fictional residents, not magical respawns of the dead.
+- **Read-only status:** `GET /api/v1/npc-succession` reports overall recruitment and only nearby named posts. The outdoor sidebar shows those appointments when the real DK Server is connected.
+- **Boundaries:** Ten predefined posts, a 96-NPC population cap, no birth/genetic system or formal inheritance law yet. The public webpage still lacks a hosted persistent backend, and no second player slot was added.
 
 ### M22: Raw materials move through the world
 

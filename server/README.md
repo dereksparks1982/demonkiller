@@ -1,4 +1,4 @@
-# DK Server M22 | Physical NPC Harvesting and Deliveries (v0.2.44)
+# DK Server M23 | Persistent Settlement Recruitment and NPC Succession (v0.2.45)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -242,3 +242,13 @@ The source node is shared with player gathering. A new `village_produce` resourc
 `GET /api/v1/npc-harvest` is read-only and reports saved harvesting/delivery counts and player-nearby goals, not hidden distant locations. `tests/npc-harvest-m22.cjs` includes M21 migration, finite resources, item custody, smithy raw material inputs, danger interruption, world time simulation and HTTP method checks. A focused JavaScript physical item transfer test passed; the full Node and browser suites remain unrun in this environment.
 
 No RunUO GPL code was reused; the design was independently informed by Ultima Online's resource harvesting and vendor stock systems. The public GitHub Pages preview still cannot run an always-on server.
+
+## M23 RunUO-inspired settlement posts and recruiting
+
+`server/npc-succession-m23.cjs` maintains ten fixed **posts**, with individually saved holder IDs, vacancy records and appointments. When the current occupant dies, their exact NPC identity remains dead and their M12 corpse, belongings, estate and events remain untouched. A deterministic recurring `vacancy_recruitment` scheduler job runs each 120 *simulated* minutes. It appoints a fresh identity only after a 120-minute vacancy, only if the settlement belongs to settlers, only if the corresponding business has 12 actual coins, and only while the world has room for more NPC records (currently 96). The business pays the recruit, rather than money or provisions appearing as a side effect of the job.
+
+New NPCs start at a traversable home tile, inherit the professional *role* but not the predecessor's inventory, money or identity, and receive separate M12 backpack, M21 behavior and M16 district records and M10 entity serial. The existing M18/M20 business now points to the new owner ID and remains closed until the worker is physically at the storefront. M22 harvesting and the M11 postal courier resolve the **current** job holder dynamically, allowing operations to resume even when the first smith, market vendor or courier dies. Guards are living replacements rather than resurrection. A successor's later death triggers the same vacancy cycle again, subject to caps and funding.
+
+`GET /api/v1/npc-succession` is read-only and reveals only posts physically close to the current character, plus aggregate hire counts. No client is allowed to appoint or resurrect residents. `tests/npc-succession-m23.cjs` checks migration, money conservation, hiring delay, idempotence, occupation and insufficient-funds holds, dynamic production, successor courier delivery and local-only API reporting. The existing M11 scheduler test suite now expects the seventh persisted job. This is independently inspired by RunUO's `Scripts/Regions/Spawning/SpawnEntry.cs` and `Scripts/Engines/Spawner/Spawner.cs`; their GPL source code was not copied.
+
+**Limitations:** No unrestricted dynamic population, childbirth, probate, orphan stewardship, factional elections, permanent hosted world or multiplayer. The settlement may reach its 96-record bound after many deaths; dead residents are deliberately retained rather than silently erased.
