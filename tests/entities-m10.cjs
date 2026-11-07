@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),G=require('../server/gameplay.cjs');
@@ -13,7 +14,7 @@ function fixture(){
  c.area_id=R.VILLAGE;c.x=54;c.y=103;
  c.inventory.herbs=10;c.inventory.tools=1;
  w.living.businesses.village_bank.open=true;
- E.reconcile(w);E.counts(w);W.validateWorld(w);
+ syncAll(w);E.reconcile(w);E.counts(w);W.validateWorld(w);
  return w;
 }
 function item(world,type,parent){
