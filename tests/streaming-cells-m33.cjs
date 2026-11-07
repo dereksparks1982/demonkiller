@@ -130,7 +130,7 @@ test('M33 read-only streaming-cell API reflects saved player location and is ret
  assert.equal(view.visited.visits,1);
  assert.equal((await fetch(base+'/api/v1/streaming-cells?radius=99')).status,422);
  assert.equal((await fetch(base+'/api/v1/streaming-cells',{method:'POST',
-  headers:{'content-type':'application/json'},body:'{}'})).status,404);
+  headers:{'content-type':'application/json'},body:'{}'})).status,405);
  await app.close();
  const again=await createDKServer({dataDir:dir,port:0,now:()=>NOW+5000});
  try{
