@@ -34,6 +34,7 @@ const {ensure:ensureSuccession,listing:successionListing}=require('./npc-success
 const {ensure:ensureCaravans,listing:caravanListing}=require('./caravan-logistics-m24.cjs');
 const {ensure:ensureScavengers}=require('./scavengers-m30.cjs');
 const {ensure:ensureBurials}=require('./burials-m30.cjs');
+const {ensure:ensureCells,streamingView:cellView}=require('./streaming-cells-m33.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -171,6 +172,7 @@ async function createDKServer({
     const caravanAdded=ensureCaravans(world);
     const scavengersAdded=ensureScavengers(world);
     const burialsAdded=ensureBurials(world);
+    const cellsAdded=ensureCells(world);
     assertEntityCounts(world);
     // A stopped world stays frozen. No NPC catch-up or world time is simulated
     // during an intentional server shutdown or an offline host restart.
@@ -178,7 +180,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -354,7 +356,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m32', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m33', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -421,6 +423,18 @@ async function createDKServer({
     }
     if(url.pathname==='/api/v1/schedule'&&!write){
       return sendJSON(res,200,{...schedulerListing(world),revision:world.revision},method);
+    }
+    if(url.pathname==='/api/v1/streaming-cells'&&!write){
+      if(!world.characters['1'])
+        return sendJSON(res,404,{error:'No character exists'},method);
+      const input=url.searchParams.get('radius'),radius=input===null?24:Number(input);
+      if(!Number.isInteger(radius)||radius<8||radius>32)
+        return sendJSON(res,422,{error:'Invalid streaming cell radius'},method);
+      try{return sendJSON(res,200,cellView(world,{radius}),method);}
+      catch(error){
+        console.error('Streaming-cell view failed:',error);
+        return sendJSON(res,500,{error:'Streaming cells unavailable'},method);
+      }
     }
     if(url.pathname==='/api/v1/sectors/interest'&&!write){
       const character=world.characters['1'];
