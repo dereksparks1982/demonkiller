@@ -3,6 +3,7 @@
 // and fixed-size map chunks. Derived from world state; never a save authority.
 const crypto=require('node:crypto');
 const S=require('./sectors-m10.cjs');
+const {rootId}=require('./streaming-cells-m33.cjs');
 const SIZE=S.SECTOR_SIZE;
 const MIN_RADIUS=8,MAX_RADIUS=32,DEFAULT_RADIUS=24;
 const MAX_SESSIONS=16,EXPIRE_MS=90_000,MAX_OBJECTS=2048;
@@ -43,7 +44,8 @@ function nearbySectors(world,slot=1,radius=DEFAULT_RADIUS){
   tiles.push({key:S.key(c.area_id,sx,sy),sx,sy,tier,
    ...sectorBounds(area,sx,sy)});
  }
- return {area_id:c.area_id,origin:{x:c.x,y:c.y},sector:home,
+ return {area_id:c.area_id,streaming_cell_id:rootId(c.area_id),
+  origin:{x:c.x,y:c.y},sector:home,
   radius,world_minute:world.living?.minute??0,sectors:tiles};
 }
 function tierFor(world,area_id,x,y){
@@ -68,7 +70,8 @@ function terrainManifest(world,{slot=1,area_id}={}){
  const {c}=position(world,slot),area=world.areas?.[area_id];
  if(!area||c.area_id!==area_id)
   throw Error('Sector is outside the current region');
- return {schema:area.schema||1,area_id,width:area.width,height:area.height,
+ return {schema:area.schema||1,area_id,streaming_cell_id:rootId(area_id),
+  width:area.width,height:area.height,
   tile_size:area.tile_size,sector_size:SIZE,world_revision:world.revision,
   sectors_x:Math.ceil(area.width/SIZE),sectors_y:Math.ceil(area.height/SIZE),
   objects:area.objects.map(o=>structuredClone(o))};
@@ -98,7 +101,8 @@ function terrainChunk(world,{slot=1,area_id,sx,sy}){
    o.y<bounds.y+bounds.height&&o.y+h>bounds.y;
  }).map(o=>({id:o.id,type:o.type,x:o.x,y:o.y,
   w:o.w||1,h:o.h||1,open:o.open??null}));
- return {area_id,sx,sy,sector_size:SIZE,bounds,
+ return {area_id,streaming_cell_id:rootId(area_id),
+  sx,sy,sector_size:SIZE,bounds,
   layers,objects,world_revision:world.revision};
 }
 function sectorEntities(index,visible){
