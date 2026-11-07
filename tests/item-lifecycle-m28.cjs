@@ -88,7 +88,7 @@ test('M28 house, village chest and ground transfers enforce actual access',()=>{
  assert.throws(()=>command(far,'move_stack',{serial,destination:E.PACK}),/accessible/);
  const retrieved=command(chest.world,'move_stack',{serial,destination:E.PACK});
  const yard=structuredClone(retrieved.world),char=yard.characters['1'];
- char.area_id=COURT;char.x=20;char.y=30;E.reconcile(yard);
+ char.area_id=COURT;char.x=20;char.y=30;syncAll(yard);E.reconcile(yard);
  const dropped=command(yard,'move_stack',{serial,destination:'ground'});
  assert(dropped.world.entity_registry.items[serial].parent.startsWith('ground_'));
  assert.equal(dropped.world.characters['1'].inventory.herbs,0);
@@ -99,7 +99,7 @@ test('M28 house, village chest and ground transfers enforce actual access',()=>{
  house.characters['1'].area_id=deed.area_id;
  house.characters['1'].x=deed.door_x;
  house.characters['1'].y=deed.door_y;
- E.reconcile(house);
+ syncAll(house);E.reconcile(house);
  const storageId=deed.storage_id;
  assert(I.backpack(house).containers.some(c=>c.id===storageId));
  const transferred=command(house,'move_stack',{serial,destination:storageId});
