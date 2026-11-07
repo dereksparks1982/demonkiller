@@ -66,8 +66,12 @@ test('A nearby living character can loot exactly once, preserving item identity'
  const result=G.apply(w,{action:'loot_corpse',corpse_id:corpse.id});
  assert.equal(result.character.gold,before+corpse.coins);
  assert.equal(result.world.entity_registry.items[id].parent,E.PACK);
- assert.equal(result.world.living.mobile_assets.corpses[corpse.id],undefined);
- assert.throws(()=>G.apply(result.world,{action:'loot_corpse',corpse_id:corpse.id}),/Move beside/);
+ const remains=result.world.living.mobile_assets.corpses[corpse.id];
+ assert(remains,'looting does not remove the body');
+ assert.equal(remains.looted,true);
+ assert.equal(remains.coins,0);
+ assert.equal(remains.bag_id,null);
+ assert.throws(()=>G.apply(result.world,{action:'loot_corpse',corpse_id:corpse.id}),/Nothing remains/);
  E.counts(result.world);W.validateWorld(result.world);
 });
 test('Ghosts, distant players and forged loot commands cannot recover NPC wealth',()=>{
@@ -78,15 +82,24 @@ test('Ghosts, distant players and forged loot commands cannot recover NPC wealth
  const ghost=structuredClone(w);ghost.characters['1'].form='ghost';ghost.characters['1'].opening_state='complete';
  assert.throws(()=>G.apply(ghost,{action:'loot_corpse',corpse_id:corpse.id}),/Ghosts/);
 });
-test('Scheduled corpse decay frees containers and item records after 720 world minutes',()=>{
- const w=fixture(),{corpse}=kill(w);
- const bag=corpse.bag_id,events=[];
- for(let m=1;m<=720;m++){
+test('M29 scheduler retains stages and finally returns unclaimed NPC possessions to earth',()=>{
+ const w=fixture(),{corpse}=kill(w),events=[];
+ const bag=corpse.bag_id;
+ for(let m=1;m<=180;m++){
    S.runMinute(w,m,events);w.living.minute=m;
  }
- assert.equal(w.living.mobile_assets.corpses[corpse.id],undefined);
+ assert.equal(w.living.mobile_assets.corpses[corpse.id].stage,'early');
+ assert(events.some(e=>e.type==='corpse.stage'&&e.to==='early'));
+ const decay=require('../server/mobile-assets-m12.cjs');
+ decay.expire(w,720,events);
+ assert.equal(w.living.mobile_assets.corpses[corpse.id].stage,'decaying');
+ decay.expire(w,2160,events);
+ assert.equal(w.living.mobile_assets.corpses[corpse.id].stage,'skeletal');
+ decay.expire(w,4320,events);
  assert.equal(w.entity_registry.containers[bag],undefined);
- assert.equal(Object.values(w.entity_registry.items).some(i=>i.parent===bag),false);
+ assert.equal(w.living.mobile_assets.corpses[corpse.id].stage,'scattered');
+ decay.expire(w,10080,events);
+ assert.equal(w.living.mobile_assets.corpses[corpse.id],undefined);
  assert(events.some(e=>e.type==='corpse.decayed'));
  E.reconcile(w);E.counts(w);W.validateWorld(w);
 });
@@ -106,7 +119,7 @@ test('HTTP corpse inspection and looting persist into the single world file',asy
   body:JSON.stringify({action:'loot_corpse',corpse_id:corpse.id})});
  assert.equal(result.status,200);
  const disk=JSON.parse(await fs.readFile(path.join(dir,'world.json'),'utf8'));
- assert.equal(disk.living.mobile_assets.corpses[corpse.id],undefined);
+ assert.equal(disk.living.mobile_assets.corpses[corpse.id].looted,true);
  assert.equal(disk.characters['1'].gold,25);
  await app.close();
 });
