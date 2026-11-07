@@ -80,9 +80,9 @@ test('M27 rejects forged, missing, inaccessible, incompatible and overlarge acti
  assert.throws(()=>M.take(paused,{action:'use_item',serial:s}),/paused/);
 });
 test('M27 HTTP inventory endpoint is isolated to the local game',async t=>{
- const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m27-'));t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m27-'));t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true});});
  const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
- t.after(()=>app.server.listening?app.close():Promise.resolve());
+ 
  const base='http://127.0.0.1:'+app.address.port;
  assert.equal((await fetch(base+'/api/v1/inventory')).status,404);
  const created=await fetch(base+'/api/v1/characters',{method:'POST',
