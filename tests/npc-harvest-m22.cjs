@@ -94,8 +94,9 @@ test('Actual world-time travel eventually completes a nearby producer delivery',
  E.counts(updated);W.validateWorld(updated);
 });
 test('Invalid travel goals and resource forgeries fail world validation',()=>{
- const w=fixture(),n=w.living.npcs.market_vendor;w.living.minute=15;
- H.plan(w,15,[]);
+ const w=fixture(),n=w.living.npcs.market_vendor;w.living.minute=120;
+ H.plan(w,120,[]);
+ assert(w.living.npc_harvest.goals.market_vendor,'market harvest must be scheduled after the 120-minute opening gate');
  w.living.npc_harvest.goals.market_vendor.item_type='fake_ore';
  assert.throws(()=>H.validate(w),/Invalid NPC harvest goal/);
 });
