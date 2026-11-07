@@ -12,7 +12,7 @@ const PREVIEW_KEY='dkSoftworks.demonkiller.outdoors.preview.v1';
 const TEMPLE_SAVE='dkSoftworks.demonkiller.characters.v1';
 const TILE=32,VIEW=20;
 const images=new Map();
-let area=null,world=null,player=null,living=null,gameplay=null,social=null,busy=false,rightHeld=false;
+let area=null,world=null,player=null,living=null,gameplay=null,social=null,law=null,busy=false,rightHeld=false;
 let pointer=null,camera={x:0,y:0},lastMove=0,lastDraw=0,animStart=0;
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
 function image(path){
@@ -394,6 +394,24 @@ function deliverContract(){
  if(!contract)return message('You have no active commission.');
  return socialAction('complete_contract',{contract_id:contract.id});
 }
+async function refreshLaw(){
+ if(!SERVER||!player)return;
+ try{
+  law=await SERVER.law();
+  const p=law.player;
+  const inGuarded=law.area_guarded?'GUARDED VILLAGE':'OUTSIDE GUARDED VILLAGE';
+  $('lawStatus').textContent=inGuarded+' · Fine '+p.fines+' gold · Heat '+p.heat+
+   ' · Citations '+p.citations+(p.detained_until_minute>=law.minute?
+    ' · Held until minute '+p.detained_until_minute:'');
+  $('payFine').disabled=!p.fines;
+ }catch(e){$('lawStatus').textContent='Law records unavailable.';}
+}
+function payFine(){
+ if(!law?.player?.fines)return message('You have no unpaid village fine.');
+ const amount=Math.min(12,law.player.fines,player?.gold||0);
+ if(amount<1)return message('You need gold and must visit the open Village Bank.');
+ return takeAction('pay_fine',{amount});
+}
 async function refreshSkills(){
  if(!SERVER)return;
  try{
@@ -439,7 +457,7 @@ async function takeAction(action,fields={}){
   const result=await SERVER.gameAction(action,fields);
   player=result.character;
   message('Saved: '+result.event.text);
-  await Promise.all([refreshGameplay(),refreshLiving(),refreshSkills()]);
+  await Promise.all([refreshGameplay(),refreshLiving(),refreshSkills(),refreshLaw()]);
  }catch(e){message('Cannot '+action.replaceAll('_',' ')+': '+e.message);}
  finally{busy=false;}
 }
@@ -640,6 +658,7 @@ document.addEventListener('keydown',e=>{
 });
 $('showBank').addEventListener('click',openBank);
 $('skillName').addEventListener('change',refreshSkills);
+$('payFine').addEventListener('click',payFine);
 $('skillApply').addEventListener('click',()=>
  takeAction('skill_lock',{skill:$('skillName').value,lock:$('skillLock').value}));
 $('closeBank').addEventListener('click',()=>{$('bankPanel').hidden=true;});
@@ -693,9 +712,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -710,6 +729,8 @@ async function begin(){
    $('socialStatus').textContent='Social records require DK Server.';
    $('skillStatus').textContent='Training and skill progression require DK Server.';
    $('skillApply').disabled=true;
+   $('lawStatus').textContent='Village law requires DK Server.';
+   $('payFine').disabled=true;
    $('needsStatus').textContent='Crafting and survival need DK Server.';
    $('combatStatus').textContent='Monster combat, NPC remains and loot require DK Server.';
    $('sectorStatus').textContent='The sector index requires DK Server.';

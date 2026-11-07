@@ -19,6 +19,7 @@ const {ensure:ensureScheduler,listing:schedulerListing}=require('./world-schedul
 const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m12.cjs');
 const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
 const {publicRecord:publicSkills}=require('./skills-m14.cjs');
+const {ensure:ensureLaw,listing:lawListing}=require('./law-m15.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -143,6 +144,7 @@ async function createDKServer({
     const entitiesAdded=reconcileEntities(world);
     const schedulerAdded=ensureScheduler(world);
     const mobileAdded=ensureMobileAssets(world);
+    const lawAdded=ensureLaw(world);
     assertEntityCounts(world);
     // A stopped world stays frozen. No NPC catch-up or world time is simulated
     // during an intentional server shutdown or an offline host restart.
@@ -150,7 +152,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -306,7 +308,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m14', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m15', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -405,6 +407,11 @@ async function createDKServer({
         return sendJSON(res,500,{error:'Social transaction could not be saved'});
       }
     }
+    if(url.pathname==='/api/v1/law'&&!write){
+      const c=world.characters['1'];
+      if(!c)return sendJSON(res,404,{error:'No character exists'},method);
+      return sendJSON(res,200,lawListing(world),method);
+    }
     if(url.pathname==='/api/v1/skills'&&!write){
       const c=world.characters['1'];
       if(!c)return sendJSON(res,404,{error:'No character exists'},method);
@@ -427,7 +434,7 @@ async function createDKServer({
           world_revision:result.world.revision,event:result.event});
       }catch(e){
         if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
-        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock/.test(e.message))
+        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock|fine|guard|witness|crime/.test(e.message))
           return sendJSON(res,409,{error:e.message});
         console.error('Player gameplay failed:',e);
         return sendJSON(res,500,{error:'Gameplay transaction was not saved'});

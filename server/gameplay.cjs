@@ -8,6 +8,7 @@ const STORAGE=require('./storage-m9.cjs');
 const ENTITIES=require('./entity-registry-m10.cjs');
 const MOBILE=require('./mobile-assets-m12.cjs');
 const SKILLS=require('./skills-m14.cjs');
+const LAW=require('./law-m15.cjs');
 const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages']);
 const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4};
 const NODES=[
@@ -80,6 +81,7 @@ function bankLocation(world,c){
  return shop;
 }
 function apply(world,command,now=Date.now()){
+ if(command?.action==='pay_fine')return LAW.payFine(world,command);
  if(command?.action==='skill_lock')return SKILLS.applyLock(world,command);
  if(command?.action==='loot_corpse')return MOBILE.loot(world,command);
  if(command?.action==='move_item')return ENTITIES.transfer(world,command);

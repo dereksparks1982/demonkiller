@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.37 / DK Server M15 | 2026-11-06 | Guarded villages and witnessed crime
+
+- Reviewed RunUO `Server/Region.cs`, `Scripts/Regions/GuardedRegion.cs` and `Scripts/Misc/Notoriety.cs` as architectural references. Implemented independent guarded-region, crime-case, witness and legal-status rules without copying GPL C#.
+- Looting a villager's corpse in a functioning settler-controlled village can be witnessed by a living nearby NPC. Only *reported* crimes generate a 12-gold fine, a short wanted period, criminal heat and Town reputation loss. Unwitnessed actions still enter private world history, but guards are not informed magically.
+- Existing village guards can pursue wanted characters across the actual cardinal grid. Guard intervention transfers available gold from the player to bank business funds, or issues a bounded nonfatal detention penalty when money is insufficient.
+- Fine payment at the open Village Bank uses real money and clears the warrant when the debt is settled. Cases, citations, witnesses and outstanding debts persist with M13 checkpoint-backed world saves.
+- Added `GET /api/v1/law`, `pay_fine` gameplay action, a simple outdoor legal-status panel, versioned docs and `tests/law-m15.cjs`. Combined module checks passed for reported/unreported theft, guard payment, bank restitution and world validation. The complete Node and browser test suites remain unverified.
+- No multiplayer, fabricated hosting, jail interior, permanent player death, new artwork, or arbitrary criminal actions introduced.
+
 ## v0.2.36 / DK Server M14 | 2026-11-06 | Skills, training locks and professions
 
 - Reviewed RunUO `Server/Skills.cs` and `Scripts/Misc/SkillCheck.cs` for the independent design of individual fixed-point skill ratings, training locks, caps, gain restrictions and anti-repetition rules. No RunUO GPL implementation was copied.

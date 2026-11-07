@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M15 (v0.2.37)
+
+DK Server introduces region-aware settlement justice in `server/law-m15.cjs`. The settler-controlled village is guarded; the courtyard is not, and a village overrun by monsters stops ordinary guard enforcement. Recovering personal items from a villager's corpse records a crime but only living NPCs physically within eight tiles may report it. Reported theft creates a dated case, persistent fine, criminal heat and reduced Town reputation. Guards respond using the established NPC pathfinding toward an offender in their region; guard payments and deliberate fine payments at the Village Bank conserve money instead of creating it. Unpaid cases remain actionable for a limited wanted interval; citation and nonfatal detainment status are saved, with no unilateral destruction of the one character.
+
+`GET /api/v1/law` is read-only; `pay_fine` is a strict server gameplay transaction. All effects persist through the existing atomic M13 save strategy and event log. Further legal systems are pending: actual jails, testimony, NPC ownership transfer, trials, false accusations, ordinary theft and bounty hunting. No public always-on server exists yet.
+
 ## Implemented milestone: DK Server M14 (v0.2.36)
 
 RunUO's skill descriptions, fixed-point values, per-skill locks, total caps and skill-check gain protections motivated an independently written `server/skills-m14.cjs`. Every character has one server-owned `skillbook`: ten named professions with numeric values in 0.1 increments, a 100.0 per-skill cap, combined 700.0 training limit, and Up/Down/Locked directions. At total cap, a deliberately Down-locked profession may lose 0.1 to permit another profession to gain 0.1. Success-based skill usage advances only with world time, slows as mastery grows, and has limited anti-repetition defenses. Legacy experience values from M13 are retained and migrated without resetting the single-character save.

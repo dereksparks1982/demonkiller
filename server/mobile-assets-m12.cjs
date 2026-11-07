@@ -3,6 +3,7 @@
 // RunUO-informed item/mobile ownership, written independently.
 const {COURT,VILLAGE}=require('./regions.cjs');
 const {PACK,reconcile}=require('./entity-registry-m10.cjs');
+const LAW=require('./law-m15.cjs');
 const PROVISIONS=Object.freeze({
  bank:'bread',bakery:'bread',smithy:'tools',market:'produce',
  guard:'tools',caretaker:'herbs',courier:'bread',caravan:'produce',
@@ -107,8 +108,10 @@ function loot(world,command){
    'The character recovered possessions from '+corpse.name+'.',
    {corpse_id:corpse.id,npc_id:corpse.npc_id,area_id:corpse.area_id,
      coins:corpse.coins,items:size});
+ const notices=[];
+ LAW.reportCorpseLoot(next,corpse,l.minute,notices);
  validate(next);
- return {world:next,character:c,event:e};
+ return {world:next,character:c,event:notices.at(-1)||e,events:[e,...notices]};
 }
 function expire(world,minute,out){
  const state=world.living.mobile_assets;if(!state)return;

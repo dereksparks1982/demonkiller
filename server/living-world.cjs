@@ -11,6 +11,7 @@ const {tick:storageTick}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,runMinute:runScheduled}=require('./world-scheduler-m11.cjs');
 const {ensure:ensureMobileAssets,onDeath:recordMobileDeath}=require('./mobile-assets-m12.cjs');
+const {ensure:ensureLaw,tick:lawTick}=require('./law-m15.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -75,8 +76,14 @@ function event(living,minute,type,text,details={}){
  living.events.push(e);if(living.events.length>MAX_EVENTS)living.events.shift();
  return e;
 }
-function npcDestination(n,minute){
+function npcDestination(n,minute,world){
  const t=minute%DAY,day=t<360;
+ if(n.role==='guard'){
+  const p=world.characters?.['1'],w=world.living.law?.player;
+  if(p?.form==='living'&&p.area_id===VILLAGE&&w?.fines>0&&
+     w.wanted_until_minute>=minute&&w.detained_until_minute<minute)
+   return {area_id:VILLAGE,x:p.x,y:p.y};
+ }
  if(n.role==='caravan'||n.role==='escort'){
   const away=(Math.floor(minute/240)%2===0);
   return away?{area_id:COURT,x:n.role==='caravan'?46:45,y:27}:
@@ -108,7 +115,7 @@ function minuteTick(world,m,generated){
  craftTick(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
-  const desired=npcDestination(n,m);
+  const desired=npcDestination(n,m,world);
   const status=n.area_id!==desired.area_id?'traveling':
    n.x===desired.x&&n.y===desired.y?(day?'working':'resting'):'walking';
   if(m%5===0){
@@ -172,6 +179,7 @@ function minuteTick(world,m,generated){
   }
  }
  combatTick(world,m,generated);
+ lawTick(world,m,generated);
  storageTick(world,m,generated);
  runScheduled(world,m,generated);
 }
@@ -198,6 +206,7 @@ function advance(world,now=Date.now(),limit=180){
  const next=structuredClone(world),events=[];
  ensureScheduler(next);
  ensureMobileAssets(next);
+ ensureLaw(next);
  for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
   minuteTick(next,m,events);
  next.living.minute+=count;

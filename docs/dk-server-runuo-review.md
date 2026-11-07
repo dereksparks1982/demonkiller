@@ -58,3 +58,7 @@ RunUO's `Server/Persistence/SaveStrategy.cs`, `StandardSaveStrategy.cs` and `Sav
 ## Milestone 14: Use-based profession skills (v0.2.36)
 
 Reviewed `Server/Skills.cs` and `Scripts/Misc/SkillCheck.cs` from RunUO. DK Server independently borrows the high-level concepts of tenths-point training, skill caps, Up/Down/Locked training, atrophy under a total cap, and anti-repetitive skill gain. Ten initial professions receive practice from actual authoritative game activity. The browser can only change training locks, not award XP, and the existing single life is preserved. The broader RunUO skill list and spell success/combat item gating remain unimplemented until corresponding game activities exist.
+
+## Milestone 15: Guarded regions and witnessed crimes (v0.2.37)
+
+RunUO `Server/Region.cs`, `Scripts/Regions/GuardedRegion.cs` and `Scripts/Misc/Notoriety.cs` organize lawful areas, criminal actions, guard candidates and notoriety. DK Server independently implements a first guarded settler-controlled village, physical NPC witnesses for theft from an NPC corpse, a saved criminal case/fine/warrant record, guard pursuit using cardinal geometry, and restitution using real bank funds. The courtyard is not subject to village justice, and guards do not magically discover unwitnessed actions. This is not RunUO's entire criminal/guard system, nor a multiplayer implementation.

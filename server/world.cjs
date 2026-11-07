@@ -11,6 +11,7 @@ const {ensure:ensureStorage,validate:validateStorage}=require('./storage-m9.cjs'
 const {reconcile:reconcileEntities,validate:validateEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,validate:validateScheduler}=require('./world-scheduler-m11.cjs');
 const {ensure:ensureMobileAssets,validate:validateMobileAssets}=require('./mobile-assets-m12.cjs');
+const {ensure:ensureLaw,validate:validateLaw}=require('./law-m15.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -77,6 +78,7 @@ function makeWorld(now = Date.now()) {
   reconcileEntities(result);
   ensureScheduler(result);
   ensureMobileAssets(result);
+  ensureLaw(result);
   return result;
 }
 
@@ -145,6 +147,7 @@ function validateWorld(world) {
   validateEntities(world);
   validateScheduler(world);
   validateMobileAssets(world);
+  validateLaw(world);
   return world;
 }
 

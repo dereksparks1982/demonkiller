@@ -2,11 +2,21 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.36 | DK Server M14, Skills and Professions
+## Current milestone: v0.2.37 | DK Server M15, Guarded Regions and Crime
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M15: A town is governed by more than its walls
+
+- **Guarded region:** The living village enforces laws when settlers control it. The courtyard has no village guards or automatic village fines. Monster occupation interrupts ordinary village-law enforcement.
+- **Physical witnesses:** Recovering possessions from a deceased villager is treated as grave robbery. A crime becomes a report only when a *living NPC actually nearby* witnesses it. An unwitnessed theft enters the private world history but produces no magically informed guards or immediate fine.
+- **Persistent reputation and warrants:** Reported theft creates a dated case, a 12-gold fine, temporary criminal heat and a negative Town reputation change. Cases, witnesses and outstanding debts survive server restarts.
+- **Guard response:** Existing village guards can pursue reported offenders along cardinal paths. A guard reaching the character can collect actual gold into the Village Bank's funds, issue a citation, or impose a temporary nonfatal detention penalty if the fine cannot be paid.
+- **Real restitution:** The player may pay a fine at the open Village Bank. Payment removes actual coins, credits the bank and clears the warrant when the debt is settled. Nothing is created or duplicated.
+- **Player controls:** Read-only law status and fine payment appear in the outdoor sidebar. There is no new game engine, rendered art pack, police dashboard or extra player slot.
+- **Current limits:** Only reported theft from a villager's corpse triggers this initial law system. Other crimes, jails, trials, guards' investigations and complex UO criminal notoriety still require later builds.
 
 ### M14: Learn by doing
 
