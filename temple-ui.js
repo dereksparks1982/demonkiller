@@ -160,8 +160,10 @@ async function update(force=false){
     cell.addEventListener('drop',event=>{
      event.preventDefault();
      const source=event.dataTransfer.getData('text/plain');
-     if(source&&source!==entry.serial)
+     if(source&&source!==entry.serial&&currentInventory?.backpack.some(i=>i.serial===source)){
+      event.stopPropagation();
       perform('combine_stacks',{source_serial:source,target_serial:entry.serial});
+     }
     });
     items.append(cell);
    }
