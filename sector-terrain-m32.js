@@ -74,7 +74,7 @@
     !integer(maxParallel)||maxParallel<1||maxParallel>8)
    throw Error('Invalid sector cache settings');
   const area=makeArea(manifest),loaded=new Map(),pending=new Map();
-  let closed=false,focus={sx:0,sy:0},lastFailure=null;
+  let closed=false,focus={sx:0,sy:0},lastFailure=null,pipe=Promise.resolve();
   function ordered(coords){
    const selected=new Map(),maxX=Math.ceil(area.width/SIZE),maxY=Math.ceil(area.height/SIZE);
    for(const s of coords||[]){
@@ -135,17 +135,24 @@
     for(let xx=sx-radius;xx<=sx+radius;xx++)coords.push({sx:xx,sy:yy});
    return ordered(coords);
   }
-  async function prefetch(coords){
+  function prefetch(coords){
    const desired=ordered(coords);
-   let next=0,failed=0;
-   const workers=Array.from({length:Math.min(maxParallel,desired.length)},async()=>{
-    while(!closed&&next<desired.length){
-     const {sx,sy}=desired[next++];
-     try{await get(sx,sy);}catch(_){failed++;}
-    }
-   });
-   await Promise.all(workers);
-   return {requested:desired.length,failed,loaded:loaded.size};
+   const batch=async()=>{
+    let next=0,failed=0;
+    const workers=Array.from({length:Math.min(maxParallel,desired.length)},async()=>{
+     while(!closed&&next<desired.length){
+      const {sx,sy}=desired[next++];
+      try{await get(sx,sy);}catch(_){failed++;}
+     }
+    });
+    await Promise.all(workers);
+    return {requested:desired.length,failed,loaded:loaded.size};
+   };
+   // One per-session queue keeps request volume bounded even if the player
+   // holds RMB across several sector boundaries before a previous prefetch ends.
+   const result=pipe.then(batch,batch);
+   pipe=result.catch(()=>{});
+   return result;
   }
   async function prime(x,y){
    const first=around(x,y,1),result=await prefetch(first);
