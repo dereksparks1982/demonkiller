@@ -122,5 +122,26 @@
 <script src="./world-regions.js"></script>
 <script src="./dk-menu-server.js"></script>
 <script src="./outdoor.js?v=0.2.48-uo-ui"></script>
-<script src="./outdoor-ui.js?v=0.2.48-uo-ui"></script>
+<script>
+/* Essential P/I window controls remain functional even if inventory data fails. */
+(function(){
+ const doll=document.getElementById('paperDoll'),bag=document.getElementById('backpack');
+ if(!doll||!bag)return;
+ let top=40;
+ function toggle(node){node.hidden=!node.hidden;if(!node.hidden)node.style.zIndex=String(++top);}
+ document.getElementById('openPaperDoll').addEventListener('click',()=>toggle(doll));
+ document.getElementById('openBackpack').addEventListener('click',()=>toggle(bag));
+ document.querySelectorAll('[data-close-window]').forEach(b=>b.addEventListener('click',()=>{
+  document.getElementById(b.dataset.closeWindow).hidden=true;
+  document.getElementById('world')?.focus({preventScroll:true});
+ }));
+ document.addEventListener('keydown',e=>{
+  if(e.repeat||e.ctrlKey||e.altKey||e.metaKey||e.target?.isContentEditable||['INPUT','SELECT','TEXTAREA'].includes(e.target?.tagName))return;
+  const key=e.key.toLowerCase();
+  if(key==='p'||key==='i'){e.preventDefault();toggle(key==='p'?doll:bag);}
+  else if(key==='escape'){if(!bag.hidden)bag.hidden=true;else if(!doll.hidden)doll.hidden=true;}
+ });
+})();
+</script>
+<script src="./outdoor-ui.js?v=0.2.49-shortcuts"></script>
 </body></html>
