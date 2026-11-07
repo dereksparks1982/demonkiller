@@ -7,6 +7,28 @@ if(!doll||!bag)return;
 const icons={herbs:'❧',wood:'▰',ore:'◆',bread:'◒',tools:'⚒',produce:'♣',
  meals:'◉',torches:'♜',rations:'▣',bandages:'✚',gold:'●'};
 let lastInventory='',lastFigure='',lastJournal='';
+let remote=null,remoteBusy=false,actionBusy=false;
+async function refreshServerBag(){
+ const server=window.DemonKillerServer;
+ if(!state().serverConnected||!server||remoteBusy)return;
+ remoteBusy=true;
+ try{remote=await server.inventory();refresh(true);}catch(_){remote=null;}
+ finally{remoteBusy=false;}
+}
+async function itemAction(action,fields){
+ const server=window.DemonKillerServer;
+ if(!state().serverConnected||!server||actionBusy)return;
+ actionBusy=true;
+ try{
+  const result=await server.gameAction(action,fields);
+  $('bagHelp').textContent=result.event?.text||'Item updated.';
+  remote=await server.inventory();
+  window.dispatchEvent(new Event('dk-inventory-updated'));
+  refresh(true);
+ }catch(error){$('bagHelp').textContent=error.message;}
+ finally{actionBusy=false;}
+}
+
 const pref='dkSoftworks.demonkiller.uoWindows.v1';
 $('deleteInGameSave').addEventListener('click',async()=>{
  const current=state(),server=window.DemonKillerServer;
@@ -65,29 +87,43 @@ function drawFigure(){
  else{ctx.fillStyle=ghost?'#afbddf':'#a78d83';ctx.fillRect(53,30,22,32);ctx.fillRect(45,64,38,61);ctx.fillRect(47,125,13,40);ctx.fillRect(68,125,13,40);}
 }
 const symbols=Object.freeze(icons);
-function itemUse(name){
- const s=state();if(!s.serverConnected){$('bagHelp').textContent='This browser preview has no server inventory actions.';return;}
- const select=$('itemChoice');if(select&&[...select.options].some(x=>x.value===name))select.value=name;
- const byItem={tools:'equipTools',torches:'equipTorch',bread:'eatFood',rations:'eatFood',meals:'eatFood',produce:'eatFood'};
- const action=byItem[name];
- if(!action){$('bagHelp').textContent='Inspect '+name+'. No double-click use action is available yet.';return;}
- // Food is consumed through the existing server action handler.
- $(action)?.click();
+function itemUse(name,serial,split=false){
+ if(!state().serverConnected){$('bagHelp').textContent='The online preview has no server inventory actions.';return;}
+ if(!serial){$('bagHelp').textContent='Waiting for the server item identity.';return;}
+ if(split){
+  const item=remote?.backpack.find(i=>i.serial===serial);
+  if(!item||item.amount<2){$('bagHelp').textContent='This stack cannot be split.';return;}
+  return itemAction('split_stack',{serial,quantity:Math.floor(item.amount/2)});
+ }
+ return itemAction('use_item',{serial});
 }
+
 function refresh(force=false){
  const s=state(),p=s.player||{},inventory=p.inventory||{};
- const pack=Object.entries(inventory).filter(([,n])=>Number(n)>0).sort(([a],[b])=>a.localeCompare(b));
- const snap=JSON.stringify([pack,p.gold,p.bank_gold,s.serverConnected]);
+ const pack=remote&&s.serverConnected?remote.backpack.map(i=>[i.type,i.amount,i.serial]):
+  Object.entries(inventory).filter(([,n])=>Number(n)>0).sort(([a],[b])=>a.localeCompare(b)).map(([type,amount])=>[type,amount,null]);
+ const snap=JSON.stringify([pack,remote?.gold??p.gold,p.bank_gold,s.serverConnected]);
  if(force||snap!==lastInventory){
-  lastInventory=snap;$('bagGold').textContent=String(p.gold??0);$('bagCapacity').textContent=pack.length+' TYPES';
+  lastInventory=snap;$('bagGold').textContent=String(remote?.gold??p.gold??0);$('bagCapacity').textContent=pack.reduce((n,i)=>n+Number(i[1]),0)+' / 200';
   const box=$('bagItems');box.replaceChildren();
-  for(const [name,num] of pack){
+  for(const [name,num,serial] of pack){
    const b=document.createElement('button');b.type='button';b.className='bag-item';
-   b.title=name+' × '+num+' (double-click to use)';b.setAttribute('aria-label',name+', '+num);
+   b.title=name+' × '+num+(serial?' · Double-click to use, Shift-double-click to split. Drag onto matching stack to combine.':'');
+   b.setAttribute('aria-label',name+', '+num);
    const symbol=document.createElement('span');symbol.className='bag-symbol';symbol.textContent=symbols[name]||'▤';
    const label=document.createElement('span');label.textContent=name;
    const count=document.createElement('span');count.className='bag-count';count.textContent='×'+num;
-   b.append(symbol,label,count);b.addEventListener('dblclick',()=>itemUse(name));box.append(b);
+   b.append(symbol,label,count);b.addEventListener('dblclick',e=>itemUse(name,serial,e.shiftKey));
+   if(serial){
+    b.draggable=true;b.dataset.serial=serial;b.dataset.type=name;
+    b.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',serial));
+    b.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/plain'))e.preventDefault();});
+    b.addEventListener('drop',e=>{
+     e.preventDefault();const from=e.dataTransfer.getData('text/plain');
+     if(from&&from!==serial)itemAction('combine_stacks',{source_serial:from,target_serial:serial});
+    });
+   }
+   box.append(b);
   }
   if(!pack.length){const empty=document.createElement('p');empty.textContent=s.serverConnected?'Your backpack is empty.':'Inventory available when DK Server is connected.';empty.style.gridColumn='1 / -1';box.append(empty);}
  }
@@ -105,5 +141,17 @@ function refresh(force=false){
  const journal=$('message')?.textContent||'';
  if(journal&&journal!==lastJournal){lastJournal=journal;$('hudJournal').textContent=journal;}
 }
-setInterval(refresh,850);refresh(true);
+for(const slot of document.querySelectorAll('.equip-slot')){
+ slot.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/plain'))e.preventDefault();});
+ slot.addEventListener('drop',e=>{
+  e.preventDefault();const serial=e.dataTransfer.getData('text/plain');
+  const item=remote?.backpack.find(i=>i.serial===serial);
+  if(!item)return;
+  if((slot.dataset.equip==='hand'&&item.type==='tools')||
+     (slot.dataset.equip==='light'&&item.type==='torches'))itemAction('use_item',{serial});
+  else $('bagHelp').textContent='That item cannot be equipped in this slot.';
+ });
+}
+setInterval(refreshServerBag,3500);setInterval(refresh,850);
+refreshServerBag();refresh(true);
 })();
