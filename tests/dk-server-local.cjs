@@ -19,7 +19,7 @@ test('one local Demon Killer game, no password, no external dashboard or exposed
  const html=await homepage.text();
  assert.match(html,/DEMON KILLER/);
  assert.match(html,/dkServerOptions/);
- assert.match(html,/SHUT DOWN SERVER/);
+ assert.match(html,/STOP SERVER/);
  assert.equal((await fetch(base+'/dk-menu-server.js')).status,200);
  const health=await (await fetch(base+'/api/v1/health')).json();
  assert.equal(health.build,'local-m33');
