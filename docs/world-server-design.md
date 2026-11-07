@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M20 (v0.2.42)
+
+Physical NPC workshops now close a piece of the M18/M19 production-and-commerce loop. `server/workshops-m20.cjs` defines fixed, server-authoritative recipes for real smithing, baking and cooking at the existing Village businesses, drawing from stored per-type M18 input ingredients and writing persistent M10 output item serials. Real NPC workers must be alive at their storefronts; they earn 2 actual business coins each completed batch. A sixth M11 timer runs production every 120 simulated minutes, and the old abstract supplier mechanism stops granting complete finished products to those workshops. Input serials, finished output serials, employee wages and source businesses all enter the permanent event history. World checkpoints preserve every change.
+
+The input supply chain is **not yet complete**. Village and Courtyard Markets still receive abstract supplier restocks, and some produce and ores must currently come from player sales. Future slices can introduce farming, merchant supply carts, independent NPC gatherers and realistic per-commodity logistics. The live Node service remains locally bound; GitHub Pages is not an always-on DK Server.
+
 ## Implemented milestone: DK Server M19 (v0.2.41)
 
 The world no longer removes merchandise and generates coins for anonymous, non-existent customers every 15 minutes. `server/npc-commerce-m19.cjs` tracks some existing NPC residents as genuine customers. They receive saved shopping plans, follow existing cardinal navigation to the nearest open food vendor, and pay from actual personal money once within range. A real item from the M18 business stock container transfers into the NPC's M12 personal backpack, preserving or splitting its M10 serial as appropriate. The buyer's coins fall by the purchase price, the shop's coins rise by the same amount, and event history records an authentic buyer and item ID.

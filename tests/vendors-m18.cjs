@@ -81,13 +81,16 @@ test('Selling goods cannot overflow a merchant storeroom or forge quantity',()=>
   item_type:'ore',quantity:3,extra:999}),/Invalid/);
  W.validateWorld(w);
 });
-test('Saved schedule restocks only when vendor has physical capacity',()=>{
- const w=fixture(),shop=w.living.businesses.village_smithy,events=[];
- shop.stock=3;E.reconcile(w);
+test('Scheduled raw suppliers replenish markets, but not workshop goods without ingredients',()=>{
+ const w=fixture(),shop=w.living.businesses.village_smithy,
+   market=w.living.businesses.village_market,events=[];
+ shop.stock=3;market.stock=3;E.reconcile(w);
  for(let m=1;m<=120;m++){T.runMinute(w,m,events);w.living.minute=m;}
  E.reconcile(w);
- assert.equal(shop.stock,28);
- assert(events.some(e=>e.type==='business.delivery'&&e.business_id==='village_smithy'));
+ assert.equal(shop.stock,3,'No magic delivery of fabricated smithy tools');
+ assert.equal(market.stock,28,'The market still receives a genuine scheduled supplier');
+ assert(events.some(e=>e.type==='business.delivery'&&e.business_id==='village_market'));
+ assert(!events.some(e=>e.type==='business.delivery'&&e.business_id==='village_smithy'));
  E.counts(w);W.validateWorld(w);
 });
 test('HTTP vendor stock is read-only and trading persists across server restart',async t=>{

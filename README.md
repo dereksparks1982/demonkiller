@@ -2,7 +2,19 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.41 | DK Server M19, NPC Customers and Real Meals
+## Current milestone: v0.2.42 | DK Server M20, Physical Workshops
+
+### M20: Residents produce goods from actual ingredients
+
+- **Three real workshops:** The existing Village Smithy, Bakery and Tavern convert goods they truly possess into merchandise. The blacksmith requires 2 ore + 1 wood to make a tool; the baker turns 2 produce into 2 bread; the innkeeper turns 2 produce into a meal.
+- **Workers earn wages:** A completed batch pays its living NPC worker 2 coins from the business's real saved funds. Each run consumes physical M18 ingredient stocks and their M10 item entities, creates individually identified finished goods and records a dated production event.
+- **Server-owned recipes:** Players cannot supply fake output items, prices, or wage values. Production requires a living worker near the actual building, an open business, sufficient inputs, unoccupied settlement and available storeroom capacity.
+- **No imaginary workshop deliveries:** The automatic supplier job no longer grants new finished tools, bread or meals to production shops. Markets still receive their existing supplier deliveries, ready for a later physically simulated farming and logistics build.
+- **Scheduled and persistent:** The M11 scheduler adds a new `workshop_batch` job every 120 running world minutes. Pausing the world stops production; saved state and M13 checkpoints preserve completed batches, employee wages and provenance.
+- **Visible activity:** The outdoor sidebar reports real workshop outputs when connected to DK Server. The approved temple, tree, houses and simple pixel artwork remain untouched.
+- This is an early NPC production loop, not full UO crafting, farming or resource delivery. The public webpage remains a static preview without a hosted world server.
+
+
 
 ### M19: Customers exist in the world
 

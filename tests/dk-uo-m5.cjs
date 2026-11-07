@@ -116,7 +116,7 @@ test('loopback DK Server advances the world without clients and archives events'
  assert.equal((await fetch(base+'/outdoor.js')).status,200);
  assert.equal((await fetch(base+'/server/living-world.cjs')).status,404);
  assert.equal((await (await fetch(base+'/api/v1/areas')).json()).regions.length,3);
- assert.equal((await (await fetch(base+'/api/v1/health')).json()).build,'local-m19');
+ assert.equal((await (await fetch(base+'/api/v1/health')).json()).build,'local-m20');
  assert.equal((await JSON_POST(base,'/api/v1/characters',{slot:2,name:'NO'})).status,422);
  assert.equal((await JSON_POST(base,'/api/v1/characters',{slot:1,name:'YES'})).status,201);
  assert.equal((await fetch(base+'/api/v1/bank/box')).status,409);

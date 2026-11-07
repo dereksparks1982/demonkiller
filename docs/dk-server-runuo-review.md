@@ -78,3 +78,7 @@ RunUO `Scripts/Mobiles/Vendors/BaseVendor.cs` and `Scripts/Mobiles/Vendors/SBInf
 ## Milestone 19: Real mobile/vendor transactions (v0.2.41)
 
 RunUO's mobile inventory and BaseVendor selling systems inspired the transition from abstract shop-sale counters to actual transactions with a living NPC buyer. Eligible DK Server customers navigate cardinally to a real open storefront, pay personal coins and receive a persistent item in their backpack. Hunger uses owned food rather than silently consuming money. All work is independently implemented in JavaScript; no GPL C# copied. Wider NPC customer roles and physical supply networks remain future slices.
+
+## Milestone 20: Server-side NPC workshop recipes (v0.2.42)
+
+RunUO `Scripts/Engines/Craft/DefBlacksmithy.cs` and `DefCooking.cs` illustrate recipe requirements and crafting output. DK Server independently applies fixed, server-owned recipes at existing businesses that consume actual M18 inputs, create serial-bearing output and pay real wages to M12 NPC staff through an M11 scheduled job. No GPL code copied. Broader professions, yield variability, physical crop growth and NPC resource shipments remain future milestones.

@@ -16,6 +16,7 @@ const {ensure:ensureDistricts,validate:validateDistricts,onPlayerMove}=require('
 const {ensure:ensureHousing,validate:validateHousing}=require('./housing-m17.cjs');
 const {ensure:ensureVendors,validate:validateVendors}=require('./vendors-m18.cjs');
 const {ensure:ensureNpcCommerce,validate:validateNpcCommerce}=require('./npc-commerce-m19.cjs');
+const {ensure:ensureWorkshops,validate:validateWorkshops}=require('./workshops-m20.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -88,6 +89,7 @@ function makeWorld(now = Date.now()) {
   ensureVendors(result);
   reconcileEntities(result);
   ensureNpcCommerce(result);
+  ensureWorkshops(result);
   return result;
 }
 
@@ -161,6 +163,7 @@ function validateWorld(world) {
   validateHousing(world);
   validateVendors(world);
   validateNpcCommerce(world);
+  validateWorkshops(world);
   return world;
 }
 

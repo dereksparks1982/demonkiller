@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.42 / DK Server M20 | 2026-11-06 | Physical NPC workshop production
+
+- Added `server/workshops-m20.cjs` with actual server-owned smithy, bakery and tavern recipes. Crafting consumes stored ore, wood or produce, records physical input item serials and creates persistent output tools, bread or meals with fresh item IDs.
+- Workshop work requires living NPC staff present at the real business, an open operating period, safe settler control, enough actual material stock and room in the storeroom. Each batch pays a saved 2-coin wage from business funds to the worker.
+- Added a sixth M11 durable recurring job (`workshop_batch`, 120 world minutes). Stopped worlds pause production and jobs cannot replay already processed minutes.
+- Removed abstract finished-goods supplier restocks for smithy, bakery and tavern. Market supplies continue temporarily through the existing scheduled supplier model; real farming and caravan cargo still remain future work.
+- Added read-only `GET /api/v1/workshops`, outdoor production readout, `tests/workshops-m20.cjs`, and updated M11/M18 regression expectations. Module-level functional checks passed recipe, provenance, money conservation, missing-input and scheduled supplier scenarios. Full Node/browser integration remains unverified.
+- Architecture independently influenced by RunUO's Blacksmithy and Cooking crafting recipe systems. No GPL source copied; still single-player and no hosted web backend.
+
 ## v0.2.41 / DK Server M19 | 2026-11-06 | Physical NPC customers and meals
 
 - Replaced anonymous automatic merchandise sales with real NPC shopping goals, cardinal storefront travel and server-authoritative arrival/purchase checks. NPCs must be alive, physically nearby, funded and equipped with sufficient personal pack space.

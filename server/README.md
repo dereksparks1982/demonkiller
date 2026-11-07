@@ -1,4 +1,4 @@
-# DK Server M19 | Physical NPC Customers and Food (v0.2.41)
+# DK Server M20 | Physical Workshops and Paid NPC Production (v0.2.42)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m19`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m20`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -141,7 +141,7 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 
 ## v0.2.34 integration correction
 
-The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m19`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m20`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
 
 ## M13 save-strategy and verification
 
@@ -214,3 +214,11 @@ The old M5 periodic anonymous business sales are removed. Existing shop-open/clo
 `tests/npc-commerce-m19.cjs` covers world migration, NPC movement to a store, physical purchase and coin conservation, provenance of the item serial, food consumption without extra money, no remote purchases, world pause and persistence through server restart. A combined 90-minute world simulation confirmed a live North Guard purchase at the Village Market, with real produce in his backpack. The complete Node/browser suite is still unverified in a full checkout.
 
 **Limits:** Only selected existing residents plan these shopping trips. Suppliers remain abstract scheduled deliveries, not yet physically represented cargo. Not all customers, food sources, professions or relationships are fully simulated. No change to single-player character slots, engine-free rendering or online hosting.
+
+## M20: Work performed from real material stocks
+
+RunUO `Scripts/Engines/Craft/DefBlacksmithy.cs` and `DefCooking.cs` provided **architectural inspiration only**, not code. The independent `server/workshops-m20.cjs` defines three allowlisted NPC production recipes: Village Smithy consumes 2 ore + 1 wood to make 1 tool; Village Bakery consumes 2 produce to make 2 bread; Village Tavern consumes 2 produce to make 1 meal. Each recipe requires the actual shop to be open in a settler-controlled district, its living owner to stand close to the physical shop, sufficient secondary M18 merchandise inputs, free capacity in the 500-item storeroom, and 2 business coins for the worker's wage. A completed batch removes real input item serials from `vendor_stock_<id>`, creates a new serial for the output item, increments main product stock, credits the worker's actual wallet and debits the business. The world event includes input IDs and quantities, output ID, worker, business, wage and world minute.
+
+M11 now schedules the `workshop_batch` task every 120 running world minutes with priority 0, ahead of other recurring activities due at that minute. M11's old abstract restock mechanism **does not create finished goods** for these three production businesses. The markets still receive existing scheduled supply deliveries; genuine NPC crop growth, forage transport, physical raw cargo and caravan logistics remain separate future milestones. M17–M19 world records migrate without inventory, gold, NPC or world-history resets, and M10 validation reconciles the physical shop serials to their typed counts. The outdoor page shows production totals and a read-only `GET /api/v1/workshops` lists the recipes and output counts. There is no client-controlled production transaction or access to arbitrary jobs.
+
+`tests/workshops-m20.cjs` checks migration, smithy, bakery, tavern, wage conservation, material identity, unavailable workers/ingredients, occupied territories, scheduled execution, corruption and HTTP persistence. Older M11 and M18 timer/restock tests are updated for the sixth scheduled job and the end of phantom deliveries to workshops. Combined module simulation passed four produced units, paid wages and proper market restocking; full Node/browser suite is still unverified without a complete runnable checkout. No new art, MMO code, online hosting or permanent player-death behavior was added.

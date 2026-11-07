@@ -260,6 +260,15 @@ function currentHouse(){
   .sort((a,b)=>(Math.abs(player.x-a.door_x)+Math.abs(player.y-a.door_y))-
     (Math.abs(player.x-b.door_x)+Math.abs(player.y-b.door_y)))[0]||null;
 }
+async function refreshWorkshops(){
+ if(!SERVER)return;
+ try{
+  const report=await SERVER.workshops();
+  $('workshopStatus').textContent=report.total_units+
+   ' goods produced by workshops · '+
+   report.shops.map(shop=>shop.name+': '+shop.made).join(' · ');
+ }catch(e){$('workshopStatus').textContent='Workshop production records unavailable.';}
+}
 async function refreshNpcCommerce(){
  if(!SERVER)return;
  try{
@@ -812,9 +821,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors(),refreshNpcCommerce()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors(),refreshNpcCommerce(),refreshWorkshops()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);setInterval(refreshWorkshops,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -839,6 +848,7 @@ async function begin(){
    $('houseStatus').textContent='House deeds and secure storage require DK Server.';
    $('vendorStatus').textContent='Physical merchant stock requires DK Server.';
    $('customerStatus').textContent='NPC shopping history requires DK Server.';
+   $('workshopStatus').textContent='Workshop production needs DK Server.';
    for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake','buyHouse','sellHouse','houseAccess','homeStore','homeTake'])
      $(id).disabled=true;
   }

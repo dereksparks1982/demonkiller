@@ -5,12 +5,14 @@
 const {COURT,VILLAGE}=require('./regions.cjs');
 const {expire:expireCorpses}=require('./mobile-assets-m12.cjs');
 const {merchandises,total:vendorTotal,CAPACITY:VENDOR_CAPACITY}=require('./vendors-m18.cjs');
+const {run:workshopRun,RECIPES:WORKSHOP_RECIPES}=require('./workshops-m20.cjs');
 const JOBS=Object.freeze({
   postal_dispatch:{every:1,priority:0},
   camp_rotation:{every:90,priority:1},
   shop_restock:{every:120,priority:1},
   guard_payroll:{every:360,priority:2},
-  corpse_cleanup:{every:60,priority:2}
+  corpse_cleanup:{every:60,priority:2},
+  workshop_batch:{every:120,priority:0}
 });
 const MAX_JOBS=2048,MAX_PER_MINUTE=128;
 function future(minute,interval){
@@ -105,6 +107,7 @@ function camp(world,minute,out){
 }
 function restock(world,minute,out){
   for(const shop of Object.values(world.living.businesses)){
+    if(Object.hasOwn(WORKSHOP_RECIPES,shop.id))continue; // Makers require actual supplies.
     if(shop.stock>=12||shop.coins<30||
       (merchandises(shop)&&vendorTotal(shop)+25>VENDOR_CAPACITY))continue;
     shop.stock+=25;shop.coins-=30;shop.expenses+=30;
@@ -127,7 +130,7 @@ function payroll(world,minute,out){
 }
 const HANDLERS=Object.freeze({
   postal_dispatch:postal,camp_rotation:camp,shop_restock:restock,guard_payroll:payroll,
-  corpse_cleanup:expireCorpses
+  corpse_cleanup:expireCorpses,workshop_batch:workshopRun
 });
 function runMinute(world,minute,out){
   ensure(world);
