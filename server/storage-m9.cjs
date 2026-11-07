@@ -43,7 +43,7 @@ function validate(world){
    !Number.isInteger(drop.x)||!Number.isInteger(drop.y)||
    drop.x<0||drop.y<0||drop.x>=area.width||drop.y>=area.height||
    !ACCEPTED.has(drop.item)||!Number.isSafeInteger(drop.quantity)||
-   drop.quantity<1||drop.quantity>20||
+   drop.quantity<1||drop.quantity>500||
    !Number.isSafeInteger(drop.dropped_minute)||drop.dropped_minute<0||
    !Number.isSafeInteger(drop.expires_minute)||
    drop.expires_minute!==drop.dropped_minute+DECAY_MINUTES)
