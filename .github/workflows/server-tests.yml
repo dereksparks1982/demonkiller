@@ -1,0 +1,28 @@
+name: DK Server tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'tests/**'
+      - 'index.html'
+      - 'test-center.html'
+      - 'temple-ui.js'
+      - 'outdoor.html'
+      - 'outdoor-ui.js'
+      - 'dk-menu-server.js'
+      - '.github/workflows/server-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  server-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Server regression suite
+        run: npm test --prefix server
