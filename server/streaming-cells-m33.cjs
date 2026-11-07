@@ -114,17 +114,15 @@ function appendEvent(world,type,minute,from,to){
  return e;
 }
 function onPlayerMove(world,previous){
- ensure(world);
- const state=world.living.streaming_cells,after=world.characters?.['1'];
+ const after=world.characters?.['1'];
  if(!after)return [];
  const before=rootId(previous?.area_id),now=rootId(after.area_id);
  if(!now)throw Error('Unknown destination streaming cell');
+ const existed=Boolean(world.living?.streaming_cells?.records?.[now]);
+ ensure(world); // Seeds the destination once for migrated saves.
  if(before===now)return [];
- const minute=world.living.minute;
- const record=state.records[now];
- // First entry was seeded by ensure(); only repeated visits add another count.
- if(record&&record.first_minute!==minute)record.visits++;
- else if(!record)state.records[now]={visits:1,first_minute:minute,last_minute:minute};
+ const state=world.living.streaming_cells,minute=world.living.minute;
+ if(existed)state.records[now].visits++;
  state.records[now].last_minute=minute;state.current=now;
  return [appendEvent(world,'cell.exit',minute,before,now),
   appendEvent(world,'cell.enter',minute,before,now)];
