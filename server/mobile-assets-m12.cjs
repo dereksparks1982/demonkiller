@@ -75,6 +75,12 @@ function clearBag(world,corpse){
  }
  corpse.coins=0;
 }
+function disperseVisitors(world,corpseId){
+ const visitors=world.living.scavengers?.visitors;
+ if(!visitors)return;
+ for(const [id,visitor] of Object.entries(visitors))
+  if(visitor.corpse_id===corpseId)delete visitors[id];
+}
 function reserve(world,minute,out){
  const m=world.living.mobile_assets;
  if(Object.keys(m.corpses).length<MAX_CORPSES)return;
@@ -84,7 +90,8 @@ function reserve(world,minute,out){
    return priority(a)-priority(b)||a.created_minute-b.created_minute||a.id.localeCompare(b.id);
   });
  if(!victims.length)return false; // Never evict preserved story remains.
- const first=victims[0];clearBag(world,first);delete m.corpses[first.id];
+ const first=victims[0];clearBag(world,first);
+ disperseVisitors(world,first.id);delete m.corpses[first.id];
  out.push(record(world,minute,'corpse.pruned','Old remains made room for a new death.',
   {corpse_id:first.id,area_id:first.area_id}));
  return true;
@@ -188,6 +195,7 @@ function expire(world,minute,out){
   if(Decay.expired(corpse,minute)){
    clearBag(world,corpse);
    leaveTrace(world,corpse,minute);
+   disperseVisitors(world,corpse.id);
    delete state.corpses[corpse.id];
    out.push(record(world,minute,'corpse.decayed',
     corpse.name+'\'s remains returned to the earth.',
