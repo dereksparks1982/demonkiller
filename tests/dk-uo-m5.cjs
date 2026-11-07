@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const {createDKServer}=require('../server/dk-server.cjs');
@@ -74,18 +75,18 @@ function DAY_MS(){return 720*MINUTE;}
 test('inventory, harvesting, trade and bank gold are authoritative and conserved',()=>{
  let w=W.makeWorld(ORIGIN);w=W.createCharacter(w,1,'TEST').world;
  w.characters['1'].form='living';w.characters['1'].opening_state='resurrected';
- w.characters['1'].area_id=R.COURT;w.characters['1'].x=18;w.characters['1'].y=33;
+ w.characters['1'].area_id=R.COURT;w.characters['1'].x=18;w.characters['1'].y=33;syncAll(w);
  w=L.advance(w,ORIGIN+16*MINUTE,25).world;
  w=G.apply(w,{action:'gather',node_id:'courtyard_herbs_west'}).world;
  assert.equal(w.characters['1'].inventory.herbs,1);
  assert.throws(()=>G.apply(w,{action:'gather',node_id:'courtyard_herbs_west'}),/wait/);
- w.characters['1'].x=10;w.characters['1'].y=25;
+ w.characters['1'].x=10;w.characters['1'].y=25;syncAll(w);
  w=G.apply(w,{action:'sell',business_id:'courtyard_market',item_type:'herbs',quantity:1}).world;
  assert.equal(w.characters['1'].gold,8);
  w=G.apply(w,{action:'buy',business_id:'courtyard_market',quantity:1}).world;
  assert.equal(w.characters['1'].gold,5);
  assert.equal(w.characters['1'].inventory.herbs,1);
- w.characters['1'].area_id=R.VILLAGE;w.characters['1'].x=54;w.characters['1'].y=103;
+ w.characters['1'].area_id=R.VILLAGE;w.characters['1'].x=54;w.characters['1'].y=103;syncAll(w);
  w=G.apply(w,{action:'bank_deposit',amount:3}).world;
  w=G.apply(w,{action:'bank_withdraw',amount:2}).world;
  assert.deepEqual([w.characters['1'].gold,w.characters['1'].bank_gold],[4,1]);
@@ -98,7 +99,7 @@ test('bank box letters require physically visiting the bank and cannot be collec
  w=L.advance(w,ORIGIN+90*MINUTE,100).world;
  w.characters['1'].form='living';w.characters['1'].opening_state='resurrected';
  assert.throws(()=>L.collectLetter(w,'letter_1'),/Visit/);
- w.characters['1'].area_id=R.VILLAGE;w.characters['1'].x=54;w.characters['1'].y=103;
+ w.characters['1'].area_id=R.VILLAGE;w.characters['1'].x=54;w.characters['1'].y=103;syncAll(w);
  const collected=L.collectLetter(w,'letter_1');
  assert.equal(collected.letter.subject,'A bank box has been reserved');
  assert.equal(collected.world.living.mail.boxes['1'].length,0);
