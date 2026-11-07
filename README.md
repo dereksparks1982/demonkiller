@@ -1,7 +1,5 @@
 # Demon Killer
 
-Demon Killer is a single-player, top-down Gothic fantasy RPG by DK Softworks, inspired by Ultima Online.
-
-Explore the temple, courtyard, and village with continuous mouse movement, a paper doll (P), and a backpack (I). The local DK Server handles persistent world saves, optional character deletion, NPC activity, crafting, trading, and world changes. The online version is a browser preview.
+Demon Killer is a single-player Gothic fantasy adventure with a custom top-down game runtime, DK Architect, and a persistent world server. Explore, fight, trade, and manage your character using classic mouse and keyboard controls.
 
 [Open Demon Killer](https://dereksparks1982.github.io/demonkiller/)
