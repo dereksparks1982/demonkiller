@@ -45,10 +45,10 @@ function ensure(world){
 function onDeath(world,npc,minute,out){
  ensure(world);
  const m=world.living.mobile_assets,r=world.entity_registry;
- if(Object.keys(m.corpses).length>=MAX_CORPSES&&!reserve(world,minute,out))
-  return null;
  const state=m.npcs[npc.id];
  if(!state||state.death_minute!==null)return null;
+ if(Object.keys(m.corpses).length>=MAX_CORPSES&&!reserve(world,minute,out))
+  return null;
  state.death_minute=minute;
  const id='corpse_'+(++m.sequence);
  const coins=npc.coins||0;npc.coins=0;
