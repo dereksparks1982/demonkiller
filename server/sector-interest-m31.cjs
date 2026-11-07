@@ -54,6 +54,14 @@ function tierFor(world,area_id,x,y){
  const d=Math.max(Math.abs(here.sx-other.sx),Math.abs(here.sy-other.sy));
  return d===0?'active':d===1?'neighbor':'background';
 }
+// Only expensive NPC threat sensing is tiered. The ordinary 5-minute
+// movement step, needs, shops, combat and territory timers continue globally.
+function npcSenseDue(world,npc,minute){
+ if(!Number.isSafeInteger(minute)||minute<0)throw Error('Invalid NPC AI minute');
+ if(minute%5!==0)return false;
+ if(!world.characters?.['1'])return true;
+ return tierFor(world,npc.area_id,npc.x,npc.y)!=='background'||minute%15===0;
+}
 function terrainChunk(world,{slot=1,area_id,sx,sy}){
  const {c}=position(world,slot),area=world.areas?.[area_id];
  if(!area||area_id!==c.area_id)throw Error('Sector is outside the current region');
@@ -139,4 +147,4 @@ function createInterestTracker({now=Date.now,maxSessions=MAX_SESSIONS}={}){
 }
 module.exports={SIZE,MIN_RADIUS,MAX_RADIUS,DEFAULT_RADIUS,MAX_SESSIONS,
  EXPIRE_MS,MAX_OBJECTS,sectorBounds,nearbySectors,tierFor,terrainChunk,
- sectorEntities,createInterestTracker};
+ sectorEntities,createInterestTracker,npcSenseDue};
