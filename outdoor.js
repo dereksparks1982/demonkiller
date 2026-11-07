@@ -667,7 +667,7 @@ function previewWorld(){
 }
 function returnTemple(){
  rightHeld=false;
- if(SERVER){location.href='./test-center.html?dkSlot='+slot;return;}
+ if(SERVER){location.href='./test-center.html?dkSlot='+slot+'&walk=continuous1';return;}
  try{
   const data=JSON.parse(localStorage.getItem(TEMPLE_SAVE)||'null');
   const saved=data?.slots?.[0]?.scene;
@@ -679,7 +679,7 @@ function returnTemple(){
    data.slots[0].scene=saved;localStorage.setItem(TEMPLE_SAVE,JSON.stringify(data));
   }
  }catch(_){}
- location.href='./test-center.html?from=courtyard';
+ location.href='./test-center.html?from=courtyard&walk=continuous1';
 }
 async function step(direction){
  if(busy||lilithPhase==='playing')return;
@@ -931,7 +931,7 @@ async function begin(){
   if(SERVER){
    await SERVER.startWorld();
    player=await SERVER.getCharacter(slot);
-   if(player.area_id===R.TEMPLE){location.href='./test-center.html?dkSlot='+slot;return;}
+   if(player.area_id===R.TEMPLE){location.href='./test-center.html?dkSlot='+slot+'&walk=continuous1';return;}
    doorOpen=true;await loadArea(player.area_id);
    const last=Number(sessionStorage.getItem('dk.lilith.entry.'+slot)||0);
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
