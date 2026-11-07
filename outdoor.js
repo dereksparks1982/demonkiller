@@ -166,16 +166,54 @@ function drawMonsters(){
   px('#28242a',x+7,y+19,18,8);px('#d2ae55',x+11,y+16,10,5);
  }
 }
+// M29 remains are static terrain features. They never participate in
+// movement collision and always use the same 32px Zelda-era pixel scale.
 function drawCorpses(){
  for(const body of Object.values(living?.mobile_assets?.corpses||{})){
   if(body.area_id!==area.area_id)continue;
   const x=body.x*TILE,y=body.y*TILE;
-  px('#231f21',x+8,y+23,17,6);
-  px('#745e4e',x+11,y+12,11,14);
-  px('#b39a80',x+11,y+9,11,6);
-  px('#3e3031',x+6,y+17,6,4);
+  const monster=body.kind==='monster'||body.species==='demon';
+  const stage=body.stage||'fresh';
+  const color=monster?{
+   fresh:'#803c4a',early:'#653448',decaying:'#422735',
+   skeletal:'#998b8b',scattered:'#4d3b40'
+  }:{
+   fresh:'#866b5f',early:'#74645d',decaying:'#564b48',
+   skeletal:'#c1b9a4',scattered:'#9c9683'
+  };
+  px('#27212a',x+6,y+24,21,4);
+  if(stage==='scattered'){
+   px(color.scattered,x+8,y+20,6,3);
+   px(color.scattered,x+17,y+23,9,2);
+   px(monster?'#6f424a':'#bbb39d',x+12,y+16,5,3);
+   continue;
+  }
+  if(stage==='skeletal'){
+   px(color.skeletal,x+12,y+13,11,7); // skull
+   px('#28242c',x+14,y+16,2,2);
+   px('#28242c',x+20,y+16,2,2);
+   px(color.skeletal,x+10,y+21,13,2);
+   px(color.skeletal,x+13,y+24,3,5);
+   px(color.skeletal,x+20,y+24,3,5);
+   continue;
+  }
+  const shade=color[stage]||color.fresh;
+  px(shade,x+10,y+14,18,11);
+  px(monster?'#8f4b52':'#b69b86',x+6,y+12,10,8);
+  px('#33272d',x+8,y+19,3,3);
+  px(monster?'#8b7772':'#302c2b',x+18,y+25,9,3);
+  if(stage==='early'||stage==='decaying'){
+   px('#544b3b',x+11,y+17,5,3);
+   px('#261d28',x+23,y+20,3,4);
+   // Small irregular specks suggest flies without extra sprite animations.
+   if(stage==='decaying'){
+    px('#99907c',x+6,y+5,2,2);px('#99907c',x+24,y+9,2,2);
+    px('#514946',x+15,y+25,7,3);
+   }
+  }
  }
 }
+
 function closestCorpse(){
  return Object.values(living?.mobile_assets?.corpses||{}).filter(body=>
   body.area_id===player.area_id&&Math.abs(body.x-player.x)+
@@ -444,9 +482,9 @@ function draw(){
    if(area.walls[y*area.width+x])drawWall(x,y);
  for(const o of area.objects)drawObject(o);
  drawResources();
+ drawCorpses();
  drawNpcs();
  drawMonsters();
- drawCorpses();
  drawGroundItems();
  drawChest();
  drawHouseSigns();
@@ -737,8 +775,15 @@ async function toggleDoor(){
 function inspect(x,y,doubleClick){
  const item=actorAt(x,y);if(!item)return message('Nothing notable here.');
  if(item.body){
-  if(doubleClick&&SERVER)return takeAction('loot_corpse',{corpse_id:item.body.id});
-  return message(item.body.name+' died here. Double-click beside the body to recover its goods.');
+  const body=item.body,stage=(body.stage||'fresh').replaceAll('_',' ');
+  const kind=body.kind==='monster'?'demon':'person';
+  const accessible=!body.looted&&body.stage!=='scattered'&&
+   (body.bag_id!==null||body.coins>0);
+  if(doubleClick&&SERVER&&accessible)
+   return takeAction('loot_corpse',{corpse_id:body.id});
+  return message((kind==='demon'?'Demon remains: ':body.name+': ')+
+   stage+' remains anchored here. '+(accessible?
+    'Double-click to recover belongings.':'Nothing remains to loot.'));
  }
  if(item.ground){
   if(doubleClick&&SERVER)return takeAction('pick_up',{drop_id:item.ground.id});
