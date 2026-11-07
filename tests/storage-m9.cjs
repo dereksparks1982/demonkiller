@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),G=require('../server/gameplay.cjs');
@@ -9,7 +10,7 @@ function fixture(){
  let w=W.createCharacter(W.makeWorld(ORIGIN),1,'ELIAS',ORIGIN).world;
  const c=w.characters['1'];c.area_id=R.VILLAGE;c.x=54;c.y=103;
  c.form='living';c.opening_state='resurrected';c.inventory.herbs=10;
- w.living.businesses.village_bank.open=true;return w;
+ w.living.businesses.village_bank.open=true;syncAll(w);return w;
 }
 test('M9 validates, migrates, and preserves item storage alongside other world data',()=>{
  const world=fixture();
