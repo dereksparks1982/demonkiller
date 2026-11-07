@@ -55,6 +55,8 @@ test('M33 browser loads cell-shell layer before outdoor rendering and retains wa
  assert.match(js,/cellShells\.visible\(area,camera,VIEW\)/);
  assert.match(js,/async function refreshCellView\(\)/);
  assert.match(js,/window\.DKStreamingCellShells/);
+ assert.match(read('server/local-game.cjs'),/'streaming-cell-shells-m33\\.js'/);
+ assert.match(read('dk-menu-server.js'),/async streamingCells\\(radius=24\\)/);
  assert.match(js,/advanceVisual\(dt\)/);
  assert.match(js,/pointerMove\(dt\)/);
  assert.match(js,/rightHeld/);
