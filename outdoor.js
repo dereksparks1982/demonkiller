@@ -20,6 +20,21 @@ let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
 // M31: nearby entities arrive through bounded server-sector deltas.
 // This is client display state only; the server remains authoritative.
 let sectorView=null,sectorCursor=null,sectorPolling=false,sectorErrors=0;
+let terrainSession=null;
+function prefetchTerrain(){
+ if(!terrainSession||!player||!area||area.area_id!==player.area_id)return;
+ const session=terrainSession;
+ try{
+  const desired=session.setFocus(player.x,player.y);
+  // Prefetch up to two sectors around the character. Never block walking
+  // on a network request; the server alone determines movement legality.
+  void session.prefetch(session.around(player.x,player.y,2)).then(result=>{
+   if(terrainSession===session&&result.failed>0&&session.stats().loaded===0)
+    message('Terrain stream temporarily unavailable.');
+  }).catch(()=>{});
+ }catch(_){}
+}
+
 function nearbyDisplay(kind,fallback){
  const view=sectorView;
  if(!view||!area||!player||view.area_id!==area.area_id||
@@ -47,6 +62,13 @@ async function refreshSectorInterest(){
   for(const entry of state.upsert)
    sectorView.entities.set(entry.kind+':'+entry.id,entry);
   sectorCursor=state.cursor;sectorErrors=0;
+  if(terrainSession&&terrainSession.area.area_id===state.area_id){
+   try{
+    terrainSession.setFocus(player.x,player.y);
+    // Client cache de-duplicates already loaded chunks and caps concurrency.
+    void terrainSession.prefetch(state.sectors).catch(()=>{});
+   }catch(_){}
+  }
   draw();
  }catch(error){
   sectorErrors++;
@@ -74,7 +96,28 @@ function previewArea(id){
 }
 async function loadArea(id){
  const changed=!area||area.area_id!==id;
- area=SERVER?(await SERVER.area(id)).area:previewArea(id);
+ if(terrainSession){terrainSession.close();terrainSession=null;}
+ let nextArea=null;
+ if(SERVER&&window.DKSectorTerrain){
+  let candidate=null;
+  try{
+   const manifest=await SERVER.sectorManifest(id);
+   candidate=window.DKSectorTerrain.makeSession({
+    manifest,
+    loadChunk:(region,sx,sy)=>SERVER.sectorChunk(region,sx,sy),
+    onChange:(updated)=>{if(terrainSession===candidate&&area===updated)draw();}
+   });
+   await candidate.prime(player.x,player.y);
+   terrainSession=candidate;nextArea=candidate.area;
+   // The first ring is ready to draw; extra sectors stream in the background.
+   void candidate.prefetch(candidate.around(player.x,player.y,2)).catch(()=>{});
+  }catch(error){
+   candidate?.close();
+   // A failed or outdated server must not leave the player on partial tiles.
+   nextArea=(await SERVER.area(id)).area;
+  }
+ }else nextArea=SERVER?(await SERVER.area(id)).area:previewArea(id);
+ area=nextArea;
  if(!area||!area.floor||area.floor.length!==area.width*area.height)
   throw Error('Invalid region geometry');
  if(changed){resetVisual();sectorView=null;sectorCursor=null;}
@@ -91,6 +134,10 @@ function viewCamera(){
 function px(color,x,y,w,h){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
 function floor(x,y){
  const f=area.floor[y*area.width+x];
+ if(area.streamed&&f===null){
+  // Explicit unready tile; never silently invent grass or wall collision.
+  px('#26252c',x*TILE,y*TILE,TILE,TILE);return;
+ }
  const colors={grass:'#36663b',path:'#716a61',garden:'#446f40',
   stone:'#625d64',roof:'#443940'};
  px(colors[f]||'#345d3b',x*TILE,y*TILE,TILE,TILE);
@@ -844,7 +891,7 @@ async function step(direction){
    if(oldDistrict!==player.region_id)refreshDistrict();
    if(area.objects.some(o=>o.type==='house'&&o.door&&Math.abs(o.door.x-player.x)+Math.abs(o.door.y-player.y)<=6))refreshHousing();
    if(area.area_id!==player.area_id)await loadArea(player.area_id);
-   else visual.queue.push({x:player.x,y:player.y});
+   else{visual.queue.push({x:player.x,y:player.y});prefetchTerrain();}
    persistPreview();
   }catch(e){message('Movement blocked: '+e.message);}
   finally{busy=false;}
