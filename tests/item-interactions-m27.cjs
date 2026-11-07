@@ -93,6 +93,12 @@ test('M27 HTTP inventory endpoint is isolated to the local game',async t=>{
  const payload=await inventory.json();
  assert.equal(payload.character,'ELIAS');assert.ok(Array.isArray(payload.backpack));
  assert.equal(payload.form,'ghost');
+ for(const asset of ['/temple-ui.js','/temple-ui.css','/outdoor-ui.js']){
+  const response=await fetch(base+asset);
+  assert.equal(response.status,200,'local server should serve '+asset);
+ }
+ assert.notEqual((await fetch(base+'/server/dk-server.cjs')).status,200,
+  'server source must remain private');
  const invalid=await fetch(base+'/api/v1/gameplay',{method:'POST',
   headers:{'Content-Type':'application/json'},
   body:JSON.stringify({action:'use_item',serial:'ent_999999'})});
