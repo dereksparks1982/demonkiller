@@ -120,7 +120,10 @@ function refresh(force=false){
     b.addEventListener('dragover',e=>{if(Array.from(e.dataTransfer.types||[]).includes('text/plain'))e.preventDefault();});
     b.addEventListener('drop',e=>{
      e.preventDefault();const from=e.dataTransfer.getData('text/plain');
-     if(from&&from!==serial)itemAction('combine_stacks',{source_serial:from,target_serial:serial});
+     if(from&&from!==serial&&remote?.backpack.some(item=>item.serial===from)){
+      e.stopPropagation();
+      itemAction('combine_stacks',{source_serial:from,target_serial:serial});
+     }
     });
    }
    box.append(b);
