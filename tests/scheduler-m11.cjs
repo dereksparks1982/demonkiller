@@ -8,10 +8,11 @@ const {createDKServer}=require('../server/dk-server.cjs');
 const START=Date.UTC(2026,10,6);
 test('M11 creates durable deterministic timer jobs and validates them',()=>{
  const w=W.makeWorld(START),jobs=Object.values(w.living.scheduler.jobs);
- assert.equal(jobs.length,7);
+ assert.equal(jobs.length,9);
  assert.deepEqual(jobs.map(j=>j.kind),
-   ['postal_dispatch','camp_rotation','shop_restock','guard_payroll','corpse_cleanup','workshop_batch','vacancy_recruitment']);
- assert.deepEqual(jobs.map(j=>j.due_minute),[1,90,120,360,60,120,120]);
+   ['postal_dispatch','camp_rotation','shop_restock','guard_payroll','corpse_cleanup','workshop_batch','vacancy_recruitment',
+    'scavenger_activity','grave_aging']);
+ assert.deepEqual(jobs.map(j=>j.due_minute),[1,90,120,360,60,120,120,15,120]);
  assert.equal(T.ensure(w),false);
  assert.doesNotThrow(()=>W.validateWorld(w));
 });
@@ -22,7 +23,7 @@ test('M10 world migrates scheduler without losing time, mail, NPCs or business m
  delete w.living.scheduler;
  assert.equal(T.ensure(w),true);
  assert.deepEqual(Object.values(w.living.scheduler.jobs).map(x=>x.due_minute),
-   [138,180,240,360,180,240,240]);
+   [138,180,240,360,180,240,240,150,240]);
  assert.equal(w.living.businesses.village_bank.coins,oldCoins);
  assert.equal(w.living.npcs.baker.name,npc);
  assert.equal(T.ensure(w),false);
@@ -92,7 +93,7 @@ test('HTTP endpoint exposes read-only jobs and reboot does not rerun paid wages'
  const res=await fetch(base+'/api/v1/schedule');
  assert.equal(res.status,200);
  const schedule=await res.json();
- assert.equal(schedule.jobs.length,7);
+ assert.equal(schedule.jobs.length,9);
  assert.equal(schedule.jobs[0].kind,'postal_dispatch');
  assert.equal((await fetch(base+'/api/v1/schedule',{method:'POST',
    headers:{'Content-Type':'application/json'},body:'{}'})).status,405);
