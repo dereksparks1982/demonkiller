@@ -15,6 +15,7 @@ const {ensure:ensureCombat}=require('./combat-m8.cjs');
 const {ensure:ensureStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,counts:assertEntityCounts,inspect:inspectEntities}=require('./entity-registry-m10.cjs');
 const {build:buildSectorIndex,lookup:sectorLookup}=require('./sectors-m10.cjs');
+const {createInterestTracker,terrainChunk,DEFAULT_RADIUS}=require('./sector-interest-m31.cjs');
 const {ensure:ensureScheduler,listing:schedulerListing}=require('./world-scheduler-m11.cjs');
 const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m12.cjs');
 const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
@@ -184,6 +185,8 @@ async function createDKServer({
   const streams = new Set();
   let server, writeQueue = Promise.resolve(), stopping = false;
   let spatialCache = null;
+  // View cursors and sector geometry are derived in memory, never saved.
+  const sectorTracker=createInterestTracker({now});
   const eventLog=path.join(dataDir,'world-events.ndjson');
   async function appendEvents(events){
     if(!events?.length)return;
@@ -351,7 +354,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m30', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m31', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -418,6 +421,43 @@ async function createDKServer({
     }
     if(url.pathname==='/api/v1/schedule'&&!write){
       return sendJSON(res,200,{...schedulerListing(world),revision:world.revision},method);
+    }
+    if(url.pathname==='/api/v1/sectors/interest'&&!write){
+      const character=world.characters['1'];
+      if(!character)return sendJSON(res,404,{error:'No character exists'},method);
+      const raw=url.searchParams.get('radius'),radius=raw===null?
+        DEFAULT_RADIUS:Number(raw);
+      const cursor=url.searchParams.get('cursor');
+      if(!Number.isSafeInteger(radius)||radius<8||radius>32)
+        return sendJSON(res,422,{error:'Sector radius must be 8 through 32'},method);
+      try{
+        if(!spatialCache||spatialCache.world_revision!==world.revision)
+          spatialCache=buildSectorIndex(world);
+        const interest=sectorTracker.poll(world,spatialCache,{radius,cursor});
+        return sendJSON(res,200,interest,method);
+      }catch(error){
+        if(/Invalid sector|Invalid player|interest.*limit/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Sector interest failed:',error);
+        return sendJSON(res,500,{error:'Sector interest could not be read'},method);
+      }
+    }
+    if(url.pathname==='/api/v1/sectors/chunk'&&!write){
+      if(!world.characters['1'])
+        return sendJSON(res,404,{error:'No character exists'},method);
+      const area_id=url.searchParams.get('area');
+      const sx=Number(url.searchParams.get('sx'));
+      const sy=Number(url.searchParams.get('sy'));
+      if(!area_id||!Number.isSafeInteger(sx)||!Number.isSafeInteger(sy)||
+        sx<0||sy<0)return sendJSON(res,422,{error:'Invalid sector chunk coordinates'},method);
+      try{
+        return sendJSON(res,200,terrainChunk(world,{area_id,sx,sy}),method);
+      }catch(error){
+        if(/Sector|Invalid/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Terrain chunk failed:',error);
+        return sendJSON(res,500,{error:'Sector chunk could not be read'},method);
+      }
     }
     if(url.pathname==='/api/v1/nearby'&&!write){
       const c=world.characters['1'];
