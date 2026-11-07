@@ -15,7 +15,7 @@ const {ensure:ensureCombat}=require('./combat-m8.cjs');
 const {ensure:ensureStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,counts:assertEntityCounts,inspect:inspectEntities}=require('./entity-registry-m10.cjs');
 const {build:buildSectorIndex,lookup:sectorLookup}=require('./sectors-m10.cjs');
-const {createInterestTracker,terrainChunk,DEFAULT_RADIUS}=require('./sector-interest-m31.cjs');
+const {createInterestTracker,terrainManifest,terrainChunk,DEFAULT_RADIUS}=require('./sector-interest-m31.cjs');
 const {ensure:ensureScheduler,listing:schedulerListing}=require('./world-scheduler-m11.cjs');
 const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m12.cjs');
 const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
@@ -354,7 +354,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m31', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m32', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -440,6 +440,20 @@ async function createDKServer({
           return sendJSON(res,422,{error:error.message},method);
         console.error('Sector interest failed:',error);
         return sendJSON(res,500,{error:'Sector interest could not be read'},method);
+      }
+    }
+    if(url.pathname==='/api/v1/sectors/manifest'&&!write){
+      if(!world.characters['1'])
+        return sendJSON(res,404,{error:'No character exists'},method);
+      const area_id=url.searchParams.get('area');
+      if(!area_id)return sendJSON(res,422,{error:'Missing streamed region'},method);
+      try{
+        return sendJSON(res,200,terrainManifest(world,{area_id}),method);
+      }catch(error){
+        if(/Sector|Invalid/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Sector manifest failed:',error);
+        return sendJSON(res,500,{error:'Sector manifest could not be read'},method);
       }
     }
     if(url.pathname==='/api/v1/sectors/chunk'&&!write){
