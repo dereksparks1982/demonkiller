@@ -17,7 +17,7 @@ assert(!html.includes('id="dkServerOptions" hidden'), 'Persistent World must be 
 assert(html.includes('id="dkServerClock"'), 'World clock status must exist even while disconnected');
 assert(/<script src="\.\/dk-menu-server\.js(?:\?v=[^\"]+)?"><\/script>/.test(html),
  'The main menu must load the local DK Server client');
-assert(html.includes("await SERVER.startWorld();")&&html.includes("location.href='./test-center.html?dkSlot='+id;"),
+assert(html.includes("await SERVER.startWorld();")&&html.includes("location.href='./test-center.html?dkSlot='+id+'&walk=continuous1';"),
  'The server-mode character launch must use a server record, not a browser save');
 
 assert(html.includes('assets/art/menu/demon-killer-main-menu-spritesheet.png'));
