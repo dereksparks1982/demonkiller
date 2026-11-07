@@ -18,6 +18,7 @@ const {build:buildSectorIndex,lookup:sectorLookup}=require('./sectors-m10.cjs');
 const {ensure:ensureScheduler,listing:schedulerListing}=require('./world-scheduler-m11.cjs');
 const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m12.cjs');
 const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
+const {deleteCharacter}=require('./character-lifecycle-m26.cjs');
 const {publicRecord:publicSkills}=require('./skills-m14.cjs');
 const {ensure:ensureLaw,listing:lawListing}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,current:currentDistrict}=require('./region-policies-m16.cjs');
@@ -227,6 +228,24 @@ async function createDKServer({
       return result;
     });
     writeQueue = pending.catch(() => {});
+    return pending;
+  }
+  async function saveDeletedCharacter(slot,name){
+    const pending=writeQueue.then(async()=>{
+      // Deletion is allowed while paused; do not advance the simulated world.
+      const result=deleteCharacter(world,slot,name);
+      // A verified pre-delete checkpoint is mandatory before modifying world.json.
+      await snapshots.checkpoint(world,JSON.stringify(world,null,2)+'\n');
+      await snapshots.save(result.world,{forceBackup:true});
+      world=result.world;
+      spatialCache=null;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('Character deletion archive failed:',error);}
+      for(const viewer of streams)push(viewer,'world.character.deleted',
+        {slot,world_revision:world.revision});
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});
     return pending;
   }
   async function saveAction(slot, command) {
@@ -530,6 +549,26 @@ async function createDKServer({
         }
       }
       return sendJSON(res, 200, { characters: Object.fromEntries(Object.entries(world.characters).map(([k,v])=>[k,playableCharacter(v)])), world_revision: world.revision }, method);
+    }
+    const deleteMatch=url.pathname.match(/^\/api\/v1\/characters\/(1)$/);
+    if(deleteMatch&&method==='DELETE'){
+      if(req.headers['x-dk-control']!=='delete-character')
+        return sendJSON(res,403,{error:'Explicit character deletion control required'});
+      let body;
+      try{body=await readJSON(req);}
+      catch(e){return sendJSON(res,e.status||400,{error:e.message});}
+      if(Object.keys(body).sort().join(',')!=='confirm,name'||
+        body.confirm!=='DELETE'||typeof body.name!=='string')
+        return sendJSON(res,422,{error:'Provide the character name and DELETE confirmation'});
+      try{
+        const result=await saveDeletedCharacter(Number(deleteMatch[1]),body.name);
+        return sendJSON(res,200,{deleted:true,slot:1,world_revision:result.world.revision});
+      }catch(e){
+        if(/Empty character slot/.test(e.message))return sendJSON(res,404,{error:e.message});
+        if(/confirmation does not match/.test(e.message))return sendJSON(res,409,{error:e.message});
+        console.error('Character deletion failed:',e);
+        return sendJSON(res,500,{error:'Character was not deleted; world checkpoint or save failed'});
+      }
     }
     const match = url.pathname.match(/^\/api\/v1\/characters\/(1)$/);
     if (match && !write) {
