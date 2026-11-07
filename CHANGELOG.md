@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.38 / DK Server M16 | 2026-11-06 | Priority districts and world location history
+
+- Added a server-owned priority district registry across the existing variable-sized temple, courtyard and village. Regions include Lilith's willow, temple grounds, four village districts and residential fallbacks with housing and guarded metadata.
+- Added persistent enter/exit event history for the single player and district-entry events for moving NPCs, including pathfinding movement while the web browser is closed and DK Server is running.
+- Integrated M15 crime/guard protection checks with the actual district coordinates and monster-occupation state. A fallen village loses protected status without deleting its districts.
+- Added `GET /api/v1/region/current`, an outdoor district readout, migration of old saves, and `tests/districts-m16.cjs` regression coverage. Module-level simulations passed player/NPC crossings, jurisdiction toggles, region validation and world save consistency. Complete Node/visual integration not yet run.
+- The RunUO region concept was independently implemented in JavaScript; no GPL C# copied. One character, approved art, no fixed-size world restriction, and no online server hosting changes.
+
 ## v0.2.37 / DK Server M15 | 2026-11-06 | Guarded villages and witnessed crime
 
 - Reviewed RunUO `Server/Region.cs`, `Scripts/Regions/GuardedRegion.cs` and `Scripts/Misc/Notoriety.cs` as architectural references. Implemented independent guarded-region, crime-case, witness and legal-status rules without copying GPL C#.

@@ -62,3 +62,7 @@ Reviewed `Server/Skills.cs` and `Scripts/Misc/SkillCheck.cs` from RunUO. DK Serv
 ## Milestone 15: Guarded regions and witnessed crimes (v0.2.37)
 
 RunUO `Server/Region.cs`, `Scripts/Regions/GuardedRegion.cs` and `Scripts/Misc/Notoriety.cs` organize lawful areas, criminal actions, guard candidates and notoriety. DK Server independently implements a first guarded settler-controlled village, physical NPC witnesses for theft from an NPC corpse, a saved criminal case/fine/warrant record, guard pursuit using cardinal geometry, and restitution using real bank funds. The courtyard is not subject to village justice, and guards do not magically discover unwitnessed actions. This is not RunUO's entire criminal/guard system, nor a multiplayer implementation.
+
+## Milestone 16: Overlapping districts and region events (v0.2.38)
+
+RunUO `Server/Region.cs` demonstrates overlapping priority regions, location-based entry/exit hooks and local rules. `Scripts/Regions/GuardedRegion.cs` supplies guarded-region architecture. M16 independently models these concepts for Demon Killer's existing three variable-sized areas, using canonical district IDs and world-saved visit history. These policies integrate with the M15 crime system without copying any RunUO GPL implementation; actual UO region event scripting and housing deeds remain unimplemented.

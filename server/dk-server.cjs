@@ -20,6 +20,7 @@ const {ensure:ensureMobileAssets,read:nearbyCorpses}=require('./mobile-assets-m1
 const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
 const {publicRecord:publicSkills}=require('./skills-m14.cjs');
 const {ensure:ensureLaw,listing:lawListing}=require('./law-m15.cjs');
+const {ensure:ensureDistricts,current:currentDistrict}=require('./region-policies-m16.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -145,6 +146,7 @@ async function createDKServer({
     const schedulerAdded=ensureScheduler(world);
     const mobileAdded=ensureMobileAssets(world);
     const lawAdded=ensureLaw(world);
+    const districtsAdded=ensureDistricts(world);
     assertEntityCounts(world);
     // A stopped world stays frozen. No NPC catch-up or world time is simulated
     // during an intentional server shutdown or an offline host restart.
@@ -152,7 +154,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -220,7 +222,7 @@ async function createDKServer({
       const playerEvent=recordPlayer(result.world,command,result.character,result.world.living.minute);
       await snapshots.save(result.world);
       world=result.world;
-      try{await appendEvents([...tick.events,...(playerEvent?[playerEvent]:[])]);}
+      try{await appendEvents([...tick.events,...(result.events||[]),...(playerEvent?[playerEvent]:[])]);}
       catch(e){console.error('World event archive write failed:',e);}
       return result;
     });
@@ -308,7 +310,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m15', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m16', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -321,6 +323,11 @@ async function createDKServer({
       const area=world.areas[areaMatch[1]];
       return area?sendJSON(res,200,{area,revision:world.revision},method):
         sendJSON(res,404,{error:'Unknown region'},method);
+    }
+    if(url.pathname==='/api/v1/region/current'&&!write){
+      const state=currentDistrict(world);
+      return state?sendJSON(res,200,state,method):
+        sendJSON(res,404,{error:'No character exists'},method);
     }
     if(url.pathname==='/api/v1/save/status'&&!write){
       return sendJSON(res,200,await snapshots.status(world),method);

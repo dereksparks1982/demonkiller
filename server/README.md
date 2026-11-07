@@ -1,4 +1,4 @@
-# DK Server M15 | Guarded Regions and Witnessed Crime (v0.2.37)
+# DK Server M16 | Priority Districts and Jurisdiction Boundaries (v0.2.38)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m15`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m16`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -141,7 +141,7 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 
 ## v0.2.34 integration correction
 
-The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m15`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m16`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
 
 ## M13 save-strategy and verification
 
@@ -174,3 +174,11 @@ A reported case adds a 12-gold fine, a 180-world-minute wanted period, 20 crimin
 `GET /api/v1/law` exposes the single player's legal standing and recent cases. `POST /api/v1/gameplay` accepts the validated `{"action":"pay_fine","amount":12}` transaction only at the open Village Bank, with real player funds. The outdoor sidebar displays fines, criminal heat and citations, plus a Pay Fine control. The existing serialized writer, verified save checkpoints and dated event archive preserve these changes. `tests/law-m15.cjs` covers visible/unseen crime, monster-held territory, money conservation, real guard intervention, valid restitution, invalid requests and HTTP persistence. Current module-level checks validated both witnessed and unwitnessed cases, physical fines, reputation changes and world-save integrity.
 
 Further RunUO-like work must add theft of ordinary objects, guard reporting dialogue, NPC murderer/notoriety classification, legal ownership, jail rooms, bounties, trials, and true witness testimony. Single-player DK Server remains loopback-only and the GitHub Pages frontend remains a static preview.
+
+## M16 district policy registry
+
+`server/region-policies-m16.cjs` implements overlapping rectangular district policies with server-defined priority and canonical IDs, independently informed by RunUO's `Server/Region.cs` and `Scripts/Regions/GuardedRegion.cs`. Each area retains its original independent dimensions, and a higher-priority district supersedes a base residential district. The village currently has a guarded bank quarter, market, smiths quarter, north gate and residential fallback; the courtyard has Lilith's willow, temple grounds and homes. Monster occupation dynamically disables village guard status while keeping stable district IDs. Region policy is **not accepted from the browser**.
+
+M15 saves receive `world.living.region_history` on startup and preserve character, business, crime, skill, NPC and item records. Character actions update `region_id` and persist `player.region.enter`/`player.region.exit` events, including through the temple door. Every world minute, the living-world simulator compares NPC locations against their previous district and saves one `npc.region.enter` event for each crossing, even if the player is logged out. The preexisting server event archive receives player crossing events through the same serialized write path. District history stays in the checkpointed world snapshot. Validation rejects fake or mismatched district IDs.
+
+`GET /api/v1/region/current` returns the one current character's official district and the saved visit counts; there is no region-modification endpoint. The outdoor UI displays guarded/occupied/housing metadata. The existing M15 law code now consults tile-specific guarded status for corpse witnesses, wanted guard intervention and fine payment. This is the foundation for later distinct laws, property and dynamic guard jurisdictions, not a claim of full RunUO region scripting. `tests/districts-m16.cjs` adds policy, migration, event, entity-identity, validation and HTTP regression contracts. Full Node/browser integration testing still needs a complete checked-out project.

@@ -12,6 +12,7 @@ const {reconcile:reconcileEntities,validate:validateEntities}=require('./entity-
 const {ensure:ensureScheduler,validate:validateScheduler}=require('./world-scheduler-m11.cjs');
 const {ensure:ensureMobileAssets,validate:validateMobileAssets}=require('./mobile-assets-m12.cjs');
 const {ensure:ensureLaw,validate:validateLaw}=require('./law-m15.cjs');
+const {ensure:ensureDistricts,validate:validateDistricts,onPlayerMove}=require('./region-policies-m16.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -79,6 +80,7 @@ function makeWorld(now = Date.now()) {
   ensureScheduler(result);
   ensureMobileAssets(result);
   ensureLaw(result);
+  ensureDistricts(result);
   return result;
 }
 
@@ -148,6 +150,7 @@ function validateWorld(world) {
   validateScheduler(world);
   validateMobileAssets(world);
   validateLaw(world);
+  validateDistricts(world);
   return world;
 }
 
@@ -164,6 +167,7 @@ function createCharacter(world, slot, name, now = Date.now()) {
   const next = structuredClone(world);
   next.characters[String(slot)] = character;
   reconcileEntities(next);
+  ensureDistricts(next);
   next.revision++;
   validateWorld(next);
   return {world: next, character};
@@ -255,9 +259,10 @@ function applyCharacterAction(world, slot, command) {
   }
   character.revision++;
   next.characters[String(slot)] = character;
+  const districtEvents=onPlayerMove(next,previous);
   next.revision++;
   validateWorld(next);
-  return {world:next,character};
+  return {world:next,character,events:districtEvents};
 }
 
 function worldClock(world, now = Date.now()) {

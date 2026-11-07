@@ -243,6 +243,16 @@ async function chestGoods(destination,source){
   await takeAction('move_item',{serial:selected.serial,quantity:order.quantity,destination});
  }catch(e){message('Chest access: '+e.message);}
 }
+async function refreshDistrict(){
+ if(!SERVER||!player)return;
+ try{
+  const r=(await SERVER.region()).region;
+  $('districtStatus').textContent='District: '+r.name+
+   ' · '+(r.guarded?'Guarded':'Unguarded')+
+   (r.occupied?' · Occupied by monsters':'')+
+   (r.housing?' · Housing allowed':' · Housing restricted');
+ }catch(e){$('districtStatus').textContent='District data unavailable.';}
+}
 async function refreshSchedule(){
  if(!SERVER)return;
  try{
@@ -535,7 +545,9 @@ async function step(direction){
   try {
    const next=await SERVER.action(slot,'move',{direction});
    if(next.area_id===R.TEMPLE){returnTemple();return;}
+   const oldDistrict=player.region_id;
    player=next;
+   if(oldDistrict!==player.region_id)refreshDistrict();
    if(area.area_id!==player.area_id)await loadArea(player.area_id);
    persistPreview();
   }catch(e){message('Movement blocked: '+e.message);}
@@ -712,9 +724,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -735,6 +747,7 @@ async function begin(){
    $('combatStatus').textContent='Monster combat, NPC remains and loot require DK Server.';
    $('sectorStatus').textContent='The sector index requires DK Server.';
     $('scheduleStatus').textContent='World timers require DK Server.';
+    $('districtStatus').textContent='District policy requires DK Server.';
    for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake'])
      $(id).disabled=true;
   }

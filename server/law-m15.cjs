@@ -2,6 +2,7 @@
 // M15: independent guarded-region and witness-based crime simulation.
 // RunUO-inspired region/notoriety concepts; no GPL implementation copied.
 const {VILLAGE}=require('./regions.cjs');
+const {regionAt}=require('./region-policies-m16.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
 const MAX_CASES=500,THEFT_FINE=12,WITNESS_RANGE=8;
 function initial(){
@@ -49,8 +50,11 @@ function log(world,minute,type,text,extra={}){
  l.events.push(e);if(l.events.length>512)l.events.shift();
  return e;
 }
-function guarded(world,area_id){
- return area_id===VILLAGE&&world.living.territories[VILLAGE]?.control==='settlers';
+function guarded(world,area_id,x,y){
+ if(area_id!==VILLAGE)return false;
+ if(Number.isInteger(x)&&Number.isInteger(y))
+   return regionAt(world,area_id,x,y).guarded;
+ return world.living.territories[VILLAGE]?.control==='settlers';
 }
 function witnesses(world,area_id,x,y,victim){
  return Object.values(world.living.npcs).filter(n=>n.alive&&n.id!==victim&&
@@ -59,7 +63,7 @@ function witnesses(world,area_id,x,y,victim){
 }
 function reportCorpseLoot(world,corpse,minute,out){
  ensure(world);
- if(!guarded(world,corpse.area_id))return null;
+ if(!guarded(world,corpse.area_id,corpse.x,corpse.y))return null;
  const player=world.characters?.['1'];
  if(!player)throw Error('No player for law report');
  const seen=witnesses(world,corpse.area_id,corpse.x,corpse.y,corpse.npc_id);
@@ -91,7 +95,7 @@ function tick(world,minute,events){
  const l=world.living,law=l.law,c=world.characters?.['1'];
  if(!law||!c||minute%5!==0)return;
  const p=law.player;
- if(!guarded(world,c.area_id)||c.form!=='living'||p.fines<=0||
+ if(!guarded(world,c.area_id,c.x,c.y)||c.form!=='living'||p.fines<=0||
    p.wanted_until_minute<minute||p.detained_until_minute>=minute)return;
  const guards=Object.values(l.npcs).filter(n=>n.alive&&n.role==='guard'&&
    n.area_id===c.area_id&&Math.abs(n.x-c.x)+Math.abs(n.y-c.y)<=32)
@@ -134,7 +138,7 @@ function payFine(world,command){
  const next=structuredClone(world),c=next.characters?.['1'];
  if(!c)throw Error('No character exists');
  if(c.form!=='living')throw Error('Ghosts cannot pay a fine');
- if(!guarded(next,c.area_id)||Math.abs(c.x-54)+Math.abs(c.y-103)>3)
+ if(!guarded(next,c.area_id,c.x,c.y)||Math.abs(c.x-54)+Math.abs(c.y-103)>3)
   throw Error('Visit the open Village Bank to pay a fine');
  const bank=next.living.businesses.village_bank;
  if(!bank?.open)throw Error('The bank is closed');
@@ -154,7 +158,7 @@ function payFine(world,command){
 }
 function listing(world){
  const l=world.living,law=l.law||initial(),c=world.characters?.['1'];
- return {guarded_area:VILLAGE,area_guarded:c?guarded(world,c.area_id):false,
+ return {guarded_area:VILLAGE,area_guarded:c?guarded(world,c.area_id,c.x,c.y):false,
    minute:l.minute,player:{...law.player},
    recent_cases:Object.values(law.cases).sort((a,b)=>b.minute-a.minute).slice(0,10)
      .map(x=>({id:x.id,kind:x.kind,minute:x.minute,

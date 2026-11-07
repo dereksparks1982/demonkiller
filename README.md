@@ -2,7 +2,17 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.37 | DK Server M15, Guarded Regions and Crime
+## Current milestone: v0.2.38 | DK Server M16, Districts and Jurisdictions
+
+### M16: Real districts inside each independent map
+
+- Priority-based subregions distinguish Lilith's willow, temple grounds, courtyard homes, the Village Bank Quarter, Market Square, Smiths Quarter, Northern Gate and residential districts. The existing 16×16 temple, 64×64 courtyard and 128×128 village **keep their actual dimensions**.
+- Crossing a district emits saved player enter/exit events; NPCs moving for work, patrols or combat also record district entry. The world stores visit histories in its authoritative save, while M10 entity serials remain unchanged.
+- M15 guarded-region crime checks now consult the specific tile's district policy. When monsters occupy the village, guarded status is withdrawn without deleting the district's identity or history. District rules identify where housing can be permitted in a future housing build.
+- The connected outdoor view shows the current district and its guarded, occupied and housing status. `GET /api/v1/region/current` provides a read-only local API with no client-controlled policy overrides.
+- Original primitive art and room links remain unchanged. This implements spatial legal boundaries, **not** full UO justice, housing deeds, private property or MMO region subscriptions.
+
+
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
