@@ -199,7 +199,7 @@ function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({versio
 async function launch(id){
  if(SERVER){
    await SERVER.startWorld();
-   location.href='./test-center.html?dkSlot='+id;
+   location.href='./test-center.html?dkSlot='+id+'&walk=continuous1;
    return;
  }
  try{
@@ -207,7 +207,7 @@ async function launch(id){
   let outdoor=null;try{outdoor=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.outdoors.preview.v1')||'null');}catch(_){}
   location.href=outdoor&&outdoor.firstCourtyardSeen&&
     ['dk.courtyard.lilith.001','dk.village.001'].includes(outdoor.area_id)?
-    './outdoor.html?v=0.2.47':'./test-center.html?v=0.2.47';
+    './outdoor.html?v=0.2.47-continuous1':'./test-center.html?v=0.2.47-continuous1';
 }
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }
