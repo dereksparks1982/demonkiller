@@ -120,11 +120,11 @@ test('M32 revisiting a sector creates no duplicates or changes to physical item 
 });
 test('M32 local server exposes bounded manifests and chunks, not arbitrary regions',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-stream-m32-'));
- t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true});});
  const w=world();
  await fs.writeFile(path.join(dir,'world.json'),JSON.stringify(w));
  const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
- t.after(async()=>{if(app.server.listening)await app.close();});
+ 
  const base='http://127.0.0.1:'+app.address.port;
  const manifest=await fetch(base+'/api/v1/sectors/manifest?area='+encodeURIComponent(R.VILLAGE));
  assert.equal(manifest.status,200);
