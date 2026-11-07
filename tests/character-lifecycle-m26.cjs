@@ -74,9 +74,9 @@ async function request(base,method,payload,control){
 }
 test('M26 HTTP DELETE requires explicit control, preserves persisted world and permits a fresh character',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-server-m26-'));
- t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true});});
  const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
- t.after(()=>app.server.listening?app.close():Promise.resolve());
+ 
  const base='http://127.0.0.1:'+app.address.port;
  let created=await fetch(base+'/api/v1/characters',{method:'POST',
   headers:{'content-type':'application/json'},body:JSON.stringify({slot:1,name:'ELIAS'})});
