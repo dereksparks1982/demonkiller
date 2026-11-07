@@ -19,7 +19,7 @@ test('M29 server exposes only saved world remains and terrain marks',()=>{
  const server=read('server/dk-server.cjs');
  assert.match(server,/mobile_assets:\{corpses:l\.mobile_assets\?\.corpses\|\|\{\},/);
  assert.match(server,/terrain_marks:l\.mobile_assets\?\.terrain_marks\|\|\{\}/);
- assert.match(server,/build: 'local-m30'/);
+ assert.match(server,/build: 'local-m31'/);
  const scheduler=read('server/world-scheduler-m11.cjs');
  assert.match(scheduler,/corpse_cleanup:expireCorpses/);
 });
