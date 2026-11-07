@@ -55,7 +55,7 @@ test('Splitting creates a new serial; moving the complete piece preserves it acr
  assert.equal(recovered.item.serial,split.item.serial,'Chest does not recreate the item');
  assert.equal(recovered.world.characters['1'].inventory.herbs,10);
  const outdoor=structuredClone(recovered.world);outdoor.characters['1'].area_id=R.COURT;
- outdoor.characters['1'].x=20;outdoor.characters['1'].y=30;
+ outdoor.characters['1'].x=20;outdoor.characters['1'].y=30;syncAll(outdoor);
  E.reconcile(outdoor);
  const dropped=G.apply(outdoor,{action:'move_item',serial:recovered.item.serial,
    quantity:4,destination:'ground'});
@@ -70,7 +70,7 @@ test('Splitting creates a new serial; moving the complete piece preserves it acr
 });
 test('Legacy M9 ground transfers keep the item identity where possible',()=>{
  const w=fixture(),old=item(w,'herbs',E.PACK).serial;
- w.characters['1'].area_id=R.COURT;w.characters['1'].x=20;w.characters['1'].y=30;
+ w.characters['1'].area_id=R.COURT;w.characters['1'].x=20;w.characters['1'].y=30;syncAll(w);
  const dropped=G.apply(w,{action:'drop_item',item_type:'herbs',quantity:10});
  E.reconcile(dropped.world);
  assert.equal(item(dropped.world,'herbs','ground_1').serial,old);
