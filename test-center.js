@@ -1893,15 +1893,19 @@
       saveCultWorld();
     }
     initializePopulation(record);
-    const panel=$('cultJournal'),toggle=$('cultJournalToggle'),close=$('cultJournalClose');
-    if(!panel||!toggle||!close)return;
+    const panel=$('cultJournal'),close=$('cultJournalClose');
+    if(!panel||!close)return;
     const show=open=>{
-      panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
+      panel.hidden=!open;
       if(open){stopRightMovement();renderCultJournal();}
     };
-    toggle.addEventListener('click',()=>show(panel.hidden));
     close.addEventListener('click',()=>show(false));
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)show(false);});
+    document.addEventListener('keydown',e=>{
+      if(e.ctrlKey||e.altKey||e.metaKey||e.repeat)return;
+      if(['INPUT','TEXTAREA','SELECT'].includes(e.target?.tagName)||e.target?.isContentEditable)return;
+      if(e.key.toLowerCase()==='c'){e.preventDefault();show(panel.hidden);}
+      if(e.key==='Escape'&&!panel.hidden){e.preventDefault();show(false);}
+    });
     // Future NPC and scene scripts may report discoveries and political events.
     if(typeof window!=='undefined')window.DemonKillerCultHooks=Object.freeze({
       registerCitizen:profile=>{const c=Cult.addCitizen(cultWorld,profile);saveCultWorld();return c.id;},
