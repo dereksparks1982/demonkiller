@@ -1017,30 +1017,52 @@
     return {x:(e.clientX-r.left)/r.width*N*TILE,y:(e.clientY-r.top)/r.height*N*TILE};
   }
   function moveTowardPointer(dt,target=rightPointer) {
-    if(!target||dt<=0)return;
+    if(!target||dt<=0||mode!=='walk'||opening||ritual)return;
     if(SERVER){
-      if(!serverReady||serverBusy||opening||ritual||mode!=='walk')return;
+      // The server still validates cardinal moves. Display their transitions
+      // smoothly while its world data stays authoritative.
+      if(!serverReady||serverBusy)return;
       const dx=target.x-(visual.x+.5)*TILE,dy=target.y-(visual.y+.5)*TILE;
       if(Math.hypot(dx,dy)<TILE*.42)return;
       if(Math.abs(dx)>=Math.abs(dy))step(dx>=0?1:-1,0);
       else step(0,dy>=0?1:-1);
       return;
     }
-    // UO-style hold-to-steer, but one CARDINAL tile at a time:
-    // no sideways drift or diagonal crossing between tile addresses.
-    if(mode!=='walk'||opening||ritual||lastFrameTime-pointerStepAt<190)return;
-    const p=scene.player,dx=target.x-(p.x+.5)*TILE,dy=target.y-(p.y+.5)*TILE;
-    if(Math.hypot(dx,dy)<TILE*.35){
+
+    // Restore the original continuous mouse steering. Pixel distance controls
+    // travel every frame; the tile grid is only consulted for collision/save.
+    // Move on one cardinal axis at a time, never diagonally.
+    visual.queue.length=0;
+    const dx=target.x-(visual.x+.5)*TILE;
+    const dy=target.y-(visual.y+.5)*TILE;
+    const distance=Math.hypot(dx,dy);
+    if(distance<=3){
       if(!rightMouseHeld)clickDestination=null;
       return;
     }
-    pointerStepAt=lastFrameTime;
-    const keepDestination=clickDestination;
-    const moved=Math.abs(dx)>=Math.abs(dy)?
-      step(dx>0?1:-1,0):step(0,dy>0?1:-1);
-    if(!rightMouseHeld)clickDestination=moved?keepDestination:null;
-    // Step() commits a cardinal destination; its visual queue must animate
-    // across that tile instead of instantly snapping to the endpoint.
+    const speed=distance>4*TILE?5.6:3.1;
+    let ax=0,ay=0;
+    if(Math.abs(dx)>=Math.abs(dy))ax=Math.sign(dx)*Math.min(Math.abs(dx)/TILE,speed*dt);
+    else ay=Math.sign(dy)*Math.min(Math.abs(dy)/TILE,speed*dt);
+    const p=scene.player;
+    const nx=visual.x+ax,ny=visual.y+ay;
+    const tx=Math.round(nx),ty=Math.round(ny);
+    if(tx!==p.x||ty!==p.y){
+      if(tx===8&&ty===0){
+        if(!scene.introSeen){message('I cannot leave.');clickDestination=null;return;}
+        const gate=scene.objects.find(o=>o.id==='temple_north_door');
+        if(!gate?.open){message('The iron arch is closed. Double-click the door to open it.');clickDestination=null;return;}
+        leaveTemple();return;
+      }
+      if(!canStand(tx,ty)){clickDestination=null;return;}
+    }
+    visual.x=nx;visual.y=ny;
+    p.facing=facing(ax,ay);
+    if(tx!==p.x||ty!==p.y){
+      p.x=tx;p.y=ty;dirty=true;
+      noteCharacterActivity();persistCharacter();
+    }
+    draw();
   }
   function advanceFrame(now) {
     const dt=lastFrameTime?Math.max(0,Math.min((now-lastFrameTime)/1000,.06)):0;
