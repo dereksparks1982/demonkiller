@@ -95,7 +95,7 @@ test('Fines are paid only at an open bank with real gold, with no minting',()=>{
  const stolen=G.apply(w,{action:'loot_corpse',corpse_id:corpse.id}).world;
  const player=stolen.characters['1'],bank=stolen.living.businesses.village_bank;
  const gold=player.gold,money=bank.coins;
- Object.assign(player,{x:54,y:103});bank.open=true;
+ Object.assign(player,{x:54,y:103});syncAll(stolen);bank.open=true;
  const paid=G.apply(stolen,{action:'pay_fine',amount:12});
  assert.equal(paid.character.gold,gold-12);
  assert.equal(paid.world.living.businesses.village_bank.coins,money+12);
