@@ -62,6 +62,17 @@ function npcSenseDue(world,npc,minute){
  if(!world.characters?.['1'])return true;
  return tierFor(world,npc.area_id,npc.x,npc.y)!=='background'||minute%15===0;
 }
+// The manifest exposes static map metadata and objects, not the full tile
+// arrays. Streaming clients use it to retain the approved interaction rules.
+function terrainManifest(world,{slot=1,area_id}={}){
+ const {c}=position(world,slot),area=world.areas?.[area_id];
+ if(!area||c.area_id!==area_id)
+  throw Error('Sector is outside the current region');
+ return {schema:area.schema||1,area_id,width:area.width,height:area.height,
+  tile_size:area.tile_size,sector_size:SIZE,world_revision:world.revision,
+  sectors_x:Math.ceil(area.width/SIZE),sectors_y:Math.ceil(area.height/SIZE),
+  objects:area.objects.map(o=>structuredClone(o))};
+}
 function terrainChunk(world,{slot=1,area_id,sx,sy}){
  const {c}=position(world,slot),area=world.areas?.[area_id];
  if(!area||area_id!==c.area_id)throw Error('Sector is outside the current region');
@@ -147,5 +158,5 @@ function createInterestTracker({now=Date.now,maxSessions=MAX_SESSIONS}={}){
  return {poll,activeSessions:()=>sessions.size,clear:()=>sessions.clear()};
 }
 module.exports={SIZE,MIN_RADIUS,MAX_RADIUS,DEFAULT_RADIUS,MAX_SESSIONS,
- EXPIRE_MS,MAX_OBJECTS,sectorBounds,nearbySectors,tierFor,terrainChunk,
+ EXPIRE_MS,MAX_OBJECTS,sectorBounds,nearbySectors,tierFor,terrainManifest,terrainChunk,
  sectorEntities,createInterestTracker,npcSenseDue};
