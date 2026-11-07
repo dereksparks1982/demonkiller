@@ -984,5 +984,8 @@ async function begin(){
   canvas.focus();requestAnimationFrame(frame);
  }catch(e){message('The region could not open: '+e.message);$('worldStatus').textContent='LOAD FAILED';}
 }
+// Read-only access for the classic UI; server-owned gameplay stays authoritative.
+window.DKOutdoorState=()=>({player,gameplay,serverConnected:!!SERVER});
+
 begin();
 })();
