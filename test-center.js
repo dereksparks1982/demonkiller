@@ -1039,10 +1039,8 @@
     const moved=Math.abs(dx)>=Math.abs(dy)?
       step(dx>0?1:-1,0):step(0,dy>0?1:-1);
     if(!rightMouseHeld)clickDestination=moved?keepDestination:null;
-    // Character sprites intentionally have NO walking animation.
-    // Draw at the new cell, never halfway across two axes.
-    visual.queue.length=0;visual.x=scene.player.x;visual.y=scene.player.y;
-    draw();
+    // Step() commits a cardinal destination; its visual queue must animate
+    // across that tile instead of instantly snapping to the endpoint.
   }
   function advanceFrame(now) {
     const dt=lastFrameTime?Math.max(0,Math.min((now-lastFrameTime)/1000,.06)):0;
@@ -1062,11 +1060,15 @@
     if(ritual){updateResurrection(dt);draw();requestAnimationFrame(advanceFrame);return;}
     if(mode==='walk'&&((rightMouseHeld&&rightPointer)||clickDestination)){
       moveTowardPointer(dt,rightMouseHeld?rightPointer:clickDestination);
-    }else if(visual.queue.length){
+    }
+    // Animate the character EVERY frame, including while RMB is held.
+    // Logical positions remain cardinal tiles for walls, doors and DK Server.
+    if(visual.queue.length){
       const target=visual.queue[0];
       const dx=target.x-visual.x,dy=target.y-visual.y;
       const distance=Math.hypot(dx,dy);
-      const change=Math.min(distance,3.1*dt);
+      const speed=rightMouseHeld||clickDestination?5.8:5.2;
+      const change=Math.min(distance,speed*dt);
       if(distance<=.001||change>=distance){
         visual.x=target.x;visual.y=target.y;visual.queue.shift();
       }else if(distance>0){
@@ -1429,12 +1431,7 @@
     }
     if(mode==='walk'&&e.button===2){
       e.preventDefault();rightPointer=pointerPosition(e);
-      // Keyboard tween queues must not delay held-mouse movement.
-      if(visual.queue.length){
-        visual.queue.length=0;
-        const nx=Math.round(visual.x),ny=Math.round(visual.y);
-        if(canStand(nx,ny)){scene.player.x=nx;scene.player.y=ny;}
-      }
+      // Keep any already-approved tile in the render queue to avoid teleporting.
       clickDestination=null;
       rightPressFrame=lastFrameTime;
       rightMouseHeld=true;
@@ -1458,12 +1455,8 @@
       return;
     }
     clickDestination=null;
-    visual.queue.length=0;
-    const nx=Math.round(visual.x),ny=Math.round(visual.y);
-    if(canStand(nx,ny)){
-      scene.player.x=nx;scene.player.y=ny;dirty=true;
-      persistCharacter();
-    }
+    // Releasing stops new steps; finish animating the last committed tile.
+    // Never rewrite saved position from a rounded intermediate screen pixel.
     draw();
   }
   function completeWallStroke(){
