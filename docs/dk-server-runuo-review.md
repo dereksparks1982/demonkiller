@@ -82,3 +82,7 @@ RunUO's mobile inventory and BaseVendor selling systems inspired the transition 
 ## Milestone 20: Server-side NPC workshop recipes (v0.2.42)
 
 RunUO `Scripts/Engines/Craft/DefBlacksmithy.cs` and `DefCooking.cs` illustrate recipe requirements and crafting output. DK Server independently applies fixed, server-owned recipes at existing businesses that consume actual M18 inputs, create serial-bearing output and pay real wages to M12 NPC staff through an M11 scheduled job. No GPL code copied. Broader professions, yield variability, physical crop growth and NPC resource shipments remain future milestones.
+
+## Milestone 21: Mobile AI states (v0.2.43)
+
+Reviewed RunUO `Scripts/Mobiles/AI/BaseAI.cs` for its separate Wander, Combat, Guard and Flee action modes. DK Server M21 independently introduces persistent work, flee, defend, recover and dead states with actual threat sensing and world-grid escape destinations. Village guards react to live threats, civilians retreat, and businesses reflect the danger. This is still a small foundation, not RunUO's complete behavior tree or pet/creature order system.

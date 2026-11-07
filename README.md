@@ -2,7 +2,15 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.42 | DK Server M20, Physical Workshops
+## Current milestone: v0.2.43 | DK Server M21, Persistent NPC Intelligence
+
+### M21: Civilians flee and guards defend
+
+- **Server-owned NPC behavior:** Each existing NPC remembers a work, flee, defend, recover or dead state, active threat ID and world-minute transition time. The record is saved in the authoritative world, not in the browser.
+- **Physical flight and defense:** Civilians search reachable cardinal tiles away from imps; village guards and caravan escorts move toward threats so the existing physical combat simulation can defend others. No diagonal movement or teleportation.
+- **After the attack:** NPCs recover for 30 simulated minutes after monsters move away or die, then return to their normal jobs and routes. Shops temporarily close when the owner flees, and M19 customers postpone purchases during danger.
+- **Small, safe read API:** `GET /api/v1/npc-ai` reports the state of residents only within 10 tiles of the player's location. The outdoor sidebar displays nearby fleeing and defending NPCs.
+- **Migrations and boundaries:** Older M20 world saves are upgraded without replacing characters or possessions. M20 workshop recipes are preserved. These are initial RunUO-inspired behavior states, not full MMO AI; the hosted world remains unfinished.
 
 ### M20: Residents produce goods from actual ingredients
 

@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.43 / DK Server M21 | 2026-11-06 | Persistent NPC flight, guard defense and recovery
+
+- Implemented independently authored RunUO-inspired mobile AI behavior modes with saved NPC identities, current threats and 30-world-minute recovery timers.
+- Civilians move away from nearby imps using reachable cardinal-only escape paths; guards and escorts pursue imps so existing physical combat can protect inhabitants.
+- NPCs resume their established routines after danger. Fleeing shop owners suspend operations and M19 shoppers delay physical purchases during combat; M20 paid ingredient-consuming workshops remain unchanged.
+- Added startup migration, schema validation, the player-nearby read-only NPC AI endpoint, outdoor status text, regression tests, and versioned release documentation.
+- Focused behavior checks confirmed flight, defense, recovery and validation. Full Node test suite and browser smoke tests still require a complete source checkout.
+- No extra character slots, Godot, new art, permanent player death, multiplayer or online persistent hosting.
+
 ## v0.2.42 / DK Server M20 | 2026-11-06 | Physical NPC workshop production
 
 - Added `server/workshops-m20.cjs` with actual server-owned smithy, bakery and tavern recipes. Crafting consumes stored ore, wood or produce, records physical input item serials and creates persistent output tools, bread or meals with fresh item IDs.

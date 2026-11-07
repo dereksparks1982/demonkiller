@@ -29,7 +29,8 @@ function plan(world,minute,out){
  ensure(world);
  const state=world.living.npc_trade;
  for(const n of Object.values(world.living.npcs)){
-  if(!n.alive||!SHOPPERS.has(n.role)||state.goals[n.id])continue;
+  if(!n.alive||!SHOPPERS.has(n.role)||state.goals[n.id]||
+     !['work','recover'].includes(world.living.npc_ai?.brains[n.id]?.mode||'work'))continue;
   if(pack(world,n).some(i=>FOOD.has(i.type)))continue;
   if((state.last_purchase[n.id]??-1000)+90>minute)continue;
   const choices=Object.values(world.living.businesses)
@@ -61,6 +62,7 @@ function purchase(world,minute,out){
  const state=world.living.npc_trade;if(!state)return;
  for(const [id,goal] of Object.entries(state.goals)){
   const n=world.living.npcs[id],shop=world.living.businesses[goal.shop_id];
+  if(['flee','defend'].includes(world.living.npc_ai?.brains[id]?.mode))continue;
   if(!n?.alive||!shop||minute>=goal.expires_minute){
    delete state.goals[id];continue;
   }

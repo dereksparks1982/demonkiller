@@ -17,6 +17,7 @@ const {ensure:ensureHousing,validate:validateHousing}=require('./housing-m17.cjs
 const {ensure:ensureVendors,validate:validateVendors}=require('./vendors-m18.cjs');
 const {ensure:ensureNpcCommerce,validate:validateNpcCommerce}=require('./npc-commerce-m19.cjs');
 const {ensure:ensureWorkshops,validate:validateWorkshops}=require('./workshops-m20.cjs');
+const {ensure:ensureMobileAI,validate:validateMobileAI}=require('./mobile-ai-m21.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -90,6 +91,7 @@ function makeWorld(now = Date.now()) {
   reconcileEntities(result);
   ensureNpcCommerce(result);
   ensureWorkshops(result);
+  ensureMobileAI(result);
   return result;
 }
 
@@ -164,6 +166,7 @@ function validateWorld(world) {
   validateVendors(world);
   validateNpcCommerce(world);
   validateWorkshops(world);
+  validateMobileAI(world);
   return world;
 }
 

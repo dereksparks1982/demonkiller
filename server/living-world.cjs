@@ -14,6 +14,7 @@ const {ensure:ensureMobileAssets,onDeath:recordMobileDeath}=require('./mobile-as
 const {ensure:ensureLaw,tick:lawTick}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,syncNpcTransitions}=require('./region-policies-m16.cjs');
 const NPCCOMMERCE=require('./npc-commerce-m19.cjs');
+const NPCAI=require('./mobile-ai-m21.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
  bank_clerk:[VILLAGE,54,103],baker:[VILLAGE,87,101],
@@ -119,8 +120,11 @@ function minuteTick(world,m,generated){
  craftTick(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
-  const desired=npcDestination(n,m,world);
-  const status=n.area_id!==desired.area_id?'traveling':
+  if(m%5===0)NPCAI.sense(world,n,m,generated);
+  const state=world.living.npc_ai?.brains[n.id]?.mode||'work';
+  const desired=NPCAI.destination(world,n)||npcDestination(n,m,world);
+  const status=state==='flee'?'fleeing':state==='defend'?'defending':
+   state==='recover'?'recovering':n.area_id!==desired.area_id?'traveling':
    n.x===desired.x&&n.y===desired.y?(day?'working':'resting'):'walking';
   if(m%5===0){
    if(npcStep(n,world,desired))
@@ -147,7 +151,8 @@ function minuteTick(world,m,generated){
  if(m%15===0){
   for(const shop of Object.values(living.businesses)){
    const occupied=living.territories[shop.area_id]?.control!=='settlers';
-   const open=day&&!occupied&&living.npcs[shop.owner_id]?.alive;
+   const open=day&&!occupied&&living.npcs[shop.owner_id]?.alive&&
+     living.npc_ai?.brains[shop.owner_id]?.mode!=='flee';
    if(shop.open!==open){
     shop.open=!!open;
     generated.push(event(living,m,'business.hours',
@@ -208,6 +213,7 @@ function advance(world,now=Date.now(),limit=180){
  ensureLaw(next);
  ensureDistricts(next);
  NPCCOMMERCE.ensure(next);
+ NPCAI.ensure(next);
  for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
   minuteTick(next,m,events);
  next.living.minute+=count;

@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M21 (v0.2.43)
+
+A separate saved mobile AI layer now holds each NPC's local behavior state. The five-world-minute simulation loop senses nearby imps, lets civilians flee along legal cardinal tiles, and directs guards/escorts toward threats for the existing combat simulation. Following thirty threat-free simulated minutes, the NPC resumes its original home/shop/travel schedule. Fleeing shop owners close business temporarily, and physical NPC shoppers defer purchases until safe. Migration is non-destructive and world-time based, with dated history records. The read-only NPC intelligence endpoint reports nearby residents only.
+
+Source: `server/mobile-ai-m21.cjs`, `tests/mobile-ai-m21.cjs`. RunUO `BaseAI` provided the conceptual action-state pattern, not source code. This is not full UO NPC AI or a hosted persistent server.
+
 ## Implemented milestone: DK Server M20 (v0.2.42)
 
 Physical NPC workshops now close a piece of the M18/M19 production-and-commerce loop. `server/workshops-m20.cjs` defines fixed, server-authoritative recipes for real smithing, baking and cooking at the existing Village businesses, drawing from stored per-type M18 input ingredients and writing persistent M10 output item serials. Real NPC workers must be alive at their storefronts; they earn 2 actual business coins each completed batch. A sixth M11 timer runs production every 120 simulated minutes, and the old abstract supplier mechanism stops granting complete finished products to those workshops. Input serials, finished output serials, employee wages and source businesses all enter the permanent event history. World checkpoints preserve every change.

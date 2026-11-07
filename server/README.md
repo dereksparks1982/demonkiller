@@ -1,4 +1,4 @@
-# DK Server M20 | Physical Workshops and Paid NPC Production (v0.2.42)
+# DK Server M21 | Persistent NPC Intelligence (v0.2.43)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -222,3 +222,13 @@ RunUO `Scripts/Engines/Craft/DefBlacksmithy.cs` and `DefCooking.cs` provided **a
 M11 now schedules the `workshop_batch` task every 120 running world minutes with priority 0, ahead of other recurring activities due at that minute. M11's old abstract restock mechanism **does not create finished goods** for these three production businesses. The markets still receive existing scheduled supply deliveries; genuine NPC crop growth, forage transport, physical raw cargo and caravan logistics remain separate future milestones. M17–M19 world records migrate without inventory, gold, NPC or world-history resets, and M10 validation reconciles the physical shop serials to their typed counts. The outdoor page shows production totals and a read-only `GET /api/v1/workshops` lists the recipes and output counts. There is no client-controlled production transaction or access to arbitrary jobs.
 
 `tests/workshops-m20.cjs` checks migration, smithy, bakery, tavern, wage conservation, material identity, unavailable workers/ingredients, occupied territories, scheduled execution, corruption and HTTP persistence. Older M11 and M18 timer/restock tests are updated for the sixth scheduled job and the end of phantom deliveries to workshops. Combined module simulation passed four produced units, paid wages and proper market restocking; full Node/browser suite is still unverified without a complete runnable checkout. No new art, MMO code, online hosting or permanent player-death behavior was added.
+
+## M21 behavior state, threat sensing, and defense
+
+`server/mobile-ai-m21.cjs` implements five durable NPC states (`work`, `flee`, `defend`, `recover`, `dead`). NPCs sense real M8 imps up to seven cardinal tiles away every five world minutes. Non-guard civilians search a bounded set of reachable cardinal tiles and choose a safer escape destination. Guards and caravan escorts route toward threatening imps and use the existing server-owned combat system. No arbitrary client AI commands or new browser timers are added.
+
+After the threat disappears, NPCs recover for thirty running world minutes and then resume their ordinary home/shop/travel schedules. Fleeing shopkeepers suspend business, and customers postpone M19 transactions during combat. State changes create dated world-history events. M20 worlds receive NPC AI records non-destructively on load, with dedicated schema validation in `validateWorld`.
+
+`GET /api/v1/npc-ai` is read-only and discloses only NPCs within ten cardinal tiles of the character, not the entire map. The outdoor sidebar presents fleeing/defending counts. `tests/mobile-ai-m21.cjs` covers migration, physical escape, guards, calm-time return, save persistence, bounded reads, corruption and HTTP method restrictions. Focused JS module checks and earlier M19-world integration passed; the complete Node/browser suites were not run in a full checkout.
+
+RunUO's `Scripts/Mobiles/AI/BaseAI.cs` supplies architectural inspiration only; no GPL code is included. The public GitHub Pages site still cannot host a persistent server.
