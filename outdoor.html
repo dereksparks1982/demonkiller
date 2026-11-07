@@ -49,6 +49,28 @@
   <button id="equipTorch" type="button">LIGHT TORCH</button>
   <button id="restButton" type="button">REST</button>
  </div>
+ <details id="skillsPanel"><summary>YOUR SKILLS & TRAINING</summary>
+  <p id="skillStatus">The server records your skill growth.</p>
+  <label for="skillName">Skill</label>
+  <select id="skillName">
+   <option value="herbalism">Herbalism</option>
+   <option value="lumberjacking">Lumberjacking</option>
+   <option value="mining">Mining</option>
+   <option value="trading">Trading</option>
+   <option value="blacksmithing">Blacksmithing</option>
+   <option value="cooking">Cooking</option>
+   <option value="healing">Healing</option>
+   <option value="wrestling">Wrestling</option>
+   <option value="tactics">Tactics</option>
+   <option value="survival">Survival</option>
+  </select>
+  <label for="skillLock">Training</label>
+  <select id="skillLock">
+   <option value="up">Up</option><option value="down">Down</option>
+   <option value="locked">Locked</option>
+  </select>
+  <button id="skillApply" type="button">SET SKILL TRAINING</button>
+ </details>
  <h2>CREATURES & TERRITORY</h2><p id="combatStatus">Monster attacks and loot are recorded by DK Server.</p>
  <div class="goods-controls">
   <button id="attackButton" type="button">ATTACK NEARBY IMP</button>
@@ -75,5 +97,5 @@
 <script src="./dk-dungeon-art.js"></script>
 <script src="./world-regions.js"></script>
 <script src="./dk-menu-server.js"></script>
-<script src="./outdoor.js?v=0.2.35"></script>
+<script src="./outdoor.js?v=0.2.36"></script>
 </body></html>

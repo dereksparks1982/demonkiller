@@ -54,3 +54,7 @@ RunUO's `Server/Mobile.cs`, `Server/Items/Container.cs` and `Scripts/Items/Misc/
 ## Milestone 13: SaveStrategy and verified world checkpoints (v0.2.35)
 
 RunUO's `Server/Persistence/SaveStrategy.cs`, `StandardSaveStrategy.cs` and `SaveMetrics.cs` demonstrate a separate world persistence pipeline, independent from game objects. Demon Killer now independently implements a validated save strategy that keeps its existing atomic primary write and adds rotating SHA-256-verified world checkpoints and save health metrics. Corrupted primary saves remain blocked from startup until an owner makes an explicit recovery decision. Journal reconciliation, incremental sectors and hosted filesystem durability are follow-on milestones.
+
+## Milestone 14: Use-based profession skills (v0.2.36)
+
+Reviewed `Server/Skills.cs` and `Scripts/Misc/SkillCheck.cs` from RunUO. DK Server independently borrows the high-level concepts of tenths-point training, skill caps, Up/Down/Locked training, atrophy under a total cap, and anti-repetitive skill gain. Ten initial professions receive practice from actual authoritative game activity. The browser can only change training locks, not award XP, and the existing single life is preserved. The broader RunUO skill list and spell success/combat item gating remain unimplemented until corresponding game activities exist.

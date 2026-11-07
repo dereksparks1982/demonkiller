@@ -2,11 +2,21 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.35 | DK Server M13, Verified World Checkpoints
+## Current milestone: v0.2.36 | DK Server M14, Skills and Professions
 
 The project now has **three connected regions with independent sizes**: the 16×16 Forsaken Temple, 64×64 outdoor courtyard, and 128×128 village. The temple exterior occupies **16×16 tiles** in the courtyard, exactly matching the actual interior footprint. Walk through the open north doorway to change rooms automatically, or walk back to return. **A single click inspects a door; a double-click opens or closes it.** The courtyard contains Lilith's golden weeping willow in the ghost path or her sickly black willow in the living path, with a short in-game transformation. No new image pack or game engine was added.
 
 The outdoor world scrolls with the character and uses existing DK Architect wall sections. Villages are not forced to fit into the temple's 16×16 viewport. Doors of houses are placeholders until their interiors are authored; **no fake house interiors are claimed**.
+
+### M14: Learn by doing
+
+- **Ten professions:** Herbalism, Lumberjacking, Mining, Trading, Blacksmithing, Cooking, Healing, Wrestling, Tactics and Survival each have their own server-owned skill value and use counter.
+- **Ultima Online-style limits:** Skills use tenths of a point, with a 100.0 individual cap and a 700.0 combined cap. Each skill may be set to Up, Down or Locked. When at the combined cap, an Up skill may grow by lowering a skill deliberately marked Down.
+- **Real practice:** Gathering, smithy work, cooking, bandaging, eating, resting, trading, fulfilling contracts and fighting imps train the corresponding skill when their original server-validated action succeeds. Skill levels cannot be specified in the action request.
+- **Anti-grinding rules:** Gains slow as proficiency increases, require advancing world minutes and stop repeated use of the exact same resource or target beyond a small allowance. Changing the selected skill's training lock does not grant points.
+- **Non-destructive migration:** Existing M13 saves retain their gold, world objects, NPCs and legacy experience. The new skillbook initializes from current experience and adds finer profession tracking without resetting the character.
+- **In-game training controls:** A collapsible skill panel displays individual values and training directions. Training locks use the existing authoritative gameplay/save pipeline. The static website cannot fake a connected skill server.
+- **Foundation, not every UO skill yet:** Spells, armor, weapon classes, tracking, stealth, animal taming and many other RunUO skill handlers still need their actual gameplay systems.
 
 ### M13: Preserve the world even if a save goes wrong
 

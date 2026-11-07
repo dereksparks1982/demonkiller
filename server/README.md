@@ -1,4 +1,4 @@
-# DK Server M13 | Verified World Checkpoints (v0.2.35)
+# DK Server M14 | Skills, Training Locks and Professions (v0.2.36)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m13`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m14`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -141,7 +141,7 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 
 ## v0.2.34 integration correction
 
-The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m13`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m14`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
 
 ## M13 save-strategy and verification
 
@@ -152,3 +152,15 @@ Up to **five valid world checkpoints** are retained. Each has a companion `.sha2
 **No automatic rollback.** If the main `world.json` cannot be parsed or validated, the original refusal-to-start behavior remains, even when checkpoints exist. Manually authorized world recovery will be implemented separately because choosing an older save without consent would permanently alter a one-life world. This milestone does not include event-journal gap reconciliation or backups of the full unbounded NDJSON event archive.
 
 `tests/save-strategy-m13.cjs` verifies backups, checksums, retention, refusal to overwrite invalid data, non-recovery on corrupt primary and the HTTP status/control boundary. Full test execution still requires a complete source checkout. No new art, MMO requirements or online hosting were introduced.
+
+## M14 persistent skillbook
+
+The independent `server/skills-m14.cjs` provides 10 profession skills with fixed-point values in tenths of a point, maximum 1000 each (100.0), total training cap 7000 (700.0) and three player-selectable locks: `up`, `down`, `locked`. At total cap, only an existing `down` skill with positive value can be reduced to permit another `up` skill to advance. Higher skills need longer simulated-world-minute gaps between gains. The same source/target cannot be used endlessly for rapid training; repeating it beyond three attempts inside 15 simulated minutes suppresses gains. This is independently implemented from RunUO's Skill/SkillCheck *concepts*, not copied GPL C#.
+
+Old characters are upgraded in place: `herbalism`, `trading`, `tactics` and `survival` initialize conservatively from earlier experience counters, and all prior fields remain intact. The new `character.skillbook` is validated on every save. Skill increases are only triggered inside successful, server-validated gathering, crafting, food/bandage use, combat, commerce and trade-contract actions. A client cannot provide a skill level or gain amount.
+
+`GET /api/v1/skills` reports the single character's training levels and lock settings. `POST /api/v1/gameplay` accepts the strict allowlisted `{"action":"skill_lock","skill":"mining","lock":"locked"}` transaction, which saves atomically and writes a dated journal event. An expandable panel in the outdoor game reads these values and can set Up/Down/Locked. As with M13, the local Node server is the only real world authority; GitHub Pages cannot advance the simulation.
+
+Run `npm --prefix server test` against a full checkout for the added `tests/skills-m14.cjs` regression suite. The immediate module-level checks covered legacy migration, skill caps, lock atrophy, repeated-source throttling, three real gameplay professions, and a world-validating lock transaction. Full browser or Node end-to-end verification remains outstanding.
+
+**Later RunUO slices:** More professions only when their in-world activities exist; skill-check success chances, skill-gated items, tool wear, NPC skills, spellcasting, justice and sector activation. Multiplayer remains a future possibility rather than an enabled mode.

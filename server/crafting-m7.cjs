@@ -2,6 +2,7 @@
 // DK Server M7: small, server-owned crafting/needs/equipment rules.
 // Recipes refer to real existing inventory; no random free item generation.
 const {VILLAGE}=require('./regions.cjs');
+const SKILLS=require('./skills-m14.cjs');
 const RECIPES=Object.freeze({
  torch:{inputs:{wood:1,herbs:1},output:'torches',amount:1,station:null},
  rations:{inputs:{bread:1,produce:1},output:'rations',amount:2,station:null},
@@ -73,6 +74,10 @@ function apply(world,command){
    player.inventory[item]-=amount;
   player.inventory[recipe.output]+=recipe.amount;
   c.skill+=2;c.craft_after_minute=minute;
+  const profession=command.recipe==='tools'?'blacksmithing':
+    command.recipe==='rations'?'cooking':
+    command.recipe==='bandages'?'healing':'survival';
+  SKILLS.practice(player,profession,minute,'recipe:'+command.recipe);
   detail=command.recipe;
  }else if(command.action==='consume'){
   const item=command.item_type;
@@ -87,6 +92,8 @@ function apply(world,command){
    c.energy=Math.min(100,c.energy+5);
   }
   player.inventory[item]--;detail=item;
+  SKILLS.practice(player,item==='bandages'?'healing':'survival',
+    minute,'consume:'+item);
  }else if(command.action==='equip'){
   const item=command.item_type;
   const slot=item==='tools'?'hand':item==='torches'?'light':null;
@@ -111,6 +118,7 @@ function apply(world,command){
   c.energy=Math.min(100,c.energy+25);
   if(c.incapacitated){c.health=Math.max(c.health,20);c.hunger=Math.max(c.hunger,5);c.incapacitated=false;}
   c.rest_after_minute=minute+60;
+  SKILLS.practice(player,'survival',minute,'rest');
   detail='rest';
  }
  player.revision++;next.revision++;

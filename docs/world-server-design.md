@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M14 (v0.2.36)
+
+RunUO's skill descriptions, fixed-point values, per-skill locks, total caps and skill-check gain protections motivated an independently written `server/skills-m14.cjs`. Every character has one server-owned `skillbook`: ten named professions with numeric values in 0.1 increments, a 100.0 per-skill cap, combined 700.0 training limit, and Up/Down/Locked directions. At total cap, a deliberately Down-locked profession may lose 0.1 to permit another profession to gain 0.1. Success-based skill usage advances only with world time, slows as mastery grows, and has limited anti-repetition defenses. Legacy experience values from M13 are retained and migrated without resetting the single-character save.
+
+Existing validated gathering, crafting, eating, healing, combat and merchant commission transactions now award appropriate skill *practice*. The game client cannot pass numeric experience grants. The read-only `GET /api/v1/skills` endpoint and `skill_lock` gameplay action connect the collapsible outdoor training panel to the authoritative snapshot and world journal. Additional RunUO professions and genuine skill difficulty checks are future milestones. The public webpage still cannot run an always-on DK Server.
+
 ## Implemented milestone: DK Server M13 (v0.2.35)
 
 Persistent world saves now flow through an independent `server/save-strategy-m13.cjs`. The main world snapshot remains atomic and crash conscious (private temporary file, fsync, rename, directory sync), with up to five retained, SHA-256-verified backup snapshots of the entire authoritative state. Checkpoints are created after significant revisions, on startup, on clean server shutdown and on user request. The server offers read-only save-health inspection and a checkpoint command through the same local-only origin-restricted interface. Secondary backup failure is not misreported as a failed completed game-state transaction.

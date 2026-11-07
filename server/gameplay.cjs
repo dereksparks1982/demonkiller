@@ -7,6 +7,7 @@ const COMBAT=require('./combat-m8.cjs');
 const STORAGE=require('./storage-m9.cjs');
 const ENTITIES=require('./entity-registry-m10.cjs');
 const MOBILE=require('./mobile-assets-m12.cjs');
+const SKILLS=require('./skills-m14.cjs');
 const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages']);
 const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4};
 const NODES=[
@@ -28,6 +29,7 @@ function ensureProgress(character){
  if(!character.skills){character.skills={foraging:0,commerce:0};changed=true;}
  if(character.skills.combat===undefined){character.skills.combat=0;changed=true;}
  if(CRAFT.ensure(character))changed=true;
+ if(SKILLS.ensure(character))changed=true;
  return changed;
 }
 function ensureResources(world){
@@ -48,6 +50,7 @@ function validateProgress(character){
     throw Error('Invalid server-owned inventory');
  }
  CRAFT.validate(character);
+ SKILLS.validate(character);
  if(character.last_attack_utc_ms!==undefined&&(!Number.isSafeInteger(character.last_attack_utc_ms)||character.last_attack_utc_ms<0))throw Error('Invalid attack timestamp');
  for(const key of ['gold','bank_gold'])
   if(character[key]!==undefined&&(!Number.isSafeInteger(character[key])||
@@ -77,6 +80,7 @@ function bankLocation(world,c){
  return shop;
 }
 function apply(world,command,now=Date.now()){
+ if(command?.action==='skill_lock')return SKILLS.applyLock(world,command);
  if(command?.action==='loot_corpse')return MOBILE.loot(world,command);
  if(command?.action==='move_item')return ENTITIES.transfer(world,command);
  if(['bank_store','bank_take','drop_item','pick_up'].includes(command?.action))return STORAGE.apply(world,command);
@@ -108,6 +112,8 @@ function apply(world,command,now=Date.now()){
    throw Error('Your pack is full');
   n.remaining--;c.inventory[n.type]++;
   c.gather_after_minute=minute;c.skills.foraging+=c.crafting?.hand==='tools'?2:1;
+  SKILLS.practice(c,n.type==='herbs'?'herbalism':n.type==='wood'?'lumberjacking':'mining',
+    minute,'resource:'+n.id);
   item=n.type;
  }else if(action==='buy'){
   shop=nearShop(next,c,command.business_id);
@@ -122,6 +128,7 @@ function apply(world,command,now=Date.now()){
    throw Error('Your pack is full');
   c.gold-=price;c.inventory[item]+=qty;shop.stock-=qty;shop.coins+=price;
   c.skills.commerce+=qty;
+  SKILLS.practice(c,'trading',minute,'business:'+shop.id);
  }else if(action==='sell'){
   shop=nearShop(next,c,command.business_id);
   if(!shop.open)throw Error('This shop is closed');
@@ -139,6 +146,7 @@ function apply(world,command,now=Date.now()){
   if(shop.coins<price)throw Error('The merchant cannot afford the trade');
   c.inventory[item]-=qty;c.gold+=price;shop.coins-=price;shop.stock+=qty;
   c.skills.commerce+=qty;
+  SKILLS.practice(c,'trading',minute,'business:'+shop.id);
  }else{
   bankLocation(next,c);
   amount=command.amount;

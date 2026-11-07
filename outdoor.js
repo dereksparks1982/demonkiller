@@ -394,6 +394,19 @@ function deliverContract(){
  if(!contract)return message('You have no active commission.');
  return socialAction('complete_contract',{contract_id:contract.id});
 }
+async function refreshSkills(){
+ if(!SERVER)return;
+ try{
+  const s=await SERVER.skills();
+  const choice=$('skillName').value;
+  const record=s.skills?.[choice];
+  const text=Object.entries(s.skills||{}).map(([name,entry])=>
+   name+': '+(entry.value/10).toFixed(1)+(entry.lock==='up'?' ↑':
+   entry.lock==='down'?' ↓':' ■')).join(' · ');
+  $('skillStatus').textContent='Total '+(s.total/10).toFixed(1)+'/700.0 · '+text;
+  if(record)$('skillLock').value=record.lock;
+ }catch(e){$('skillStatus').textContent='Skillbook unavailable: '+e.message;}
+}
 async function refreshGameplay(){
  if(!SERVER)return;
  try{
@@ -426,7 +439,7 @@ async function takeAction(action,fields={}){
   const result=await SERVER.gameAction(action,fields);
   player=result.character;
   message('Saved: '+result.event.text);
-  await Promise.all([refreshGameplay(),refreshLiving()]);
+  await Promise.all([refreshGameplay(),refreshLiving(),refreshSkills()]);
  }catch(e){message('Cannot '+action.replaceAll('_',' ')+': '+e.message);}
  finally{busy=false;}
 }
@@ -626,6 +639,9 @@ document.addEventListener('keydown',e=>{
  if(dir){e.preventDefault();step(dir);}
 });
 $('showBank').addEventListener('click',openBank);
+$('skillName').addEventListener('change',refreshSkills);
+$('skillApply').addEventListener('click',()=>
+ takeAction('skill_lock',{skill:$('skillName').value,lock:$('skillLock').value}));
 $('closeBank').addEventListener('click',()=>{$('bankPanel').hidden=true;});
 $('gatherButton').addEventListener('click',gather);
 $('dropItem').addEventListener('click',dropGoods);
@@ -677,9 +693,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -692,6 +708,8 @@ async function begin(){
    $('clockStatus').textContent='No persistent world connected';
    $('packStatus').textContent='Persistent inventory and trading require DK Server.';
    $('socialStatus').textContent='Social records require DK Server.';
+   $('skillStatus').textContent='Training and skill progression require DK Server.';
+   $('skillApply').disabled=true;
    $('needsStatus').textContent='Crafting and survival need DK Server.';
    $('combatStatus').textContent='Monster combat, NPC remains and loot require DK Server.';
    $('sectorStatus').textContent='The sector index requires DK Server.';

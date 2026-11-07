@@ -2,6 +2,7 @@
 // DK Server M6: persistent social relationships and trade commissions.
 // No client-authored reward, NPC position, stock or reputation is trusted.
 const {COURT,VILLAGE}=require('./regions.cjs');
+const SKILLS=require('./skills-m14.cjs');
 const COMMODITIES=Object.freeze({
   courtyard_market:{item:'herbs',quantity:3,reward:18,description:'Deliver three bundles of medicinal herbs.'},
   village_bakery:{item:'wood',quantity:4,reward:16,description:'Bring four logs for the bakery ovens.'},
@@ -163,6 +164,7 @@ function apply(world,command){
   const player=next.characters['1'];
   player.inventory[contract.item_type]-=contract.quantity;
   player.gold+=contract.reward;player.skills.commerce=(player.skills.commerce||0)+2;
+  SKILLS.practice(player,'trading',m,'contract:'+contract.business_id);
   shop.stock+=contract.quantity;shop.coins-=contract.reward;
   contract.status='completed';contract.completed_minute=m;
   const faction=FACTIONS[owner.role]||'town';

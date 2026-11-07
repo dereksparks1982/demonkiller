@@ -3,6 +3,7 @@
 // Only the server decides health, attack distance, drops and region cleansing.
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
+const SKILLS=require('./skills-m14.cjs');
 const {onDeath:recordMobileDeath}=require('./mobile-assets-m12.cjs');
 const MAX_CREATURES=48,MAX_DROPS=2048;
 function seed(){return {schema:1,sequence:0,creatures:{},drops:{}};}
@@ -163,6 +164,8 @@ function apply(world,command,now=Date.now()){
   const damage=c.crafting?.hand==='tools'?8:5;
   enemy.health=Math.max(0,enemy.health-damage);
   c.skills.combat=(c.skills.combat||0)+1;
+  SKILLS.practice(c,c.crafting?.hand==='tools'?'tactics':'wrestling',minute,
+    'monster:'+enemy.id);
   events.push(event(next,minute,'player.attack','The character struck an imp.',
    {creature_id:enemy.id,damage,area_id:c.area_id}));
   if(enemy.health===0)dead(next,enemy,minute,events);

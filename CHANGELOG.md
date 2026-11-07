@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.36 / DK Server M14 | 2026-11-06 | Skills, training locks and professions
+
+- Reviewed RunUO `Server/Skills.cs` and `Scripts/Misc/SkillCheck.cs` for the independent design of individual fixed-point skill ratings, training locks, caps, gain restrictions and anti-repetition rules. No RunUO GPL implementation was copied.
+- Added ten server-owned profession skills: Herbalism, Lumberjacking, Mining, Trading, Blacksmithing, Cooking, Healing, Wrestling, Tactics and Survival. Every skill has a 100.0 maximum and all skills share a 700.0 total cap.
+- Added Up/Down/Locked training and automatic atrophy of a player-selected Down skill when another Up skill advances at total cap. Growth slows at higher proficiency, and repeated use of the same target/location temporarily suppresses training.
+- Wired skill gains only to successful server-authored gathering, crafting, trade, recovery, food use, rest, and monster-combat actions. No direct skill XP grants are accepted from browser requests.
+- Existing M13 characters retain all world progression, legacy experience and inventory, with an idempotent non-destructive skillbook migration.
+- Added read-only `GET /api/v1/skills`, strict `skill_lock` gameplay command, expandable outdoor skills/training controls, version updates and `tests/skills-m14.cjs`. Module checks verified migration, caps, anti-grinding rules, and actual gameplay integration with world validation. The full Node integration suite still needs a complete checkout.
+- Single-player only. No new graphics, engine, additional character slots, hosted backend or premature spellcasting/crafting-profession claims.
+
 ## v0.2.35 / DK Server M13 | 2026-11-06 | Verified world save checkpoints
 
 - Extracted authoritative saves into `server/save-strategy-m13.cjs` while keeping the existing single-writer queue and fsynced atomic world-file replacement. The strategy validates state before writing.
