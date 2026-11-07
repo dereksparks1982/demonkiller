@@ -123,10 +123,12 @@ test('M31 tiles stream as 16x16 bounded, authenticated-by-location chunks',()=>{
 });
 test('M31 read-only sector endpoints obey the player location, validate input and refresh after movement',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m31-'));
- t.after(()=>fs.rm(dir,{recursive:true,force:true}));
  await fs.writeFile(path.join(dir,'world.json'),JSON.stringify(sample()));
  const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
- t.after(async()=>{if(app.server.listening)await app.close();});
+ t.after(async()=>{
+  if(app.server.listening)await app.close();
+  await fs.rm(dir,{recursive:true,force:true});
+ });
  const base='http://127.0.0.1:'+app.address.port;
  let data=await fetch(base+'/api/v1/sectors/interest');
  assert.equal(data.status,200);
