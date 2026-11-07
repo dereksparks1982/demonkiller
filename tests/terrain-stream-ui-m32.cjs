@@ -5,7 +5,7 @@ const read=file=>fs.readFileSync(path.join(__dirname,'..',file),'utf8');
 test('M32 outdoor loads chunk cache before the renderer and retains keyboard-only gameplay',()=>{
  const html=read('outdoor.html');
  const client=html.indexOf('sector-terrain-m32.js');
- const game=html.indexOf('outdoor.js?v=0.2.59-terrain-m32');
+ const game=html.indexOf('outdoor.js?v=');
  assert(client!==-1&&game>client);
  for(const id of ['openPaperDoll','openBackpack','showChunks','serverSectorsButton'])
   assert(!html.includes('id="'+id+'"'));
