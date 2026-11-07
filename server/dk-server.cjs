@@ -446,9 +446,10 @@ async function createDKServer({
       if(!world.characters['1'])
         return sendJSON(res,404,{error:'No character exists'},method);
       const area_id=url.searchParams.get('area');
-      const sx=Number(url.searchParams.get('sx'));
-      const sy=Number(url.searchParams.get('sy'));
-      if(!area_id||!Number.isSafeInteger(sx)||!Number.isSafeInteger(sy)||
+      const rawX=url.searchParams.get('sx'),rawY=url.searchParams.get('sy');
+      const sx=Number(rawX),sy=Number(rawY);
+      if(!area_id||rawX===null||rawY===null||
+        !Number.isSafeInteger(sx)||!Number.isSafeInteger(sy)||
         sx<0||sy<0)return sendJSON(res,422,{error:'Invalid sector chunk coordinates'},method);
       try{
         return sendJSON(res,200,terrainChunk(world,{area_id,sx,sy}),method);
