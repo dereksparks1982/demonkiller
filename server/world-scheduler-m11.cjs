@@ -7,6 +7,8 @@ const {expire:expireCorpses}=require('./mobile-assets-m12.cjs');
 const {merchandises,total:vendorTotal,CAPACITY:VENDOR_CAPACITY}=require('./vendors-m18.cjs');
 const {run:workshopRun,RECIPES:WORKSHOP_RECIPES}=require('./workshops-m20.cjs');
 const {run:recruitResident}=require('./npc-succession-m23.cjs');
+const {run:scavengerRun}=require('./scavengers-m30.cjs');
+const {run:gravesRun}=require('./burials-m30.cjs');
 const JOBS=Object.freeze({
   postal_dispatch:{every:1,priority:0},
   camp_rotation:{every:90,priority:1},
@@ -14,7 +16,9 @@ const JOBS=Object.freeze({
   guard_payroll:{every:360,priority:2},
   corpse_cleanup:{every:60,priority:2},
   workshop_batch:{every:120,priority:0},
-  vacancy_recruitment:{every:120,priority:2}
+  vacancy_recruitment:{every:120,priority:2},
+  scavenger_activity:{every:15,priority:2},
+  grave_aging:{every:120,priority:2}
 });
 const MAX_JOBS=2048,MAX_PER_MINUTE=128;
 function future(minute,interval){
@@ -133,7 +137,8 @@ function payroll(world,minute,out){
 const HANDLERS=Object.freeze({
   postal_dispatch:postal,camp_rotation:camp,shop_restock:restock,guard_payroll:payroll,
   corpse_cleanup:expireCorpses,workshop_batch:workshopRun,
-  vacancy_recruitment:recruitResident
+  vacancy_recruitment:recruitResident,
+  scavenger_activity:scavengerRun,grave_aging:gravesRun
 });
 function runMinute(world,minute,out){
   ensure(world);
