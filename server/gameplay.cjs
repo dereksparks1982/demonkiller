@@ -90,7 +90,7 @@ function apply(world,command,now=Date.now()){
  if(command?.action==='skill_lock')return SKILLS.applyLock(world,command);
  if(command?.action==='loot_corpse')return MOBILE.loot(world,command);
  if(command?.action==='move_item')return ENTITIES.transfer(world,command);
- if(['use_item','split_stack','combine_stacks'].includes(command?.action))return ITEMS.take(world,command);
+ if(['use_item','split_stack','combine_stacks','move_stack','equip_item','unequip_item'].includes(command?.action))return ITEMS.take(world,command);
  if(['bank_store','bank_take','drop_item','pick_up'].includes(command?.action))return STORAGE.apply(world,command);
  if(['attack','loot'].includes(command?.action))return COMBAT.apply(world,command,now);
  if(['craft','consume','equip','unequip','rest'].includes(command?.action))
