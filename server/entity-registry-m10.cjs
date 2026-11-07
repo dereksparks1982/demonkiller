@@ -100,6 +100,13 @@ function reconcile(world){
     obsolete.sort((a,b)=>Number(r.refs[a].serial.slice(4))-Number(r.refs[b].serial.slice(4)));
     for(const k of obsolete.slice(0,obsolete.length-1024)){delete r.refs[k];changed=true;}
   }
+  // Corpses retain their serial while visible. After decomposition only
+  // recent tombstones remain, preserving history without unbounded refs.
+  const decomposed=Object.keys(r.refs).filter(k=>k.startsWith('corpse:')&&!r.refs[k].active);
+  if(decomposed.length>1024){
+    decomposed.sort((a,b)=>Number(r.refs[a].serial.slice(4))-Number(r.refs[b].serial.slice(4)));
+    for(const k of decomposed.slice(0,decomposed.length-1024)){delete r.refs[k];changed=true;}
+  }
   const want=targets(world,r),have=new Map();
   for(const item of Object.values(r.items)){
     const k=item.parent+'|'+item.type;
