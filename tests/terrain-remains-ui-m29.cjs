@@ -30,5 +30,5 @@ test('M29 keeps gameplay shortcuts keyboard-only',()=>{
  for(const id of ['openPaperDoll','openBackpack'])
   assert(!outdoor.includes('id="'+id+'"'));
  assert.match(temple,/temple-ui\.js/);
- assert.match(outdoor,/outdoor\\.js\\?v=/);
+ assert.match(outdoor,/outdoor\.js\?v=/);
 });
