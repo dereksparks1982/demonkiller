@@ -121,10 +121,9 @@ test('M28 full backpack denies equipment return and leaves the original world un
 });
 test('M28 server item ownership survives actual world.json reload',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m28-'));
- t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true});});
  await fs.writeFile(path.join(dir,'world.json'),JSON.stringify(fixture()));
  const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
- t.after(async()=>{if(app.server.listening)await app.close();});
  const base='http://127.0.0.1:'+app.address.port;
  const first=await (await fetch(base+'/api/v1/inventory')).json();
  const serial=first.backpack.find(i=>i.type==='herbs').serial;
@@ -146,10 +145,9 @@ test('M28 server item ownership survives actual world.json reload',async t=>{
 
 test('M28 concurrent stale transfers cannot duplicate a world item',async t=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m28-race-'));
- t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ t.after(async()=>{if(app.server.listening)await app.close();await fs.rm(dir,{recursive:true,force:true});});
  await fs.writeFile(path.join(dir,'world.json'),JSON.stringify(fixture()));
  const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
- t.after(()=>app.server.listening?app.close():Promise.resolve());
  const base='http://127.0.0.1:'+app.address.port;
  const snapshot=await (await fetch(base+'/api/v1/inventory')).json();
  const serial=snapshot.backpack.find(i=>i.type==='herbs').serial;
