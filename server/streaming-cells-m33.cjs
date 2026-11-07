@@ -94,8 +94,10 @@ function validate(world){
  if(state.schema!==SCHEMA||!state.records||Array.isArray(state.records)||
   typeof state.records!=='object'||Object.keys(state.records).length>MAX_RECORDS)
   throw Error('Invalid persistent streaming cells');
- const player=world.characters?.['1'];
- if(state.current!==null&&(!player||state.current!==rootId(player.area_id)))
+ // The authoritative location is always the player record. This cached
+ // cell pointer may be one update behind in a legacy or interrupted save;
+ // ensure() repairs it during startup without moving the player.
+ if(state.current!==null&&!graph.cells[state.current])
   throw Error('Invalid current streaming cell');
  for(const [id,r] of Object.entries(state.records)){
   if(!graph.cells[id]||!r||
