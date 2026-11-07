@@ -227,7 +227,7 @@ const dblclick=async(x,y)=>get('room').emit('dblclick',{button:0,clientX:x*32+16
   tickFrames(1800);
   key('a');for(let i=0;i<11;i++)key('w');
   key('d');key('w');
-  assert.equal(sandbox.window.location.href,'./outdoor.html',
+  assert.equal(sandbox.window.location.href,'./outdoor.html?walk=continuous1',
     'Walking into the open north door loads the courtyard automatically');
   assert.match(get('lifeState').textContent,/GHOST/);
 
