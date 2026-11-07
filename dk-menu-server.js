@@ -80,6 +80,15 @@
     async caravans() { return request('/api/v1/caravans'); },
     async corpses() { return request('/api/v1/corpses'); },
     async nearby(radius=8) { return request('/api/v1/nearby?radius='+encodeURIComponent(radius)); },
+    async sectorInterest(cursor=null,radius=24){
+      const url='/api/v1/sectors/interest?radius='+encodeURIComponent(radius)+
+        (cursor?'&cursor='+encodeURIComponent(cursor):'');
+      return request(url);
+    },
+    async sectorChunk(area,sx,sy){
+      return request('/api/v1/sectors/chunk?area='+encodeURIComponent(area)+
+        '&sx='+encodeURIComponent(sx)+'&sy='+encodeURIComponent(sy));
+    },
     async social() { return request('/api/v1/social'); },
     async socialAction(action,fields={}) { return post('/api/v1/social',{action,...fields}); },
     async gameAction(action,fields={}) {
@@ -120,7 +129,7 @@
     }
     try {
       const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
-      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<30) throw Error('DK Server needs M30 or later');
+      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<31) throw Error('DK Server needs M31 or later');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';
