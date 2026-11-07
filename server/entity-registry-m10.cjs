@@ -37,6 +37,10 @@ function refTargets(world){
     targets.push(['ground:'+drop.id,'ground',drop.area_id]);
   for(const corpse of Object.values(world.living?.mobile_assets?.corpses||{}))
     targets.push(['corpse:'+corpse.id,'corpse',corpse.area_id]);
+  for(const grave of Object.values(world.living?.burials?.records||{}))
+    targets.push(['grave:'+grave.id,'grave',grave.area_id]);
+  for(const animal of Object.values(world.living?.scavengers?.visitors||{}))
+    targets.push(['scavenger:'+animal.id,'scavenger',animal.area_id]);
   return targets.sort((a,b)=>a[0].localeCompare(b[0]));
 }
 function targets(world,registry){
@@ -106,6 +110,11 @@ function reconcile(world){
   if(decomposed.length>1024){
     decomposed.sort((a,b)=>Number(r.refs[a].serial.slice(4))-Number(r.refs[b].serial.slice(4)));
     for(const k of decomposed.slice(0,decomposed.length-1024)){delete r.refs[k];changed=true;}
+  }
+  const departed=Object.keys(r.refs).filter(k=>k.startsWith('scavenger:')&&!r.refs[k].active);
+  if(departed.length>512){
+    departed.sort((a,b)=>Number(r.refs[a].serial.slice(4))-Number(r.refs[b].serial.slice(4)));
+    for(const k of departed.slice(0,departed.length-512)){delete r.refs[k];changed=true;}
   }
   const want=targets(world,r),have=new Map();
   for(const item of Object.values(r.items)){
@@ -182,7 +191,7 @@ function validate(world){
     serials.add(s);highest=Math.max(highest,n);
   };
   for(const [key,ref] of Object.entries(r.refs)){
-    if(typeof key!=='string'||!ref||!['character','mobile','monster','fixture','ground','corpse'].includes(ref.kind)||
+    if(typeof key!=='string'||!ref||!['character','mobile','monster','fixture','ground','corpse','grave','scavenger'].includes(ref.kind)||
       !world.areas?.[ref.area_id]||typeof ref.active!=='boolean')
       throw Error('Invalid entity reference');
     verifySerial(ref.serial);
