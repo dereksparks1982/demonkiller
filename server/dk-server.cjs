@@ -506,7 +506,7 @@ async function createDKServer({
           world_revision:result.world.revision,event:result.event});
       }catch(e){
         if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
-        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock|fine|guard|witness|crime/.test(e.message))
+        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock|fine|guard|witness|crime|Stack|stack|incompatible|selected|Selected/.test(e.message))
           return sendJSON(res,409,{error:e.message});
         console.error('Player gameplay failed:',e);
         return sendJSON(res,500,{error:'Gameplay transaction was not saved'});
