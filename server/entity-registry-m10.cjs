@@ -242,14 +242,17 @@ function inspect(world){
     .map(i=>({...i})).sort((a,b)=>Number(a.serial.slice(4))-Number(b.serial.slice(4))),
     containers:[...allowed].map(k=>({...r.containers[k]})),revision:world.revision};
 }
-function transfer(world,command){
+function transfer(world,command,{maxQuantity=20}={}){
+  // The public move_item action retains its 20-unit limit. Internal
+  // whole-stack transfers may request up to a validated 500-unit entity.
   if(!command||typeof command!=='object'||Array.isArray(command)||
     Object.keys(command).sort().join(',')!=='action,destination,quantity,serial'||
     command.action!=='move_item'||typeof command.serial!=='string'||
     !/^ent_[1-9][0-9]*$/.test(command.serial))
     throw Error('Invalid item transfer');
   const qty=command.quantity;
-  if(!Number.isSafeInteger(qty)||qty<1||qty>20)
+  if(!Number.isSafeInteger(maxQuantity)||maxQuantity<1||maxQuantity>500||
+    !Number.isSafeInteger(qty)||qty<1||qty>maxQuantity)
     throw Error('Invalid transfer quantity');
   if(![PACK,VAULT,HAND,LIGHT,CHEST,'ground'].includes(command.destination)&&
      world.entity_registry?.containers?.[command.destination]?.kind!=='house_store')
