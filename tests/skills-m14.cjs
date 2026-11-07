@@ -87,10 +87,12 @@ test('Skill lock actions persist atomically and reject client-invented skill lev
 });
 test('Real crafting, gathering and trade actions train their corresponding professions',()=>{
  let w=world(),c=w.characters['1'];
- c.area_id='dk.courtyard.001';c.x=19;c.y=12;
  c.inventory.wood=2;c.inventory.herbs=3;c.inventory.bread=1;c.inventory.produce=1;
  const node=Object.values(w.living.resources).find(n=>n.id==='courtyard_wood');
  assert(node);
+ // Test actual harvesting at the resource, not an unrelated hardcoded tile.
+ c.area_id=node.area_id;c.x=node.x;c.y=node.y;
+ c.region_id=require('../server/region-policies-m16.cjs').regionAt(w,c.area_id,c.x,c.y).id;
  let g=G.apply(w,{action:'gather',node_id:node.id});
  assert.equal(g.character.skillbook.skills.lumberjacking.value,1);
  w=g.world;w.living.minute=1;
