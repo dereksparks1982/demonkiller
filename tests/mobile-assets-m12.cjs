@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),E=require('../server/entity-registry-m10.cjs');
@@ -12,6 +13,7 @@ function fixture(){
  const npc=w.living.npcs.baker,c=w.characters['1'];
  Object.assign(c,{form:'living',opening_state:'resurrected',
    area_id:npc.area_id,x:npc.x,y:npc.y});
+ syncAll(w);
  return w;
 }
 function kill(world,npcId='baker',minute=0){
