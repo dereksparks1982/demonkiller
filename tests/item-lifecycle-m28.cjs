@@ -142,3 +142,25 @@ test('M28 server item ownership survives actual world.json reload',async t=>{
   E.counts(restored.world);W.validateWorld(restored.world);
  }finally{await restored.close();}
 });
+
+test('M28 concurrent stale transfers cannot duplicate a world item',async t=>{
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'dk-m28-race-'));
+ t.after(()=>fs.rm(dir,{recursive:true,force:true}));
+ await fs.writeFile(path.join(dir,'world.json'),JSON.stringify(fixture()));
+ const app=await createDKServer({dataDir:dir,port:0,now:()=>NOW});
+ t.after(()=>app.server.listening?app.close():Promise.resolve());
+ const base='http://127.0.0.1:'+app.address.port;
+ const snapshot=await (await fetch(base+'/api/v1/inventory')).json();
+ const serial=snapshot.backpack.find(i=>i.type==='herbs').serial;
+ const post=()=>fetch(base+'/api/v1/gameplay',{method:'POST',
+  headers:{'content-type':'application/json'},
+  body:JSON.stringify({action:'move_stack',serial,destination:E.VAULT})});
+ const results=await Promise.all([post(),post()]);
+ assert.deepEqual(results.map(x=>x.status).sort(),[200,409]);
+ const saved=JSON.parse(await fs.readFile(path.join(dir,'world.json'),'utf8'));
+ assert.equal(saved.entity_registry.items[serial].amount,48);
+ assert.equal(saved.entity_registry.items[serial].parent,E.VAULT);
+ assert.equal(saved.characters['1'].inventory.herbs,0);
+ assert.equal(saved.living.storage.vaults['1'].herbs,48);
+ E.counts(saved);W.validateWorld(saved);
+});
