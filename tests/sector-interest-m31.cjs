@@ -67,6 +67,9 @@ test('M31 first observation is full, repeated observation is compact, and moving
 });
 test('M31 old entities leave interest on movement but not world memory',()=>{
  const w=sample(),manager=M.createInterestTracker();
+ // Put a known NPC in the old sector to prove the leave delta is genuine.
+ w.living.npcs.baker.x=15;w.living.npcs.baker.y=30;
+ w.revision++;E.reconcile(w);
  const first=manager.poll(w,S.build(w),{radius:8});
  const p=w.characters['1'];p.x=111;p.y=109;w.revision++;E.reconcile(w);
  const next=manager.poll(w,S.build(w),{radius:8,cursor:first.cursor});
