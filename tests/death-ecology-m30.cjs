@@ -8,6 +8,7 @@ const D=require('../server/corpse-decay-m29.cjs');
 const S=require('../server/scavengers-m30.cjs');
 const G=require('../server/burials-m30.cjs');
 const SCH=require('../server/world-scheduler-m11.cjs');
+const SECT=require('../server/sectors-m10.cjs');
 const PLAY=require('../server/gameplay.cjs');
 const {createDKServer}=require('../server/dk-server.cjs');
 const NOW=Date.UTC(2026,10,7);
@@ -161,4 +162,22 @@ test('M30 HTTP burial persists across restart with no phantom corpse or lost wor
   assert.equal(resumed.world.characters['1'].gold,w.characters['1'].gold);
   E.counts(resumed.world);W.validateWorld(resumed.world);
  }finally{await resumed.close();}
+});
+
+
+test('M30 graves and scavengers have stable serials in nearby sector queries',()=>{
+ const w=fixture(),body=dead(w),events=[];
+ w.living.minute=180;S.run(w,180,events);E.reconcile(w);E.counts(w);
+ const visitor=Object.values(w.living.scavengers.visitors)[0];
+ const identity=w.entity_registry.refs['scavenger:'+visitor.id].serial;
+ const found=SECT.lookup(SECT.build(w),body.area_id,body.x,body.y,16).entities;
+ assert(found.some(e=>e.kind==='scavenger'&&e.id===visitor.id&&e.serial===identity));
+ const result=G.bury(w,{action:'bury_corpse',corpse_id:body.id}).world;
+ const grave=Object.values(result.living.burials.records)[0];
+ const serial=result.entity_registry.refs['grave:'+grave.id].serial;
+ const local=SECT.lookup(SECT.build(result),grave.area_id,grave.x,grave.y,16).entities;
+ assert(local.some(e=>e.kind==='grave'&&e.serial===serial));
+ assert(!local.some(e=>e.kind==='corpse'&&e.id===body.id));
+ assert.equal(result.entity_registry.refs['corpse:'+body.id].active,false);
+ E.counts(result);W.validateWorld(result);
 });
