@@ -21,21 +21,8 @@ $('deleteInGameSave').addEventListener('click',()=>{
 });
 
 function state(){return window.DKOutdoorState?.()||{};}
-function toggle(el){el.hidden=!el.hidden;if(!el.hidden){el.style.zIndex=String(++topLayer);el.querySelector('button')?.focus({preventScroll:true});}refresh(true);}
 let topLayer=30;
-$('openPaperDoll').addEventListener('click',()=>toggle(doll));
-$('openBackpack').addEventListener('click',()=>toggle(bag));
-document.querySelectorAll('[data-close-window]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.closeWindow).hidden=true;$('world')?.focus({preventScroll:true});}));
-document.addEventListener('keydown',e=>{
- if(e.ctrlKey||e.altKey||e.metaKey||e.repeat)return;
- if(['INPUT','TEXTAREA','SELECT'].includes(e.target?.tagName)||e.target?.isContentEditable)return;
- const k=e.key.toLowerCase();
- if(k==='p'||k==='i'){e.preventDefault();toggle(k==='p'?doll:bag);}
- if(k==='escape'){
-  if(!bag.hidden)bag.hidden=true;
-  else if(!doll.hidden)doll.hidden=true;
- }
-});
+// Window open/close controls are initialized inline in outdoor.html, independent of this script.
 // Drag only a window's header. Never intercept the game canvas's RMB movement.
 for(const win of [doll,bag]){
  const bar=win.querySelector('.uo-window-head');
