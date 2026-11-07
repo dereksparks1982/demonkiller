@@ -34,7 +34,7 @@ const {ensure:ensureSuccession,listing:successionListing}=require('./npc-success
 const {ensure:ensureCaravans,listing:caravanListing}=require('./caravan-logistics-m24.cjs');
 const {ensure:ensureScavengers}=require('./scavengers-m30.cjs');
 const {ensure:ensureBurials}=require('./burials-m30.cjs');
-const {ensure:ensureCells,streamingView:cellView}=require('./streaming-cells-m33.cjs');
+const {ensure:ensureCells,streamingView:cellView,onPlayerMove:trackCellMove}=require('./streaming-cells-m33.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -280,12 +280,13 @@ async function createDKServer({
       if(!world.runtime?.running)throw Error('World is paused; press Start Server');
       const tick=advance(world,now(),180);
       const result=applyGameplay(checkpointWorldTime(tick.world,now()),command,now());
+      const cellEvents=trackCellMove(result.world,world.characters?.['1']);
       reconcileEntities(result.world);
       assertEntityCounts(result.world);
       validateWorld(result.world);
       await snapshots.save(result.world);
       world=result.world;
-      try{await appendEvents([...tick.events,...(result.events||[result.event])]);}
+      try{await appendEvents([...tick.events,...(result.events||[result.event]),...cellEvents]);}
       catch(e){console.error('World event archive write failed:',e);}
       return result;
     });
@@ -296,12 +297,13 @@ async function createDKServer({
       if(!world.runtime?.running)throw Error('World is paused; press Start Server');
       const tick=advance(world,now(),180);
       const result=applySocial(checkpointWorldTime(tick.world,now()),command);
+      const cellEvents=trackCellMove(result.world,world.characters?.['1']);
       reconcileEntities(result.world);
       assertEntityCounts(result.world);
       validateWorld(result.world);
       await snapshots.save(result.world);
       world=result.world;
-      try{await appendEvents([...tick.events,result.event]);}
+      try{await appendEvents([...tick.events,result.event,...cellEvents]);}
       catch(e){console.error('Social event archive write failed:',e);}
       return result;
     });
