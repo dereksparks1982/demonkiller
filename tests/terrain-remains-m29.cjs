@@ -153,3 +153,35 @@ test('M29 HTTP corpse inspection, looting and restart preserve the visible body'
   E.counts(resumed.world);W.validateWorld(resumed.world);
  }finally{await resumed.close();}
 });
+
+
+test('M29 final decay creates a world-saved stain which eventually fades',()=>{
+ const w=fixture(),{c}=kill(w),events=[];
+ w.living.minute=10080;M.expire(w,10080,events);
+ assert(!w.living.mobile_assets.corpses[c.id]);
+ const mark=Object.values(w.living.mobile_assets.terrain_marks)[0];
+ assert(mark);
+ assert.equal(mark.kind,'stain');
+ assert.equal(mark.area_id,c.area_id);
+ assert.equal(mark.x,c.x);
+ assert.equal(mark.y,c.y);
+ assert.equal(mark.expires_minute,10080+M.MARK_LIFETIME);
+ E.reconcile(w);E.counts(w);W.validateWorld(w);
+ w.living.minute=mark.expires_minute-1;M.expire(w,w.living.minute,events);
+ assert(w.living.mobile_assets.terrain_marks[mark.id]);
+ w.living.minute=mark.expires_minute;M.expire(w,w.living.minute,events);
+ assert(!w.living.mobile_assets.terrain_marks[mark.id]);
+ E.reconcile(w);E.counts(w);W.validateWorld(w);
+});
+test('M29 monster remains leave a distinct ash trace',()=>{
+ const w=fixture(),events=[];
+ const creature={id:'imp_999',area_id:W.COURT,x:12,y:16};
+ const body=M.onCreatureDeath(w,creature,0,events);
+ E.reconcile(w);W.validateWorld(w);
+ w.living.minute=body.expires_minute;
+ M.expire(w,w.living.minute,events);
+ assert(!w.living.mobile_assets.corpses[body.id]);
+ const mark=Object.values(w.living.mobile_assets.terrain_marks)[0];
+ assert.equal(mark.kind,'ash');
+ E.reconcile(w);E.counts(w);W.validateWorld(w);
+});
