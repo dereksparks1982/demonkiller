@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.46 / DK Server M24 | 2026-11-06 | Physical merchant caravans between settlements
+
+- Implemented an independent, server-owned caravan job for the existing wandering merchant and escort. The merchant navigates from Village Market to Courtyard Market through cardinal tile routes and actual region portals.
+- Transactions transfer two units of produce from Village Market to the merchant's physical backpack for four existing merchant coins, then to the Courtyard Market for six existing destination-shop coins. The same M10 item serial is preserved throughout; server-side stock, business funds and merchant profit are updated atomically.
+- Caravan goals survive world restarts, stop/pause, and safe travel; living escorts, shop hours, owner staffing, terrain and territorial control are enforced. A dead trader or escort cancels the trip without deleting carried goods.
+- M19 NPC shopping cannot redirect active caravans or consume shipment-reserved food. Normal NPC provisions remain usable.
+- Added read-only nearby-only `GET /api/v1/caravans`, outdoor caravan progress text, safe M23 save migration and cargo-validation rules.
+- Added `tests/caravan-logistics-m24.cjs` regression contracts. Standalone JS transport simulations passed for purchase, cross-region sale, stable serial, guarded physical transactions, funds and inventory conservation. Full Node checkout suite not yet run.
+- No new art, no Godot, no additional player slot and no hosted persistent online server.
+
 ## v0.2.45 / DK Server M23 | 2026-11-06 | NPC succession and vacancy recruitment
 
 - Added server-owned, validated settlement posts for ten essential village and courtyard roles. Each post remembers its current occupant, vacancy and appointment history. Existing M22 worlds migrate without resetting businesses, corpses or inventories.

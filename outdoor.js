@@ -269,6 +269,16 @@ async function refreshWorkshops(){
    report.shops.map(shop=>shop.name+': '+shop.made).join(' · ');
  }catch(e){$('workshopStatus').textContent='Workshop production records unavailable.';}
 }
+async function refreshCaravans(){
+ if(!SERVER)return;
+ try{
+  const report=await SERVER.caravans();
+  const trip=report.nearby_caravan;
+  $('caravanStatus').textContent=report.purchased+' goods purchased · '+
+   report.delivered+' delivered · Merchant earnings '+report.merchant_profit+
+   (trip?' · Nearby: '+trip.merchant_name+' '+trip.phase.replaceAll('_',' '):'');
+ }catch(e){$('caravanStatus').textContent='Trade caravan records unavailable.';}
+}
 async function refreshNpcSuccession(){
  if(!SERVER)return;
  try{
@@ -857,9 +867,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors(),refreshNpcCommerce(),refreshWorkshops(),refreshNpcAI(),refreshNpcHarvest(),refreshNpcSuccession()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors(),refreshNpcCommerce(),refreshWorkshops(),refreshNpcAI(),refreshNpcHarvest(),refreshNpcSuccession(),refreshCaravans()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);setInterval(refreshWorkshops,15000);setInterval(refreshNpcAI,10000);setInterval(refreshNpcHarvest,15000);setInterval(refreshNpcSuccession,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);setInterval(refreshWorkshops,15000);setInterval(refreshNpcAI,10000);setInterval(refreshNpcHarvest,15000);setInterval(refreshNpcSuccession,15000);setInterval(refreshCaravans,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -888,6 +898,7 @@ async function begin(){
     $('npcAIStatus').textContent='NPC threat response requires DK Server.';
     $('npcHarvestStatus').textContent='NPC resource gathering requires DK Server.';
     $('npcSuccessionStatus').textContent='Settlement recruitment requires DK Server.';
+    $('caravanStatus').textContent='Physical trade caravans require DK Server.';
    for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake','buyHouse','sellHouse','houseAccess','homeStore','homeTake'])
      $(id).disabled=true;
   }

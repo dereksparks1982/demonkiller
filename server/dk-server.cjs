@@ -28,6 +28,7 @@ const {ensure:ensureWorkshops,listing:workshopListing}=require('./workshops-m20.
 const {ensure:ensureMobileAI,listing:npcAIListing}=require('./mobile-ai-m21.cjs');
 const {ensure:ensureHarvest,listing:harvestListing}=require('./npc-harvest-m22.cjs');
 const {ensure:ensureSuccession,listing:successionListing}=require('./npc-succession-m23.cjs');
+const {ensure:ensureCaravans,listing:caravanListing}=require('./caravan-logistics-m24.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -162,6 +163,7 @@ async function createDKServer({
     const npcAIAdded=ensureMobileAI(world);
     const harvestAdded=ensureHarvest(world);
     const successionAdded=ensureSuccession(world);
+    const caravanAdded=ensureCaravans(world);
     assertEntityCounts(world);
     // A stopped world stays frozen. No NPC catch-up or world time is simulated
     // during an intentional server shutdown or an offline host restart.
@@ -169,7 +171,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -325,7 +327,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m23', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m24', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -338,6 +340,9 @@ async function createDKServer({
       const area=world.areas[areaMatch[1]];
       return area?sendJSON(res,200,{area,revision:world.revision},method):
         sendJSON(res,404,{error:'Unknown region'},method);
+    }
+    if(url.pathname==='/api/v1/caravans'&&!write){
+      return sendJSON(res,200,caravanListing(world),method);
     }
     if(url.pathname==='/api/v1/npc-succession'&&!write){
       return sendJSON(res,200,successionListing(world),method);

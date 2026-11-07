@@ -20,6 +20,7 @@ const {ensure:ensureWorkshops,validate:validateWorkshops}=require('./workshops-m
 const {ensure:ensureMobileAI,validate:validateMobileAI}=require('./mobile-ai-m21.cjs');
 const {ensure:ensureHarvest,validate:validateHarvest}=require('./npc-harvest-m22.cjs');
 const {ensure:ensureSuccession,validate:validateSuccession}=require('./npc-succession-m23.cjs');
+const {ensure:ensureCaravans,validate:validateCaravans}=require('./caravan-logistics-m24.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -96,6 +97,7 @@ function makeWorld(now = Date.now()) {
   ensureMobileAI(result);
   ensureHarvest(result);
   ensureSuccession(result);
+  ensureCaravans(result);
   return result;
 }
 
@@ -173,6 +175,7 @@ function validateWorld(world) {
   validateMobileAI(world);
   validateHarvest(world);
   validateSuccession(world);
+  validateCaravans(world);
   return world;
 }
 

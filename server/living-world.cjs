@@ -16,6 +16,7 @@ const {ensure:ensureDistricts,syncNpcTransitions}=require('./region-policies-m16
 const NPCCOMMERCE=require('./npc-commerce-m19.cjs');
 const NPCAI=require('./mobile-ai-m21.cjs');
 const NPCHARVEST=require('./npc-harvest-m22.cjs');
+const CARAVAN=require('./caravan-logistics-m24.cjs');
 const {location:shopLocation}=require('./vendors-m18.cjs');
 const MINUTE=60_000,DAY=720,MAX_EVENTS=512;
 const HOME=Object.freeze({
@@ -89,6 +90,8 @@ function npcDestination(n,minute,world){
      w.wanted_until_minute>=minute&&w.detained_until_minute<minute)
    return {area_id:VILLAGE,x:p.x,y:p.y};
  }
+ const caravan=CARAVAN.destination(world,n);
+ if(caravan)return caravan;
  const harvesting=NPCHARVEST.destination(world,n);
  if(harvesting)return harvesting;
  const shopperDestination=NPCCOMMERCE.destination(world,n);
@@ -123,6 +126,7 @@ function minuteTick(world,m,generated){
  socialTick(world,m,generated);
  craftTick(world,m,generated);
  NPCHARVEST.plan(world,m,generated);
+ CARAVAN.plan(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
   if(m%5===0)NPCAI.sense(world,n,m,generated);
@@ -154,6 +158,7 @@ function minuteTick(world,m,generated){
   }
  }
  NPCHARVEST.process(world,m,generated);
+ CARAVAN.process(world,m,generated);
  if(m%15===0){
   for(const shop of Object.values(living.businesses)){
    const occupied=living.territories[shop.area_id]?.control!=='settlers';

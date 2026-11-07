@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M24 (v0.2.46)
+
+Existing RunUO-inspired mobile inventory (M12), serial items (M10), guards and movement (M21), physical vendors (M18) and real NPC production (M22) now support **cross-region caravans**. The wandering merchant obtains two produce from a staffed Village Market using their own money; their escort follows, and both must survive the physical trip. At the Courtyard Market the same item serial is transferred from the mobile pack to the destination vendor stock in exchange for real shop money. Trip goals, item ownership, vendor ledgers and dated transaction history persist with the world.
+
+The caravan can be paused by monster danger or closed shops and aborted by NPC death, escort loss or deadline without deleting cargo. The existing M12 corpse system retains goods carried at death. Initial trade is deliberately limited to one route and small lots. The actual movement remains cardinal on variable-sized region maps. The server is still not hosted behind the public GitHub Pages preview.
+
 ## Implemented milestone: DK Server M23 (v0.2.45)
 
 Settlements now track **posts rather than permanent immortal NPC holders**. The ten fixed occupations have a saved current holder; a worker's death vacates their job without resurrecting or deleting that individual. M11 schedules a recruitment check every 120 running world minutes. After at least a 120-minute vacancy and only in a safe settled territory, the paying business may hire a new NPC for 12 real coins. Every successor starts with their own serial identity, personal inventory, AI brain, home location and district, while the deceased retains their corpse, possessions and history. Existing merchant stock and economic ledgers remain associated with the business, not the person.

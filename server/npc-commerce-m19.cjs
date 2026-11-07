@@ -30,6 +30,7 @@ function plan(world,minute,out){
  const state=world.living.npc_trade;
  for(const n of Object.values(world.living.npcs)){
   if(!n.alive||!SHOPPERS.has(n.role)||state.goals[n.id]||
+     (world.living.caravans?.active&&['caravan','escort'].includes(n.role))||
      !['work','recover'].includes(world.living.npc_ai?.brains[n.id]?.mode||'work'))continue;
   if(pack(world,n).some(i=>FOOD.has(i.type)))continue;
   if((state.last_purchase[n.id]??-1000)+90>minute)continue;
@@ -104,7 +105,8 @@ function purchase(world,minute,out){
 }
 function consume(world,n,minute,out){
  if(!n.alive||n.hunger<10||!world.entity_registry)return false;
- const item=pack(world,n).find(i=>FOOD.has(i.type));
+ const reserved=world.living.caravans?.active?.cargo_serial;
+ const item=pack(world,n).find(i=>FOOD.has(i.type)&&i.serial!==reserved);
  if(!item)return false;
  if(item.amount===1)delete world.entity_registry.items[item.serial];
  else item.amount--;

@@ -94,3 +94,7 @@ RunUO's `Scripts/Engines/Harvest/Mining.cs` and harvesting architecture inform t
 ## Milestone 23: Spawn entries and permanent NPC succession (v0.2.45)
 
 RunUO's `Scripts/Regions/Spawning/SpawnEntry.cs` and `Scripts/Engines/Spawner/Spawner.cs` showed why settlement population must be separate from a particular mobile's lifespan. Demon Killer implements a **non-resurrection** variant for ten important jobs: when a resident dies, a bounded world-time hiring process can appoint a different character if safe territory and real business funds permit it. The previous person, corpse and assets remain part of the simulation, and shops/harvesters/courier jobs follow newly assigned living holders. No RunUO code was copied, and a full civilian population/estate or MMO spawning system remains future work.
+
+## Milestone 24: Mobile merchant shipment and vendor transaction cycle (v0.2.46)
+
+RunUO's `Scripts/Mobiles/Vendors/BaseVendor.cs`, mobile backpacks, item-parent serials and sector travel informed an independent one-route caravan pipeline. Demon Killer's wandering trader now physically buys real Village Market produce, carries an immutable item serial guarded by the caravan escort, and sells to the Courtyard Market for existing money. The purchase, journey and sale are independent saved states, with no automatic delivery teleports or inventory duplication. No RunUO GPL implementation was copied. Expanded merchant routes, caravan raids, tolls, guarded escort contracts and network hosting are future slices.

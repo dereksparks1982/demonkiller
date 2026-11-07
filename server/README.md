@@ -1,4 +1,4 @@
-# DK Server M23 | Persistent Settlement Recruitment and NPC Succession (v0.2.45)
+# DK Server M24 | Physical Caravan Trade and Cross-Region Supply (v0.2.46)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -252,3 +252,11 @@ New NPCs start at a traversable home tile, inherit the professional *role* but n
 `GET /api/v1/npc-succession` is read-only and reveals only posts physically close to the current character, plus aggregate hire counts. No client is allowed to appoint or resurrect residents. `tests/npc-succession-m23.cjs` checks migration, money conservation, hiring delay, idempotence, occupation and insufficient-funds holds, dynamic production, successor courier delivery and local-only API reporting. The existing M11 scheduler test suite now expects the seventh persisted job. This is independently inspired by RunUO's `Scripts/Regions/Spawning/SpawnEntry.cs` and `Scripts/Engines/Spawner/Spawner.cs`; their GPL source code was not copied.
 
 **Limitations:** No unrestricted dynamic population, childbirth, probate, orphan stewardship, factional elections, permanent hosted world or multiplayer. The settlement may reach its 96-record bound after many deaths; dead residents are deliberately retained rather than silently erased.
+
+## M24 merchant caravan logistics
+
+`server/caravan-logistics-m24.cjs` independently extends RunUO-style physical mobile inventories and vendor transactions. A single saved caravan goal follows the existing `caravan_trader` and `caravan_guard` through actual Village/Courtyard region portals using M6 cardinal pathfinding and M21 threat-aware movement. The goal starts only when the NPCs are alive, nearby, in safe settled territory, the merchant can afford real stock and his backpack has room, and the destination shop can pay and receive the merchandise. The merchant walks to the **open** Village Market, buys two produce units for four coins, carries their server-owned M10 item serial, and sells them to the **open** Courtyard Market for six coins. The same item changes parents from one vendor container to an NPC backpack to the other vendor container; there is no teleporting stock or newly minted gold.
+
+Caravan safety and shop hours matter. Danger or flight pauses trade; a missing escort, merchant death or 2160-minute deadline interrupts the goal without deleting real cargo. A killed trader's goods remain in their M12 backpack and physical corpse. M19 food shopping remains available outside trips, and active shipment serials are excluded from normal NPC food consumption. The M24 state and dated events are saved with the existing world snapshot/append-only history. The read-only `GET /api/v1/caravans` route returns aggregate delivery counts and only physically nearby trip details. The frontend displays simple text status without generated graphics or another dashboard.
+
+`tests/caravan-logistics-m24.cjs` covers old-save migration, real item/coin conservation, cross-region delivery identity, stock and shop-hour restrictions, danger, escort loss, death cargo retention, malformed records and read-only HTTP reporting. Isolated transport tests passed; the complete Node test suite remains to be executed in a full repository checkout. This remains **single player**, with one route, no hosted world or MMO protocol.

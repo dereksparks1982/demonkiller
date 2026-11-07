@@ -2,7 +2,18 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.45 | DK Server M23, Settlement Succession and Vacant Posts
+## Current milestone: v0.2.46 | DK Server M24, Physical Guarded Trade Caravans
+
+### M24: A wandering merchant carries real goods between settlements
+
+- **Actual traveling merchandise:** The wandering trader plans a physical trip from the Village Market to the Courtyard Market, with his caravan guard following him. The travel uses the existing cardinal, obstacle-aware NPC movement and real map portals.
+- **Real purchase and sale:** He buys two units of produce from the open Village Market using four of his own coins. The goods leave that shop's M18 inventory and enter his separate M12 backpack as a stable M10 item serial. At the open Courtyard Market, the **same cargo record** transfers into the destination storeroom in exchange for six existing shop coins. The merchant earns two coins in profit; money and item quantities are conserved.
+- **No teleports or imaginary stock:** The server requires physical proximity to both shop counters, an accompanying living escort, safe territories, real shop hours, available funds, backpack capacity, and destination storage space. A merchant can wait for a shop to reopen.
+- **Danger and death:** A monster attack, NPC panic, missing escort, or closed territory suspends the trip. If the merchant or escort dies or the trip expires, the goal ends but acquired items stay in the merchant's pack or corpse; cargo is never silently destroyed.
+- **Other systems still apply:** NPC shopping pauses while the guard is escorting active cargo. The trader can eat ordinary provisions but will not consume a shipment reserved for delivery.
+- **Stored history:** Purchases, deliveries and interrupted journeys are timestamped world events. The single-player server owns the entire trip and its coins, stock, item IDs, and travel state, even when the game webpage is closed.
+- **Status:** `GET /api/v1/caravans` reveals only an aggregate trade count and caravans near the player. The outdoor sidebar shows delivery progress when DK Server is connected.
+- **Limits:** One initial route and two-unit produce shipments. Later RunUO-style trade networks can use this foundation for more routes, tolls, robbery, escorts and city economies. The public static webpage still cannot host the world process.
 
 ### M23: Settlements can replace their dead workers
 
