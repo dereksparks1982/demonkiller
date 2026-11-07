@@ -4,6 +4,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs'),G=require('../server/gameplay.cjs');
 const E=require('../server/entity-registry-m10.cjs');
+const MOBILE=require('../server/mobile-assets-m12.cjs');
 const R=require('../server/regions.cjs');
 const {createDKServer}=require('../server/dk-server.cjs');
 const NOW=Date.UTC(2026,10,6);
@@ -80,8 +81,12 @@ test('Legacy M9 ground transfers keep the item identity where possible',()=>{
 });
 test('M9 worlds migrate without deleting their inventory or any NPC history',()=>{
  const w=fixture(),npc=w.living.npcs.baker.name,old=w.characters['1'].inventory.herbs;
+ // An M9 save predates both the serial registry and M12 NPC backpacks.
+ // Migrate the two stores together rather than leaving dangling bag IDs.
  delete w.entity_registry;
+ delete w.living.mobile_assets;
  assert.equal(E.reconcile(w),true);
+ assert.equal(MOBILE.ensure(w),true);
  assert.equal(w.characters['1'].inventory.herbs,old);
  assert.equal(w.living.npcs.baker.name,npc);
  assert.equal(E.reconcile(w),false);
