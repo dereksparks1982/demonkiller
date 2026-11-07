@@ -8,6 +8,18 @@ const icons={herbs:'❧',wood:'▰',ore:'◆',bread:'◒',tools:'⚒',produce:'�
  meals:'◉',torches:'♜',rations:'▣',bandages:'✚',gold:'●'};
 let lastInventory='',lastFigure='',lastJournal='';
 const pref='dkSoftworks.demonkiller.uoWindows.v1';
+$('deleteInGameSave').addEventListener('click',()=>{
+ const current=state();
+ if(current.serverConnected){
+  $('hudJournal').textContent='Server characters cannot be deleted from this browser interface yet.';
+  return;
+ }
+ const name=current.player?.name||'this character';
+ if(!window.confirm('Permanently delete '+name+' and its browser save? This cannot be undone.'))return;
+ for(const key of ['dkSoftworks.demonkiller.characters.v1','dkSoftworks.demonkiller.activeCharacter.v1','dkSoftworks.demonkiller.outdoors.preview.v1','dkSoftworks.demonkiller.testCenter.v1','dkSoftworks.demonkiller.architectLocalBackup.v1'])localStorage.removeItem(key);
+ window.location.replace('./index.html');
+});
+
 function state(){return window.DKOutdoorState?.()||{};}
 function toggle(el){el.hidden=!el.hidden;if(!el.hidden){el.style.zIndex=String(++topLayer);el.querySelector('button')?.focus({preventScroll:true});}refresh(true);}
 let topLayer=30;
