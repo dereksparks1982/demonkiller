@@ -43,6 +43,12 @@ function build(world){
   for(const corpse of Object.values(world.living?.mobile_assets?.corpses||{}))
     add({kind:'corpse',id:corpse.id,serial:serialFor('corpse:'+corpse.id),
       name:corpse.name,area_id:corpse.area_id,x:corpse.x,y:corpse.y});
+  for(const grave of Object.values(world.living?.burials?.records||{}))
+    add({kind:'grave',id:grave.id,serial:serialFor('grave:'+grave.id),
+      name:grave.name,stage:grave.stage,area_id:grave.area_id,x:grave.x,y:grave.y});
+  for(const bird of Object.values(world.living?.scavengers?.visitors||{}))
+    add({kind:'scavenger',id:bird.id,serial:serialFor('scavenger:'+bird.id),
+      type:bird.kind,area_id:bird.area_id,x:bird.x,y:bird.y});
   for(const drop of Object.values(world.living?.combat?.drops||{}))
     add({kind:'monster_loot',id:drop.id,serial:null,
       area_id:drop.area_id,x:drop.x,y:drop.y,type:drop.item});
