@@ -1,4 +1,5 @@
 'use strict';
+const {syncAll}=require('./helpers/sync-fixture.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const W=require('../server/world.cjs');
@@ -17,7 +18,7 @@ function fixture(){
  const npc=w.living.npcs.baker,c=w.characters['1'];
  Object.assign(c,{area_id:npc.area_id,x:npc.x,y:npc.y,
    form:'living',opening_state:'resurrected',crystal_spent:true});
- c.inventory.tools=1;E.reconcile(w);E.counts(w);W.validateWorld(w);
+ c.inventory.tools=1;syncAll(w);E.reconcile(w);E.counts(w);W.validateWorld(w);
  return w;
 }
 function dead(w,id='baker'){
