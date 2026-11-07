@@ -47,15 +47,17 @@ function view(c,minute){
   preserved:c.preserved,looted:c.looted,
   age_minutes:now,expires_minute:c.expires_minute,
   next_stage_minute:i<STAGES.length-1?c.created_minute+times[i+1]:null,
-  can_search:i<4&&!c.looted};
+  can_search:i<4&&!c.looted&&Boolean(c.bag_id||c.coins)};
 }
-function migrate(c){
+function migrate(c,minute=c.created_minute){
  if(c.stage!==undefined)return false;
  // Old M12 corpses expired after 720 minutes. Preserve their deaths,
  // backpack identities, loot state, and coordinates during M29 migration.
  const cfg=configure({kind:'npc',species:'human',area_id:c.area_id,
   minute:c.created_minute});
  Object.assign(c,cfg);
+ c.stage=stageAt(c,minute);
+ c.last_stage_minute=Math.max(c.created_minute,minute);
  return true;
 }
 function validate(c,minute){
