@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.40 / DK Server M18 | 2026-11-06 | Physical merchant merchandise
+
+- Migrated five merchant primary-product stocks into individually identified M10 persistent merchandise containers without changing existing shop locations or NPC personal backpacks. Financial-service banking remains distinct from ordinary retail.
+- Separated commodities purchased from the player into explicit type-specific secondary merchant stock, ending the prior error where selling ore or wood to a smithy increased its saleable tools count.
+- Integrated item-serial-preserving purchasing and selling, strict 500-item vendor capacity, M11 restock limits, world validation and non-destructive M17-save migration.
+- Added a read-only local `GET /api/v1/vendors` and outdoor inventory display with no new artwork. Existing buy and sell controls remain.
+- Added `tests/vendors-m18.cjs` migration, serial, capacity, stock and HTTP regression contracts. Functional module checks passed for commodity conservation, buying, selling, stock restocking and world validation. Full Node/browser tests remain unverified.
+- Architecture informed by RunUO BaseVendor/SBInfo only; no GPL implementation copied. Background customers and suppliers are not yet physically instantiated, and the project remains unhosted online.
+
 ## v0.2.39 / DK Server M17 | 2026-11-06 | Existing house deeds and persistent property
 
 - Added server-owned titles, prices, ownership, home storage and sign access metadata for the existing four Courtyard and six Village house exteriors, preserving actual original building dimensions.

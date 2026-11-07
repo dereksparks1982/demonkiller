@@ -70,3 +70,7 @@ RunUO `Server/Region.cs` demonstrates overlapping priority regions, location-bas
 ## Milestone 17: House signs, deeds and ownership (v0.2.39)
 
 RunUO `Scripts/Multis/BaseHouse.cs`, `Scripts/Multis/HouseSign.cs` and `Scripts/Regions/HouseRegion.cs` show how property ownership, signed public/private status and secure containers interact with region rules. Our `server/housing-m17.cjs` independently applies these architectural ideas to the actual ten existing house exteriors and the M16 housing districts. Purchases use real gold balances, M10 serials persist through house storage, and NPC deaths preserve titles as estates. We have not copied GPL C# and have not introduced UO-style freeform house placement or full interior lock-down, access lists and housing decay.
+
+## Milestone 18: Vendor-owned stock (v0.2.40)
+
+RunUO `Scripts/Mobiles/Vendors/BaseVendor.cs` and `Scripts/Mobiles/Vendors/SBInfo/SBInfo.cs` distinguish merchandise lists and buy/sell logic from personal NPC possessions. Demon Killer now independently gives each merchandise shop its own persistent stock container, with M10 item IDs, typed secondary goods, actual player trades and bounded supplier restocking. The bank remains a financial service. Individual autonomous customer transfers and supplier cargo are not yet simulated.

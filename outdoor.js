@@ -260,6 +260,22 @@ function currentHouse(){
   .sort((a,b)=>(Math.abs(player.x-a.door_x)+Math.abs(player.y-a.door_y))-
     (Math.abs(player.x-b.door_x)+Math.abs(player.y-b.door_y)))[0]||null;
 }
+async function refreshVendors(){
+ if(!SERVER)return;
+ try{
+  const data=await SERVER.vendors();
+  const near=(data.nearby||[]).sort((a,b)=>
+   Math.abs(a.x-player.x)+Math.abs(a.y-player.y)-
+   (Math.abs(b.x-player.x)+Math.abs(b.y-player.y)))[0];
+  $('vendorStatus').textContent=near?
+   near.name+' · '+(near.open?'Open':'Closed')+
+   ' · '+near.quantity+' '+near.product+' available'+
+   (Object.keys(near.other_stock||{}).length?
+    ' · Other merchandise: '+Object.entries(near.other_stock)
+      .filter(([,n])=>n>0).map(([type,n])=>type+' '+n).join(', '):''):
+   'No merchandise vendor within six tiles.';
+ }catch(e){$('vendorStatus').textContent='Vendor inventory unavailable.';}
+}
 async function refreshHousing(){
  if(!SERVER)return;
  try{
@@ -522,7 +538,7 @@ async function takeAction(action,fields={}){
   const result=await SERVER.gameAction(action,fields);
   player=result.character;
   message('Saved: '+result.event.text);
-  await Promise.all([refreshGameplay(),refreshLiving(),refreshSkills(),refreshLaw()]);
+  await Promise.all([refreshGameplay(),refreshLiving(),refreshSkills(),refreshLaw(),refreshVendors()]);
  }catch(e){message('Cannot '+action.replaceAll('_',' ')+': '+e.message);}
  finally{busy=false;}
 }
@@ -785,9 +801,9 @@ async function begin(){
    if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
     firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
    }
-   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing()]);
+   await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors()]);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
-   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);
+   setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
@@ -810,6 +826,7 @@ async function begin(){
     $('scheduleStatus').textContent='World timers require DK Server.';
     $('districtStatus').textContent='District policy requires DK Server.';
    $('houseStatus').textContent='House deeds and secure storage require DK Server.';
+   $('vendorStatus').textContent='Physical merchant stock requires DK Server.';
    for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake','buyHouse','sellHouse','houseAccess','homeStore','homeTake'])
      $(id).disabled=true;
   }

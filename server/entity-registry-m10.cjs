@@ -54,6 +54,13 @@ function targets(world,registry){
   }
   for(const [type,amount] of Object.entries(world.living?.storage?.vaults?.['1']||{}))
     add(VAULT,type,amount);
+  for(const shop of Object.values(world.living?.businesses||{})){
+    const vendor='vendor_stock_'+shop.id;
+    if(registry.containers[vendor]?.kind!=='vendor_stock')continue;
+    add(vendor,shop.product,shop.stock);
+    for(const [type,amount] of Object.entries(shop.other_stock||{}))
+      add(vendor,type,amount);
+  }
   for(const d of Object.values(world.living?.storage?.ground||{}))
     add(d.id,d.item,d.quantity);
   // NPC backpacks and house stores have no M9 count mirror; serials are canonical.
@@ -187,9 +194,9 @@ function validate(world){
     byParent[item.parent]=(byParent[item.parent]||0)+item.amount;
   }
   for(const [id,c] of Object.entries(r.containers)){
-    if(!c||c.id!==id||!['pack','bank','equip','chest','npc_pack','house_store'].includes(c.kind)||
+    if(!c||c.id!==id||!['pack','bank','equip','chest','npc_pack','house_store','vendor_stock'].includes(c.kind)||
       !Number.isInteger(c.capacity)||c.capacity<1||c.capacity>500||
-      (['chest','house_store'].includes(c.kind)&&(!world.areas?.[c.area_id]||
+      (['chest','house_store','vendor_stock'].includes(c.kind)&&(!world.areas?.[c.area_id]||
         !Number.isInteger(c.x)||!Number.isInteger(c.y)||
         c.x<0||c.y<0||c.x>=world.areas[c.area_id].width||
         c.y>=world.areas[c.area_id].height)))

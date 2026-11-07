@@ -14,6 +14,7 @@ const {ensure:ensureMobileAssets,validate:validateMobileAssets}=require('./mobil
 const {ensure:ensureLaw,validate:validateLaw}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,validate:validateDistricts,onPlayerMove}=require('./region-policies-m16.cjs');
 const {ensure:ensureHousing,validate:validateHousing}=require('./housing-m17.cjs');
+const {ensure:ensureVendors,validate:validateVendors}=require('./vendors-m18.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -83,6 +84,8 @@ function makeWorld(now = Date.now()) {
   ensureLaw(result);
   ensureDistricts(result);
   ensureHousing(result);
+  ensureVendors(result);
+  reconcileEntities(result);
   return result;
 }
 
@@ -154,6 +157,7 @@ function validateWorld(world) {
   validateLaw(world);
   validateDistricts(world);
   validateHousing(world);
+  validateVendors(world);
   return world;
 }
 

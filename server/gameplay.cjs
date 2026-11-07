@@ -10,6 +10,7 @@ const MOBILE=require('./mobile-assets-m12.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const LAW=require('./law-m15.cjs');
 const HOUSING=require('./housing-m17.cjs');
+const VENDORS=require('./vendors-m18.cjs');
 const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages']);
 const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4};
 const NODES=[
@@ -148,7 +149,10 @@ function apply(world,command,now=Date.now()){
   if(c.inventory[item]<qty)throw Error('You do not own those items');
   const price=VALUES[item]*qty;
   if(shop.coins<price)throw Error('The merchant cannot afford the trade');
-  c.inventory[item]-=qty;c.gold+=price;shop.coins-=price;shop.stock+=qty;
+  if(!VENDORS.canAccept(shop,item,qty))throw Error('The vendor storeroom is full');
+  c.inventory[item]-=qty;c.gold+=price;shop.coins-=price;
+  if(item===shop.product)shop.stock+=qty;
+  else shop.other_stock[item]=(shop.other_stock[item]||0)+qty;
   c.skills.commerce+=qty;
   SKILLS.practice(c,'trading',minute,'business:'+shop.id);
  }else{

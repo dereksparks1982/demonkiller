@@ -1,4 +1,4 @@
-# DK Server M17 | Houses, Deeds and Persistent Ownership (v0.2.39)
+# DK Server M18 | Physical Vendor Merchandise (v0.2.40)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -16,7 +16,7 @@ All routes have the `/api/v1` prefix. The server serves game assets via an allow
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/health` | DK Server build `local-m17`, online state and world running flag |
+| GET | `/health` | DK Server build `local-m18`, online state and world running flag |
 | GET | `/world` | Temple legacy snapshot and world clock |
 | GET | `/clock` | Six-hour day/night state and paused/running flag |
 | GET | `/server/state` | Server world running/paused state |
@@ -141,7 +141,7 @@ The world scheduler now has a fifth recurring job `corpse_cleanup` every 60 runn
 
 ## v0.2.34 integration correction
 
-The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m17`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
+The original v0.2.33 commit included mobile-assets modules and the outdoor UI but accidentally left `server/dk-server.cjs` at the pre-M12 route integration. v0.2.34 corrects that server entry point, activates `ensureMobileAssets` at startup, adds `GET /api/v1/corpses`, and includes read-only corpse markers under `GET /api/v1/living`. The backend remains build `local-m18`; this is a server-wiring correction, not a new major server milestone. Existing world files are not reset.
 
 ## M13 save-strategy and verification
 
@@ -194,3 +194,13 @@ Every house has a distinct `house_store` container (64 total item capacity) in M
 `POST /api/v1/gameplay` also supports `{"action":"buy_house","house_id":"courtyard_house_se"}`, `{"action":"sell_house","house_id":"courtyard_house_se"}`, and `{"action":"set_house_public","house_id":"courtyard_house_se","public":true}`. `GET /api/v1/housing` exposes only nearby title summaries and the player's known home. NPC deaths update a house title to an unsettled estate, rather than deleting the building, automatically selling it or transferring it to an invented heir. This is groundwork for future wills, family ownership, estate courts and house interiors, not a completed property-trading MMO.
 
 `tests/housing-m17.cjs` covers old-save migration, original building dimensions, real money conservation, item serial identity, locked house access, one-home cap, corpse-to-estate transition and persisted HTTP deeds. Functional module checks passed; complete Node/browser suites require a full repository checkout and remain unverified. House icons are primitive original Canvas signs; no third-party sprites are introduced.
+
+## M18 vendor containers and sale provenance
+
+`server/vendors-m18.cjs` independently implements the vendor-stock organization inspired by RunUO's `Scripts/Mobiles/Vendors/BaseVendor.cs` and `Scripts/Mobiles/Vendors/SBInfo/SBInfo.cs`; no RunUO GPL code is used. Five merchandise businesses (bakery, smithy, village market, tavern and courtyard market) now each own a private `vendor_stock_<id>` container in M10's server-authored entity registry. The Village Bank's product string `bank` is a service and is deliberately excluded from physical merchandise. Existing numerical `business.stock` remains a compatibility view of the merchant's primary product. New `business.other_stock` separately stores secondary commodities accepted from players; those goods never inflate primary stock.
+
+The existing `buy` gameplay action lowers a vendor's primary-product count and raises the player's actual inventory count, so the serialized entity reconciliation transfers item serials when possible or splits stacks on partial movement. The existing `sell` action now distinguishes a shop's primary product from secondary goods and rejects excess quantity above the 500-item capacity, preserving actual item types and one-time transactions. The merchant's *personal* `npc_pack_` container remains separate. No new player inventory format or third-party artwork is required.
+
+At world initialization or migration, `ensureVendors` creates the five merchant containers; M10 reconciliation instantiates or reconciles their actual commodity quantities before validation and durable save. World-minute restocking is limited by the vendor's total occupied storage capacity. The legacy background customer sale simulation still represents **offscreen customer demand** and does not yet create an item for a specific NPC recipient. Physical trade from NPC to NPC, supply shipments, vendor provenance, warehousing, markup and per-item store pricing will be independent later milestones.
+
+`GET /api/v1/vendors` returns current-area nearby merchant stock summaries only, and the outdoor sidebar displays the closest store's available products and secondary goods. Clients cannot mutate vendor stock through the read endpoint or transfer from a store as though it were their own bank. `tests/vendors-m18.cjs` covers migration, commodity separation, item serials, capacity, restocking and HTTP durability; module-level integration tests passed. The complete Node/browser suite remains to be run against a full checkout.

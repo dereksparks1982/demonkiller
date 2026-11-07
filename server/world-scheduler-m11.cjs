@@ -4,6 +4,7 @@
 // No arbitrary function serialization, no browser timers, and no replay on restart.
 const {COURT,VILLAGE}=require('./regions.cjs');
 const {expire:expireCorpses}=require('./mobile-assets-m12.cjs');
+const {merchandises,total:vendorTotal,CAPACITY:VENDOR_CAPACITY}=require('./vendors-m18.cjs');
 const JOBS=Object.freeze({
   postal_dispatch:{every:1,priority:0},
   camp_rotation:{every:90,priority:1},
@@ -104,7 +105,8 @@ function camp(world,minute,out){
 }
 function restock(world,minute,out){
   for(const shop of Object.values(world.living.businesses)){
-    if(shop.stock>=12||shop.coins<30)continue;
+    if(shop.stock>=12||shop.coins<30||
+      (merchandises(shop)&&vendorTotal(shop)+25>VENDOR_CAPACITY))continue;
     shop.stock+=25;shop.coins-=30;shop.expenses+=30;
     out.push(event(world,minute,'business.delivery',
       'A supplier replenished '+shop.name+'.',

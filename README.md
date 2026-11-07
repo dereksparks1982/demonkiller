@@ -2,7 +2,18 @@
 
 **Demon Killer** is DK Softworks' original engine-free Gothic RPG, with Ultima Online-inspired cardinal movement, DK Architect construction, and a planned fully persistent single-player world. Its intentionally simple pixel art and approved sacrificial-temple opening remain the visual foundation.
 
-## Current milestone: v0.2.39 | DK Server M17, House Deeds and Property
+## Current milestone: v0.2.40 | DK Server M18, Physical Merchant Stock
+
+### M18: A shop has actual goods, not just a stock number
+
+- Five merchandise businesses now own **separate, persistent item containers** for bread, tools, produce, meals and herbs. The Village Bank remains a financial service, not an imaginary shop selling "bank" items.
+- Each storefront's existing product stock migrates into M10's durable item registry. Full stacks keep their serials through server-owned transfers; partial purchases or sales split a real item stack into independent serials with no duplication.
+- A smithy can buy **ore or wood without transforming those goods into extra tools**. Nonprimary goods are stored separately as physical merchandise with their own item types and saved quantities. Other businesses retain the same commodity distinctions.
+- Restocking uses the saved M11 schedule and actual merchant funds. The server rejects deliveries or incoming trades that would exceed a 500-item storeroom. The existing buying/selling UI continues to work, with a read-only nearby vendor inventory display.
+- Shop sales to simulated, offscreen customers are still an abstract demand model; individual NPC customer inventories and supplier-origin cargo are future UO-inspired slices.
+- The game remains one character, engine-free, and based on the approved primitive pixel graphics. GitHub Pages still does not host DK Server.
+
+
 
 ### M17: Existing buildings are durable property
 

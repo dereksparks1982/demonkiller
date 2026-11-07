@@ -1,3 +1,9 @@
+## Implemented milestone: DK Server M18 (v0.2.40)
+
+Each of the five genuine merchandise businesses now has a private, persistent `vendor_stock` item container at its existing storefront. Existing primary stock migrates without reset, secondary purchased goods become type-specific `business.other_stock`, and M10 item serials track stock as it moves between a vendor and the single player's physical backpack. A smithy buying ore no longer converts the ore into tools. Real money changes hands under the existing economy, and M11 restocking respects a 500-item total physical storeroom capacity.
+
+`server/vendors-m18.cjs` controls migration, strict validation, goods capacity and player-local merchant readouts. The existing gameplay trade endpoint remains authoritative; `GET /api/v1/vendors` adds a read-only inventory summary. Bank correspondence and currency are not treated as ordinary merchandise. Merchant-to-NPC simulated trade is still abstract demand: future work should assign actual physical buyers and suppliers before claiming complete Ultima Online-style economic autonomy.
+
 ## Implemented milestone: DK Server M17 (v0.2.39)
 
 The ten preexisting true-scale house exteriors in the Courtyard and Village now have saved deed IDs, price, title owner, public/private status, doorway coordinates and a 64-item secure container. The new `server/housing-m17.cjs` checks M16 district housing rules, existing monster occupation, physical proximity, single-player deed cap, and actual player/Village Bank money before authorizing purchase or resale. Containers are incorporated into M10's item registry, retaining serial identity and preventing unauthorized or remote item extraction. Empty houses can be sold back to the settlement at a discount without creating additional gold.

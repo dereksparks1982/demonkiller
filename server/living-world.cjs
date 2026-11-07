@@ -150,7 +150,7 @@ function minuteTick(world,m,generated){
     generated.push(event(living,m,'business.hours',
      shop.name+(open?' opened.':' closed.'),{business_id:shop.id,area_id:shop.area_id}));
    }
-   if(!open||shop.stock<=0)continue;
+   if(!open||shop.stock<=0||shop.product==='bank')continue;
    const sold=1+Math.floor(rng(living)*4),actual=Math.min(sold,shop.stock);
    shop.stock-=actual;shop.sales+=actual;
    const price=shop.product==='tools'?8:shop.product==='meals'?4:2;
