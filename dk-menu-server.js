@@ -85,6 +85,9 @@
         (cursor?'&cursor='+encodeURIComponent(cursor):'');
       return request(url);
     },
+    async sectorManifest(area){
+      return request('/api/v1/sectors/manifest?area='+encodeURIComponent(area));
+    },
     async sectorChunk(area,sx,sy){
       return request('/api/v1/sectors/chunk?area='+encodeURIComponent(area)+
         '&sx='+encodeURIComponent(sx)+'&sy='+encodeURIComponent(sy));
@@ -129,7 +132,7 @@
     }
     try {
       const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
-      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<31) throw Error('DK Server needs M31 or later');
+      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<32) throw Error('DK Server needs M32 or later');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';
