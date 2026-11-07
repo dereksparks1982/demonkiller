@@ -47,6 +47,12 @@ function deleteCharacter(world,slot,name){
   if(record.npc_visits===0)delete l.region_history.records[id];
  }
  delete next.characters['1'];
+ // Visit history belongs to the retired character, not a future one.
+ // The cells themselves and every object in the world remain intact.
+ if(l.streaming_cells){
+  l.streaming_cells.records={};
+  l.streaming_cells.current=null;
+ }
  // A new character gets a NEW serial. Do not revive the retired identity.
  delete r.refs['player:1'];
  reconcile(next);counts(next);
