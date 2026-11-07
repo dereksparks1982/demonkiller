@@ -114,7 +114,6 @@ function createInterestTracker({now=Date.now,maxSessions=MAX_SESSIONS}={}){
   const time=now();
   for(const [key,session] of sessions)
    if(time-session.created_at>EXPIRE_MS)sessions.delete(key);
-  while(sessions.size>=maxSessions)sessions.delete(sessions.keys().next().value);
  }
  function poll(world,index,{slot=1,cursor=null,radius=DEFAULT_RADIUS}={}){
   validateRadius(radius);
@@ -124,6 +123,8 @@ function createInterestTracker({now=Date.now,maxSessions=MAX_SESSIONS}={}){
   const view=nearbySectors(world,slot,radius);
   const previous=cursor===null?null:sessions.get(cursor);
   if(cursor!==null)sessions.delete(cursor); // One-use cursor prevents stale replay.
+  // Evict only after preserving the cursor actively being continued.
+  while(sessions.size>=maxSessions)sessions.delete(sessions.keys().next().value);
   const reset=!previous||previous.area_id!==view.area_id||
    previous.radius!==radius||previous.world_id!==world.world_id;
   const entries=sectorEntities(index,view);
