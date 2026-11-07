@@ -67,6 +67,7 @@
     async skills() { return request('/api/v1/skills'); },
     async law() { return request('/api/v1/law'); },
     async items() { return request('/api/v1/entities/items'); },
+    async inventory() { return request('/api/v1/inventory'); },
     async schedule() { return request('/api/v1/schedule'); },
     async region() { return request('/api/v1/region/current'); },
     async housing() { return request('/api/v1/housing'); },
@@ -119,7 +120,7 @@
     }
     try {
       const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
-      if (health.build !== 'local-m25') throw Error('DK Server needs the latest M4 build');
+      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<27) throw Error('DK Server needs M27 or later');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';
