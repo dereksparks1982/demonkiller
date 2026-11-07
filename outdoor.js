@@ -20,7 +20,27 @@ let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
 // M31: nearby entities arrive through bounded server-sector deltas.
 // This is client display state only; the server remains authoritative.
 let sectorView=null,sectorCursor=null,sectorPolling=false,sectorErrors=0;
-let terrainSession=null;
+let terrainSession=null,terrainFailures=0,terrainRecovering=false;
+async function recoverFullTerrain(session){
+ if(terrainRecovering||terrainSession!==session||!SERVER||!area)return;
+ terrainRecovering=true;
+ const id=area.area_id;
+ try{
+  const complete=(await SERVER.area(id)).area;
+  if(terrainSession!==session||area.area_id!==id)return;
+  if(!complete?.floor||complete.floor.length!==complete.width*complete.height)
+   throw Error('Invalid region fallback');
+  session.close();terrainSession=null;terrainFailures=0;
+  // Keep the current player position, visual interpolation, and input state.
+  area=complete;draw();
+ }catch(_){terrainFailures=0;}
+ finally{terrainRecovering=false;}
+}
+function checkTerrainFetch(session,result){
+ if(terrainSession!==session)return;
+ if(result.failed===0){terrainFailures=0;return;}
+ if(++terrainFailures>=3)void recoverFullTerrain(session);
+}
 function prefetchTerrain(){
  if(!terrainSession||!player||!area||area.area_id!==player.area_id)return;
  const session=terrainSession;
@@ -28,10 +48,8 @@ function prefetchTerrain(){
   const desired=session.setFocus(player.x,player.y);
   // Prefetch up to two sectors around the character. Never block walking
   // on a network request; the server alone determines movement legality.
-  void session.prefetch(session.around(player.x,player.y,2)).then(result=>{
-   if(terrainSession===session&&result.failed>0&&session.stats().loaded===0)
-    message('Terrain stream temporarily unavailable.');
-  }).catch(()=>{});
+  void session.prefetch(session.around(player.x,player.y,2))
+   .then(result=>checkTerrainFetch(session,result)).catch(()=>{});
  }catch(_){}
 }
 
@@ -66,7 +84,9 @@ async function refreshSectorInterest(){
    try{
     terrainSession.setFocus(player.x,player.y);
     // Client cache de-duplicates already loaded chunks and caps concurrency.
-    void terrainSession.prefetch(state.sectors).catch(()=>{});
+    const session=terrainSession;
+    void session.prefetch(state.sectors)
+     .then(result=>checkTerrainFetch(session,result)).catch(()=>{});
    }catch(_){}
   }
   draw();
@@ -97,6 +117,7 @@ function previewArea(id){
 async function loadArea(id){
  const changed=!area||area.area_id!==id;
  if(terrainSession){terrainSession.close();terrainSession=null;}
+ terrainFailures=0;
  let nextArea=null;
  if(SERVER&&window.DKSectorTerrain){
   let candidate=null;
