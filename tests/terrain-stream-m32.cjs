@@ -53,6 +53,8 @@ test('M32 bounded cache retains the focus neighborhood and evicts distant chunks
  assert.equal(s.stats().loaded,9);
  const old=0*128+0;
  assert(s.has(25,25));
+ // The server only authorizes chunks near its authoritative player tile.
+ w.characters['1'].x=80;w.characters['1'].y=80;
  s.setFocus(80,80);
  const result=await s.prefetch(s.around(80,80,2));
  assert.equal(result.failed,0);
