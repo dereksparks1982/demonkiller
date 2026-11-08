@@ -12,6 +12,7 @@ const GUARDS=require('./guard-watch-m61.cjs');
 const GARRISON=require('./garrison-m62.cjs');
 const REFUGEES=require('./refugees-m63.cjs');
 const TRAFFIC=require('./npc-traffic-m64.cjs');
+const CAMPAIGNS=require('./settlement-campaigns-m65.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
@@ -134,6 +135,7 @@ function changeStatus(n,desired,minute,living,allEvents){
 }
 function minuteTick(world,m,generated){
  const living=world.living,t=m%DAY,day=t<360;
+ if(living.minute!==m)throw Error('World clock drift during catch-up');
  regenerate(world,m,generated);
  MAGIC.tick(world,m);
  socialTick(world,m,generated);
@@ -226,6 +228,7 @@ function minuteTick(world,m,generated){
  storageTick(world,m,generated);
  runScheduled(world,m,generated);
  syncNpcTransitions(world,m,generated);
+ if(m%CAMPAIGNS.INTERVAL===0)CAMPAIGNS.tick(world,m,generated);
 }
 function validateLiving(l){
  if(!l||l.schema!==1||!Number.isSafeInteger(l.minute)||l.minute<0||
@@ -254,15 +257,20 @@ function advance(world,now=Date.now(),limit=180){
  GARRISON.ensure(next);
  REFUGEES.ensure(next);
  TRAFFIC.ensure(next);
+ CAMPAIGNS.ensure(next);
  ensureMobileAssets(next);
  ensureLaw(next);
  ensureDistricts(next);
  NPCCOMMERCE.ensure(next);
  NPCAI.ensure(next);
  NPCHARVEST.ensure(next);
- for(let m=next.living.minute+1;m<=next.living.minute+count;m++)
+ // Every system sees the same authoritative minute, including during
+ // catch-up batches. Freeze the endpoint before updating living.minute.
+ const endMinute=next.living.minute+count;
+ for(let m=next.living.minute+1;m<=endMinute;m++){
+  next.living.minute=m;
   minuteTick(next,m,events);
- next.living.minute+=count;
+ }
  reconcileEntities(next);
  next.revision++;
  validateLiving(next.living);

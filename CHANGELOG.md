@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.63 / M65 | 2026-11-08 | Integrated siege simulation and per-minute clock correction
+
+- Fixed the authoritative world clock during multi-minute catch-up: each minute is recorded **before** running NPC, combat, guard, refugee, traffic, commerce, and scheduler systems. Frozen batch endpoint avoids extending the loop accidentally.
+- Added a world-minute drift assertion, preventing silent de-synchronization when future systems are added.
+- Added persistent two-region settlement campaign records showing occupation, liberation, rebuilding and peace, alongside dead/displaced resident counts, defenders, active monsters and open shops.
+- Recovery requires 90 safe minutes, every surviving resident returned, and a genuinely operating business; no fake recovery, gold, NPCs, goods or teleportation.
+- Campaign records tolerate direct player-led liberation between scheduled ticks. They catch up when simulation resumes without blocking world saves.
+- Corrected guard medical purchase eligibility so an absent/dead employee cannot dispense stock merely because a shop's open flag is still true.
+- Added nine M65 cross-system regression contracts and read-only campaign diagnostics, without new artwork or on-screen buttons.
+
 ## v0.2.62 / M64 | 2026-11-08 | Collision-aware NPC traffic and blocked gate arrivals
 
 - NPC route selection now checks actual occupied tiles by living players, other NPCs, monsters and companions. Ghosts remain intangible. Every allowed step remains cardinal.

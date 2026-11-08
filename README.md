@@ -4,6 +4,16 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M65 | Integrated siege recovery and authoritative per-minute simulation
+
+**World catch-up fix:** Every simulated minute now updates the authoritative `living.minute` before the NPC, combat, economy, scheduling, and event work for that minute. A runtime drift guard prevents future regressions. This makes multi-minute simulation batches consistent with small successive time advances, so healing, traffic, saving and world clocks no longer refer to different minutes within the same tick.
+
+**Settlement campaign ledger:** Courtyard and village each have a persisted `peace → occupied → rebuilding → peace` history, based on real territorial control, refugees, living residents, guards, remaining hostiles, and operating businesses. Occupation and liberation are recorded once, while a destroyed town cannot be marked recovered simply because the monsters disappeared. Recovery requires at least **90 safe world minutes**, all surviving civilians back from displacement, and at least one actual shop operating if businesses exist in that region. Deaths and displacement remain recorded; nothing is resurrected, restocked or teleported just to satisfy the ledger. The same authoritative tick logs the transition. Player-triggered liberation between scheduled ticks remains savable.
+
+**Medical service integrity:** A shop marked open is no longer sufficient to treat an injured guard when the actual employee is dead or has fled. Medical purchases still require the original physical goods, personal gold, inventory serials, and proximity. This prevents M62 care from ignoring M63 evacuation.
+
+Read-only development status: `GET /api/v1/settlements/campaigns`. Nine integrated regression contracts join the existing 32 M61–M64 cases. The standalone browser-playable game, controls, sprites, music and opening scene are unchanged.
+
 ## M64 | Collision-aware NPC traffic and streaming-world movement
 
 All server-controlled mobile routes now use the existing **cardinal pathfinder with actual actor occupancy**: living characters, NPCs, monsters and companion animals can no longer choose the same tile as another mobile merely because the terrain itself is passable. Ghosts remain intangible. Crowds can navigate around blocked streets and stop adjacent to occupied targets; **portals refuse movement when their arrival tile is occupied**, so characters wait rather than overlap or teleport through one another.

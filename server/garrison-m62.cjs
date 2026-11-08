@@ -62,8 +62,12 @@ function available(world,n,rule){
  if(!shop||!shop.open||n.area_id!==shop.area_id||
    world.living.territories[shop.area_id]?.control!=='settlers')return null;
  const owner=B.owned(world,shop),serving=owner?B.presence(world,shop):shop.owner_id;
- // A player personally serving a shop must not be bypassed by NPC automation.
+ // Store hours can lag actual movement: never invent medical service from an
+ // evacuated, deceased, or otherwise absent employee.
+ const worker=world.living.npcs[shop.owner_id],door=V.location(world,shop);
  if(owner&&(!serving||serving==='player'))return null;
+ if(!owner&&(!worker?.alive||worker.area_id!==shop.area_id||
+   Math.abs(worker.x-door.x)+Math.abs(worker.y-door.y)>6))return null;
  const stock=rule.type===shop.product?shop.stock:shop.other_stock?.[rule.type]||0;
  const cost=B.price(world,shop,rule.base_cost);
  if(stock<rule.count||n.coins<cost||shop.coins+cost>1e9)return null;

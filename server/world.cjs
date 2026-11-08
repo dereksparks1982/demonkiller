@@ -12,6 +12,7 @@ const GUARDS=require('./guard-watch-m61.cjs');
 const GARRISON=require('./garrison-m62.cjs');
 const REFUGEES=require('./refugees-m63.cjs');
 const TRAFFIC=require('./npc-traffic-m64.cjs');
+const CAMPAIGNS=require('./settlement-campaigns-m65.cjs');
 const {ensure:ensureStorage,validate:validateStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,validate:validateEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,validate:validateScheduler}=require('./world-scheduler-m11.cjs');
@@ -106,6 +107,7 @@ function makeWorld(now = Date.now()) {
   GARRISON.ensure(result);
   REFUGEES.ensure(result);
   TRAFFIC.ensure(result);
+  CAMPAIGNS.ensure(result);
   ensureStorage(result);
   reconcileEntities(result);
   ensureScheduler(result);
@@ -203,6 +205,7 @@ function validateWorld(world) {
   GARRISON.validate(world);
   REFUGEES.validate(world);
   TRAFFIC.validate(world);
+  CAMPAIGNS.validate(world);
   validateStorage(world);
   validateEntities(world);
   validateScheduler(world);

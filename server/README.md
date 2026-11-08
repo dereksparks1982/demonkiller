@@ -1,6 +1,16 @@
-# DK Server M64 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M65 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M65 settlement campaigns and world-minute integration correction
+
+**Clock ordering correction:** In `living-world.cjs`, `advance()` calculates its catch-up endpoint once and sets `next.living.minute = m` immediately before every `minuteTick(next,m,events)`. Old code left `living.minute` at the pre-batch time until after all minutes ran, which could cause cross-subsystem validations and item serial timestamps to disagree with guard/refugee/traffic actions. This is fixed without changing the wall-clock scheduler, offline pause semantics, scene rendering or world time scale. A runtime invariant raises on drift rather than making a corrupt save.
+
+**Campaign lifecycle:** `server/settlement-campaigns-m65.cjs` persists a phase record for both real world regions and updates it every five simulated minutes. Active hostile control moves the ledger to occupied; liberation moves it into rebuilding. A region returns to peaceful status only after at least 90 consecutive simulated minutes, all surviving displaced residents are back, and at least one store is genuinely operating when the region has businesses. The ledger tracks repeated occupations/liberations, peak displacement and timestamps without creating or destroying any NPC, item or coin. Territory changes from explicit combat are legal before the next scheduled campaign observation; world validation intentionally allows the journal to lag until its next tick.
+
+**Garrison:** `garrison-m62.cjs` now requires a currently alive employee physically near their shop for automated care at non-player-owned storefronts. A stale `open` flag cannot silently sell supplies after that employee has evacuated or died. Existing inventory-serial and coin-transfer rules remain.
+
+**Diagnostics:** Read-only `GET /api/v1/settlements/campaigns` includes each region's campaign history, surviving/dead/absent civilians, hostile count, sentries, open businesses and recovery gate. A suite of nine focused integrated tests is registered in `tests/settlement-campaigns-m65.cjs` and the existing manual-only CI runner.
 
 ## M64 crowd-safe movement, portal arrival queues and saved traffic metrics
 
