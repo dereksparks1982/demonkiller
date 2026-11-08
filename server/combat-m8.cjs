@@ -6,6 +6,7 @@ const {chooseStep}=require('./npc-navigation-m6.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const CREATURES=require('./creatures-m42.cjs');
 const SPAWNERS=require('./spawners-m59.cjs');
+const GUARDS=require('./guard-watch-m61.cjs');
 const MONSTER_AI=require('./monster-ai-m60.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
@@ -177,12 +178,9 @@ function tick(world,minute,events){
     {creature_id:monster.id,area_id:monster.area_id,target:player===target?'player':target.id,
       damage}));
   }
-  // Guards fight back when a monster is beside them.
-  for(const guard of guards)if(guard.alive&&distance(guard,monster)<=1){
-   monster.health=Math.max(0,monster.health-CREATURES.config(monster.kind).guardDamage);
-   if(monster.health===0){dead(world,monster,minute,events);break;}
-  }
+  // Guard duty runs once per world combat tick, not once per monster.
  }
+ GUARDS.tick(world,minute,events,dead);
 }
 function apply(world,command,now=Date.now()){
  const expected={attack:'action,target_id',loot:'action,drop_id'};

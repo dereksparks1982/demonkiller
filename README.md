@@ -4,6 +4,12 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M61 | Persistent settlement guard watch
+
+Guard and escort NPCs now keep real server-owned duty records, alarm targets, combat counters and last-action minutes. A sentry spots a hostile through the actual area terrain, shares a recent alarm with nearby colleagues, advances toward the enemy on navigable cardinal ground, and strikes within melee reach. Badly wounded guards withdraw from attacking; the existing citizen/NPC succession system can recruit a successor when a guard dies. Strikes occur at most once per guard per five-world-minute combat step; a duplicate tick or browser reload cannot invent extra attacks. Deaths use the **same combat corpse, loot, territory liberation and decay system** as player kills.
+
+Read-only `GET /api/v1/guard-watch` reports nearby sentries, alarms, attacks and kills. There are **no client guard-damage commands** and no additional HUD buttons. M60's persistent monster AI and M59's spawn ecology remain active. Saved M60 worlds gain missing guard-watch records non-destructively.
+
 ## M60 | Classic UO controls, War Mode and creature intelligence
 
 **Tab** and **Alt+C** toggle a persistent **War / Peace** stance. Creature double-clicks inspect in Peace Mode or initiate an attack in War Mode; pressing **T** selects the nearest visible hostile and **L** repeats the last selected target attack. The existing **right-mouse movement, left-click inspection, double-click interaction, P paper doll, I backpack, C cult dossier, B burial and F8 Architect** remain. Both the temple and overworld now understand the common UO keyboard controls:

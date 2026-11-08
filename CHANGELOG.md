@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.59 / M61 | 2026-11-08 | Active settlement guard watches
+
+- Moved guard offense out of the monster turn loop and into one world-owned, exact-once defensive pass per combat interval.
+- Persistent NPC sentry records track alarm targets, alarms, strikes, kills and action timestamps. Guards sound local alarms, share threat sightings, follow cardinal paths, and defend towns without player presence.
+- Wounded guards do not blindly attack. Successful guard kills use ordinary physical remains, loot and territory liberation, including M59 spawn suppression.
+- Backward-compatible M60 world migration; strict validation and a read-only diagnostic endpoint.
+- Added seven M61 regression contracts covering migration, alarm, combat, repeat ticks, corpse/territory effects, wounded response, NPC succession and HTTP wiring. No imported RunUO implementation.
+
 ## v0.2.58 / M60 | 2026-11-08 | UO keyboard controls and persistent combat behavior
 
 - Tab/Alt+C toggles a saved character War/Peace stance across temple and overworld; double-clicking a creature attacks only while the browser is in War Mode, otherwise inspects. T selects nearest hostile; L attacks last target.

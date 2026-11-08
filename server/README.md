@@ -1,6 +1,12 @@
-# DK Server M60 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M61 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M61 active NPC guard watch
+
+`server/guard-watch-m61.cjs` adds one persisted watch record per guard/escort, with stable identity and counters for alerts, strikes, kills and the last processed minute. Two sentries defending the same region may share a short-lived alarm. Combat is server-authored once per five world minutes and uses the same `combat.dead()` path as other creature deaths. A guard must be alive and not critically wounded, the hostile must be in the same area, the path must be walkable, and melee range is enforced. Threats are only NPC/monster data already owned by the world, never client-provided coordinates or damage. Succession hires receive new watch entries without rewriting an old guard's history.
+
+`GET /api/v1/guard-watch` exposes read-only local sentry status, no POST actions. `tests/guard-watch-m61.cjs` covers old-save migration, alarm and combat events, at-most-once strikes, corpse/loot/territory aftermath, wounded defenders, new appointments, and API source contracts. Game browser visuals and menus are unchanged.
 
 ## M60 character war stance and persistent creature decision-making
 
