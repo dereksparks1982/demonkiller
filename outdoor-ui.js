@@ -83,8 +83,8 @@ function drawFigure(){
  const ctx=$('paperFigure').getContext('2d');if(!ctx)return;
  ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,128,192);
  const p=state().player||{},ghost=p.form==='ghost',im=ghost?ghostPortrait:portrait;
- if(im.complete&&im.naturalWidth){ctx.drawImage(im,16,27,96,128);}
- else{ctx.fillStyle=ghost?'#afbddf':'#a78d83';ctx.fillRect(53,30,22,32);ctx.fillRect(45,64,38,61);ctx.fillRect(47,125,13,40);ctx.fillRect(68,125,13,40);}
+ // Avoid flashing legacy paper-doll placeholder pixels under approved art.
+ if(im.complete&&im.naturalWidth)ctx.drawImage(im,16,27,96,128);
 }
 const symbols=Object.freeze(icons);
 function itemUse(name,serial,split=false){

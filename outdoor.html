@@ -2,7 +2,8 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Demon Killer | The Living World</title>
 <link rel="stylesheet" href="./outdoor.css">
-<link rel="stylesheet" href="./dk-architect-ui-m39.css?v=1"></head>
+<link rel="stylesheet" href="./dk-architect-ui-m39.css?v=1">
+<link rel="stylesheet" href="./dk-lilith-cinematic-m40.css?v=m57"></head>
 <body>
 <main class="world-app">
  <header class="head"><div><h1>DEMON KILLER</h1><small>DK SOFTWORKS · THE LIVING WORLD</small></div>
@@ -10,6 +11,9 @@
  <div class="layout"><section class="world-pane"><div class="world-title"><strong id="areaName">OUTDOOR REGION</strong>
  <span id="worldStatus">Loading world...</span></div>
  <canvas id="world" width="640" height="640" tabindex="0" aria-label="Overhead world, cardinal directions only"></canvas>
+ <section id="lilithPrayer" hidden class="lilith-prayer" aria-live="polite" aria-label="Lilith prays before transforming">
+ <strong>LILITH · PRAYER</strong><p id="lilithPrayerText"></p><small class="progress" id="lilithPrayerProgress"></small>
+ </section>
  <div class="hints">RIGHT MOUSE · MOVE &nbsp; LEFT CLICK · INSPECT &nbsp; DOUBLE CLICK · USE &nbsp; P · PAPER DOLL &nbsp; I · BACKPACK</div><p class="world-journal" id="hudJournal" role="status" aria-live="polite">Explore the world.</p>
  </section>
  <aside class="world-sidebar" hidden aria-hidden="true"><button id="showBank" type="button">BANK BOX</button>
@@ -127,7 +131,8 @@
 <script src="./sector-terrain-m32.js?v=1"></script>
 <script src="./streaming-cell-shells-m33.js?v=1"></script>
 <script src="./streaming-cell-contents-m34.js?v=1"></script>
-<script src="./outdoor.js?v=0.2.65-architect-m39"></script>
+<script src="./dk-lilith-cinematic-m40.js?v=m57"></script>
+<script src="./outdoor.js?v=0.2.55-lilith-m57"></script>
 <script src="./dk-architect-exterior-m38.js?v=1"></script>
 <script src="./dk-architect-preview-m37.js?v=m39"></script>
 <script src="./dk-architect-ui-m39.js?v=1"></script>
@@ -152,5 +157,5 @@
  });
 })();
 </script>
-<script src="./outdoor-ui.js?v=0.2.54-m28"></script>
+<script src="./outdoor-ui.js?v=0.2.55-art-m57"></script>
 </body></html>

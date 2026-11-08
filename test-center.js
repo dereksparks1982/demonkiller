@@ -304,11 +304,9 @@
     const bodyWidth=40,bodyHeight=20;
     const x=altar.x*TILE+Math.floor((altarWidth*TILE-bodyWidth)/2),
       y=altar.y*TILE+Math.floor((altarHeight*TILE-bodyHeight)/2);
-    if(picture){ctx.drawImage(picture,x,y,bodyWidth,bodyHeight);return;}
-    // Fallback block art uses the same reduced size when the sprite cannot load.
-    pixel(ctx,'#261b24',x,y+3,bodyWidth,15);
-    pixel(ctx,stillAlive?'#986771':'#694d5c',x+9,y+5,24,9);
-    pixel(ctx,'#cc9a85',x+2,y+5,8,8);
+    // The accepted altar sprite is the ONLY body art. Never display retired
+    // low-resolution block figures while the approved PNG is still loading.
+    if(picture)ctx.drawImage(picture,x,y,bodyWidth,bodyHeight);
   }
   function drawActor(a){
     if(a.y<0)return;
@@ -316,8 +314,7 @@
     if(a.kind==='woman'){
       const frame=opening.phase==='kneel'?'kneeling':a.facing;
       const pic=womanImages[frame];
-      if(pic&&pic.complete&&pic.naturalWidth>0){ctx.drawImage(pic,x,y,TILE,TILE);return;}
-      pixel(ctx,'#ba4e2c',x+8,y+3,16,11);pixel(ctx,'#285740',x+7,y+15,18,15);
+      if(pic&&pic.complete&&pic.naturalWidth>0)ctx.drawImage(pic,x,y,TILE,TILE);
       return;
     }
     if(a.kind==='member'){
@@ -733,31 +730,9 @@
       ghost=ritual?ritual.phase==='spirit':p.form==='ghost';
     const spriteGroup=ghost?'ghost':'human';
     const image=readyImage('characters/'+spriteGroup+'/'+spriteGroup+'_'+p.facing+'.png');
-    if(image){
-      ctx.drawImage(image,Math.round(x),Math.round(y),TILE,TILE);
-      return;
-    }
-    ctx.save();ctx.translate(x,y);
-    if(ghost){
-      ctx.globalAlpha=.86;ctx.shadowColor='#a3b8ec';ctx.shadowBlur=9;
-      pixel(ctx,'#7388b6',10,6,12,17);pixel(ctx,'#bcc8e1',12,3,8,10);
-      pixel(ctx,'#8999bc',8,17,16,10);pixel(ctx,'#b1bddd',6,16,4,8);
-      pixel(ctx,'#b1bddd',22,16,4,8);pixel(ctx,'#607799',10,26,5,4);
-      pixel(ctx,'#b4c5e0',19,24,5,5);ctx.shadowBlur=0;
-      pixel(ctx,'#202337',13,9,2,3);pixel(ctx,'#202337',18,9,2,3);
-      pixel(ctx,'#e2edff',12,7,2,2);ctx.globalAlpha=1;
-    } else {
-      pixel(ctx,'#16131a',10,23,5,7);pixel(ctx,'#16131a',18,23,5,7);
-      pixel(ctx,'#603744',8,13,16,14);pixel(ctx,'#9c6570',7,17,5,10);
-      pixel(ctx,'#9c6570',21,17,5,10);pixel(ctx,'#d8b4a3',12,5,10,11);
-      pixel(ctx,'#30232c',11,3,12,5);pixel(ctx,'#392733',11,9,2,4);
-      pixel(ctx,'#231e28',15,11,2,2);pixel(ctx,'#231e28',21,11,2,2);
-      pixel(ctx,'#d3b6ab',13,14,8,3);
-    }
-    const facing={north:[13,2],south:[13,29],west:[2,14],east:[28,14]};
-    const m=facing[p.facing]||facing.north;
-    pixel(ctx,ghost?'#e9edff':'#d8a483',m[0],m[1],4,2);
-    ctx.restore();
+    // The approved human/ghost sprites are the single source of player art.
+    // Do not paint the retired colored-block sprite underneath or during load.
+    if(image)ctx.drawImage(image,Math.round(x),Math.round(y),TILE,TILE);
   }
   function draw() {
     ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,512,512);

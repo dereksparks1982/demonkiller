@@ -8,6 +8,8 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 Press **F8** or **ARCHITECT** in the temple or outdoors to use the same Prison Architect-style construction menus. The browser preview stores local map drafts that can be exported as JSON. The first temple exit shows Lilith's prayer and the **approved** golden ghost-world or black living-world weeping-willow transformation.
 
+**M57 first-exit repair:** Leaving the temple for the courtyard now plays the complete approved Lilith sequence: the camera follows her north, she prays visibly, the owner-approved green/golden or red/black six-stage willow transformation runs, and the camera returns before control is restored. Characters remain hidden during the scene. The 12 panels come from the original archived art, not new drawings. Existing saves receive one opportunity to see the restored scene despite the old premature completion marker. A local running DK Server is required for persistent-world state.
+
 The paper doll has Ultima Online-style commands, without destructive save buttons. **Main Menu → Options → Save Management** separates character deletion (world preserved), server-world reset (requires an actual connected server) and Start Fresh (browser-only on GitHub Pages).
 
 ## DK Server M41–M56: Sixteen connected gameplay slices
