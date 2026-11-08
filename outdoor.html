@@ -1,11 +1,12 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Demon Killer | The Living World</title>
-<link rel="stylesheet" href="./outdoor.css"></head>
+<link rel="stylesheet" href="./outdoor.css">
+<link rel="stylesheet" href="./dk-architect-dock-m37.css?v=1"></head>
 <body>
 <main class="world-app">
  <header class="head"><div><h1>DEMON KILLER</h1><small>DK SOFTWORKS · THE LIVING WORLD</small></div>
- <nav><a href="./index.html">MAIN MENU</a></nav></header>
+ <nav><button id="editMode" type="button" aria-pressed="false" title="Open construction tools. F8 also works.">▦ ARCHITECT · F8</button><a href="./index.html">MAIN MENU</a></nav></header>
  <div class="layout"><section class="world-pane"><div class="world-title"><strong id="areaName">OUTDOOR REGION</strong>
  <span id="worldStatus">Loading world...</span></div>
  <canvas id="world" width="640" height="640" tabindex="0" aria-label="Overhead world, cardinal directions only"></canvas>
@@ -116,15 +117,17 @@
  <section id="paperDoll" class="uo-window paper-doll" hidden aria-label="Character paper doll" role="dialog" aria-modal="false"><header class="uo-window-head"><strong>CHARACTER</strong><button type="button" class="window-close" data-close-window="paperDoll" aria-label="Close paper doll">×</button></header><div class="uo-paper-body"><div class="equipment"><div class="equip-slot" data-equip="head">HEAD</div><div class="equip-slot" data-equip="neck">NECK</div><div class="equip-slot" data-equip="hand">HAND</div><div class="equip-slot" data-equip="chest">CHEST</div></div><div class="paper-figure"><canvas id="paperFigure" width="128" height="192" aria-label="Character paper doll"></canvas><strong id="paperName">ADVENTURER</strong><span id="paperForm">LIVING</span></div><div class="equipment"><div class="equip-slot" data-equip="back">BACK</div><div class="equip-slot" data-equip="ring">RING</div><div class="equip-slot" data-equip="light">LIGHT</div><div class="equip-slot" data-equip="feet">FEET</div></div></div><div class="paper-stats" id="paperStats">Equipment and statistics</div><button id="deleteInGameSave" type="button" class="delete-save-button">DELETE SAVE</button></section>
  <section id="backpack" class="uo-window backpack-window" hidden aria-label="Character backpack" role="dialog" aria-modal="false"><header class="uo-window-head"><strong>BACKPACK</strong><button type="button" class="window-close" data-close-window="backpack" aria-label="Close backpack">×</button></header><div class="bag-top"><span>🟡 <strong id="bagGold">0</strong> GOLD</span><span id="bagCapacity">PACK</span></div><div id="bagItems" class="bag-items" aria-label="Items in backpack"></div><div id="bagHelp" class="bag-help">Double-click food to eat, tools to equip, or a torch to light.</div></section>
 </main>
+<section id="dkOutdoorArchitect" aria-label="DK Architect world editor" hidden><button class="dk-overlay-exit" type="button" id="dkOutdoorArchitectClose">CLOSE ARCHITECT · F8</button><iframe id="dkOutdoorArchitectFrame" title="DK Architect full-world construction"></iframe></section>
 <script src="./assets/art/dkarchitect/imported/first-catalog.js"></script>
 <script src="./assets/art/dkarchitect/imported/catalog.js"></script>
 <script src="./dk-dungeon-art.js"></script>
 <script src="./world-regions.js"></script>
-<script src="./dk-menu-server.js?v=m34"></script>
+<script src="./dk-menu-server.js?v=m37"></script>
 <script src="./sector-terrain-m32.js?v=1"></script>
 <script src="./streaming-cell-shells-m33.js?v=1"></script>
 <script src="./streaming-cell-contents-m34.js?v=1"></script>
-<script src="./outdoor.js?v=0.2.62-architect-m36"></script>
+<script src="./outdoor.js?v=0.2.63-architect-m37"></script>
+<script src="./dk-architect-game-m37.js?v=1"></script>
 <script>
 /* Essential P/I window controls remain functional even if inventory data fails. */
 (function(){

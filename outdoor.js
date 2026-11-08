@@ -167,6 +167,13 @@ function persistPreview(){
 }
 function previewArea(id){
  const template=R.templates[id];if(!template)throw Error('Unknown preview region');
+ // Exportable Architect drafts stay separate from character saves.
+ try{
+  const key='dkSoftworks.demonkiller.architect.outdoorDraft.m37.'+id;
+  const record=JSON.parse(localStorage.getItem(key)||'null');
+  if(record?.area?.area_id===id&&record.area.width===template().width&&
+     record.area.height===template().height)return R.checkRegion(record.area);
+ }catch(_){}
  return template();
 }
 async function loadArea(id){

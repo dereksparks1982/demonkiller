@@ -3,7 +3,7 @@
  */
 (()=>{
 'use strict';
-const api=window.DemonKillerServer,$=id=>document.getElementById(id);
+const api=window.DemonKillerServer,localDraft=Boolean(window.DKArchitectPreviewActive),$=id=>document.getElementById(id);
 const map=$('map'),ctx=map.getContext('2d');
 const COURT='dk.courtyard.lilith.001',VILLAGE='dk.village.001';
 const PALETTE={grass:'#566744',path:'#897c71',stone:'#8a8787',garden:'#425e37',
@@ -61,7 +61,7 @@ function modeSet(next){
   'Select a building; use MOVE, DOORS, ERASE, MATERIALS, or EXPORT JSON.');
 }
 function controls(){
- $('revision').textContent='SERVER REVISION: '+revision;
+ $('revision').textContent=(localDraft?'BROWSER DRAFT: ':'SERVER REVISION: ')+revision;
  $('undo').disabled=!undo.length||busy;$('redo').disabled=!redo.length||busy;
 }
 function floorColor(f){return PALETTE[f]||'#39363c';}
@@ -168,7 +168,7 @@ async function submit(action,fields,track=true){
   const response=await api.area(area_id);
   area=response.area;revision=response.revision;
   choose(selectedObject());controls();
-  status('SAVED to DK Server · '+action.replaceAll('_',' ')+' · revision '+revision);
+  status((localDraft?'BROWSER DRAFT · EXPORT JSON TO SHARE':'SAVED TO DK SERVER')+' · '+action.replaceAll('_',' ')+' · revision '+revision);
   return true;
  }catch(error){
   if(/Stale exterior revision/.test(error.message)){
@@ -252,7 +252,7 @@ function saveJSON(){
   a.href=url;a.download='demon-killer-'+(area.area_id===COURT?'courtyard':'village')+'-m36.json';
   document.body.append(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
-  status('Exported layout only. Send this JSON for GitHub integration; no character save included.');
+  status('Exported MAP JSON. Send this file for integration into GitHub. No character save included.');
  }).catch(error=>status('Export failed: '+error.message,true));
 }
 map.addEventListener('pointerdown',begin);
@@ -272,9 +272,39 @@ $('showGrid').addEventListener('change',e=>{grid=e.target.checked;draw();});
 $('undo').addEventListener('click',()=>history('undo'));
 $('redo').addEventListener('click',()=>history('redo'));
 $('export').addEventListener('click',saveJSON);
+function exitArchitect(){
+ if(window.parent!==window){window.parent.postMessage({dkArchitect:'close'},location.origin);return;}
+ location.href=$('returnGame').href;
+}
+$('returnGame').addEventListener('click',e=>{
+ if(window.parent!==window){e.preventDefault();exitArchitect();}
+});
+const GROUPS={
+ foundations:['select','move','door','erase'],
+ materials:['ground','select'],
+ rooms:['door','erase','move','select'],
+ objects:['select','move','door','erase','inspect'],
+ staff:['inspect','select'],
+ utilities:['ground','inspect'],
+ deployment:['select','inspect'],
+ logistics:['inspect','select'],
+ planning:['inspect','select','move','ground']
+};
+function groupSet(name){
+ if(!Object.hasOwn(GROUPS,name))return;
+ document.querySelectorAll('[data-group]').forEach(b=>
+  b.classList.toggle('active',b.dataset.group===name));
+ document.querySelectorAll('[data-tool]').forEach(b=>{
+  b.hidden=!GROUPS[name].includes(b.dataset.tool);
+ });
+ status(name.toUpperCase()+' TOOLS · use the choices above and click or drag on the map.');
+}
+document.querySelectorAll('[data-group]').forEach(b=>
+ b.addEventListener('click',()=>groupSet(b.dataset.group)));
+groupSet('foundations');
 document.addEventListener('keydown',e=>{
  if(e.target?.matches?.('input,select,textarea')||e.ctrlKey||e.altKey||e.metaKey)return;
- if(e.key==='F8'){e.preventDefault();location.href=$('returnGame').href;return;}
+ if(e.key==='F8'){e.preventDefault();exitArchitect();return;}
  if(e.key==='Escape'){drag=null;choose(null);return;}
  if(e.key==='z'||e.key==='Z'){history('undo');return;}
  if(e.key==='y'||e.key==='Y'){history('redo');return;}
@@ -285,7 +315,7 @@ const wanted=params.get('area_id');
 if(wanted===COURT||wanted===VILLAGE)$('region').value=wanted;
 const slot=params.get('dkSlot');
 if(slot==='1')$('returnGame').href='./outdoor.html?dkSlot=1&walk=continuous1';
-if(!api)status('Open the local DK Server at 127.0.0.1. The public preview cannot edit world saves.',true);
-else reload(false).then(()=>status('Ready. Select a building, drag it, edit doors, and EXPORT JSON.'))
+if(!api)status('No DK Server or browser draft is available.',true);
+else reload(false).then(()=>status(localDraft?'BROWSER DRAFT READY · EDIT & EXPORT JSON · NOT SERVER SAVED':'ARCHITECT READY · EDIT BUILDINGS & DOORS ON THE MAP'))
  .catch(error=>status('Cannot open DK Architect: '+error.message,true));
 })();

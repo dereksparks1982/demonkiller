@@ -4,10 +4,13 @@ Demon Killer is a single-player Gothic fantasy RPG with original pixel art, a cu
 
 [Open Demon Killer](https://dereksparks1982.github.io/demonkiller/)
 
-## DK Architect | Outdoor Construction (M36)
+## DK Architect | On-screen Construction (M37)
 
-On the **local** DK Server, enter the outdoor courtyard or village and press **F8** for the dedicated top-down world editor. Its blue bottom toolbar provides building selection, whole-building drag/move, external door replacement/removal, ground/material brushes, and inspection. Mouse wheel zooms; right-drag pans; Z and Y undo/redo supported building and doorway edits. Changes are server-validated, committed to the persistent world and backed up before confirmation. Existing interior blueprints retain their Streaming Cell IDs. The temple exterior, temple gate, and willow story anchor remain protected.
+While playing **inside the temple or outside**, click the visible **ARCHITECT · F8** button or press **F8**. This opens a Prison Architect-inspired construction dock with **category icons along the bottom** and the available tool options above them, directly on the game screen.
 
-Use **EXPORT JSON** to download a map-only courtyard or village layout. Send that file for review and integration into the repository's authored defaults. This is *not* a character save or a replacement world file. The GitHub Pages version remains a static gameplay preview and cannot change the server world.
+- **Temple:** The existing placement, wall/floor tools, object transforms, sprite palette, spawn marker and export controls are available through the bottom toolbar. The old floating Architect panel is retired from the visible interface.
+- **Courtyard/village:** The Architect controls open as an overlay **over gameplay**, rather than navigating away. Whole-building moves, doors, materials, inspection and JSON export are available without the player leaving the game page. Close with F8 or the visible close button.
+- **Local DK Server:** Edits are validated and saved atomically in the single persistent world. Whole-building moves maintain stable Streaming Cell IDs, deeds, and vendor inventory locations.
+- **Public GitHub Pages preview:** An independent **browser-only layout draft** is available for editing and exporting JSON. It is **not** a server world save and does not update the repository automatically. Send exported JSON back for validation and integration.
 
-Interior blueprints remain in the separate local workspace at /dk-architect-interiors-m35.html. M36 does not yet publish those interior drafts as playable rooms.
+The temple exterior, portal, willow story anchor and other story-critical positions remain protected. This release does **not** rearrange the village or implement the Lilith cutscene. Interior drafts remain in the separate DK Architect interior workspace and are not yet playable.

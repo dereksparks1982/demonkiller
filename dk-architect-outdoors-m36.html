@@ -16,10 +16,10 @@ main{flex:1;position:relative;min-height:300px;display:flex;overflow:hidden;back
 canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-action:none;cursor:crosshair}
 #inspector{position:absolute;right:12px;top:12px;width:220px;max-width:45vw;background:#24212be9;border:2px solid #a08064;padding:12px;font:12px/1.5 monospace;pointer-events:none;white-space:pre-line}
 #status{position:absolute;bottom:12px;left:12px;max-width:80%;padding:7px 10px;background:#171419ed;border:1px solid #a78c6a;color:#e6d7b7;font:12px monospace;pointer-events:none}
-#tools{background:#111b2a;border-top:3px solid #6088ac;min-height:90px;display:flex;align-items:stretch;gap:8px;padding:8px;flex-wrap:wrap}
-.tool{display:grid;place-items:center;align-content:center;min-width:104px;min-height:70px;gap:3px;background:linear-gradient(#174178,#082140);border:2px solid #6e9cca;border-radius:3px;color:#e8efff;font:bold 10px monospace;letter-spacing:.06em}
+#tools{background:#111b2a;border-top:3px solid #6088ac;min-height:76px;display:flex;align-items:stretch;gap:4px;padding:7px 5px;flex-wrap:nowrap;overflow-x:auto}
+.tool{display:grid;place-items:center;align-content:center;min-width:96px;min-height:63px;gap:3px;background:linear-gradient(#174178,#082140);border:2px solid #6e9cca;border-radius:3px;color:#e8efff;font:bold 10px monospace;letter-spacing:.06em}
 .tool span{font-size:25px;line-height:1}.tool.active{background:linear-gradient(#2670b9,#194f88);border-color:#d6b56c;color:#fff2bd}
-#toolOptions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px;background:#202534;border-top:1px solid #536482}
+#toolOptions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px;background:#202534;border-top:1px solid #536482;min-height:74px}#subtools{display:flex;align-items:center;gap:5px;flex-wrap:wrap;width:100%}#subtools button{padding:6px 10px;font-size:11px;border-color:#789bbc}#subtools button.active{border-color:#dfbf6e;background:#305883}#subtools button[hidden]{display:none!important}
 #toolOptions label{display:flex;align-items:center;gap:5px;font-size:12px}
 #toolOptions output{font:12px monospace;color:#b9c8db}
 #toolOptions button{padding:5px 9px}
@@ -40,20 +40,33 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-acti
  <div id="status" role="status" aria-live="polite">Connecting to local DK Server…</div>
 </main>
 <section id="toolOptions" aria-label="Tool settings">
+ <div id="subtools" aria-label="Current construction category tools">
+ <button type="button" data-tool="select">SELECT</button>
+ <button type="button" data-tool="move">MOVE WHOLE BUILDING</button>
+ <button type="button" data-tool="door">PLACE / MOVE DOOR</button>
+ <button type="button" data-tool="erase">REMOVE DOOR</button>
+ <button type="button" data-tool="ground">PAINT MATERIALS</button>
+ <button type="button" data-tool="inspect">INSPECT</button>
+ </div>
  <label>MODE <output id="modeText">SELECT BUILDING</output></label>
  <label>GROUND <select id="ground"><option value="path">Stone path</option><option value="grass">Grass</option><option value="dirt">Dirt</option><option value="garden">Garden</option><option value="stone">Stone floor</option></select></label>
  <label>ZOOM <input id="zoom" type="range" min="8" max="30" value="15"></label>
  <label><input id="showGrid" type="checkbox" checked> GRID</label>
  <output>LEFT DRAG · MOVE / BRUSH &nbsp; RIGHT DRAG · PAN &nbsp; WHEEL · ZOOM &nbsp; 1–6 · TOOLS</output>
 </section>
-<nav id="tools" aria-label="Construction tools, inspired by top-down building games">
- <button class="tool active" data-tool="select"><span>▣</span>BUILDINGS</button>
- <button class="tool" data-tool="move"><span>✥</span>MOVE</button>
- <button class="tool" data-tool="door"><span>▥</span>DOORS</button>
- <button class="tool" data-tool="erase"><span>⌫</span>ERASE DOOR</button>
- <button class="tool" data-tool="ground"><span>▦</span>MATERIALS</button>
- <button class="tool" data-tool="inspect"><span>⌕</span>INSPECT</button>
+<nav id="tools" aria-label="Prison Architect-style construction categories">
+ <button class="tool active" data-group="foundations"><span>▦</span>FOUNDATIONS</button>
+ <button class="tool" data-group="materials"><span>▤</span>MATERIALS</button>
+ <button class="tool" data-group="rooms"><span>▣</span>ROOMS</button>
+ <button class="tool" data-group="objects"><span>◇</span>OBJECTS</button>
+ <button class="tool" data-group="staff"><span>♙</span>STAFF</button>
+ <button class="tool" data-group="utilities"><span>✣</span>UTILITIES</button>
+ <button class="tool" data-group="deployment"><span>⚑</span>DEPLOYMENT</button>
+ <button class="tool" data-group="logistics"><span>▥</span>LOGISTICS</button>
+ <button class="tool" data-group="planning"><span>⌕</span>PLANNING</button>
 </nav>
-<script src="./dk-menu-server.js?v=m36"></script>
-<script src="./dk-architect-outdoors-m36.js?v=1"></script>
+<script src="./world-regions.js"></script>
+<script src="./dk-menu-server.js?v=m37"></script>
+<script src="./dk-architect-preview-m37.js?v=1"></script>
+<script src="./dk-architect-outdoors-m36.js?v=m37"></script>
 </body></html>

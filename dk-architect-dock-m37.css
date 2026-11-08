@@ -1,0 +1,29 @@
+/* DK Architect M37: a bottom construction bar, not a floating legacy editor. */
+#dkArchitectDock[hidden],#dkOutdoorArchitect[hidden]{display:none!important}
+#dkArchitectDock{position:fixed;z-index:80;bottom:0;left:0;right:0;color:#e3eaf1;background:#1c2c3e;border-top:4px solid #557da2;box-shadow:0 -6px 24px #000c;font:11px/1.25 monospace;display:flex;flex-direction:column}
+#dkArchitectDock *{box-sizing:border-box}
+.dk-dock-head{display:flex;align-items:center;gap:10px;padding:5px 12px;background:#17232e;border-bottom:1px solid #53687c}
+.dk-dock-head strong{font-size:12px;letter-spacing:.15em;color:#f1d398}
+.dk-dock-head small{color:#b7cad8}
+.dk-dock-head button{margin-left:auto;background:#3d292c;border:1px solid #bc8786;color:#fce9df;font:700 11px monospace;padding:6px 12px;cursor:pointer}
+.dk-dock-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:5px 10px;background:#243a50;min-height:40px}
+.dk-dock-actions button{color:#e7eaf1;border:2px solid #748d9c;background:#374a5d;cursor:pointer;padding:7px 10px;font:700 11px monospace;min-width:80px}
+.dk-dock-actions button:hover{background:#54718b}.dk-dock-actions button:focus-visible,.dk-dock-tab:focus-visible{outline:3px solid #f5ce70}
+.dk-dock-palette{height:74px;background:#1b252f;border-top:1px solid #455464;display:flex;align-items:center;padding:2px 12px;overflow:hidden}
+.dk-dock-palette:empty{display:none}
+#dkArchitectDock #uoPaletteViewport{display:block!important;overflow-x:auto!important;overflow-y:hidden!important;max-width:100%!important;width:100%!important;max-height:68px!important;min-height:64px;white-space:nowrap}
+#dkArchitectDock #uoPaletteList{display:flex!important;align-items:center;gap:4px;min-height:60px;width:max-content}
+#dkArchitectDock #uoPaletteList button{flex:0 0 auto}
+.dk-dock-tabs{display:flex;gap:3px;align-items:stretch;overflow-x:auto;padding:7px 6px 6px;background:#182c47;min-height:72px}
+.dk-dock-tab{border:2px solid #7599b8;border-radius:2px;background:#22548b;color:#e1e8f0;min-width:94px;padding:5px 8px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;font:700 10px monospace;letter-spacing:.03em;cursor:pointer}
+.dk-dock-tab span{font:26px/1 monospace}
+.dk-dock-tab[aria-selected=true],.dk-dock-tab:hover{background:#3879bf;border-color:#f3d793;color:#fff1c5}
+.dk-dock-footer{padding:4px 10px;color:#c9bba3;background:#181d28;font:10px monospace;min-height:19px}
+body.dk-architect-v37 #architectWindow{display:none!important}
+body.dk-architect-v37 .stage{padding-bottom:0}
+#dkOutdoorArchitect{position:fixed;inset:0;z-index:90;background:#10151c;display:flex;flex-direction:column}
+#dkOutdoorArchitect iframe{display:block;border:0;width:100%;height:100%;flex:1;background:#121923}
+#dkOutdoorArchitect button.dk-overlay-exit{position:absolute;right:12px;top:9px;z-index:2;border:2px solid #b99170;background:#57363a;color:white;padding:8px 13px;cursor:pointer}
+body.dk-outdoor-editing{overflow:hidden}
+body.dk-outdoor-editing .world-app{pointer-events:none}
+@media(max-width:750px){.dk-dock-tab{min-width:80px}.dk-dock-tab span{font-size:21px}.dk-dock-palette{height:64px}.dk-dock-head small{display:none}#dkArchitectDock .dk-dock-actions button{min-width:65px;padding:6px}}
