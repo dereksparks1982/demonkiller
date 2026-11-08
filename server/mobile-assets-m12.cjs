@@ -107,7 +107,8 @@ function onCreatureDeath(world,creature,minute,out){
  const corpse={id,npc_id:null,creature_id:creature.id,name:species.name,
   area_id:creature.area_id,x:creature.x,y:creature.y,
   created_minute:minute,coins:0,bag_id:null,
-  ...Decay.configure({kind:'monster',species:species.corpse,area_id:creature.area_id,minute})};
+  ...Decay.configure({kind:'monster',species:species.corpse,area_id:creature.area_id,minute}),
+  ...(species.corpse==='beast'?{harvest:{skinned:false,butchered:false,venom_taken:false}}:{})};
  m.corpses[id]=corpse;
  out.push(record(world,minute,'monster.corpse',species.name+' left remains on the ground.',
   {corpse_id:id,creature_id:creature.id,area_id:creature.area_id}));
@@ -127,7 +128,8 @@ function read(world){
  return {corpses:nearby.map(c=>({
    id:c.id,npc_id:c.npc_id,creature_id:c.creature_id||null,
    name:c.name,area_id:c.area_id,x:c.x,y:c.y,coins:c.coins,
-   ...Decay.view(c,m),items:Object.values(world.entity_registry.items)
+   ...Decay.view(c,m),harvest:c.harvest||null,
+   items:Object.values(world.entity_registry.items)
     .filter(i=>c.bag_id!==null&&i.parent===c.bag_id)
     .map(i=>({serial:i.serial,type:i.type,amount:i.amount}))
  })),minute:m,revision:world.revision};
@@ -256,7 +258,11 @@ function validate(world){
     !Number.isSafeInteger(c.created_minute)||c.created_minute<0||
     (legacy?c.expires_minute!==c.created_minute+DECAY:
       !Decay.validate(c,Math.max(world.living.minute,c.created_minute)))||
-    (c.bag_id!==null&&!world.entity_registry.containers[c.bag_id]))
+    (c.bag_id!==null&&!world.entity_registry.containers[c.bag_id])||
+    (c.harvest!==undefined&&(c.kind!=='monster'||c.species!=='beast'||
+      typeof c.harvest.skinned!=='boolean'||
+      typeof c.harvest.butchered!=='boolean'||
+      typeof c.harvest.venom_taken!=='boolean')))
     throw Error('Invalid persistent corpse');
  }
  return true;

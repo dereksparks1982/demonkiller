@@ -15,6 +15,14 @@ const RECIPES=Object.freeze({
   output:'meals',quantity:1,wage:2}
 });
 const IDS=Object.keys(RECIPES);
+function recipeFor(id,shop){
+ const base=RECIPES[id];
+ if(id==='village_tavern'&&
+  (shop?.other_stock?.raw_meat||0)>=1&&
+  (shop?.other_stock?.produce||0)>=1)
+  return {...base,ingredients:{raw_meat:1,produce:1}};
+ return base;
+}
 function ensure(world){
  if(!world.living||!world.entity_registry)throw Error('Workshops require the living world');
  let changed=false;
@@ -57,7 +65,7 @@ function run(world,minute,out){
  const state=world.living.workshops;
  let produced=0;
  for(const id of IDS){
-  const recipe=RECIPES[id],shop=world.living.businesses[id],
+  const shop=world.living.businesses[id],recipe=recipeFor(id,shop),
     worker=shop?world.living.npcs[shop.owner_id]:null;
   if(!shop||!PLAYERBUSINESS.productionEnabled(world,shop)||
      (PLAYERBUSINESS.owned(world,shop)&&!PLAYERBUSINESS.owned(world,shop).assistant_enabled)||
@@ -121,7 +129,7 @@ function listing(world){
  return {world_minute:world.living.minute,production_runs:state?.production_runs||0,
   total_units:state?.total_units||0,
   shops:IDS.map(id=>({id,name:world.living.businesses[id]?.name,
-   recipe:RECIPES[id],made:state?.shops[id]?.made||0,
+   recipe:recipeFor(id,world.living.businesses[id]),made:state?.shops[id]?.made||0,
    last_minute:state?.shops[id]?.last_minute??-1}))};
 }
 
@@ -146,7 +154,7 @@ function applyPlayer(world,command){
   throw Error('The settlement is occupied');
  const next=structuredClone(world),c=next.characters['1'];
  ensure(next);SKILLS.ensure(c);
- const id=command.business_id,shop=next.living.businesses[id],recipe=RECIPES[id];
+ const id=command.business_id,shop=next.living.businesses[id],recipe=recipeFor(id,shop);
  const state=next.living.workshops,row=state.shops[id],minute=next.living.minute;
  if(row.player_last_minute>=minute)
   throw Error('Work on this station requires another world minute');
@@ -183,4 +191,4 @@ function applyPlayer(world,command){
  counts(next);validate(next);
  return {world:next,character:c,event:e,events:[e,...following]};
 }
-module.exports={RECIPES,ensure,validate,run,listing,applyPlayer};
+module.exports={RECIPES,recipeFor,ensure,validate,run,listing,applyPlayer};

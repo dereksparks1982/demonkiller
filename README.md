@@ -10,7 +10,7 @@ Press **F8** or **ARCHITECT** in the temple or outdoors to use the same Prison A
 
 The paper doll has Ultima Online-style commands, without destructive save buttons. **Main Menu → Options → Save Management** separates character deletion (world preserved), server-world reset (requires an actual connected server) and Start Fresh (browser-only on GitHub Pages).
 
-## DK Server M41–M55: Fifteen connected gameplay slices
+## DK Server M41–M56: Sixteen connected gameplay slices
 
 - **59 trainable skills**, 100.0 individual/700.0 overall caps, groups, training locks and existing-save migration.
 - **Seven persistent monster species** with different strengths, patrols, NPC threats, loot and decay.
@@ -28,8 +28,9 @@ The paper doll has Ultima Online-style commands, without destructive save button
 - **Snooping and stealing**: inspect actual NPC backpacks, try to take known item serials, and face witness reports and guard fines.
 - **Forged weapons and armor**: make swords, maces, spears, bows, arrows, shields, and armor from physical supplies. Equipping uses real serials; weapons wear down, armor reduces damage, and bows consume ammunition.
 - **Working armorer service**: repair equipment yourself from ore/wood, hire the village smith to work while you're away, return to collect the exact same gear, or salvage unwanted gear.
+- **Real carcass harvesting**: skin wolves for hides, butcher fresh wolf meat, harvest spider silk and venom, cook meals, and supply actual NPC tavern production. One physical corpse remains and decays.
 
-Use **P → Skills, Spellbook, Quests, Animals, Crafting, BUSINESS, THIEVING or ARMORY** on a **connected DK Server** for these gameplay actions. The dedicated mill building, more kinds of magic, guilds, and the entire original Ultima Online feature set are **not** complete yet. The first milling station uses the **existing village bakery**, without changing the owner-approved village layout.
+Use **P → Skills, Spellbook, Quests, Animals, Crafting, BUSINESS, THIEVING, ARMORY or HUNTING** on a **connected DK Server** for these gameplay actions. The dedicated mill building, more kinds of magic, guilds, and the entire original Ultima Online feature set are **not** complete yet. The first milling station uses the **existing village bakery**, without changing the owner-approved village layout.
 
 **Important:** GitHub Pages is a static **preview**. It does not host a persistent server, so it cannot run the independent NPC economy or save authoritative monster/pet states. The server needs to be running separately to simulate events while you are away. This release does not deploy a public server.
 

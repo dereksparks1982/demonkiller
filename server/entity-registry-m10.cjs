@@ -5,7 +5,8 @@
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const ITEM_TYPES=Object.freeze(['herbs','wood','ore','bread','tools','produce','meals',
   'torches','rations','bandages','grain','grist','flour',
-  'short_sword','mace','spear','bow','arrows','buckler','iron_armor']);
+  'short_sword','mace','spear','bow','arrows','buckler','iron_armor',
+  'raw_meat','hides','spider_silk','venom']);
 const KNOWN=new Set(ITEM_TYPES),PACK='pack_1',VAULT='vault_1',
   HAND='hand_1',LIGHT='light_1',CHEST='chest_village_1';
 const LIMIT=8192,REF_LIMIT=16384,GROUND_LIMIT=1024;

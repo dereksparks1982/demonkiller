@@ -14,6 +14,7 @@ const FIELD=require('./field-skills-m43.cjs');
 const THIEVERY=require('./thievery-m53.cjs');
 const ARMORY=require('./armory-m54.cjs');
 const ARMORER=require('./armorer-m55.cjs');
+const HUNTING=require('./hunting-m56.cjs');
 const MAGIC=require('./spells-m44.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
@@ -26,8 +27,10 @@ const LAW=require('./law-m15.cjs');
 const HOUSING=require('./housing-m17.cjs');
 const VENDORS=require('./vendors-m18.cjs');
 const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages','grain','grist','flour',
- 'short_sword','mace','spear','bow','arrows','buckler','iron_armor']);
-const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4,grain:2,grist:3,flour:4};
+ 'short_sword','mace','spear','bow','arrows','buckler','iron_armor',
+ 'raw_meat','hides','spider_silk','venom']);
+const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4,grain:2,grist:3,flour:4,
+ raw_meat:3,hides:4,spider_silk:5,venom:6};
 const NODES=[
  ['courtyard_herbs_west',COURT,18,32,'herbs',6],
  ['courtyard_herbs_east',COURT,45,33,'herbs',6],
@@ -116,6 +119,8 @@ function apply(world,command,now=Date.now()){
   return ARMORY.act(world,command);
  if(['repair_by_hand','salvage_gear','submit_repair','collect_repair'].includes(command?.action))
   return ARMORER.apply(world,command);
+ if(['skin_carcass','butcher_carcass','extract_venom','cook_meat'].includes(command?.action))
+  return HUNTING.apply(world,command);
  if(command?.action==='cast_spell')return MAGIC.apply(world,command,now);
  if(['accept_bounty','turn_in_bounty'].includes(command?.action))return BOUNTIES.apply(world,command);
  if(['tame_creature','feed_pet','release_pet','pet_follow','pet_stay','pet_guard'].includes(command?.action))return COMPANIONS.apply(world,command);
@@ -185,10 +190,11 @@ function apply(world,command,now=Date.now()){
   if(!TYPES.has(item)||!Number.isInteger(qty)||qty<1||qty>10)
    throw Error('Invalid item or quantity');
   const accepted={
-   village_smithy:['wood','ore'],village_market:['herbs','produce','grain','flour'],
+   village_smithy:['wood','ore'],
+   village_market:['herbs','produce','grain','flour','hides','spider_silk','raw_meat'],
    village_bakery:['grain','flour'],
-   courtyard_market:['herbs'],
-   village_tavern:['meals','produce']
+   courtyard_market:['herbs','venom','spider_silk'],
+   village_tavern:['meals','produce','raw_meat']
   }[shop.id]||[];
   if(!accepted.includes(item))throw Error('This merchant does not buy that item');
   if(c.inventory[item]<qty)throw Error('You do not own those items');

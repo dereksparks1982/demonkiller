@@ -3,7 +3,8 @@
 // RunUO BaseVendor/SBInfo inspired; no third-party GPL implementation copied.
 const {COURT,VILLAGE}=require('./regions.cjs');
 const GOODS=new Set(['herbs','wood','ore','bread','tools','produce','meals',
- 'torches','rations','bandages','grain','grist','flour']);
+ 'torches','rations','bandages','grain','grist','flour',
+ 'raw_meat','hides','spider_silk','venom']);
 const CAPACITY=500,MAX_VENDORS=32;
 function inventoryId(shop){return 'vendor_stock_'+shop.id;}
 function location(world,shop){

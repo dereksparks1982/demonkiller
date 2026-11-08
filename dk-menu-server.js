@@ -93,6 +93,7 @@
     async maintenance() { return request('/api/v1/maintenance'); },
     async armory() { return request('/api/v1/armory'); },
     async armorer() { return request('/api/v1/armorer'); },
+    async hunting() { return request('/api/v1/hunting'); },
     async law() { return request('/api/v1/law'); },
     async items() { return request('/api/v1/entities/items'); },
     async inventory() { return request('/api/v1/inventory'); },

@@ -1,4 +1,4 @@
-# DK Server M55 | Independent World Smith, Item Repair Contracts and Salvage (v2.30.0)
+# DK Server M56 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -306,3 +306,11 @@ Use `GET /api/v1/armory` and `POST /api/v1/gameplay` actions `forge_gear`, `equi
 The village smith now accepts a damaged item by real serial in exchange for 12 gold; the owner's backpack and smithy treasury both change. The item moves to a registered smith work-order container and remains there while a saved world job runs. After at least 60 running world minutes a physically present living smith can consume one actual vendor-stock ore/wood item, receive three real wage gold from the shop and restore durability on the same serial. Finished gear moves to a separate pickup container until collected. Jobs stall if the village is occupied, machinery is broken, no material exists, the employee cannot work or the player-owner disabled assistant service.
 
 Owners may repair unequipped gear themselves with equipped tools and one actual ore/wood from their pack, or permanently salvage the item for one lower-yield raw material. Character deletion clears uncollected private repair goods, not businesses or NPCs. Older saves migrate two registered custody containers and the persistent repair ledger. New read-only route `GET /api/v1/armorer`; game actions `repair_by_hand`, `submit_repair`, `collect_repair`, `salvage_gear` are server-authoritative. Existing ARMORY paper-doll controls expose these workflows. Source: `server/armorer-m55.cjs`, tests: `tests/armorer-m55.cjs`. GitHub Actions remains manual-only.
+
+## M56 one-time carcass resources, cooking and physical tavern supplies
+
+Server-owned wolf and giant-spider corpses inherit three optional one-time harvest flags. The original M29 decay remains on terrain. Skinning yields hides or silk, wolf butchery yields raw meat only while fresh, spider venom extraction consumes a bandage, and each verified field action requires hand tools and a running world-minute work interval. Camp/tavern cooking spends one meat plus one wood to produce one edible meal.
+
+All four new commodity types exist in the same serial-backed pack/bank/vendor stores. Players can sell them at historically existing village and courtyard storefronts using real company coins. The staffed village tavern prefers a physical meat-plus-produce recipe when supplied, or falls back to the existing produce recipe without meat. NPC customers may buy the finished meals using existing M19 behavior.
+
+Routes: `GET /api/v1/hunting` (nearby eligible bodies and real stocks); `POST /api/v1/gameplay` actions `skin_carcass`, `butcher_carcass`, `extract_venom`, `cook_meat`. The classic paper doll has a HUNTING section in both temple/outdoor interfaces; no HUD clutter or imported sprites. Local regression: `tests/hunting-m56.cjs`. GitHub Actions remains manual-only. The server must be running to simulate an unattended world.

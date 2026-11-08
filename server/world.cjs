@@ -33,6 +33,7 @@ const BUSINESS=require('./player-business-m48.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const ARMORY=require('./armory-m54.cjs');
 const ARMORER=require('./armorer-m55.cjs');
+const HUNTING=require('./hunting-m56.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -121,6 +122,7 @@ function makeWorld(now = Date.now()) {
   MAINTENANCE.ensure(result);
   ARMORY.ensure(result);
   ARMORER.ensure(result);
+  HUNTING.ensure(result);
   return result;
 }
 
@@ -210,6 +212,7 @@ function validateWorld(world) {
   MAINTENANCE.validate(world);
   ARMORY.validate(world);
   ARMORER.validate(world);
+  HUNTING.validate(world);
   return world;
 }
 

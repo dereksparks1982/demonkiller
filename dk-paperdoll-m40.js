@@ -537,6 +537,67 @@ async function showArmory(){
 }
 menu('ARMORY',showArmory,'Physical weapons, metalwork, armor, shields and lasting durability');
 
+async function showHunting(){
+ if(!connected()){
+  show('HUNTING',['Carcass harvesting and food production require the running DK Server. The static preview does not keep world remains.']);
+  return;
+ }
+ try{
+  const api=window.DemonKillerServer,record=await api.hunting();
+  show('HUNTING · SKINNING & BUTCHERY',[
+   'Harvest an actual slain wolf or giant spider before its remains rot.',
+   'Equip hand tools to skin or butcher. Each body can only provide each resource once.',
+   'Wolves supply meat and hides. Giant spiders supply silk and venom; venom extraction also consumes a clean bandage.',
+   'Cook raw meat with wood at an active camp or the open village tavern. The finished meal is real food.',
+   'One harvesting/cooking action per world minute. Corpses remain on terrain and continue to decay.'
+  ]);
+  const stock=document.createElement('p');
+  const bag=record.inventory||{};
+  stock.textContent='PACK · raw meat '+(bag.raw_meat||0)+' · hides '+(bag.hides||0)+
+   ' · spider silk '+(bag.spider_silk||0)+' · venom '+(bag.venom||0)+
+   ' · wood '+(bag.wood||0)+' · bandages '+(bag.bandages||0);
+  content.append(stock);
+  const cook=button('COOK MEAT AT CAMP / TAVERN',async()=>{
+   try{
+    const result=await api.gameAction('cook_meat');
+    await showHunting();feedback(result.event?.text||'Meal prepared.');
+   }catch(error){feedback(error.message);}
+  },!record.can_cook||(bag.raw_meat||0)<1||(bag.wood||0)<1);
+  content.append(cook);
+  const title=document.createElement('h3');title.className='dk-skill-heading';
+  title.textContent='ACTUAL NEARBY REMAINS';content.append(title);
+  if(!(record.corpses||[]).length){
+   const empty=document.createElement('p');
+   empty.textContent='No eligible animal remains nearby.';content.append(empty);
+  }
+  for(const body of record.corpses||[]){
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const name=document.createElement('span');
+   name.textContent=body.name+' · '+body.stage+' · ('+body.x+', '+body.y+')';
+   row.append(name);content.append(row);
+   const actionRow=document.createElement('div');actionRow.className='dk-skill-row';
+   const usable=['fresh','early'].includes(body.stage);
+   const tasks=[
+    ['SKIN','skin_carcass',body.harvest?.skinned||!usable],
+    ...(body.kind==='wolf'?[['BUTCHER','butcher_carcass',
+      body.harvest?.butchered||body.stage!=='fresh']]:[]),
+    ...(body.kind==='spider'?[['EXTRACT VENOM','extract_venom',
+      body.harvest?.venom_taken||!usable||(bag.bandages||0)<1]]:[])
+   ];
+   for(const [label,action,unavailable]of tasks)
+    actionRow.append(button(label,async()=>{
+     try{
+      const result=await api.gameAction(action,{corpse_id:body.id});
+      await showHunting();feedback(result.event?.text||'Carcass harvested.');
+     }catch(error){feedback(error.message);}
+    },Boolean(unavailable)));
+   content.append(actionRow);
+  }
+ }catch(error){show('HUNTING',['Wildlife records unavailable: '+error.message]);}
+}
+menu('HUNTING',showHunting,'Real wolf meat, hides, spider silk, venom and camp cooking');
+
+
 menu('GUILD',()=>{},'Guild creation and membership are not implemented yet',false);
 async function showQuests(){
  if(!connected()){show('QUESTS',['Bounty contracts and their rewards are saved by DK Server. The static GitHub Pages preview does not have an authoritative bounty ledger.']);return;}
