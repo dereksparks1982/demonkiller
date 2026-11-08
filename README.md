@@ -4,6 +4,10 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## Original MIDI score | M58
+
+**Title screen:** *The Oath Beneath the Ashes*, an original 78 BPM dark-fantasy score (church organ, distant choir, funeral bells, strings and ritual percussion). **Overworld:** *The Land Beyond the Altar*, the owner-approved original 114 BPM exploration theme. Both are committed as editable Standard MIDI Files in `assets/audio/music/` and played locally using `dk-midi-soundtrack.js` with Web Audio, without downloading a soundfont or an external service. The menu's saved **Music** toggle and volume setting carry into the courtyard, village and other outdoor regions. Audio begins after the browser permits playback, resumes when a player interacts, and stops on page exit. The existing Forsaken Temple soundtrack is separate and unchanged. No additional gameplay buttons were added.
+
 ## One DK Architect, real saves and the opening ritual
 
 Press **F8** or **ARCHITECT** in the temple or outdoors to use the same Prison Architect-style construction menus. The browser preview stores local map drafts that can be exported as JSON. The first temple exit shows Lilith's prayer and the **approved** golden ghost-world or black living-world weeping-willow transformation.

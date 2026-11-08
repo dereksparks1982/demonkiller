@@ -59,7 +59,6 @@ label{cursor:pointer}
 <noscript><style>.art-loading #home{visibility:visible}</style></noscript>
 </head>
 <body class="art-loading">
-<audio id="menuMusic" src="./assets/audio/music/creepyloop-v2.ogg" preload="none" loop aria-hidden="true"></audio>
 <main class="menu">
 <section class="screen" id="home" aria-label="Demon Killer main menu">
 <h1 id="logoFallback" class="logo-fallback">DEMON KILLER</h1>
@@ -89,12 +88,12 @@ label{cursor:pointer}
 </section>
 <section class="screen panel" id="optionsScreen" hidden aria-label="Game options">
 <h2>OPTIONS</h2>
-<p>Adjust the main menu soundtrack. Your browser may require a click before music starts.</p>
+<p>Original MIDI soundtrack. Your browser may require a click before music starts.</p>
 <fieldset><legend>Music</legend>
 <label><input id="musicEnabled" type="checkbox" checked> Play main menu music</label>
 <label class="music-volume-control" for="musicVolume"><span class="music-volume-heading"><span>Main menu volume</span><output id="musicVolumeValue" for="musicVolume">200%</output></span></label>
 <input id="musicVolume" type="range" min="0" max="200" step="5" value="200" aria-label="Main menu volume">
-<small id="musicVolumeHint" class="music-volume-hint">100% is the original level. Above 100% boosts the music, with peak limiting.</small>
+<small id="musicVolumeHint" class="music-volume-hint">100% is normal level. Above 100% amplifies the MIDI synthesizer, with peak limiting.</small>
 </fieldset>
 <fieldset id="dkServerOptions">
 <legend>Persistent World</legend>
@@ -119,6 +118,7 @@ label{cursor:pointer}
 <p id="notice" class="notice" role="status" aria-live="polite"></p>
 <footer class="menu-footer">DK SOFTWORKS · HOUSE OF CULTURE · ORIGINAL PIXEL ART<br>One character · one life. In the web preview, saves remain browser-only until DK Server hosting is connected.</footer>
 </main>
+<script src="./dk-midi-soundtrack.js?v=m58"></script>
 <script src="./dk-menu-server.js?v=m34"></script>
 <script>
 (function(){
@@ -129,63 +129,32 @@ const ACTIVE_KEY='dkSoftworks.demonkiller.activeCharacter.v1';
 const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
 const SERVER=window.DemonKillerServer||null;
 const $=id=>document.getElementById(id);
-const menuMusic=$('menuMusic');
-const DEFAULT_MENU_VOLUME=200;
-let audioContext=null,menuGain=null;
-$('musicVolume').value=String(DEFAULT_MENU_VOLUME);
-function ensureMenuAudio(){
- if(menuGain)return true;
- const Context=window.AudioContext||window.webkitAudioContext;
- if(typeof Context!=='function'){
-  $('musicVolumeHint').textContent='Amplification above 100% is unavailable in this browser.';
-  return false;
+const menuMusic=window.DKMidiSoundtrack?.create({
+  url:'./assets/audio/music/demon-killer-title-theme-v1.mid',volume:200,baseGain:.26
+ })||null;
+ const DEFAULT_MENU_VOLUME=200;
+ $('musicVolume').value=String(DEFAULT_MENU_VOLUME);
+ function applyMenuVolume(){
+  const n=Number($('musicVolume').value);
+  const level=Number.isFinite(n)?Math.max(0,Math.min(200,Math.round(n))):DEFAULT_MENU_VOLUME;
+  $('musicVolume').value=String(level);
+  $('musicVolumeValue').textContent=level+'%';
+  $('musicVolume').setAttribute('aria-valuetext',level+' percent'+(level>100?', amplified':''));
+  menuMusic?.setVolume(level);
+  $('musicVolume').disabled=!$('musicEnabled').checked;
  }
- try{
-  const ctx=new Context(),source=ctx.createMediaElementSource(menuMusic);
-  const gain=ctx.createGain(),limiter=ctx.createDynamicsCompressor();
-  limiter.threshold.value=-3;limiter.knee.value=0;limiter.ratio.value=20;
-  limiter.attack.value=0.003;limiter.release.value=0.18;
-  source.connect(gain);gain.connect(limiter);limiter.connect(ctx.destination);
-  audioContext=ctx;menuGain=gain;
-  menuMusic.volume=1.0;
-  return true;
- }catch(e){
-  $('musicVolumeHint').textContent='Amplification is unavailable; browser volume is used.';
-  return false;
+ function saveMenuPrefs(){
+  try{localStorage.setItem(PREFS_KEY,JSON.stringify({
+   musicEnabled:$('musicEnabled').checked,volumePercent:Number($('musicVolume').value)
+  }));}catch(e){notice('Music settings could not be saved.');}
  }
-}
-function applyMenuVolume(){
- const n=Number($('musicVolume').value);
- const level=Number.isFinite(n)?Math.max(0,Math.min(200,Math.round(n))):DEFAULT_MENU_VOLUME;
- $('musicVolume').value=String(level);
- $('musicVolumeValue').textContent=level+'%';
- $('musicVolume').setAttribute('aria-valuetext',level+' percent'+(level>100?', amplified':''));
- if(menuGain)menuGain.gain.value=level/100;
- else menuMusic.volume=Math.min(1,level/100);
- $('musicVolume').disabled=!$('musicEnabled').checked;
-}
-function saveMenuPrefs(){
- try{localStorage.setItem(PREFS_KEY,JSON.stringify({
-  musicEnabled:$('musicEnabled').checked,volumePercent:Number($('musicVolume').value)
- }));}catch(e){notice('Music settings could not be saved.');}
-}
-function syncMenuMusic(){
- if(!$('musicEnabled').checked){
-  menuMusic.pause();menuMusic.currentTime=0;applyMenuVolume();
-  return;
+ function syncMenuMusic(){
+  applyMenuVolume();
+  if(!$('musicEnabled').checked){menuMusic?.stop();return;}
+  if(menuMusic&&!menuMusic.playing)void menuMusic.play();
  }
- ensureMenuAudio();applyMenuVolume();
- if(audioContext&&audioContext.state==='suspended'){
-  try{const resuming=audioContext.resume();
-   if(resuming&&typeof resuming.catch==='function')resuming.catch(()=>{});}
-  catch(e){/* A click may be required for audio. */}
- }
- if(!menuMusic.paused)return;
- try{const pending=menuMusic.play();
-  if(pending&&typeof pending.catch==='function')pending.catch(()=>{});}
- catch(e){/* A click may be required for audio. */}
-}
-const views=['home','slotsScreen','nameScreen','optionsScreen','quitScreen'];
+ window.addEventListener('pagehide',()=>menuMusic?.stop());
+ const views=['home','slotsScreen','nameScreen','optionsScreen','quitScreen'];
 let mode='new',chosen=0,atlas=null,serverSlots=[null];
 function show(id){for(const view of views)$(view).hidden=view!==id;$('notice').textContent='';}
 function notice(message){$('notice').textContent=message;}

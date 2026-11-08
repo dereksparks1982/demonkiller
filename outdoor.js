@@ -5,6 +5,24 @@
 'use strict';
 const R=window.DemonKillerRegions,D=window.DKArchitectDungeon||null;
 const CINEMATIC=window.DKLilithCinematic;
+ // The same original MIDI score plays in every outdoor region.
+ const MUSIC=window.DKMidiSoundtrack?.create({
+  url:'./assets/audio/music/demon-killer-overworld-theme-v1.mid',
+  volume:100,baseGain:.26
+ })||null;
+ function startOutdoorMusic(){
+  if(!MUSIC||MUSIC.playing)return;
+  let prefs={};
+  try{prefs=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.menuPrefs.v1')||'{}')||{};}catch(_){}
+  if(prefs.musicEnabled===false)return;
+  MUSIC.setVolume(Number.isFinite(prefs.volumePercent)?prefs.volumePercent:200);
+  void MUSIC.play();
+ }
+ document.addEventListener('pointerdown',startOutdoorMusic,{passive:true});
+ document.addEventListener('keydown',startOutdoorMusic);
+ window.addEventListener('pagehide',()=>MUSIC?.stop());
+ startOutdoorMusic();
+
 const q=new URLSearchParams(location.search),slot=Number(q.get('dkSlot')||1);
 const SERVER=window.DemonKillerServer&&q.has('dkSlot')?window.DemonKillerServer:null;
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d');

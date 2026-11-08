@@ -28,11 +28,12 @@ assert(html.includes("classList.remove('art-loading')"),
 assert(html.includes('min(265px,75vw,41svh)')&&html.includes('min(252px,78vw,38svh)'),
  'Approved menu art must scale with viewport height at 100% zoom');
 assert(fs.existsSync(path.join(root,'assets/art/menu/demon-killer-main-menu-spritesheet.png')));
-assert(html.includes('id="menuMusic"')&&html.includes('assets/audio/music/creepyloop-v2.ogg'),
- 'Main menu must load the local OGG track');
-const audioPath=path.join(root,'assets/audio/music/creepyloop-v2.ogg');
-assert(fs.existsSync(audioPath),'Selected audio must be present in the game');
-assert.equal(fs.readFileSync(audioPath).subarray(0,4).toString(),'OggS','Audio must be OGG');
+assert(html.includes('dk-midi-soundtrack.js?v=m58')&&
+ html.includes('assets/audio/music/demon-killer-title-theme-v1.mid'),
+ 'Main menu must play the original MIDI title theme');
+assert(!html.includes('src="./assets/audio/music/creepyloop-v2.ogg"'),
+ 'The retired menu OGG must not be active');
+assert(fs.existsSync(path.join(root,'assets/audio/music/demon-killer-title-theme-v1.mid')));
 const noop=()=>{},saved=new Map(),elements={};
 class El{
  constructor(id){this.id=id;this.hidden=false;this.checked=true;this.disabled=false;
@@ -62,36 +63,22 @@ const document={
 };
 const localStorage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,String(v)),removeItem:k=>saved.delete(k)};
 const location={href:''};
-class AudioNode{
- constructor(){this.connections=[];this.gain={value:1};this.threshold={value:0};this.knee={value:0};
-  this.ratio={value:1};this.attack={value:0};this.release={value:0};}
- connect(target){this.connections.push(target);return target;}
-}
-class AudioContext{
- constructor(){this.state='suspended';this.destination=new AudioNode();this.source=new AudioNode();
-  this.outputGain=new AudioNode();this.limiter=new AudioNode();AudioContext.instances.push(this);}
- createMediaElementSource(el){this.media=el;return this.source;}
- createGain(){return this.outputGain;}
- createDynamicsCompressor(){return this.limiter;}
- resume(){this.state='running';return Promise.resolve();}
-}
-AudioContext.instances=[];
-const window={confirm:()=>true,AudioContext};
+const midi={volume:0,playing:false,playCount:0,stopCount:0,
+ setVolume(value){this.volume=value;},
+ play(){this.playing=true;this.playCount++;return Promise.resolve(true);},
+ stop(){this.playing=false;this.stopCount++;}
+};
+const window={confirm:()=>true,
+ addEventListener:noop,
+ DKMidiSoundtrack:{create({url}){assert.match(url,/demon-killer-title-theme-v1[.]mid/);return midi;}}
+};
 class Image{set src(v){this.file=v;}}
 vm.runInNewContext(code[1],{document,localStorage,location,window,Image,Date,console},
  {filename:'index.html',timeout:3000});
-assert.equal(get('menuMusic').volume,1);
 assert.equal(get('musicVolume').value,'200');
 assert.equal(get('musicVolumeValue').textContent,'200%');
-assert.equal(AudioContext.instances.length,1);
-const audio=AudioContext.instances[0];
-assert.equal(audio.outputGain.gain.value,2,'200% must boost the actual audio signal');
-assert.equal(audio.source.connections[0],audio.outputGain);
-assert.equal(audio.outputGain.connections[0],audio.limiter,'Limiter must be in signal path');
-assert.equal(audio.limiter.connections[0],audio.destination);
-assert.equal(audio.limiter.threshold.value,-3);
-assert.equal(audio.state,'running');
-assert.equal(get('menuMusic').paused,false,'Menu should request music when enabled');
+assert.equal(midi.volume,200);
+assert.equal(midi.playCount,1,'Menu must start original MIDI playback when enabled');
 actions.new.emit('click');
 assert.equal(get('slotsScreen').hidden,false);
 assert.equal(get('slots').children.length,1,'Only one character slot is shown');
@@ -116,21 +103,21 @@ actions.options.emit('click');assert.equal(get('optionsScreen').hidden,false);
 assert(html.includes('Play main menu music')&&!html.includes('Play music when available'));
 assert(html.includes('type="range" min="0" max="200"'));
 get('musicVolume').value='75';get('musicVolume').emit('input');
-assert.equal(audio.outputGain.gain.value,0.75,'Slider must control live signal');
+assert.equal(midi.volume,75,'Slider must control the original MIDI synthesizer');
 assert.equal(get('musicVolumeValue').textContent,'75%');
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).volumePercent,75);
 get('musicVolume').value='200';get('musicVolume').emit('change');
-assert.equal(audio.outputGain.gain.value,2);
+assert.equal(midi.volume,200);
 get('musicEnabled').checked=false;get('musicEnabled').emit('change');
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).musicEnabled,false);
-assert.equal(get('menuMusic').paused,true,'Disabling music must pause audio');
+assert.equal(midi.playing,false,'Disabling music must stop MIDI notes');
 assert.equal(get('musicVolume').disabled,true);
 for(const fn of documentEvents.pointerdown||[])fn();
-assert.equal(get('menuMusic').paused,true,'Disabled audio remains silent after interaction');
+assert.equal(midi.playing,false,'Disabled audio remains silent after interaction');
 get('musicEnabled').checked=true;get('musicEnabled').emit('change');
-assert.equal(get('menuMusic').paused,false,'Enabling music should resume audio');
+assert.equal(midi.playing,true,'Enabling music should resume MIDI');
 assert.equal(get('musicVolume').disabled,false);
-assert.equal(AudioContext.instances.length,1,'Music toggling must not duplicate audio nodes');
+assert.equal(midi.playCount,2,'Enabling MIDI must restart just once');
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).musicEnabled,true);
 assert.equal(JSON.parse(saved.get('dkSoftworks.demonkiller.menuPrefs.v1')).volumePercent,200);
-console.log('PASS: Demon Killer menu, amplified audio, saved slider, limiter, single life, Continue, occupied-slot guard, persistent-world options.');
+console.log('PASS: Demon Killer menu, original MIDI, saved slider, music toggle, single life, Continue, occupied-slot guard, persistent-world options.');

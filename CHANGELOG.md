@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.56 / M58 | 2026-11-07 | Original MIDI title and overworld soundtracks
+
+- Added the exact owner-approved **The Land Beyond the Altar** overworld MIDI and the original dark title score **The Oath Beneath the Ashes** to `assets/audio/music/`.
+- The courtyard, village and future outdoor regions use one looping score. The main menu uses its distinct funeral-organ, choir and bell theme instead of the old OGG menu loop.
+- Added a standalone Standard MIDI / Web Audio synthesizer with tempo-aware looping, several period-appropriate instrument timbres, active-note cleanup, volume control, and browser gesture handling.
+- Both tracks follow saved music preferences. The original temple organ track and temple cutscene logic remain untouched.
+- Added M58 source, parser, page-wiring, menu, and loopback server regression coverage. Browser listening remains to be accepted by the owner.
+
 ## v0.2.47 / DK Server M25 | 2026-11-06 | Persistent caravan manifests
 
 - Added a bounded server-owned manifest history for actual merchant journeys with unique trip IDs, cargo serials, simulated purchase/finish minutes and delivered/interrupted status.
