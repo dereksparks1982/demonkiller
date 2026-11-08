@@ -45,6 +45,8 @@ function catalogue(world){
     cells[id]={id,area_id,parent:root,kind:'building',
      bounds:{x:o.x,y:o.y,width:o.w,height:o.h},
      interior_ready:o.interior_ready===true,
+     // Draft blueprints are not playable interiors or portal destinations.
+     draft_revision:world.living?.interior_drafts?.records?.[id]?.revision||0,
      object_id:o.id,children:[],
      doorway:o.door?{x:o.door.x,y:o.door.y}:null};
     cells[root].children.push(id);
