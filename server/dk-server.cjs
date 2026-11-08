@@ -36,6 +36,7 @@ const {ensure:ensureScavengers}=require('./scavengers-m30.cjs');
 const {ensure:ensureBurials}=require('./burials-m30.cjs');
 const {ensure:ensureCells,streamingView:cellView,onPlayerMove:trackCellMove}=require('./streaming-cells-m33.cjs');
 const INTERIORS=require('./interior-drafts-m35.cjs');
+const OUTDOORS=require('./outdoor-architect-m36.cjs');
 const {createTracker:createCellContentsTracker}=require('./cell-contents-m34.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
@@ -277,6 +278,20 @@ async function createDKServer({
     writeQueue=pending.catch(()=>{});
     return pending;
   }
+  async function saveOutdoorEdit(command){
+    const pending=writeQueue.then(async()=>{
+      // Paused worlds remain editable. No simulation advances on an edit.
+      const result=OUTDOORS.edit(world,command);
+      validateWorld(result.world);
+      await snapshots.save(result.world,{forceBackup:true});
+      world=result.world;spatialCache=null;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('Exterior Architect event archive failed:',error);}
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});
+    return pending;
+  }
   async function saveAction(slot, command) {
     const pending = writeQueue.then(async () => {
       if(!worldClock(world,now()).running)throw Error('World is paused; press Start Server');
@@ -377,7 +392,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m35', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m36', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -476,6 +491,32 @@ async function createDKServer({
           return sendJSON(res,422,{error:error.message},method);
         console.error('Interior draft save failed:',error);
         return sendJSON(res,500,{error:'Interior draft could not be saved'},method);
+      }
+    }
+    if(url.pathname==='/api/v1/architect/outdoors'&&!write){
+      try{return sendJSON(res,200,OUTDOORS.list(world,url.searchParams.get('area_id')),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/architect/outdoors/export'&&!write){
+      try{return sendJSON(res,200,OUTDOORS.exportLayout(world,url.searchParams.get('area_id')),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/architect/outdoors/edit'&&method==='POST'){
+      if(req.headers['x-dk-architect']!=='outdoors')
+        return sendJSON(res,403,{error:'Exterior editing requires DK Architect control'});
+      let command;try{command=await readJSON(req);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
+      try{
+        const result=await saveOutdoorEdit(command);
+        return sendJSON(res,200,{area_id:result.area_id,revision:result.revision,
+          event:result.event},method);
+      }catch(error){
+        if(/Stale exterior revision/.test(error.message))
+          return sendJSON(res,409,{error:error.message},method);
+        if(/exterior|Exterior|Door|door|Building|building|Fixture|fixture|ground|Ground|Invalid|Unknown|Unsupported|protected|Cannot/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Exterior edit save failed:',error);
+        return sendJSON(res,500,{error:'Exterior edit could not be saved'},method);
       }
     }
     if(url.pathname==='/api/v1/streaming-cells/contents'&&!write){

@@ -1139,6 +1139,13 @@ document.addEventListener('keydown',e=>{
  const tag=e.target?.tagName;
  if(e.ctrlKey||e.altKey||e.metaKey)return;
  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='BUTTON'||tag==='SELECT'||e.target?.isContentEditable)return;
+ if(e.key==='F8'&&!e.repeat){
+  e.preventDefault();rightHeld=false;
+  if(!SERVER)return message('World editing needs the local DK Server.');
+  if(lilithPhase==='playing')return message('Wait for Lilith to finish her transformation.');
+  location.href='./dk-architect-outdoors-m36.html?dkSlot='+slot+'&area_id='+encodeURIComponent(area.area_id);
+  return;
+ }
  if(e.key.toLowerCase()==='b'&&!e.repeat){e.preventDefault();buryCorpse();return;}
  const dir={ArrowUp:'north',w:'north',ArrowDown:'south',s:'south',
   ArrowLeft:'west',a:'west',ArrowRight:'east',d:'east'}[e.key.length===1?e.key.toLowerCase():e.key];

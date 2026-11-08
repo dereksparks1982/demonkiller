@@ -61,6 +61,18 @@
     async clock() { return request('/api/v1/clock'); },
     async regions() { return request('/api/v1/areas'); },
     async area(id) { return request('/api/v1/areas/' + encodeURIComponent(id)); },
+    async outdoorInfo(id) {
+      return request('/api/v1/architect/outdoors?area_id='+encodeURIComponent(id));
+    },
+    async exportOutdoor(id) {
+      return request('/api/v1/architect/outdoors/export?area_id='+encodeURIComponent(id));
+    },
+    async editOutdoor(action,area_id,expected_revision,fields={}) {
+      return request('/api/v1/architect/outdoors/edit',{
+        method:'POST',headers:{'Content-Type':'application/json','X-DK-Architect':'outdoors'},
+        body:JSON.stringify({action,area_id,expected_revision,...fields})
+      });
+    },
     async living() { return request('/api/v1/living'); },
     async events(after=0) { return request('/api/v1/living/events?after='+after); },
     async gameplay() { return request('/api/v1/gameplay'); },

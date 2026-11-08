@@ -21,10 +21,11 @@ function houseObjects(world){
   for(const obj of area.objects||[]){
    if(obj.type!=='house')continue;
    const door=obj.door;
-   if(!door||!Number.isInteger(door.x)||!Number.isInteger(door.y))
-    throw Error('House exterior is missing its real doorway');
+   if(door&&(!Number.isInteger(door.x)||!Number.isInteger(door.y)))
+    throw Error('House exterior has invalid doorway coordinates');
+   // The deed and goods survive when Architect erases a doorway.
    houses.push({id:obj.id,area_id,x:obj.x,y:obj.y,w:obj.w,h:obj.h,
-     door_x:door.x,door_y:door.y});
+     door_x:door?.x??null,door_y:door?.y??null});
   }
  return houses.sort((a,b)=>a.id.localeCompare(b.id));
 }
@@ -66,7 +67,8 @@ function event(world,minute,type,text,details={}){
  return e;
 }
 function beside(player,house,range=2){
- return player.area_id===house.area_id&&
+ return Number.isInteger(house.door_x)&&Number.isInteger(house.door_y)&&
+  player.area_id===house.area_id&&
   Math.abs(player.x-house.door_x)+Math.abs(player.y-house.door_y)<=range;
 }
 function isOwner(house){

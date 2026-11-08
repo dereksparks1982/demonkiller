@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DK Architect | World Construction</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#101116;color:#eee5d5}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}
+button,select{font:inherit;color:#e8efff;background:#283849;border:2px solid #597da0;padding:7px;cursor:pointer}
+button:hover,button:focus-visible{border-color:#c7d9f0}button:disabled{opacity:.4;cursor:default}
+header{background:#1c1b24;border-bottom:3px solid #8f6965;display:flex;gap:12px;align-items:center;padding:8px 14px;flex-wrap:wrap;min-height:52px}
+header strong{color:#dfbb91;letter-spacing:.07em}header label{font-size:12px;display:flex;gap:7px;align-items:center}
+#revision,#selection{font:12px monospace;color:#c1c5cf;white-space:nowrap}
+.spacer{flex:1}a{color:#eac99e;font-size:13px}
+main{flex:1;position:relative;min-height:300px;display:flex;overflow:hidden;background:#151b17}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-action:none;cursor:crosshair}
+#inspector{position:absolute;right:12px;top:12px;width:220px;max-width:45vw;background:#24212be9;border:2px solid #a08064;padding:12px;font:12px/1.5 monospace;pointer-events:none;white-space:pre-line}
+#status{position:absolute;bottom:12px;left:12px;max-width:80%;padding:7px 10px;background:#171419ed;border:1px solid #a78c6a;color:#e6d7b7;font:12px monospace;pointer-events:none}
+#tools{background:#111b2a;border-top:3px solid #6088ac;min-height:90px;display:flex;align-items:stretch;gap:8px;padding:8px;flex-wrap:wrap}
+.tool{display:grid;place-items:center;align-content:center;min-width:104px;min-height:70px;gap:3px;background:linear-gradient(#174178,#082140);border:2px solid #6e9cca;border-radius:3px;color:#e8efff;font:bold 10px monospace;letter-spacing:.06em}
+.tool span{font-size:25px;line-height:1}.tool.active{background:linear-gradient(#2670b9,#194f88);border-color:#d6b56c;color:#fff2bd}
+#toolOptions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px;background:#202534;border-top:1px solid #536482}
+#toolOptions label{display:flex;align-items:center;gap:5px;font-size:12px}
+#toolOptions output{font:12px monospace;color:#b9c8db}
+#toolOptions button{padding:5px 9px}
+@media(max-width:700px){.tool{min-width:85px}#inspector{position:absolute;right:4px;top:4px;width:145px;font-size:10px}#tools{gap:4px;padding:5px}.tool{min-height:55px}header{gap:7px}}
+</style>
+</head>
+<body>
+<header>
+ <strong>DK ARCHITECT · WORLD CONSTRUCTION</strong>
+ <label>REGION <select id="region"><option value="dk.courtyard.lilith.001">Temple courtyard</option><option value="dk.village.001">Village</option></select></label>
+ <span id="revision">SERVER REVISION: ...</span><span id="selection">NO SELECTION</span>
+ <div class="spacer"></div><button id="undo" disabled>↶ UNDO</button><button id="redo" disabled>↷ REDO</button>
+ <button id="export" title="Download map-only layout JSON to send for GitHub integration">EXPORT JSON</button>
+ <a id="returnGame" href="./outdoor.html">RETURN TO GAME · F8</a>
+</header>
+<main id="workarea"><canvas id="map" width="1200" height="730" tabindex="0" aria-label="Top-down exterior construction grid"></canvas>
+ <aside id="inspector">SELECT A BUILDING.<br>Building footprints, doors, and paths remain server-owned.</aside>
+ <div id="status" role="status" aria-live="polite">Connecting to local DK Server…</div>
+</main>
+<section id="toolOptions" aria-label="Tool settings">
+ <label>MODE <output id="modeText">SELECT BUILDING</output></label>
+ <label>GROUND <select id="ground"><option value="path">Stone path</option><option value="grass">Grass</option><option value="dirt">Dirt</option><option value="garden">Garden</option><option value="stone">Stone floor</option></select></label>
+ <label>ZOOM <input id="zoom" type="range" min="8" max="30" value="15"></label>
+ <label><input id="showGrid" type="checkbox" checked> GRID</label>
+ <output>LEFT DRAG · MOVE / BRUSH &nbsp; RIGHT DRAG · PAN &nbsp; WHEEL · ZOOM &nbsp; 1–6 · TOOLS</output>
+</section>
+<nav id="tools" aria-label="Construction tools, inspired by top-down building games">
+ <button class="tool active" data-tool="select"><span>▣</span>BUILDINGS</button>
+ <button class="tool" data-tool="move"><span>✥</span>MOVE</button>
+ <button class="tool" data-tool="door"><span>▥</span>DOORS</button>
+ <button class="tool" data-tool="erase"><span>⌫</span>ERASE DOOR</button>
+ <button class="tool" data-tool="ground"><span>▦</span>MATERIALS</button>
+ <button class="tool" data-tool="inspect"><span>⌕</span>INSPECT</button>
+</nav>
+<script src="./dk-menu-server.js?v=m36"></script>
+<script src="./dk-architect-outdoors-m36.js?v=1"></script>
+</body></html>

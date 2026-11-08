@@ -15,7 +15,8 @@ const ROOT_FILES = new Set([
   'cult-system.js','cult-network.js','cult-journal.css',
   'citizen-population.js','temple-music.js','dk-dungeon-art.js',
   'dk-skills.js','dk-menu-server.js','world-regions.js','outdoor.html','outdoor.js','outdoor.css',
-  'outdoor-ui.js','temple-ui.js','temple-ui.css','sector-terrain-m32.js','streaming-cell-shells-m33.js','streaming-cell-contents-m34.js','dk-architect-interiors-m35.html','dk-architect-interiors-m35.js'
+  'outdoor-ui.js','temple-ui.js','temple-ui.css','sector-terrain-m32.js','streaming-cell-shells-m33.js','streaming-cell-contents-m34.js','dk-architect-interiors-m35.html','dk-architect-interiors-m35.js',
+   'dk-architect-outdoors-m36.html','dk-architect-outdoors-m36.js'
 ]);
 
 function localRequestAllowed(req, port) {
