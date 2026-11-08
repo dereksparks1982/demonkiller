@@ -10,6 +10,7 @@ const {ensure:ensureCombat,validate:validateCombat}=require('./combat-m8.cjs');
 const SPAWNERS=require('./spawners-m59.cjs');
 const GUARDS=require('./guard-watch-m61.cjs');
 const GARRISON=require('./garrison-m62.cjs');
+const REFUGEES=require('./refugees-m63.cjs');
 const {ensure:ensureStorage,validate:validateStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,validate:validateEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,validate:validateScheduler}=require('./world-scheduler-m11.cjs');
@@ -102,6 +103,7 @@ function makeWorld(now = Date.now()) {
   SPAWNERS.ensure(result);
   GUARDS.ensure(result);
   GARRISON.ensure(result);
+  REFUGEES.ensure(result);
   ensureStorage(result);
   reconcileEntities(result);
   ensureScheduler(result);
@@ -197,6 +199,7 @@ function validateWorld(world) {
   SPAWNERS.validate(world);
   GUARDS.validate(world);
   GARRISON.validate(world);
+  REFUGEES.validate(world);
   validateStorage(world);
   validateEntities(world);
   validateScheduler(world);

@@ -10,6 +10,7 @@ const {tick:combatTick,dead:monsterDeath}=require('./combat-m8.cjs');
 const SPAWNERS=require('./spawners-m59.cjs');
 const GUARDS=require('./guard-watch-m61.cjs');
 const GARRISON=require('./garrison-m62.cjs');
+const REFUGEES=require('./refugees-m63.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
@@ -138,11 +139,13 @@ function minuteTick(world,m,generated){
  craftTick(world,m,generated);
  NPCHARVEST.plan(world,m,generated);
  CARAVAN.plan(world,m,generated);
+ REFUGEES.plan(world,m,generated);
  for(const n of Object.values(living.npcs)){
   if(!n.alive)continue;
   if(npcSenseDue(world,n,m))NPCAI.sense(world,n,m,generated);
   const state=world.living.npc_ai?.brains[n.id]?.mode||'work';
-  const desired=GARRISON.destination(world,n)||NPCAI.destination(world,n)||
+  const desired=REFUGEES.destination(world,n)||GARRISON.destination(world,n)||
+    NPCAI.destination(world,n)||
     npcDestination(n,m,world);
   const status=state==='flee'?'fleeing':state==='defend'?'defending':
    state==='recover'?'recovering':n.area_id!==desired.area_id?'traveling':
@@ -246,6 +249,7 @@ function advance(world,now=Date.now(),limit=180){
  SPAWNERS.ensure(next);
  GUARDS.ensure(next);
  GARRISON.ensure(next);
+ REFUGEES.ensure(next);
  ensureMobileAssets(next);
  ensureLaw(next);
  ensureDistricts(next);

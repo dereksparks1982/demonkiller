@@ -4,6 +4,12 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M63 | Civilian evacuation, displacement and homecoming
+
+Civilians no longer continue ordinary work as though nothing happened when their settlement falls. The server saves each noncombatant's evacuation state, origin, temporary shelter, arrival and return dates. Surviving residents flee toward a different **actually safe** region via the existing walkable **courtyard/village gates**, never by teleportation. Camps have distinct assigned tiles, and refugees wait until their home territory has stayed safe for **90 simulated minutes** before attempting to return to their actual home positions. If both regions are occupied, civilians become stranded rather than materializing in an imaginary safe city. Death while displaced is irreversible and counted once.
+
+Guards and caravan escorts remain on their existing M61/M24 defensive/escort duties. Shop staffing and NPC routines use the actual current locations of displaced workers, so trade and production can be interrupted by an invasion. Returns resume existing jobs without inventing a new NPC or rewriting company titles. Current-world migration preserves existing NPC records. Read-only server diagnostics: `GET /api/v1/refugees`. No additional play-screen buttons.
+
 ## M62 | Paid medical care and physical garrison supplies
 
 Guards and escorts wounded in battle now seek an **actual staffed, open storefront** when treatment is available and affordable. Their recovery is not a free world-tick heal: village market bandages, tavern meals or courtyard herbal supplies are physically consumed by serial, while actual NPC coins transfer into the shop treasury. A medic's supply stock and the buyer's position must be valid. Player-operated businesses requiring personal service are not bypassed. Occupied settlements, closed shops, exhausted stock, missing money and distant patients prevent treatment.

@@ -1,6 +1,12 @@
-# DK Server M62 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M63 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M63 civilians can flee, take shelter and return to their occupations
+
+`server/refugees-m63.cjs` stores civilian evacuation decisions in the authoritative world. When a settlement is monster-held, surviving noncombatants choose a distinct reachable destination in a neighboring, genuinely settler-controlled area. The existing region gates and cardinal NPC pathfinding handle travel; the refuge controller only chooses destinations. When no neighboring safe region exists, refugees are **stranded in place** and stay vulnerable to real monster combat. Their return begins only after the original home region has remained under settler control for 90 simulated minutes; the NPC must physically arrive before the homecoming event is recorded.
+
+Guards, escorts and the caravan profession are exempt so M61 defensive duty and M24 shipment custody aren't silently overridden. Workers physically displaced from a business are no longer eligible for that shop's normal staffed-open check. NPCs remain persistent individuals with the same home positions, history and monetary holdings. When an evacuated NPC dies, their existing death/corpse and successor rules apply. `GET /api/v1/refugees` is a read-only displacement view. Eight regression tests are registered under `tests/refugees-m63.cjs`. No new buttons or browser cutscene changes were needed.
 
 ## M62 recovery economy: guards pay for their own care
 

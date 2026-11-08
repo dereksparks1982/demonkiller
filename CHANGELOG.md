@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.61 / M63 | 2026-11-08 | Civilian evacuation and homecoming
+
+- Saved per-NPC refuge status: home, evacuating, sheltered, returning, stranded or lost. Occupied towns trigger real journeys over the existing cardinal navigation and inter-region portals.
+- Refugees get unique legal camp destinations in a safe neighboring region. There are no fabricated "safe" areas and nobody teleports at the moment of an invasion.
+- Civilians wait for 90 consecutive world minutes of restored home-region safety before traveling home. If both regions fall, they shelter in place and remain vulnerable.
+- Guards/escorts and caravan activities retain their existing duties. Displacement persists and affects worker proximity to shops, commerce and mills.
+- Eight tests cover migration, real movement intent, camp uniqueness, stable safety windows, stranded civilians, death and historical counters.
+- Read-only refugee endpoint. No client-side world authority, new sprites or HUD controls.
+
 ## v0.2.60 / M62 | 2026-11-08 | Resource-backed garrison medical care
 
 - New saved garrison care records: treatment timing, spent coins, healing totals and patients, with idempotent migration.
