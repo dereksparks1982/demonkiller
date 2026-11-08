@@ -25,6 +25,7 @@ const {ensure:ensureScavengers,validate:validateScavengers}=require('./scavenger
 const {ensure:ensureBurials,validate:validateBurials}=require('./burials-m30.cjs');
 const {ensure:ensureCells,validate:validateCells,onPlayerMove:cellMove}=require('./streaming-cells-m33.cjs');
 const {ensure:ensureInteriors,validate:validateInteriors}=require('./interior-drafts-m35.cjs');
+const FIELD=require('./field-skills-m43.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
@@ -310,15 +311,19 @@ function applyCharacterAction(world, slot, command) {
       character.x=x; character.y=y; character.facing=command.direction;
     }
   }
-  if(command.action==='move'&&character.fieldcraft)
+  const concealmentEvent=command.action==='move'?FIELD.onMove(next,character):null;
+  if(command.action==='toggle_door'&&character.fieldcraft){
    character.fieldcraft.hidden_until_minute=-1;
+   character.fieldcraft.stealth_steps=0;
+  }
   character.revision++;
   next.characters[String(slot)] = character;
   const districtEvents=onPlayerMove(next,previous);
   const cellEvents=cellMove(next,previous);
   next.revision++;
   validateWorld(next);
-  return {world:next,character,events:[...districtEvents,...cellEvents]};
+  return {world:next,character,events:[...(concealmentEvent?[concealmentEvent]:[]),
+   ...districtEvents,...cellEvents]};
 }
 
 function worldClock(world, now = Date.now()) {

@@ -15,6 +15,9 @@ function deleteCharacter(world,slot,name){
  // An old owner's title cannot pass to a newly created character.
  // Keep NPC workers, physical merchandise and the historical sales ledger.
  if(l.player_business)l.player_business.shops={};
+ // Customers still exist and can be served by the NPC assistant, but
+ // no pending order belongs to the retired character any longer.
+ if(l.npc_trade?.pending_sales)l.npc_trade.pending_sales={};
  // Remove only the selected character's custody, never world loot or NPC goods.
  const owned=new Set([PACK,VAULT,HAND,LIGHT,CHEST]);
  for(const house of Object.values(l.housing?.records||{})){

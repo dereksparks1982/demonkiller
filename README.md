@@ -10,7 +10,7 @@ Press **F8** or **ARCHITECT** in the temple or outdoors to use the same Prison A
 
 The paper doll has Ultima Online-style commands, without destructive save buttons. **Main Menu → Options → Save Management** separates character deletion (world preserved), server-world reset (requires an actual connected server) and Start Fresh (browser-only on GitHub Pages).
 
-## DK Server M41–M50: Ten connected gameplay slices
+## DK Server M41–M52: Twelve connected gameplay slices
 
 - **59 trainable skills**, 100.0 individual/700.0 overall caps, groups, training locks and existing-save migration.
 - **Seven persistent monster species** with different strengths, patrols, NPC threats, loot and decay.
@@ -23,6 +23,8 @@ The paper doll has Ultima Online-style commands, without destructive save button
 - **Real player-owned shops**: acquire an existing business from its NPC proprietor, manage budgets, prices, inventory and assistant staffing, and serve actual NPC shoppers while at its counter.
 - **Hands-on workshop production**: manufacture bread, tools and meals yourself from actual shop stock. Operators can carry on when you are hunting.
 - **Breakdowns and maintenance**: production wears machinery, monster raids can damage it, and work stops until you use a tool or pay an actual worker for repairs.
+- **Owner-served NPC customers**: NPCs really wait to be served when you're at your own counter. They leave if ignored or pay your assistant when you leave.
+- **Stealth and camping**: Hide, sneak limited cardinal steps with real monster detection, and consume wood to set up a restorative outdoor camp.
 
 Use **P → Skills, Spellbook, Quests, Animals, Crafting or BUSINESS** on a **connected DK Server** for these gameplay actions. The dedicated mill building, more kinds of magic, guilds, and the entire original Ultima Online feature set are **not** complete yet. The first milling station uses the **existing village bakery**, without changing the owner-approved village layout.
 

@@ -102,7 +102,7 @@ menu('JOURNAL',async()=>{
 },'Open recorded messages and nearby world events');
 // The entire authoritative UO-scale skillbook, grouped and scrollable,
 // with physical skill use and per-skill up/down/locked training controls.
-const FIELD_ACTIONS=new Set(['tracking','hiding','anatomy','forensic_evaluation','meditation','spirit_speak']);
+const FIELD_ACTIONS=new Set(['tracking','hiding','stealth','camping','anatomy','animal_lore','forensic_evaluation','meditation','spirit_speak']);
 function feedback(text){entry(text);const node=document.createElement('p');node.className='dk-paper-feedback';node.textContent=text;content.prepend(node);}
 function button(label,click,disabled=false){
  const b=document.createElement('button');b.type='button';b.className='dk-paper-action';
@@ -232,10 +232,10 @@ async function showBusinesses(){
   show('BUSINESS',['Ownership, stock, assistants and NPC purchases require a real DK Server. The static Pages preview is not an economy server.']);return;
  }
  try{
-  const api=window.DemonKillerServer,[report,p,maintenance]=await Promise.all([api.playerBusiness(),character(),api.maintenance()]);
+  const api=window.DemonKillerServer,[report,p,maintenance,trade]=await Promise.all([api.playerBusiness(),character(),api.maintenance(),api.npcCommerce()]);
   show('BUSINESS · OWNERSHIP',[
    'At a storefront you can purchase an existing business from its proprietor.',
-   'When present, you serve real NPC shoppers; when absent, the hired assistant keeps the counter running.',
+   'When present, NPC shoppers wait for you to press SERVE CUSTOMER. If you leave, your assistant handles their purchases.',
    'The employee keeps the existing schedule and payroll. Store funds, merchandise and your personal gold remain separate.',
    'Gold · '+(p.gold||0)+' · Owned businesses · '+Object.keys(report.ownership||{}).length,
    'No new buildings are placed automatically. Architect controls the village layout.'
@@ -256,6 +256,21 @@ async function showBusinesses(){
      }catch(e){feedback(e.message);}
     },!b.near||p.gold<b.cost));
     continue;
+   }
+   const customers=(trade.waiting_customers||[]).filter(order=>order.business_id===b.id);
+   for(const customer of customers){
+    const order=document.createElement('div');order.className='dk-skill-row';
+    const label=document.createElement('span');
+    label.textContent=customer.npc_name+' wants to buy '+b.product+
+     ' for '+customer.price+' gold · leaves at minute '+customer.expires_minute;
+    const serve=button('SERVE CUSTOMER',async()=>{
+     try{
+      const result=await api.gameAction('serve_customer',
+       {npc_id:customer.npc_id,business_id:b.id});
+      await showBusinesses();feedback(result.event?.text||'Customer served.');
+     }catch(error){feedback(error.message);}
+    },!b.near||!customer.near_owner);
+    order.append(label,serve);content.append(order);
    }
    const machine=(maintenance.shops||[]).find(m=>m.id===b.id);
    if(machine){

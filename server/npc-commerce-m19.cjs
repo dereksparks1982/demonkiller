@@ -7,11 +7,17 @@ const BUSINESS=require('./player-business-m48.cjs');
 const FOOD=new Set(['bread','produce','meals','rations']);
 const SHOPPERS=new Set(['guard','caravan','escort','courier','caretaker','herbalist','smithy','bakery','market','tavern','bank']);
 const PRICE=Object.freeze({bread:2,produce:2,meals:4});
-const MAX_GOALS=40;
+const MAX_GOALS=40,MAX_WAIT=30;
 function ensure(world){
  if(!world.living)throw Error('NPC trade requires a living world');
- if(world.living.npc_trade)return false;
- world.living.npc_trade={schema:1,goals:{},last_purchase:{},purchases:0};
+ if(world.living.npc_trade){
+  const state=world.living.npc_trade;
+  if(state.schema!==1)throw Error('Unknown NPC commerce save schema');
+  if(!state.pending_sales){state.pending_sales={};return true;}
+  return false;
+ }
+ world.living.npc_trade={schema:1,goals:{},pending_sales:{},
+  last_purchase:{},purchases:0};
  return true;
 }
 function event(world,minute,type,text,extra={}){
@@ -60,22 +66,43 @@ function destination(world,n){
  const spot=location(world,shop);
  return {area_id:shop.area_id,x:spot.x,y:spot.y};
 }
-function purchase(world,minute,out){
- if(minute%5!==0)return;
+function purchase(world,minute,out,serveId=null){
+ if(minute%5!==0&&serveId===null)return;
  const state=world.living.npc_trade;if(!state)return;
  for(const [id,goal] of Object.entries(state.goals)){
+  if(serveId!==null&&serveId!==id)continue;
   const n=world.living.npcs[id],shop=world.living.businesses[goal.shop_id];
-  if(['flee','defend'].includes(world.living.npc_ai?.brains[id]?.mode))continue;
   if(!n?.alive||!shop||minute>=goal.expires_minute){
-   delete state.goals[id];continue;
+   delete state.goals[id];delete state.pending_sales[id];continue;
   }
+  const waiting=state.pending_sales[id];
+  if(waiting&&minute>=waiting.expires_minute){
+   delete state.pending_sales[id];delete state.goals[id];
+   state.last_purchase[id]=minute;
+   out.push(event(world,minute,'npc.trade.abandoned',
+    n.name+' left '+shop.name+' after waiting to be served.',
+    {npc_id:id,business_id:shop.id,area_id:shop.area_id}));
+   continue;
+  }
+  if(['flee','defend'].includes(world.living.npc_ai?.brains[id]?.mode))continue;
   const point=location(world,shop);
   if(n.area_id!==shop.area_id||distance(n,point.x,point.y)>1)continue;
   const price=BUSINESS.price(world,shop,PRICE[shop.product]);
   if(!shop.open||shop.stock<1||!price||n.coins<price||
      (BUSINESS.owned(world,shop)&&!BUSINESS.presence(world,shop))||
      shop.coins+price>1e9){
-   delete state.goals[id];continue;
+   delete state.goals[id];delete state.pending_sales[id];continue;
+  }
+  if(BUSINESS.owned(world,shop)&&BUSINESS.presence(world,shop)==='player'&&serveId!==id){
+   if(!state.pending_sales[id]){
+    state.pending_sales[id]={npc_id:id,shop_id:shop.id,
+     queued_minute:minute,expires_minute:minute+MAX_WAIT};
+    out.push(event(world,minute,'npc.trade.waiting',
+     n.name+' is waiting for the owner at '+shop.name+'.',
+     {npc_id:id,business_id:shop.id,area_id:shop.area_id,
+      expires_minute:minute+MAX_WAIT}));
+   }
+   continue;
   }
   // Restocking may have happened earlier inside this same simulation batch.
   reconcile(world);
@@ -101,7 +128,7 @@ function purchase(world,minute,out){
   const serving=BUSINESS.owned(world,shop)?BUSINESS.presence(world,shop):null;
   if(BUSINESS.owned(world,shop))BUSINESS.recordSale(world,shop,serving,price,out);
   state.last_purchase[id]=minute;state.purchases++;
-  delete state.goals[id];
+  delete state.goals[id];delete state.pending_sales[id];
   out.push(event(world,minute,'business.trade',
     n.name+' bought '+shop.product+' at '+shop.name+'.',
     {npc_id:id,business_id:shop.id,area_id:shop.area_id,
@@ -125,8 +152,12 @@ function validate(world){
  const state=world.living?.npc_trade;
  if(!state)return true;
  if(state.schema!==1||!state.goals||!state.last_purchase||
+   (state.pending_sales!==undefined&&
+    (!state.pending_sales||Array.isArray(state.pending_sales)||
+     typeof state.pending_sales!=='object'))||
    !Number.isSafeInteger(state.purchases)||state.purchases<0||
-   Object.keys(state.goals).length>MAX_GOALS)
+   Object.keys(state.goals).length>MAX_GOALS||
+   Object.keys(state.pending_sales||{}).length>MAX_GOALS)
   throw Error('Invalid physical NPC trade state');
  for(const [id,g] of Object.entries(state.goals)){
   if(!world.living.npcs[id]||g.npc_id!==id||
@@ -135,6 +166,15 @@ function validate(world){
    !Number.isSafeInteger(g.expires_minute)||
    g.expires_minute!==g.assigned_minute+300)
    throw Error('Invalid NPC customer travel goal');
+ }
+ for(const [id,p] of Object.entries(state.pending_sales||{})){
+  const goal=state.goals[id];
+  if(!goal||p.npc_id!==id||p.shop_id!==goal.shop_id||
+   !BUSINESS.owned(world,world.living.businesses[p.shop_id])||
+   !Number.isSafeInteger(p.queued_minute)||p.queued_minute<0||
+   !Number.isSafeInteger(p.expires_minute)||
+   p.expires_minute!==p.queued_minute+MAX_WAIT)
+   throw Error('Invalid pending NPC customer transaction');
  }
  for(const [id,minute] of Object.entries(state.last_purchase))
   if(!world.living.npcs[id]||!Number.isSafeInteger(minute)||minute<0)
@@ -145,8 +185,46 @@ function listing(world){
  const s=world.living?.npc_trade;
  return {world_minute:world.living?.minute||0,
    recorded_purchases:s?.purchases||0,
+   waiting_customers:Object.values(s?.pending_sales||{}).map(wait=>{
+    const n=world.living?.npcs?.[wait.npc_id],shop=world.living?.businesses?.[wait.shop_id];
+    return {npc_id:wait.npc_id,npc_name:n?.name||wait.npc_id,
+     business_id:wait.shop_id,business_name:shop?.name||wait.shop_id,
+     queued_minute:wait.queued_minute,expires_minute:wait.expires_minute,
+     price:shop?BUSINESS.price(world,shop,PRICE[shop.product]):0,
+     near_owner:!!(shop&&BUSINESS.presence(world,shop)==='player')};
+   }),
    active_shoppers:Object.values(s?.goals||{}).map(g=>({
     npc_id:g.npc_id,shop_id:g.shop_id,
     expires_minute:g.expires_minute}))};
 }
-module.exports={ensure,validate,plan,destination,purchase,consume,listing};
+
+function serve(world,command){
+ if(!command||typeof command!=='object'||Array.isArray(command)||
+  command.action!=='serve_customer'||
+  Object.keys(command).sort().join(',')!=='action,business_id,npc_id'||
+  typeof command.npc_id!=='string'||typeof command.business_id!=='string')
+  throw Error('Invalid customer service command');
+ if(!world.runtime?.running)throw Error('World is paused');
+ const player=world.characters?.['1'],shop=world.living?.businesses?.[command.business_id];
+ if(!player||player.form!=='living'||player.crafting?.incapacitated||
+  !shop||!BUSINESS.owned(world,shop)||BUSINESS.presence(world,shop)!=='player')
+  throw Error('Stand at your own storefront to serve a waiting customer');
+ const queued=world.living?.npc_trade?.pending_sales?.[command.npc_id],
+  goal=world.living?.npc_trade?.goals?.[command.npc_id],
+  npc=world.living?.npcs?.[command.npc_id];
+ if(!queued||!goal||goal.shop_id!==shop.id||queued.shop_id!==shop.id||
+  world.living.minute>=queued.expires_minute||
+  !npc?.alive||npc.area_id!==shop.area_id)
+  throw Error('This NPC is not waiting to buy from you');
+ const pt=location(world,shop);
+ if(distance(npc,pt.x,pt.y)>1)
+  throw Error('The customer left the counter');
+ const next=structuredClone(world),c=next.characters['1'],events=[];
+ purchase(next,next.living.minute,events,command.npc_id);
+ const sale=events.find(e=>e.type==='business.trade'&&e.npc_id===command.npc_id);
+ if(!sale)throw Error('The customer could not complete this purchase');
+ c.revision++;next.revision++;
+ validate(next);
+ return {world:next,character:c,event:sale,events};
+}
+module.exports={MAX_WAIT,ensure,validate,plan,destination,purchase,consume,listing,serve};

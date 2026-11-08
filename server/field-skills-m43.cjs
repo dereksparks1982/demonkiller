@@ -3,14 +3,26 @@
 // No copied RunUO code. Every success/failure is decided by the server.
 const SKILLS=require('./skills-m14.cjs');
 const DECAY=require('./corpse-decay-m29.cjs');
+const ENTITIES=require('./entity-registry-m10.cjs');
+const {TEMPLE,traversable}=require('./regions.cjs');
 const ALLOWED=Object.freeze(['tracking','hiding','anatomy',
- 'forensic_evaluation','meditation','spirit_speak','animal_lore']);
+ 'forensic_evaluation','meditation','spirit_speak','animal_lore',
+ 'stealth','camping']);
 const RANGE=12,COOLDOWN=5;
 function ensure(character){
  if(!character)return false;
- if(character.fieldcraft)return false;
+ if(character.fieldcraft){
+  let changed=false;
+  if(character.fieldcraft.stealth_steps===undefined){
+   character.fieldcraft.stealth_steps=0;changed=true;
+  }
+  if(character.fieldcraft.camp_until_minute===undefined){
+   character.fieldcraft.camp_until_minute=-1;changed=true;
+  }
+  return changed;
+ }
  character.fieldcraft={schema:1,hidden_until_minute:-1,last_use_minute:-COOLDOWN,
-  last_skill:null};return true;
+  last_skill:null,stealth_steps:0,camp_until_minute:-1};return true;
 }
 function validate(character){
  const f=character?.fieldcraft;
@@ -18,6 +30,10 @@ function validate(character){
  if(f.schema!==1||!Number.isSafeInteger(f.hidden_until_minute)||
   f.hidden_until_minute < -1||!Number.isSafeInteger(f.last_use_minute)||
   f.last_use_minute< -COOLDOWN||
+  (f.stealth_steps!==undefined&&(!Number.isSafeInteger(f.stealth_steps)||
+   f.stealth_steps<0||f.stealth_steps>12))||
+  (f.camp_until_minute!==undefined&&(!Number.isSafeInteger(f.camp_until_minute)||
+   f.camp_until_minute < -1))||
   (f.last_skill!==null&&!ALLOWED.includes(f.last_skill)))
   throw Error('Invalid field skill state');
  return true;
@@ -51,9 +67,11 @@ function apply(world,command){
  if(!world.characters?.['1'])throw Error('No character exists');
  const next=structuredClone(world),c=next.characters['1'],l=next.living,minute=l.minute;
  SKILLS.ensure(c);ensure(c);
- if(c.fieldcraft.last_use_minute+COOLDOWN>minute)
-  throw Error('Wait for your skill cooldown');
  const skill=command.skill;
+ const stealthCombo=skill==='stealth'&&c.fieldcraft.last_skill==='hiding'&&
+  c.fieldcraft.hidden_until_minute>minute;
+ if(c.fieldcraft.last_use_minute+COOLDOWN>minute&&!stealthCombo)
+  throw Error('Wait for your skill cooldown');
  let target=null,text='',success=false;
  if(skill==='hiding'){
   if(c.form!=='living')throw Error('Ghosts do not need concealment');
@@ -61,7 +79,36 @@ function apply(world,command){
   target=nearest(next,c,['monster'],6);
   if(target)throw Error('Too close to a monster to hide');
   c.fieldcraft.hidden_until_minute=minute+15;
+  c.fieldcraft.stealth_steps=0;
   text='You slip out of sight for fifteen world minutes.';success=true;
+ }else if(skill==='stealth'){
+  if(c.form!=='living'||c.crafting?.incapacitated)
+   throw Error('Only a conscious living character can sneak');
+  if(c.fieldcraft.hidden_until_minute<=minute)
+   throw Error('Hide successfully before attempting to move in stealth');
+  c.fieldcraft.stealth_steps=Math.min(12,
+   2+Math.floor(c.skillbook.skills.stealth.value/150));
+  text='You prepare to sneak '+c.fieldcraft.stealth_steps+
+   ' cardinal steps while staying concealed. Nearby monsters may detect you.';
+  success=true;
+ }else if(skill==='camping'){
+  if(c.form!=='living'||c.crafting?.incapacitated)
+   throw Error('Only a conscious living character can make camp');
+  if(c.area_id===TEMPLE||!traversable(next.areas[c.area_id],c.x,c.y,'living'))
+   throw Error('You must camp on safe outdoor ground');
+  if(c.fieldcraft.camp_until_minute>minute)
+   throw Error('Your camp is already established');
+  if(nearest(next,c,['monster'],6))
+   throw Error('Dangerous creatures are too close to make camp');
+  if((c.inventory?.wood||0)<1)
+   throw Error('You need wood to set up a camp');
+  c.inventory.wood--;
+  ENTITIES.reconcile(next);
+  c.crafting.energy=Math.min(100,c.crafting.energy+25);
+  c.crafting.health=Math.min(100,c.crafting.health+5);
+  c.fieldcraft.camp_until_minute=minute+30;
+  c.fieldcraft.hidden_until_minute=-1;c.fieldcraft.stealth_steps=0;
+  text='You set up a temporary camp and recover health and energy.';success=true;
  }else if(skill==='tracking'){
   target=nearest(next,c,['monster','npc'],RANGE);
   text=target?'You detect '+(target.name||target.kind||target.id)+
@@ -113,4 +160,34 @@ function apply(world,command){
  validate(c);SKILLS.validate(c);
  return {world:next,character:c,event:e};
 }
-module.exports={ALLOWED,RANGE,COOLDOWN,ensure,validate,apply,nearest,labelDirection};
+
+function onMove(world,character){
+ const state=character?.fieldcraft;
+ if(!state)return null;
+ ensure(character);
+ const minute=world.living.minute;
+ if(state.camp_until_minute>minute)state.camp_until_minute=-1;
+ if(state.hidden_until_minute<=minute){
+  state.hidden_until_minute=-1;state.stealth_steps=0;return null;
+ }
+ if(state.stealth_steps<=0){
+  state.hidden_until_minute=-1;return null;
+ }
+ const level=character.skillbook?.skills?.stealth?.value||0;
+ const detectRange=Math.max(2,5-Math.floor(level/250));
+ const spotted=nearest(world,character,['monster'],detectRange);
+ state.stealth_steps--;
+ if(spotted||state.stealth_steps===0){
+  state.hidden_until_minute=-1;state.stealth_steps=0;
+  const l=world.living,e={id:'event_'+(++l.event_sequence),minute,
+   type:spotted?'player.stealth.detected':'player.stealth.exhausted',
+   text:spotted?'A nearby monster spotted your movement.':'You emerged from concealment.',
+   area_id:character.area_id,slot:1,creature_id:spotted?.id||null};
+  l.events.push(e);if(l.events.length>512)l.events.shift();
+  return e;
+ }
+ SKILLS.practice(character,'stealth',minute,
+  'sneak:'+character.area_id+':'+Math.floor(character.x/8)+':'+Math.floor(character.y/8));
+ return null;
+}
+module.exports={ALLOWED,RANGE,COOLDOWN,ensure,validate,apply,nearest,labelDirection,onMove};

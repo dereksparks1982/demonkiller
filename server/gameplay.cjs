@@ -16,6 +16,7 @@ const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
+const NPC_COMMERCE=require('./npc-commerce-m19.cjs');
 const WORKSHOPS=require('./workshops-m20.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const LAW=require('./law-m15.cjs');
@@ -108,6 +109,7 @@ function apply(world,command,now=Date.now()){
  if(['tame_creature','feed_pet','release_pet','pet_follow','pet_stay','pet_guard'].includes(command?.action))return COMPANIONS.apply(world,command);
  if(['mill_grind','mill_sack'].includes(command?.action))return MILLING.apply(world,command);
  if(command?.action==='run_workshop')return WORKSHOPS.applyPlayer(world,command);
+ if(command?.action==='serve_customer')return NPC_COMMERCE.serve(world,command);
  if(['repair_workshop','hire_repair'].includes(command?.action))
   return MAINTENANCE.apply(world,command);
  if(['buy_business','set_business_price','set_assistant','set_production',
