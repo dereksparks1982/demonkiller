@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.62 / M64 | 2026-11-08 | Collision-aware NPC traffic and blocked gate arrivals
+
+- NPC route selection now checks actual occupied tiles by living players, other NPCs, monsters and companions. Ghosts remain intangible. Every allowed step remains cardinal.
+- Cross-region portals validate their destination tile's occupancy. Congested streets get legal detours, gates wait if blocked, and actors stop beside rather than on top of occupied targets.
+- Added durable per-NPC movement/blocked-step records and throttled traffic-jam events, all tied to exact world minutes.
+- New residents receive separate traffic records, while legacy M63 worlds migrate without losing characters or world history.
+- Read-only `GET /api/v1/traffic`; nine focused test cases for crowd avoidance, gate queues, duplicate ticks and save validation.
+- Existing M61–M63 guards, garrison care and refugees retain their behavior, with safer movements. No visible toolbar, imported assets or cutscene changes.
+
 ## v0.2.61 / M63 | 2026-11-08 | Civilian evacuation and homecoming
 
 - Saved per-NPC refuge status: home, evacuating, sheltered, returning, stranded or lost. Occupied towns trigger real journeys over the existing cardinal navigation and inter-region portals.

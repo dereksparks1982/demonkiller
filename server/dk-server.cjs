@@ -16,6 +16,7 @@ const SPAWNERS=require('./spawners-m59.cjs');
 const GUARDS=require('./guard-watch-m61.cjs');
 const GARRISON=require('./garrison-m62.cjs');
 const REFUGEES=require('./refugees-m63.cjs');
+const TRAFFIC=require('./npc-traffic-m64.cjs');
 const MONSTER_AI=require('./monster-ai-m60.cjs');
 const {ensure:ensureStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,counts:assertEntityCounts,inspect:inspectEntities}=require('./entity-registry-m10.cjs');
@@ -172,6 +173,7 @@ async function createDKServer({
     const guardsAdded=GUARDS.ensure(world);
     const garrisonAdded=GARRISON.ensure(world);
     const refugeesAdded=REFUGEES.ensure(world);
+    const trafficAdded=TRAFFIC.ensure(world);
     const storageAdded=ensureStorage(world);
     const playerAdded=Object.values(world.characters).some(c=>ensureProgress(c));
     const bountiesAdded=BOUNTIES.ensure(world);
@@ -212,7 +214,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -745,6 +747,10 @@ async function createDKServer({
       const c=world.characters['1'];
       if(!c)return sendJSON(res,404,{error:'No character exists'},method);
       return sendJSON(res,200,lawListing(world),method);
+    }
+    if(url.pathname==='/api/v1/traffic'&&!write){
+      const character=world.characters?.['1'];
+      return sendJSON(res,200,TRAFFIC.listing(world,character?.area_id||null),method);
     }
     if(url.pathname==='/api/v1/refugees'&&!write){
       const character=world.characters?.['1'];

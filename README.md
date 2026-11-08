@@ -4,6 +4,12 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M64 | Collision-aware NPC traffic and streaming-world movement
+
+All server-controlled mobile routes now use the existing **cardinal pathfinder with actual actor occupancy**: living characters, NPCs, monsters and companion animals can no longer choose the same tile as another mobile merely because the terrain itself is passable. Ghosts remain intangible. Crowds can navigate around blocked streets and stop adjacent to occupied targets; **portals refuse movement when their arrival tile is occupied**, so characters wait rather than overlap or teleport through one another.
+
+A saved traffic ledger tracks each NPC's position, actual steps, repeated blocked attempts and congestion alerts. Events are throttled to avoid flooding the world archive, and old world records gain missing traffic data without changing NPCs. Refugees from M63, sentries from M61, caravans, citizens and traveling workers use the same real movement constraints. No new UI buttons; diagnostics only at read-only `GET /api/v1/traffic`.
+
 ## M63 | Civilian evacuation, displacement and homecoming
 
 Civilians no longer continue ordinary work as though nothing happened when their settlement falls. The server saves each noncombatant's evacuation state, origin, temporary shelter, arrival and return dates. Surviving residents flee toward a different **actually safe** region via the existing walkable **courtyard/village gates**, never by teleportation. Camps have distinct assigned tiles, and refugees wait until their home territory has stayed safe for **90 simulated minutes** before attempting to return to their actual home positions. If both regions are occupied, civilians become stranded rather than materializing in an imaginary safe city. Death while displaced is irreversible and counted once.

@@ -3,6 +3,21 @@
 // walls, house footprints and portals, not a straight line through scenery.
 const {COURT,VILLAGE,traversable,portal}=require('./regions.cjs');
 const DIRECTIONS=[[0,-1],[1,0],[0,1],[-1,0]];
+function occupiedTiles(world,area_id,actor=null){
+ const used=new Set();
+ const add=(m)=>{
+  if(!m||m.area_id!==area_id||m.id&&actor?.id===m.id||!Number.isInteger(m.x)||
+    !Number.isInteger(m.y)||m.alive===false)return;
+  used.add(m.x+','+m.y);
+ };
+ for(const n of Object.values(world.living?.npcs||{}))add(n);
+ for(const c of Object.values(world.living?.combat?.creatures||{}))add(c);
+ for(const p of Object.values(world.living?.companions?.pets||{}))add(p);
+ const player=world.characters?.['1'];
+ if(player?.area_id===area_id&&player.form==='living'&&player!==actor)
+  used.add(player.x+','+player.y);
+ return used;
+}
 function chooseStep(world,n,dest){
  const area=world.areas[n.area_id];if(!area)return null;
  let tx=dest.x,ty=dest.y;
@@ -12,6 +27,7 @@ function chooseStep(world,n,dest){
   else return null;
  }
  const width=area.width,height=area.height;
+ const occupied=occupiedTiles(world,n.area_id,n);
  if(tx<0||ty<0||tx>=width||ty>=height)return null;
  if(n.x===tx&&n.y===ty)return null;
  const length=width*height,seen=new Uint8Array(length);
@@ -28,7 +44,7 @@ function chooseStep(world,n,dest){
   if(here===goal){best=here;break;}
   for(const [dx,dy] of DIRECTIONS){
    const x=cx+dx,y=cy+dy;
-   if(x<0||y<0||x>=width||y>=height)continue;
+   if(x<0||y<0||x>=width||y>=height||occupied.has(x+','+y))continue;
    const k=y*width+x;if(seen[k])continue;
    const link=portal(world,n.area_id,x,y);
    if((link&&link.blocked)||(!link&&!traversable(area,x,y)))continue;
@@ -45,8 +61,11 @@ function chooseStep(world,n,dest){
  const jump=portal(world,n.area_id,x,y);
  if(jump){
   if(jump.blocked)return null;
+  // Gate arrivals must yield to real occupants, not overlap on the far side.
+  if(occupiedTiles(world,jump.area_id,n).has(jump.x+','+jump.y))
+   return null;
   return {area_id:jump.area_id,x:jump.x,y:jump.y};
  }
  return {area_id:n.area_id,x,y};
 }
-module.exports={chooseStep};
+module.exports={chooseStep,occupiedTiles};

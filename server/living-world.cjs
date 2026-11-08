@@ -11,6 +11,7 @@ const SPAWNERS=require('./spawners-m59.cjs');
 const GUARDS=require('./guard-watch-m61.cjs');
 const GARRISON=require('./garrison-m62.cjs');
 const REFUGEES=require('./refugees-m63.cjs');
+const TRAFFIC=require('./npc-traffic-m64.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
@@ -151,10 +152,12 @@ function minuteTick(world,m,generated){
    state==='recover'?'recovering':n.area_id!==desired.area_id?'traveling':
    n.x===desired.x&&n.y===desired.y?(day?'working':'resting'):'walking';
   if(m%5===0){
-   if(npcStep(n,world,desired))
+   const moved=npcStep(n,world,desired);
+   if(moved)
     generated.push(event(living,m,'npc.move',
       n.name+' moved in '+n.area_id+'.',
       {npc_id:n.id,area_id:n.area_id,x:n.x,y:n.y}));
+   TRAFFIC.observe(world,n,desired,m,moved,generated);
    changeStatus(n,status,m,living,generated);
   }
   if(m%30===0){
@@ -250,6 +253,7 @@ function advance(world,now=Date.now(),limit=180){
  GUARDS.ensure(next);
  GARRISON.ensure(next);
  REFUGEES.ensure(next);
+ TRAFFIC.ensure(next);
  ensureMobileAssets(next);
  ensureLaw(next);
  ensureDistricts(next);

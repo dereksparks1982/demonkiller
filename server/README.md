@@ -1,6 +1,12 @@
-# DK Server M63 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M64 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M64 crowd-safe movement, portal arrival queues and saved traffic metrics
+
+`server/npc-navigation-m6.cjs` now creates an occupancy set from saved living NPCs, monsters, pets and the living character before breadth-first pathfinding. The original terrain wall, roof and portal checks still apply. The pathfinder can approach an occupied goal and stop beside it, or detour around traffic, but it will not place the actor on an occupied tile. Inter-region portal destinations are checked separately and wait when the arrival tile is occupied. Ghosts are nonblocking. This extends the same cardinal movement system used by M63 refugees and M61 guards without bypassing the world or inventing interpolation positions.
+
+`server/npc-traffic-m64.cjs` maintains per-NPC last position, checks, steps and blocked intervals. The traffic report records only actual world movement, suppresses repeated events for the same minute, and records persistent stalls after consecutive blocked intervals. No state is changed by requesting `GET /api/v1/traffic`. The records are saved and validated, including migrations for older M63 worlds and new NPC successors. Nine test cases are included in `tests/npc-traffic-m64.cjs`. Full Node/browser integration remains to be verified.
 
 ## M63 civilians can flee, take shelter and return to their occupations
 
