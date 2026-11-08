@@ -6,26 +6,29 @@
 (function(root){
 'use strict';
 const CATEGORY_ASSETS=Object.freeze({
- foundations:'walls',materials:'floors',rooms:'structure',
+ foundations:'walls',materials:'floors',terrain:null,rooms:'structure',
  objects:'furniture',staff:'npcs',utilities:'relics',
  deployment:'library',logistics:'items',
  intelligence:null,emergencies:'npcs',clone:null,planning:null
 });
 const TOOLS=Object.freeze({
  foundations:['move_building','draw_wall','erase_wall','wall_line','room_outline'],
+ terrain:['terrain_ocean','terrain_river','terrain_mountain','terrain_rock',
+  'terrain_grass','terrain_forest','terrain_marsh','terrain_beach',
+  'terrain_raise','terrain_lower','terrain_smooth','terrain_flatten'],
  materials:['paint_path','paint_grass','paint_dirt','paint_garden','paint_stone','brush_rect'],
  rooms:['place_door','erase_door','room_outline','inspect'],
  objects:['select','move_object','place_object','rotate_object','erase_object'],
  staff:['place_npc','select','inspect'],
  utilities:['move_fixture','place_fixture','inspect'],
  deployment:['spawn','place_object','select'],
- logistics:['export','save','undo','redo'],
+ logistics:['export','export_world','save','undo','redo'],
  intelligence:['inspect','select'],
  emergencies:['place_npc','erase_object'],
  clone:['copy','paste','duplicate'],
  planning:['select','move_building','brush_rect','export']
 });
-const ACTIONS=new Set(['export','save','undo','redo']);
+const ACTIONS=new Set(['export','export_world','save','undo','redo']);
 const ROTATIONS=[0,1,2,3];
 function create(host){
  if(!host||typeof host.available!=='function'||typeof host.execute!=='function')

@@ -30,7 +30,7 @@ test('M68 only temple retains its old playable architecture',()=>{
  assert.equal(W.validateWorld(w),w);
 });
 test('M68 four 128x128 overhead regions are part of one fixed 4096x4096 world grid',()=>{
- const w=fresh();assert.equal(T.MASTER,4096);assert.equal(T.SIZE,128);
+ const w=fresh();assert.equal(T.MASTER,9216);assert.equal(T.SIZE,128);
  assert.equal(T.SECTOR,16);assert.equal(T.TILE,32);
  assert.equal(T.IDS.length,4);
  for(const id of T.IDS){

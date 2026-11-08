@@ -2,7 +2,7 @@
 // M67: Code-only replacement-world topology. No legacy temple, village,
 // courtyard, artwork, map image, paths, NPCs or settlements are imported.
 // The old areas remain isolated until their dependent gameplay is migrated.
-const SCHEMA=1, WIDTH=4096, HEIGHT=4096, TILE=32, SECTOR=16, CELL=128;
+const SCHEMA=1, WIDTH=9216, HEIGHT=9216, TILE=32, SECTOR=16, CELL=128;
 const DIRECTIONS=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
 function integer(value,label,min,max){
  if(!Number.isSafeInteger(value)||value<min||value>max)throw Error('Invalid '+label);
@@ -55,7 +55,7 @@ function step(x,y,direction){
  return nx<0||ny<0||nx>=WIDTH||ny>=HEIGHT?null:tile(nx,ny);
 }
 function blank(){
- // Only structural plans are stored. Empty terrain is not a 16M-tile array.
+ // Only structural plans are stored. No 85M-tile allocation.
  return {schema:SCHEMA,width:WIDTH,height:HEIGHT,tile_size:TILE,
   sector_size:SECTOR,cell_size:CELL,buildings:{}};
 }
@@ -78,10 +78,12 @@ function validBuilding(id,b){
 function validate(world){
  const plan=world?.world_grid;
  if(plan===undefined)return true; // Accept pre-M67 saves; ensure() migrates.
- if(!plan||plan.schema!==SCHEMA||plan.width!==WIDTH||plan.height!==HEIGHT||
+ if(!plan||plan.schema!==SCHEMA||
+  !((plan.width===WIDTH&&plan.height===HEIGHT)||
+    (plan.width===4096&&plan.height===4096))||
   plan.tile_size!==TILE||plan.cell_size!==CELL||plan.sector_size!==SECTOR||
   !plan.buildings||Array.isArray(plan.buildings)||typeof plan.buildings!=='object'||
-  Object.keys(plan).some(key=>!['schema','width','height','tile_size','sector_size','cell_size','buildings'].includes(key)))
+  Object.keys(plan).some(key=>!['schema','width','height','tile_size','sector_size','cell_size','buildings','terrain'].includes(key)))
   throw Error('Invalid replacement world grid');
  const entries=Object.entries(plan.buildings);
  if(entries.length>4096)throw Error('Too many building drafts');
@@ -99,7 +101,11 @@ function validate(world){
 function ensure(world){
  if(!world||!world.areas||!world.characters)throw Error('World required');
  if(world.world_grid===undefined){world.world_grid=blank();return true;}
- validate(world);return false;
+ validate(world);
+ if(world.world_grid.width===4096&&world.world_grid.height===4096){
+  world.world_grid.width=WIDTH;world.world_grid.height=HEIGHT;return true;
+ }
+ return false;
 }
 function planBuilding(world,input){
  ensure(world);

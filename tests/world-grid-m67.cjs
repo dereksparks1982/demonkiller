@@ -14,10 +14,10 @@ test('M67 replacement-world grid is empty, code-only and independent of old maps
  assert.equal(JSON.stringify(w.world_grid).includes('temple'),false);
  assert.equal(JSON.stringify(w.world_grid).includes('village'),false);
  const status=GRID.overview(w);
- assert.deepEqual(status.world_tiles,{width:4096,height:4096});
+ assert.deepEqual(status.world_tiles,{width:9216,height:9216});
  assert.equal(status.tile_size,32);
- assert.deepEqual(status.sectors,{size:16,columns:256,rows:256});
- assert.deepEqual(status.streaming_cells,{size:128,columns:32,rows:32});
+ assert.deepEqual(status.sectors,{size:16,columns:576,rows:576});
+ assert.deepEqual(status.streaming_cells,{size:128,columns:72,rows:72});
  assert.equal(status.legacy_scenes_imported,false);
  assert.equal(status.planned_buildings,0);
 });
@@ -31,15 +31,15 @@ test('M67 cell and sector addressing agrees across boundaries and corners',()=>{
  assert.equal(b.cell.local_x,0);
  assert.deepEqual(GRID.cellBounds(31,31),{x:3968,y:3968,width:128,height:128});
  assert.deepEqual(GRID.sectorBounds(255,255),{x:4080,y:4080,width:16,height:16});
- assert.equal(GRID.tile(4095,4095).cell.id,'dk.cell.world.31.31');
- for(const pair of [[-1,0],[4096,0],[0,4096],[0,1.5],[NaN,0]])
+ assert.equal(GRID.tile(9215,9215).cell.id,'dk.cell.world.71.71');
+ for(const pair of [[-1,0],[9216,0],[0,9216],[0,1.5],[NaN,0]])
   assert.throws(()=>GRID.tile(...pair),/Invalid/);
 });
 
 test('M67 cardinal steps cross cells without teleporting or diagonals',()=>{
  assert.deepEqual([GRID.step(127,25,'east').x,GRID.step(127,25,'east').y],[128,25]);
  assert.equal(GRID.step(0,25,'west'),null);
- assert.equal(GRID.step(4095,4095,'south'),null);
+ assert.equal(GRID.step(9215,9215,'south'),null);
  assert.throws(()=>GRID.step(20,20,'northeast'),/Cardinal/);
  assert.deepEqual(GRID.neighborCells(0,0),{
   north:null,east:'dk.cell.world.1.0',south:'dk.cell.world.0.1',west:null});
@@ -76,7 +76,19 @@ test('M67 initializes a fresh server world without importing any old scene into 
  const w=W.makeWorld(Date.UTC(2026,10,8));
  assert.equal(GRID.validate(w),true);
  assert.equal(GRID.overview(w).planned_buildings,0);
- assert.equal(w.world_grid.width,4096);
+ assert.equal(w.world_grid.width,9216);
  assert.deepEqual(w.world_grid.buildings,{});
  assert.equal(W.validateWorld(w),w);
+});
+
+test('M69 extends an old 4096 world grid without losing building drafts',()=>{
+ const w=sample();GRID.ensure(w);
+ GRID.planBuilding(w,{id:'old_mill',kind:'mill',x:100,y:100,width:8,height:8});
+ w.world_grid.width=4096;w.world_grid.height=4096;
+ assert.equal(GRID.validate(w),true);
+ assert.equal(GRID.ensure(w),true);
+ assert.equal(w.world_grid.width,9216);
+ assert.equal(w.world_grid.height,9216);
+ assert.equal(w.world_grid.buildings.old_mill.kind,'mill');
+ assert.equal(GRID.tile(9215,9215).cell.id,'dk.cell.world.71.71');
 });

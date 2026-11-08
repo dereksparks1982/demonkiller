@@ -1,29 +1,26 @@
-# DK Architect | Temple-first development plan
+# DK Architect | Current Terrain and Construction Direction
 
-## Locked design principles
+The former temple-only plan was superseded when the owner retired the old temple/village layouts and approved a new **9,216 × 9,216-tile** world. The original text is preserved at [history/architect-plan-temple-era.md](history/architect-plan-temple-era.md).
 
-- Use original Gothic/noir artwork inspired by the clarity and interconnected world structure of classic top-down adventure games, **not** borrowed Zelda artwork.
-- Base construction grid: **32 × 32 pixel tiles**. Objects may occupy several rectangular grid cells. Every object has a stable ID, exact X/Y grid coordinates, footprint and optional interaction/state.
-- **Cardinal directions only:** North, east, south, west; rotations at 0°, 90°, 180°, 270°. No diagonal walls or diagonal placement.
-- A **room** is an area with its own `area_id` and size, from one tiny chamber to a huge playable meadow. Later rooms form a non-linear connected graph rather than one huge global grid.
-- For now, work **only in `dk.temple.sacrifice.001`**. Do not build the courtyard or other world regions until approved.
-- Maintain both opening routes: take the crystal and become mortal, or avoid it and continue as a ghost. The ghost-only completion route is a long-term secret design goal, not yet implemented.
+**Canonical reference:** [Demon Killer master roadmap](demon-killer-master-roadmap.md).  
+**Implementation and handoff:** [development-handoff.md](development-handoff.md).
 
-## Next substantial temple + editor build
+## Working editor contract
 
-1. Actual semi-transparent sprite placement preview attached to the pointer, with exact multi-tile footprint and green/red validity.
-2. **Mouse wheel rotates the unplaced preview** one cardinal step in either direction (only when the placement tool is active). **Rotate button** rotates a *selected already-placed* item or a wall; never silently rotates the unplaced preview.
-3. Produce real directional art, not just mechanically turn the same sprite image, for directional furniture, doors, statues and characters. Symmetric terrain can reuse one view.
-4. Auto-joining walls: horizontal/vertical runs, corners, ends, T junctions, crossings, entrances and compatible door frames. Never diagonal.
-5. Visual asset browser: searchable categories and thumbnails for architecture, ritual props, floors, furniture and eventually terrain.
-6. Decorate the **same** sacrificial temple convincingly: ritual banners, carved stone details, torches/braziers, candle clusters, offerings, ruined columns, stains, chains and additional altarpieces. Preserve the established altar, crystal and player choice unless approved otherwise.
-7. Improve object inspector: stable ID, X/Y coordinate, orientation, footprint, blocking, interaction and custom properties. Add tests for editor actions and save round trips.
-8. Carefully layer light, shadows and atmospheric effects so they enhance spatial legibility; they must not hide the grid during editing.
+Use one coherent toolbar combining the existing Prison Architect-like object/build categories and Cities: Skylines-like terrain brushes.
 
-## Later, after temple acceptance
+- Left drag paints terrain, changes elevation or places a structure.
+- Hold right mouse and drag to pan the map. A movement click in play mode is separate.
+- Mouse wheel zooms the map; active object preview rotation follows existing placement-mode rules.
+- Terrain strokes save automatically to the authoritative server in connected play. GitHub Pages is only a browser preview.
+- Provide undo/redo, elevation inspection and full/world-cell export via server.
+- All world state is partitioned into 128×128 Streaming Cells, 16×16 sectors and a 9,216² global coordinate system.
+- Respect actor/structure collision, cardinal movement and server-authoritative revisions.
 
-Variable-sized areas, culling, camera panning/zooming, doorway transition data, area state persistence and the connected courtyard. Build one area at a time and do not mutate accepted room geometry without approval.
+## Current boundaries
 
-## Release discipline
+M69 supports a sparse terrain ledger, material painting, signed height editing, a Landscape menu in the connected existing outdoor editor, limited-area rendering, undo and export. Whole-world navigation, big-brush oceans, realistic height-aware 2.5D terrain, rivers with hydrology, cave authoring, spawner painting and staged construction are **not complete**.
 
-Before a new accepted release: update README and changelog, run contract tests and visual checks, obtain acceptance, commit, annotate a version tag when available, push and verify GitHub. Preserve historical branches and source/license attribution.
+The replacement world should have about one-third ocean, a great navigable river, natural mountains and marshes, six sigil towns (one capital), three villages, three worker camps, and ultimately independent NPC civilization building.
+
+Further work must not reintroduce prefabricated old town/temple geometry. Treat historical architectural notes as archived reference, not active design instructions.

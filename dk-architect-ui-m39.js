@@ -5,13 +5,20 @@
 'use strict';
 const CATEGORIES=[
  ['foundations','▦','FOUNDATIONS',[['move_building','MOVE WHOLE BUILDING','▣'],['draw_wall','BUILD WALL','▥'],['erase_wall','DEMOLISH WALL','⌫'],['wall_line','STRAIGHT WALL','▬'],['room_outline','BUILD ROOM OUTLINE','▢']]],
+ ['terrain','▲','LANDSCAPE',[
+  ['terrain_ocean','OCEAN','≈'],['terrain_river','RIVER','≋'],
+  ['terrain_mountain','MOUNTAIN / CLIFF','▲'],['terrain_rock','ROCK','◆'],
+  ['terrain_grass','GRASS','♣'],['terrain_forest','FOREST','♠'],
+  ['terrain_marsh','MARSH','♧'],['terrain_beach','BEACH','▤'],
+  ['terrain_raise','RAISE LAND','↑'],['terrain_lower','LOWER LAND','↓'],
+  ['terrain_smooth','SMOOTH SLOPES','∿'],['terrain_flatten','FLATTEN','▬']]],
  ['materials','▧','MATERIALS',[['paint_path','STONE PATH','◫'],['paint_grass','GRASS','♣'],['paint_dirt','DIRT','░'],['paint_garden','GARDEN','♧'],['paint_stone','STONE FLOOR','▤'],['brush_rect','RECTANGLE BRUSH','□']]],
  ['rooms','▣','ROOMS',[['place_door','INSTALL / MOVE DOOR','▥'],['erase_door','REMOVE DOOR','⌫'],['room_outline','ROOM WALLS','▢'],['inspect','INSPECT ROOM','⌕']]],
  ['objects','◇','OBJECTS',[['select','SELECT','⌖'],['move_object','MOVE OBJECT','✥'],['place_object','PLACE OBJECT','◈'],['rotate_object','ROTATE OBJECT','↻'],['erase_object','DELETE OBJECT','⌫']]],
  ['staff','♟','STAFF',[['place_npc','PLACE ACTOR','♟'],['select','SELECT','⌖'],['inspect','INSPECT','⌕']]],
  ['utilities','⚙','UTILITIES',[['move_fixture','MOVE FIXTURE','✥'],['place_fixture','PLACE FIXTURE','◈'],['inspect','INSPECT','⌕']]],
  ['deployment','⚑','DEPLOYMENT',[['spawn','PLAYER SPAWN','⚑'],['place_object','PLACE SPRITE','◈'],['select','SELECT','⌖']]],
- ['logistics','▤','LOGISTICS',[['export','EXPORT MAP JSON','⇩'],['save','SAVE LAYOUT','▣'],['undo','UNDO','↶'],['redo','REDO','↷']]],
+ ['logistics','▤','LOGISTICS',[['export','EXPORT AREA JSON','⇩'],['export_world','EXPORT SERVER TERRAIN','⇩'],['save','SAVE LAYOUT','▣'],['undo','UNDO','↶'],['redo','REDO','↷']]],
  ['intelligence','⌕','INTELLIGENCE',[['inspect','INSPECT OBJECT','⌕'],['select','SELECT','⌖']]],
  ['emergencies','⚠','EMERGENCIES',[['place_npc','STAGE ACTOR','♟'],['erase_object','REMOVE ACTOR','⌫']]],
  ['clone','▥','CLONE',[['copy','COPY','▣'],['paste','PASTE','▧'],['duplicate','DUPLICATE','⊞']]],

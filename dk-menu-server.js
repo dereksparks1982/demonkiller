@@ -66,6 +66,20 @@
       });
     },
     async clock() { return request('/api/v1/clock'); },
+    async terrainSector(sx,sy) {
+      return request('/api/v1/world/terrain/sector?sx='+sx+'&sy='+sy);
+    },
+    async exportWorldTerrain(cx=null,cy=null) {
+      const suffix=cx===null?'':'?cx='+cx+'&cy='+cy;
+      return request('/api/v1/world/terrain/export'+suffix);
+    },
+    async editWorldTerrain(action,expected_revision,fields={}) {
+      return request('/api/v1/architect/world-terrain',{
+        method:'POST',headers:{'Content-Type':'application/json',
+          'X-DK-Architect':'world-terrain'},
+        body:JSON.stringify({action,expected_revision,...fields})
+      });
+    },
     async regions() { return request('/api/v1/areas'); },
     async area(id) { return request('/api/v1/areas/' + encodeURIComponent(id)); },
     async outdoorInfo(id) {

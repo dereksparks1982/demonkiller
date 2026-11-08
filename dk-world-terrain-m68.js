@@ -1,5 +1,5 @@
 /* DK Softworks M68. True overhead procedural wilderness, 32px tiles.
- * Single coordinate system: a 4096 x 4096 master grid, but ONLY four 128x128
+ * Single coordinate system: a 9216 x 9216 master grid, but ONLY four 128x128
  * regions materialize for this slice. 16x16 sectors stream within each region.
  * All terrain is deterministic from its world tile coordinate, including edges.
  */
@@ -10,7 +10,7 @@
  if(root)root.DKWorldTerrain=api;
 })(typeof window!=='undefined'?window:null,function(){
  'use strict';
- const TILE=32,SIZE=128,MASTER=4096,SECTOR=16;
+ const TILE=32,SIZE=128,MASTER=9216,SECTOR=16;
  const GRID=Object.freeze([[12,14],[13,14],[12,15],[13,15]]);
  const id=(col,row)=>'dk.overworld.c'+col+'r'+row;
  const IDS=Object.freeze(GRID.map(([c,r])=>id(c,r)));

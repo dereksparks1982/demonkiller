@@ -9,6 +9,7 @@ const crypto = require('node:crypto');
 const { makeWorld, validateWorld, createCharacter, playableCharacter, applyCharacterAction, worldClock, AREA_ID, COURT, VILLAGE, ensureRegions, setWorldRunning, checkpointWorldTime } = require('./world.cjs');
 const { localRequestAllowed, serveGame } = require('./local-game.cjs');
 const WORLD_GRID=require('./world-grid-m67.cjs');
+const WORLD_TERRAIN=require('./world-terrain-editor-m69.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
@@ -124,14 +125,14 @@ async function acquireWriterLock(dataDir) {
   throw new Error('Could not acquire DK Server writer lock');
 }
 
-async function readJSON(req) {
+async function readJSON(req, limit=MAX_BODY) {
   if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) {
     const err = new Error('Expected application/json'); err.status = 415; throw err;
   }
   let bytes = 0; const chunks = [];
   for await (const chunk of req) {
     bytes += chunk.length;
-    if (bytes > MAX_BODY) { const err = new Error('Request too large'); err.status = 413; throw err; }
+    if (bytes > limit) { const err = new Error('Request too large'); err.status = 413; throw err; }
     chunks.push(chunk);
   }
   try {
@@ -170,6 +171,7 @@ async function createDKServer({
     world=await loadWorld(dataDir,now());
     const regionsAdded=ensureRegions(world),livingAdded=ensureLivingWorld(world);
     const gridAdded=WORLD_GRID.ensure(world);
+    const terrainAdded=WORLD_TERRAIN.ensure(world);
     const resourcesAdded=ensureResources(world);
     const socialAdded=ensureSocial(world);
     const combatAdded=ensureCombat(world);
@@ -220,7 +222,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(gridAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
+    if(gridAdded||terrainAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -338,6 +340,23 @@ async function createDKServer({
       world=result.world;
       try{await appendEvents([result.event]);}
       catch(error){console.error('Interior draft event archive failed:',error);}
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});
+    return pending;
+  }
+  async function saveWorldTerrain(command){
+    const pending=writeQueue.then(async()=>{
+      // Authoring is permitted while the world simulation is paused.
+      // The server, not the browser, validates geometry and writes the ledger.
+      const result=WORLD_TERRAIN.edit(world,command);
+      validateWorld(result.world);
+      await snapshots.save(result.world,{forceBackup:true});
+      world=result.world;spatialCache=null;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('World terrain history failed:',error);}
+      for(const viewer of streams)push(viewer,'world.terrain.edited',
+        {revision:world.revision,changed:result.changed});
       return result;
     });
     writeQueue=pending.catch(()=>{});
@@ -468,6 +487,43 @@ async function createDKServer({
         return sendJSON(res,400,{error:'Invalid world tile coordinates'},method);
       return sendJSON(res,200,WORLD_GRID.overview(world,
         x===null?null:Number(x),y===null?null:Number(y)),method);
+    }
+    if(url.pathname==='/api/v1/world/terrain/sector'&&!write){
+      const sx=url.searchParams.get('sx'),sy=url.searchParams.get('sy');
+      if(!/^(0|[1-9][0-9]{0,2})$/.test(sx||'')||
+         !/^(0|[1-9][0-9]{0,2})$/.test(sy||''))
+        return sendJSON(res,422,{error:'Invalid terrain sector coordinates'},method);
+      try{return sendJSON(res,200,WORLD_TERRAIN.sector(world,Number(sx),Number(sy)),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/world/terrain/export'&&!write){
+      const cx=url.searchParams.get('cx'),cy=url.searchParams.get('cy');
+      if((cx===null)!==(cy===null)||
+         (cx!==null&&(!/^(0|[1-9][0-9]{0,2})$/.test(cx)||
+                     !/^(0|[1-9][0-9]{0,2})$/.test(cy))))
+        return sendJSON(res,422,{error:'Invalid terrain export cell'},method);
+      try{return sendJSON(res,200,WORLD_TERRAIN.exportData(world,
+        cx===null?null:Number(cx),cy===null?null:Number(cy)),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/architect/world-terrain'&&method==='POST'){
+      if(req.headers['x-dk-architect']!=='world-terrain')
+        return sendJSON(res,403,{error:'DK Architect terrain control required'},method);
+      let command;
+      try{command=await readJSON(req,131072);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
+      try{
+        const result=await saveWorldTerrain(command);
+        return sendJSON(res,200,{saved:true,revision:result.revision,
+          changed:result.changed,undo:result.undo},method);
+      }catch(error){
+        if(/Stale world revision/.test(error.message))
+          return sendJSON(res,409,{error:error.message},method);
+        if(/Invalid|Unknown terrain|Terrain|terrain|Duplicate|obstruct|No editable|made no changes/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('World terrain edit failed:',error);
+        return sendJSON(res,500,{error:'World terrain not saved'},method);
+      }
     }
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)

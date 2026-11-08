@@ -4,6 +4,7 @@
 // Forsaken Temple. No player-character progression is shared or invented here.
 const {TEMPLE,COURT,VILLAGE,TERRAIN,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
 const WORLD_GRID=require('./world-grid-m67.cjs');
+const WORLD_TERRAIN=require('./world-terrain-editor-m69.cjs');
 const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
 const {ensureSocial,validateSocial}=require('./social-m6.cjs');
@@ -103,6 +104,7 @@ function makeWorld(now = Date.now()) {
     runtime: { running: true, elapsed_ms: 0, resumed_at_utc: new Date(now).toISOString() }
   };
   WORLD_GRID.ensure(result);
+  WORLD_TERRAIN.ensure(result);
   ensureResources(result);
   ensureSocial(result);
   ensureCombat(result);
@@ -201,6 +203,7 @@ function validateWorld(world) {
   if (!ids.has('sacrifice_altar') || !ids.has('temple_north_door'))
     throw new Error('Required approved temple objects missing');
   WORLD_GRID.validate(world);
+  WORLD_TERRAIN.validate(world);
   if(world.areas[COURT])checkRegion(world.areas[COURT]);
   if(world.areas[VILLAGE])checkRegion(world.areas[VILLAGE]);
   for(const id of TERRAIN.IDS)if(world.areas[id])checkRegion(world.areas[id]);

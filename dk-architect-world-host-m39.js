@@ -27,10 +27,13 @@ const enabled=new Set([
  'erase_door','paint_path','paint_grass','paint_dirt','paint_garden','paint_stone',
  'brush_rect','draw_wall','erase_wall','wall_line','room_outline','export','save',
  'undo','redo','place_object','erase_object','rotate_object','place_npc',
- 'place_fixture','copy','paste','duplicate','spawn'
+ 'place_fixture','copy','paste','duplicate','spawn','export_world',
+ ...Core.TOOLS.terrain
 ]);
 const core=Core.create({
- available:key=>enabled.has(key),
+ available:key=>enabled.has(key)&&(!key.startsWith('terrain_')||
+ Boolean(area?.world_origin&&window.DemonKillerServer?.editWorldTerrain))&&
+ (key!=='export_world'||Boolean(window.DemonKillerServer?.exportWorldTerrain)),
  category:()=>{},
  execute:(action,state)=>{
   if(action==='activate_tool'){
@@ -47,11 +50,15 @@ const core=Core.create({
   }else if(action==='rotate_preview'){
    say('ROTATED '+['NORTH','EAST','SOUTH','WEST'][state.rotation]);draw();
   }else if(action==='export')exportJSON();
+  else if(action==='export_world')exportWorldTerrain();
   else if(action==='save')say('Edits are saved after each operation. EXPORT JSON when finished.');
   else if(action==='undo'||action==='redo')history(action);
  }
 });
 const menu=Menus.create({core,onClose:()=>close()});
+const TERRAIN_TOOLS=Object.freeze({terrain_ocean:'sea',terrain_river:'river',
+ terrain_mountain:'cliff',terrain_rock:'boulder',terrain_grass:'grass',
+ terrain_forest:'forest',terrain_marsh:'marsh',terrain_beach:'beach'});
 function wallArt(){
  const a=selectedAsset;
  if(!a||a.category!=='walls')return {};
@@ -147,7 +154,7 @@ function draw(){
     y:object.door.y+drag.preview.y-object.y}},
    candidate?.ok?'#59e68b4d':'#f34a514f',candidate?.ok?'#8ef5ad':'#fa6a6a');
  }
- if(drag?.kind==='rectangle'&&hover){
+ if((drag?.kind==='rectangle'||drag?.kind==='terrain_rectangle')&&hover){
   const state=bridge.snapshot(),scale=640/state.span,
    x=Math.min(drag.start.x,hover.x),y=Math.min(drag.start.y,hover.y),
    w=Math.abs(drag.start.x-hover.x)+1,h=Math.abs(drag.start.y-hover.y)+1;
@@ -235,11 +242,69 @@ async function submit(action,fields,remember=true){
   say(error.message,true);return false;
  }finally{busy=false;draw();}
 }
+async function submitTerrain(action,fields,remember=true){
+ const api=window.DemonKillerServer;
+ if(busy||!area?.world_origin||!api?.editWorldTerrain)return false;
+ busy=true;
+ try{
+  const result=await api.editWorldTerrain(action,revision,fields);
+  revision=result.revision;
+  if(remember){
+   undo.push({terrain:true,undo:{action:'restore',fields:{tiles:result.undo}},
+    redo:{action,fields}});
+   redo.length=0;if(undo.length>40)undo.shift();
+  }
+  await load();await bridge.refresh();
+  say('SERVER TERRAIN SAVED · '+result.changed+' tiles · revision '+revision);
+  return true;
+ }catch(error){
+  if(/Stale/.test(error.message)){
+   undo.length=0;redo.length=0;try{await load();}catch(_){}
+  }
+  say(error.message,true);return false;
+ }finally{busy=false;draw();}
+}
+async function exportWorldTerrain(){
+ try{
+  const api=window.DemonKillerServer;
+  if(!api?.exportWorldTerrain)throw Error('Terrain export requires a connected DK Server');
+  const data=await api.exportWorldTerrain();
+  const blob=new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'});
+  const href=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=href;link.download='demon-killer-world-terrain-m69.json';
+  document.body.append(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(href),3000);
+  say('SERVER TERRAIN EXPORTED · '+data.dimensions.width+'×'+data.dimensions.height+
+    ' · revision '+data.world_revision);
+ }catch(error){say(error.message,true);}
+}
+async function paintWorldTerrain(p0,p1,chosenMode){
+ const origin=area?.world_origin,api=window.DemonKillerServer;
+ if(!origin||!api?.editWorldTerrain)
+  return say('World terrain editing requires a connected server wilderness cell',true);
+ const x=origin.x+Math.min(p0.x,p1.x),y=origin.y+Math.min(p0.y,p1.y);
+ const width=Math.abs(p0.x-p1.x)+1,height=Math.abs(p0.y-p1.y)+1;
+ if(width*height>1024)return say('Maximum terrain brush is 1024 tiles',true);
+ const actions={terrain_raise:'raise_elevation',terrain_lower:'lower_elevation',
+  terrain_smooth:'smooth_elevation',terrain_flatten:'flatten_elevation'};
+ const action=actions[chosenMode]||'paint_material',fields={x,y,width,height};
+ if(action==='paint_material')fields.material=TERRAIN_TOOLS[chosenMode];
+ if(action==='flatten_elevation'){
+  try{
+   const sx=Math.floor((origin.x+p0.x)/16),sy=Math.floor((origin.y+p0.y)/16);
+   const sector=await api.terrainSector(sx,sy);
+   fields.target_elevation=sector.tiles[(origin.y+p0.y)%16][(origin.x+p0.x)%16].elevation;
+  }catch(error){return say('Cannot inspect flatten height: '+error.message,true);}
+ }
+ return submitTerrain(action,fields);
+}
 async function history(which){
  const a=which==='undo'?undo:redo,b=which==='undo'?redo:undo;
  if(!a.length){say('Nothing to '+which);return;}
- const item=a.pop(),command=item[which],{action,...fields}=command;
- const ok=await submit(action,fields,false);
+ const item=a.pop(),command=item[which];
+ const {action,...fields}=item.terrain?{action:command.action,...command.fields}:command;
+ const ok=item.terrain?await submitTerrain(action,fields,false):
+  await submit(action,fields,false);
  if(ok)b.push(item);else a.push(item);
 }
 async function exportJSON(){
@@ -265,7 +330,7 @@ async function openEditor(){
 }
 function close(){
  if(!open)return;
- open=false;drag=null;hover=null;canvas.hidden=true;feedback.hidden=true;
+ open=false;drag=null;hover=null;canvas.hidden=true;feedback.hidden=true;canvas.style.cursor='';
  menu.close();document.body.classList.remove('dk-pa-building');
  button.setAttribute('aria-pressed','false');bridge.end();
  game.focus({preventScroll:true});
@@ -284,10 +349,16 @@ canvas.addEventListener('pointerdown',e=>{
  if(!open||busy||!area)return;
  const p=tile(e);if(!p)return;hover=p;
  if(e.button===2){
-  drag={kind:'pan',px:p.px,py:p.py};
+  e.preventDefault();
+  drag={kind:'pan',pointerId:e.pointerId,px:p.px,py:p.py};
+  canvas.style.cursor='grabbing';
   canvas.setPointerCapture(e.pointerId);return;
  }
  if(e.button!==0)return;
+ if(mode.startsWith('terrain_')){
+  drag={kind:'terrain_rectangle',start:p,tool:mode,pointerId:e.pointerId};
+  canvas.setPointerCapture(e.pointerId);draw();return;
+ }
  const wallTools=['draw_wall','erase_wall'];
  if(mode==='move_building'||mode==='move_object'||mode==='move_fixture'){
   const o=pick(p,mode==='move_fixture'?FIXTURES:
@@ -343,9 +414,12 @@ canvas.addEventListener('pointermove',e=>{
  if(!open)return;
  const p=tile(e);if(!p)return;hover=p;
  if(drag?.kind==='pan'){
+  if(e.pointerId!==drag.pointerId)return;
+  if(!(e.buttons&2)){drag=null;canvas.style.cursor='';return draw();}
   const span=bridge.snapshot()?.span||20,dx=(p.px-drag.px)/640*span,
    dy=(p.py-drag.py)/640*span;
   bridge.pan(-dx,-dy);drag.px=p.px;drag.py=p.py;
+  return draw();
  }
  if(drag?.kind==='wall_stroke'){
   const last=drag.last;
@@ -368,10 +442,14 @@ canvas.addEventListener('pointermove',e=>{
 });
 canvas.addEventListener('pointerup',e=>{
  if(!open||!drag)return;
+ if(drag.kind==='pan'&&e.pointerId!==drag.pointerId)return;
  const operation=drag;drag=null;
+ if(operation.kind==='pan')canvas.style.cursor='';
  if(canvas.hasPointerCapture?.(e.pointerId))canvas.releasePointerCapture(e.pointerId);
  const p=tile(e);if(!p)return draw();
- if(operation.kind==='wall_stroke'){
+ if(operation.kind==='terrain_rectangle'){
+  paintWorldTerrain(operation.start,p,operation.tool);
+ }else if(operation.kind==='wall_stroke'){
   submit('wall_batch',{tiles:operation.cells,erase:operation.erase,
    ...(operation.erase?{}:wallArt())});
  }else if(operation.kind==='move'&&operation.preview){
@@ -393,7 +471,10 @@ canvas.addEventListener('pointerup',e=>{
  }
  draw();
 });
-canvas.addEventListener('pointercancel',()=>{drag=null;draw();});
+canvas.addEventListener('pointercancel',()=>{drag=null;canvas.style.cursor='';draw();});
+canvas.addEventListener('lostpointercapture',()=>{
+ if(drag?.kind==='pan'){drag=null;canvas.style.cursor='';draw();}
+});
 canvas.addEventListener('wheel',e=>{
  if(!open)return;e.preventDefault();
  if((mode==='place_object'||mode==='paste'||mode==='draw_wall')&&!e.shiftKey){core.rotate(e.deltaY>0?1:-1);return;}

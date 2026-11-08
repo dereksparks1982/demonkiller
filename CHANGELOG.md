@@ -1,3 +1,14 @@
+## v0.2.67 / M69 | 2026-11-08 | Authoritative world terrain painting and documentation reorganization
+
+- Expanded the replacement world's coordinate bounds to 9,216 × 9,216 tiles (72 × 72 Streaming Cells, 576 × 576 detailed 16-tile sectors), including non-destructive migration of legacy 4,096 × 4,096 grid records.
+- Added sparse world-terrain edit persistence for terrain types and signed elevations, supporting painting, raise/lower, flatten, smooth and exact previous-overrides restore. Brush operations validate all tiles before applying any changes and reject stale server revisions and obstructed footprints.
+- Added revision-checked, serialized and checkpointed world-terrain mutations in DK Server, read-only per-sector inspection, full sparse world export and optional cell-scoped export. Materialized wilderness areas update their authoritative floor data for collision and renderer refresh; unmaterialized regions remain sparse, not invented playable land.
+- Added the Landscape menu to the existing DK Architect toolbar, with paint and height tools, immediate server auto-save per completed stroke, undo/redo, export, and robust right-mouse pointer-capture map panning. No fabricated save behavior for the static GitHub Pages preview.
+- Fixed DK Server's static allowlist so the M68 wilderness-terrain script can load in the connected browser.
+- Moved technical README history into docs/history/, replaced both READMEs with concise player and operator guides, and added comprehensive world and feature roadmap, source handoff and release notes.
+- Added M69 tests for boundaries, terrain paint/collision, height edits, persistence, export, stale edits and editor/server contracts. Full Node suite and live browser interaction require verification in a checked-out environment.
+- No new images, premade buildings, whole-world raster allocation, public hosting or fully implemented 2.5D terrain renderer.
+
 ## 0.2.66 | M68 (2026-11-08)
 
 - Replaced the previously populated outdoor courtyard with wooded temple grounds. Retained only the temple exterior and Lilith's willow; removed the courtyard homes, stalls and old gateway.
