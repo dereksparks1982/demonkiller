@@ -8,7 +8,7 @@ const TILE_FIELDS=['floor','walls','wallStyles','wallVariants','wallPacks','wall
 const BASE={floor:'grass',walls:0,wallStyles:'clean',wallVariants:null,
  wallPacks:'ox72i',wallRotations:0,floorArt:null};
 const GROUND=new Set(['grass','path','garden','dirt','stone']);
-const DECOR=new Set(['grass','path','garden','dirt','stone']);
+const DECOR=new Set(['grass','dirt']);
 function integer(v){return Number.isSafeInteger(v);}
 function at(a,x,y){return y*a.width+x;}
 function inside(a,x,y){return integer(x)&&integer(y)&&x>=1&&y>=1&&x<a.width-1&&y<a.height-1;}
@@ -69,6 +69,9 @@ function syncAttached(world,object,area_id){
   stock.y=object.door?object.door.y+1:object.y;}
 }
 function freeOutside(area,object,x,y){
+ if((x===object.x||x===object.x+object.w-1)&&
+    (y===object.y||y===object.y+object.h-1))
+  throw Error('Door cannot occupy a building corner');
  let outside=null;
  if(x===object.x)outside={x:x-1,y};
  else if(x===object.x+object.w-1)outside={x:x+1,y};
@@ -131,6 +134,7 @@ function edit(world,command){
    const i=at(area,x,y),row=image[n++];
    TILE_FIELDS.forEach((field,k)=>{area[field][i]=row[k];});
   }
+  if(target.door)freeOutside(area,target,target.door.x,target.door.y);
   syncAttached(next,target,id);
  }else if(action==='move_fixture'){
   target=editable(area,command.object_id,FIXTURES);
@@ -143,6 +147,11 @@ function edit(world,command){
    throw Error('Fixture destination is blocked');
   for(const other of area.objects)if(other.id!==target.id&&overlaps(rect(other),rect(pos)))
    throw Error('Fixture overlaps another object');
+  const player=next.characters?.['1'];
+  if(player?.area_id===id&&player.x===pos.x&&player.y===pos.y)
+   throw Error('Fixture destination is occupied by the player');
+  if(Object.values(next.living.npcs||{}).some(n=>n.alive&&n.area_id===id&&n.x===pos.x&&n.y===pos.y))
+   throw Error('Fixture destination is occupied by an NPC');
   target.x=pos.x;target.y=pos.y;
  }else if(action==='set_door'||action==='remove_door'){
   target=editable(area,command.object_id,BUILDINGS);

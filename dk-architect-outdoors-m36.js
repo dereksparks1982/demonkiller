@@ -280,7 +280,10 @@ document.addEventListener('keydown',e=>{
  if(e.key==='y'||e.key==='Y'){history('redo');return;}
  if(/^[1-6]$/.test(e.key))modeSet(MODES[Number(e.key)-1]);
 });
-const slot=new URLSearchParams(location.search).get('dkSlot');
+const params=new URLSearchParams(location.search);
+const wanted=params.get('area_id');
+if(wanted===COURT||wanted===VILLAGE)$('region').value=wanted;
+const slot=params.get('dkSlot');
 if(slot==='1')$('returnGame').href='./outdoor.html?dkSlot=1&walk=continuous1';
 if(!api)status('Open the local DK Server at 127.0.0.1. The public preview cannot edit world saves.',true);
 else reload(false).then(()=>status('Ready. Select a building, drag it, edit doors, and EXPORT JSON.'))
