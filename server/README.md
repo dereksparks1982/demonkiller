@@ -1,6 +1,12 @@
-# DK Server M66 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M67 | Empty Replacement-World Grid (v2.31.11)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M67 code-only replacement-world topology
+
+`server/world-grid-m67.cjs` supplies an independent, blank 4096 × 4096 tile coordinate system, 128 × 128 Streaming Cells, 16 × 16 sectors, strict cardinal movement and durable draft building footprints. Unlike the old `world.areas`, `world.world_grid` starts with no structures or predefined geography. Server startup migrates older saves by adding this empty structure without replacing character, NPC, market or other legacy state. No publicly exposed write routes are added.
+
+`GET /api/v1/world/grid` reports dimensions, streaming partitioning and draft counts. Optional `?x=128&y=128` returns tile-to-cell and tile-to-sector coordinates. Existing temple/courtyard/village modules are still needed by M66 gameplay and are deliberately isolated pending a safe removal; **they are not part of the new world blueprint**.
 
 ## M66 physical construction and resource-backed settlement rebuilding
 

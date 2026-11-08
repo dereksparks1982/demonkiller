@@ -8,6 +8,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { makeWorld, validateWorld, createCharacter, playableCharacter, applyCharacterAction, worldClock, AREA_ID, COURT, VILLAGE, ensureRegions, setWorldRunning, checkpointWorldTime } = require('./world.cjs');
 const { localRequestAllowed, serveGame } = require('./local-game.cjs');
+const WORLD_GRID=require('./world-grid-m67.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
@@ -168,6 +169,7 @@ async function createDKServer({
     await snapshots.init();
     world=await loadWorld(dataDir,now());
     const regionsAdded=ensureRegions(world),livingAdded=ensureLivingWorld(world);
+    const gridAdded=WORLD_GRID.ensure(world);
     const resourcesAdded=ensureResources(world);
     const socialAdded=ensureSocial(world);
     const combatAdded=ensureCombat(world);
@@ -218,7 +220,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
+    if(gridAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -457,6 +459,16 @@ async function createDKServer({
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
       { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m36', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
+    if (url.pathname === '/api/v1/world/grid' && !write) {
+      const x=url.searchParams.get('x'),y=url.searchParams.get('y');
+      if ((x===null)!==(y===null)||
+          (x!==null&&!/^(0|[1-9][0-9]{0,3})$/.test(x))||
+          (y!==null&&!/^(0|[1-9][0-9]{0,3})$/.test(y))||
+          (x!==null&&(Number(x)>=WORLD_GRID.WIDTH||Number(y)>=WORLD_GRID.HEIGHT)))
+        return sendJSON(res,400,{error:'Invalid world tile coordinates'},method);
+      return sendJSON(res,200,WORLD_GRID.overview(world,
+        x===null?null:Number(x),y===null?null:Number(y)),method);
+    }
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
       return sendJSON(res,200,{regions:Object.values(world.areas).map(a=>({

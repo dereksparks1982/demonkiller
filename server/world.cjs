@@ -3,6 +3,7 @@
 // DK Server's first immutable-area snapshot mirrors the approved playable
 // Forsaken Temple. No player-character progression is shared or invented here.
 const {TEMPLE,COURT,VILLAGE,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
+const WORLD_GRID=require('./world-grid-m67.cjs');
 const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
 const {ensureSocial,validateSocial}=require('./social-m6.cjs');
@@ -100,6 +101,7 @@ function makeWorld(now = Date.now()) {
     characters: {},living:seed(),
     runtime: { running: true, elapsed_ms: 0, resumed_at_utc: new Date(now).toISOString() }
   };
+  WORLD_GRID.ensure(result);
   ensureResources(result);
   ensureSocial(result);
   ensureCombat(result);
@@ -197,6 +199,7 @@ function validateWorld(world) {
   }
   if (!ids.has('sacrifice_altar') || !ids.has('temple_north_door'))
     throw new Error('Required approved temple objects missing');
+  WORLD_GRID.validate(world);
   if(world.areas[COURT])checkRegion(world.areas[COURT]);
   if(world.areas[VILLAGE])checkRegion(world.areas[VILLAGE]);
   if(world.living)validateLiving(world.living);

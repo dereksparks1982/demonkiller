@@ -4,6 +4,14 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M67 | Empty replacement-world grid and editable building foundations
+
+The existing temple, courtyard and village layouts are **retired from the design of the replacement world**. M67 adds a separate, server-saved, initially empty **4,096 × 4,096 tile grid** with 32 px logical tiles, 16 × 16 terrain sectors and 128 × 128 Streaming Cells. The new grid has **zero imported structures or scenery**. Global coordinates, cardinal steps, cross-cell bounds and draft structure footprints are implemented without allocating millions of tiles or generating a new map illustration.
+
+A draft building footprint may straddle sector and cell borders; overlaps, invalid coordinates and corrupt save records are rejected. These are **plans, not instantly built or player-usable structures**. No construction materials are fabricated, no economy rules bypassed, and no new client write commands are exposed. Read-only `GET /api/v1/world/grid` and `?x=128&y=128` report the replacement grid and coordinate addressing.
+
+**Transition limitation:** The existing browser game and M66 economy still require the legacy named regions. Their content is not imported into the new grid, but remains in the legacy runtime during migration. The new location and opening story will be rebuilt later, with no new artwork or replacement scene in M67. Tests cover grid addressing, movement, drafts and old-save migration.
+
 ## M66 | Physical rebuilding with serialized materials and paid crews
 
 A monster occupation now leaves **physical damage records against actual shop and service buildings**. M65's recovery ledger cannot declare peace merely because residents return and a business briefly opens: every damaged site must also finish reconstruction. The normal shop-hour and manual production rules keep damaged workshops, the mill and destroyed storefronts closed until their structural condition is restored. Existing M50 equipment breakdowns remain separate from building damage, so a rebuilt smithy may still need a machinery repair.

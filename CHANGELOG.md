@@ -1,3 +1,10 @@
+## 0.2.65 | M67 (2026-11-08)
+
+- Introduced a clean 4096 × 4096 global world-grid model, partitioned into 16-tile sectors and 128-tile Streaming Cells, without importing the retired temple, courtyard or village scenery.
+- Added cardinal coordinate stepping, adjacent-cell addressing and cross-boundary building draft placement with strict geometry and overlap validation.
+- Added persisted, empty world-grid metadata and non-destructive migration for older saves.
+- Added read-only world-grid diagnostics and focused M67 regression tests. Legacy browser scenes remain available only during migration; no new art or replacement scene was created.
+
 # Demon Killer Changelog
 
 ## v0.2.64 / M66 | 2026-11-08 | Real-material reconstruction of ruined settlements
