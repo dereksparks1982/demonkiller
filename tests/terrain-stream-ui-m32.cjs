@@ -18,7 +18,8 @@ test('M32 outdoor loads chunk cache before the renderer and retains keyboard-onl
 });
 test('M32 streaming path downloads manifest and chunks without fetching full map first',()=>{
  const code=read('outdoor.js');
- assert.match(code,/if\(SERVER&&window\.DKSectorTerrain\)/);
+ assert.match(code,/if\(SERVER&&window\.DKSectorTerrain&&!window\.DKOutdoorArchitect\?\.isOpen\(\)\)/);
+ assert.match(code,/nextArea=SERVER\?\(await SERVER\.area\(id\)\)\.area:previewArea\(id\)/);
  assert.match(code,/const manifest=await SERVER\.sectorManifest\(id\)/);
  assert.match(code,/candidate\.prime\(player\.x,player\.y\)/);
  assert.match(code,/loadChunk:\(region,sx,sy\)=>SERVER\.sectorChunk\(region,sx,sy\)/);

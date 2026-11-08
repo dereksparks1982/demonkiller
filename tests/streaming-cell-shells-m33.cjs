@@ -52,7 +52,9 @@ test('M33 browser loads cell-shell layer before outdoor rendering and retains wa
  const html=read('outdoor.html'),js=read('outdoor.js');
  assert(html.indexOf('streaming-cell-shells-m33.js')>0);
  assert(html.indexOf('streaming-cell-shells-m33.js')<html.indexOf('outdoor.js?v='));
- assert.match(js,/cellShells\.visible\(area,camera,VIEW\)/);
+ assert.match(js,/cellShells\.visible\(area,camera,viewSpan\)/);
+ assert.match(js,/const viewSpan=VIEW\/editorScale/);
+ assert.match(js,/window\.DKOutdoorArchitectBridge/);
  assert.match(js,/async function refreshCellView\(\)/);
  assert.match(js,/window\.DKStreamingCellShells/);
  assert.match(read('server/local-game.cjs'),/'streaming-cell-shells-m33\.js'/);
