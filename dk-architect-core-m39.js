@@ -22,13 +22,13 @@ const TOOLS=Object.freeze({
  staff:['place_npc','select','inspect'],
  utilities:['move_fixture','place_fixture','inspect'],
  deployment:['spawn','place_object','select'],
- logistics:['export','export_world','save','undo','redo'],
+ logistics:['world_atlas','export','export_world','save','undo','redo'],
  intelligence:['inspect','select'],
  emergencies:['place_npc','erase_object'],
  clone:['copy','paste','duplicate'],
  planning:['select','move_building','brush_rect','export']
 });
-const ACTIONS=new Set(['export','export_world','save','undo','redo']);
+const ACTIONS=new Set(['world_atlas','export','export_world','save','undo','redo']);
 const ROTATIONS=[0,1,2,3];
 function create(host){
  if(!host||typeof host.available!=='function'||typeof host.execute!=='function')

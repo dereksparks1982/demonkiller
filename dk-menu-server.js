@@ -66,6 +66,19 @@
       });
     },
     async clock() { return request('/api/v1/clock'); },
+    async atlasViewport({x,y,scale,columns=72,rows=72}) {
+      return request('/api/v1/world/terrain/atlas?'+
+        new URLSearchParams({x,y,scale,columns,rows}));
+    },
+    async worldCoverage() { return request('/api/v1/world/terrain/coverage'); },
+    async paintAtlasCells(action,expected_revision,fields={}) {
+      return request('/api/v1/architect/world-atlas',{
+        method:'POST',
+        headers:{'Content-Type':'application/json',
+          'X-DK-Architect':'world-atlas'},
+        body:JSON.stringify({action,expected_revision,...fields})
+      });
+    },
     async terrainSector(sx,sy) {
       return request('/api/v1/world/terrain/sector?sx='+sx+'&sy='+sy);
     },

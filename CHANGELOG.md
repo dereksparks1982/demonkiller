@@ -1,3 +1,14 @@
+## v0.2.68 / M70 | 2026-11-08 | DK Architect whole-world pixel painter
+
+- Built the first whole-atlas **DK Architect World Pixel Painter** for all 9,216×9,216 logical tiles (72×72 Streaming Cells), with a direct launcher from main menu Options / persistent server and from the in-game F8 Logistics panel.
+- Matched the existing 32×32 NPC pixel language with a coarse, intentionally simpler-than-UO terrain representation: hard-edged flat-color blocks, no antialiased terrain imagery, high-detail textures, predesigned map backgrounds or new artwork.
+- Added configurable eight-step zoom from entire world (128 tiles per display square) down to individual ground tiles, global right-mouse pan, left-drag rectangular whole-cell and fine material painting, terrain elevation edits, undo/redo, on-demand server export and ocean coverage counter.
+- Added sparse `world_grid.terrain.cells` as a backward-compatible M69 ledger field, rather than allocating 85 million terrain tile objects. A single atomic `fill_cells` operation can paint up to all 5,184 Streaming Cells; fine 16×16 sector overrides retain precedence.
+- Added authoritative `GET /api/v1/world/terrain/atlas` and `GET /api/v1/world/terrain/coverage`, plus revision-checked `POST /api/v1/architect/world-atlas` using the same durable serialized server writer as M69. Full JSON exports now include whole-cell fills.
+- Impassable broad brushes skip occupied/protected temporary M68 cells without canceling all safe cells. Skipped positions are returned to the editor.
+- Added M70 server, pixel painter, coverage, undo, world export and security regression tests. V8 isolated tests passed one-third-ocean fill, restore, tile override and viewport. Full Node regression and browser end-to-end still require local execution.
+- No change to old temple/courtyard scenery, 2.5D game renderer, permanent server hosting, river hydrology or autonomous city simulation.
+
 ## v0.2.67 / M69 | 2026-11-08 | Authoritative world terrain painting and documentation reorganization
 
 - Expanded the replacement world's coordinate bounds to 9,216 × 9,216 tiles (72 × 72 Streaming Cells, 576 × 576 detailed 16-tile sectors), including non-destructive migration of legacy 4,096 × 4,096 grid records.

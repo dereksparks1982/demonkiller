@@ -27,13 +27,14 @@ const enabled=new Set([
  'erase_door','paint_path','paint_grass','paint_dirt','paint_garden','paint_stone',
  'brush_rect','draw_wall','erase_wall','wall_line','room_outline','export','save',
  'undo','redo','place_object','erase_object','rotate_object','place_npc',
- 'place_fixture','copy','paste','duplicate','spawn','export_world',
+ 'place_fixture','copy','paste','duplicate','spawn','export_world','world_atlas',
  ...Core.TOOLS.terrain
 ]);
 const core=Core.create({
  available:key=>enabled.has(key)&&(!key.startsWith('terrain_')||
  Boolean(area?.world_origin&&window.DemonKillerServer?.editWorldTerrain))&&
- (key!=='export_world'||Boolean(window.DemonKillerServer?.exportWorldTerrain)),
+ (key!=='export_world'||Boolean(window.DemonKillerServer?.exportWorldTerrain))&&
+ (key!=='world_atlas'||Boolean(window.DKWorldAtlasM70&&window.DemonKillerServer?.atlasViewport)),
  category:()=>{},
  execute:(action,state)=>{
   if(action==='activate_tool'){
@@ -51,6 +52,11 @@ const core=Core.create({
    say('ROTATED '+['NORTH','EAST','SOUTH','WEST'][state.rotation]);draw();
   }else if(action==='export')exportJSON();
   else if(action==='export_world')exportWorldTerrain();
+   else if(action==='world_atlas'){
+    if(window.DKWorldAtlasM70?.show())
+     say('WORLD ATLAS · PAINT ANYWHERE IN THE 9,216 × 9,216 WORLD');
+    else say('The world atlas requires a connected DK Server.',true);
+   }
   else if(action==='save')say('Edits are saved after each operation. EXPORT JSON when finished.');
   else if(action==='undo'||action==='redo')history(action);
  }
@@ -330,6 +336,7 @@ async function openEditor(){
 }
 function close(){
  if(!open)return;
+ window.DKWorldAtlasM70?.close();
  open=false;drag=null;hover=null;canvas.hidden=true;feedback.hidden=true;canvas.style.cursor='';
  menu.close();document.body.classList.remove('dk-pa-building');
  button.setAttribute('aria-pressed','false');bridge.end();

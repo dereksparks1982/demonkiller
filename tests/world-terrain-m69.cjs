@@ -115,7 +115,7 @@ test('M69 browser and loopback server include terrain editor and safe pan contro
  const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
  const html=read('outdoor.html'),editor=read('dk-architect-world-host-m39.js');
  const client=read('dk-menu-server.js'),server=read('server/dk-server.cjs');
- assert.match(html,/dk-architect-world-host-m39\.js\?v=m69/);
+ assert.match(html,/dk-architect-world-host-m39\.js\?v=m(?:69|70)/);
  assert.match(editor,/setPointerCapture/);
  assert.match(editor,/lostpointercapture/);
  assert.match(editor,/e\.button===2/);

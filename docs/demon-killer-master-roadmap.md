@@ -125,10 +125,12 @@ Additional UO principles worth reviving: single-world Felucia-like risk rather t
 
 **Delivered before this plan:** M67 sparse original 4,096 atlas and building drafts; M68 four walkable overhead wilderness regions, still with legacy story/economy compatibility; many earlier NPC/combat/economy/streaming prototypes. Full RunUO parity and the live new atlas remain unimplemented.
 
+**M70 whole-world pixel painter slice:** directly connected DK Architect atlas, sparse whole-cell ocean/biome fill, 72×72 live world preview down to individual tiles, pixel art deliberately no more detailed than the 32×32 NPCs, server saves, coverage, undo/redo and exports. Coordinates are editable globally, but nonmaterialized world regions are not yet fully playable. Protected legacy M68 cells must not be erased accidentally.
+
 **M69 first slice:** enlarged sparse world topology (9,216²), terrain material/height ledger, revisioned server saves/exports, basic landscape brushes in currently materialized wilderness, improved editor right-drag and technical README relocation.
 
 **Then, in dependency order (numbers are provisional):**
-- **M70:** dedicated whole-world DK Architect viewport, zoomed-out navigation, giant ocean brushes, server-streamed terrain outside the four M68 regions and land/water coverage counters.
+- **M70 delivered foundation:** whole-world DK Architect viewport, zoomed-out navigation, giant ocean/biome cell brushes, server-authored sparse terrain outside the four M68 regions and authored land/water coverage counters. Gameplay streaming into those unmaterialized regions remains pending.
 - **M71:** 2.5D height-aware renderer, slope and cliff collision, autotiling, coherent mountain shape/shading and seam tests.
 - **M72:** water physics, sea level, coastlines, broad river carving, depth and connected navigable Great River.
 - **M73:** underground cells, cave entrances, mines, tunnels, supports and collapse ecology.

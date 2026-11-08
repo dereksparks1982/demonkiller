@@ -11,14 +11,27 @@ const MATERIALS=new Set([
 const SOLID=new Set(['cliff','boulder','crevasse','sea','river','lake','deepwater']);
 const valid=n=>Number.isSafeInteger(n);
 const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
-function blank(){return {schema:SCHEMA,sectors:{}};}
+function blank(){return {schema:SCHEMA,sectors:{},cells:{}};}
 function validate(world){
  const terrain=world?.world_grid?.terrain;
  if(terrain===undefined)return true; // M67/M68 saves acquire an empty ledger.
  if(!terrain||terrain.schema!==SCHEMA||!terrain.sectors||
   typeof terrain.sectors!=='object'||Array.isArray(terrain.sectors)||
-  Object.keys(terrain).some(k=>!['schema','sectors'].includes(k)))
+  Object.keys(terrain).some(k=>!['schema','sectors','cells'].includes(k)))
   throw Error('Invalid world terrain ledger');
+ if(terrain.cells!==undefined){
+  if(!terrain.cells||typeof terrain.cells!=='object'||Array.isArray(terrain.cells))
+   throw Error('Invalid painted cells');
+  const c=Object.entries(terrain.cells);
+  if(c.length>GRID.WIDTH/GRID.CELL*GRID.HEIGHT/GRID.CELL)
+   throw Error('Invalid number of painted cells');
+  for(const [key,material] of c){
+   const m=/^(0|[1-9][0-9]{0,2})\.(0|[1-9][0-9]{0,2})$/.exec(key);
+   if(!m||Number(m[1])>=GRID.WIDTH/GRID.CELL||
+     Number(m[2])>=GRID.HEIGHT/GRID.CELL||!MATERIALS.has(material))
+    throw Error('Invalid painted Streaming Cell');
+  }
+ }
  const entries=Object.entries(terrain.sectors);
  if(entries.length>MAX_SECTORS)throw Error('World terrain sector limit exceeded');
  for(const [name,sector] of entries){
@@ -47,7 +60,11 @@ function ensure(world){
  if(world.world_grid.terrain===undefined){
   world.world_grid.terrain=blank();return true;
  }
- validate(world);return false;
+ validate(world);
+ if(world.world_grid.terrain.cells===undefined){
+  world.world_grid.terrain.cells={};return true;
+ }
+ return false;
 }
 function address(x,y){
  GRID.tile(x,y);
@@ -68,7 +85,8 @@ function areaTile(world,x,y){
 }
 function readTile(world,x,y){
  const a=areaTile(world,x,y),o=override(world,x,y);
- return {x,y,material:o?.material??(a?.area.floor[a.index]??null),
+ return {x,y,material:o?.material??world.world_grid?.terrain?.cells?.[
+   Math.floor(x/GRID.CELL)+'.'+Math.floor(y/GRID.CELL)]??(a?.area.floor[a.index]??null),
   elevation:o?.elevation??(a?.area.elevation?.[a.index]??0),
   override:o?{...o}:null,sector:address(x,y).sector,
   materialized:Boolean(a)};
@@ -190,7 +208,8 @@ function edit(world,command){
   const a=areaTile(nextWorld,u.x,u.y);
   if(a){
    if(u.next.material!==undefined)a.area.floor[a.index]=u.next.material;
-   else if(previous?.material!==undefined)a.area.floor[a.index]=M68.tile(u.x,u.y);
+   else if(previous?.material!==undefined)a.area.floor[a.index]=
+     world.world_grid?.terrain?.cells?.[Math.floor(u.x/GRID.CELL)+'.'+Math.floor(u.y/GRID.CELL)]??M68.tile(u.x,u.y);
    if(u.next.elevation!==undefined||previous?.elevation!==undefined){
     if(!Array.isArray(a.area.elevation))
      a.area.elevation=Array(a.area.width*a.area.height).fill(0);
@@ -242,6 +261,8 @@ function exportData(world,cx=null,cy=null){
    tile_size:GRID.TILE,sector_size:GRID.SECTOR,cell_size:GRID.CELL},
   scope:cx===null?'all':{cell_x:cx,cell_y:cy},
   sectors:structuredClone(sectors),
+  cells:structuredClone(cx===null?data.cells||{}:
+    Object.fromEntries(Object.entries(data.cells||{}).filter(([key])=>key===cx+'.'+cy))),
   building_drafts:cx===null?structuredClone(world.world_grid?.buildings||{}):null,
   legacy_scenes_imported:false};
 }

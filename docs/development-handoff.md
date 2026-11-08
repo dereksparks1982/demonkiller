@@ -4,7 +4,7 @@ This document is the working continuity reference if a conversation thread fills
 
 ## Source and release discipline
 
-Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M69 target version is game **0.2.67**, server **2.31.13**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
+Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The current M70 release target is game **0.2.68**, server **2.31.14**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
@@ -21,6 +21,18 @@ Do not build until explicitly instructed. When authorized: inspect current HEAD,
 - Kilns and heavy industrial equipment should have **very rare** breakdowns after years, not constantly wear out. M50/M66 failures need rebalancing.
 - NPCs must autonomously found differentiated settlements, disagree and secede, trade and make peace or war, operate companies and continue independent lives. Avoid WorldBox's arbitrary population blobs and repetitive all-out war.
 - Study the full private-server mod list in the master roadmap, prioritizing Nerun's Distro, OWLTR, FS-ATS, Xanthos Evo/Shrink, Knives Town Houses and Knives Chat. Do not copy proprietary UO art or unsuitable GPL code into commercial game source.
+
+## M70 added whole-world authoring (November 8, 2026)
+
+M70 introduces `server/world-atlas-m70.cjs` and a whole-world editor route `dk-world-architect-m70.html`. A connected browser may open **Options → Persistent World → Open DK Architect** directly, without running through the temple, or **F8 → Logistics → World Pixel Painter** from the older outdoor editor. The atlas samples any world coordinate at 72×72 display blocks, from 1:128 whole-world down to 1:1 tile painting. It intentionally uses hard-edged flat-color pixel blocks matching the project's original 32×32 NPCs; the owner explicitly asked for a UO-inspired but **less detailed** representation, not a polished or 3D illustration.
+
+The M69 terrain ledger now includes optional sparse **`world_grid.terrain.cells`**, keyed by global Streaming Cell (`cx.cy`), permitting one material fill for an entire 128² tile area. Tile-level M69 overrides take priority. Broad cell paints are atomic, revision-checked and saved durably via `POST /api/v1/architect/world-atlas` with `X-DK-Architect: world-atlas`. The server exposes per-sample viewport and approximate authored-water coverage and includes cell records in the terrain JSON export. A broad impassable stroke skips M68 preview cells with active actors, objects or structures, reporting protected cells. No existing authored objects are erased.
+
+**Do not exaggerate scope:** All coordinates are editable from the new atlas, but full world walkability, terrain streaming into new playable areas, height geometry, connected water simulation, cave levels and automated city-building remain future builds. The old M68 four-cell outdoor preview still exists separately. No new graphics were generated.
+
+**Verification:** Source syntax and isolated V8 terrain/cell mock checks have passed; `tests/world-atlas-m70.cjs` adds Node regression cases. A Linux checkout is still needed to run `npm --prefix server test` and visually confirm browser controls and persistence after restart.
+
+**Next:** M71 height-aware world display and walkability/streaming; M72 freshwater/ocean modeling, rivers and coastlines; then cave editing, spawners and material-backed construction.
 
 ## What M69 implements, and what it does NOT
 
@@ -48,7 +60,7 @@ DK Server `POST /api/v1/architect/world-terrain` uses the normal serial writer, 
 
 Run `npm --prefix server test` from the full Linux checkout (manual-only workflow). Inspect Console errors and Node logs. Start the connected browser game from the loopback server. In a wilderness region enter F8, select Landscape, drag an ocean/mountain/height brush across a 128-tile boundary, confirm revision increases, verify actual collision and scene refresh, verify RMB pan and wheel zoom, undo, reapply, restart server, export and inspect material/heights. Check legacy area construction tools, placement, rotation, walls, doors, export and undo/redo independently. The old town/temple migration is unresolved and cannot be declared removed from runtime until full integration passes.
 
-## Immediate next build guidance
+## Older M69 next-build guidance (superseded by M70 completion)
 
 1. Build a **dedicated 9,216² world-viewport editing camera** so author is not trapped in four sample regions. Support very large ocean brushes and high-volume rasterless fill while streaming edited cells.
 2. Implement height-aware rendering, slopes and ground transitions, not just elevation numbers.

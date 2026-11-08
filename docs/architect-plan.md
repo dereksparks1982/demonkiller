@@ -1,26 +1,24 @@
-# DK Architect | Current Terrain and Construction Direction
+# DK Architect | Current Editor Roadmap
 
-The former temple-only plan was superseded when the owner retired the old temple/village layouts and approved a new **9,216 × 9,216-tile** world. The original text is preserved at [history/architect-plan-temple-era.md](history/architect-plan-temple-era.md).
+The old temple-only editor proposal has been retired and preserved under `docs/history/architect-plan-temple-era.md`. The authoritative owner-approved design lives in [the master roadmap](demon-killer-master-roadmap.md).
 
-**Canonical reference:** [Demon Killer master roadmap](demon-killer-master-roadmap.md).  
-**Implementation and handoff:** [development-handoff.md](development-handoff.md).
+## Implemented foundation through M70
 
-## Working editor contract
+- The logical world grid is 9,216×9,216 tiles, each 32px in original top-down art scale, addressed through 128×128 Streaming Cells and 16×16 sectors.
+- The **M70 World Pixel Painter** can open directly from the connected server's main menu **Options → Persistent World → Open DK Architect** or from F8 **Logistics → World Pixel Painter**.
+- It is intentionally simpler in visual detail than Ultima Online and uses the same hard-edged 32×32 character pixel vocabulary: 72×72 block world overview, no gradient, no GPU art model, no smoothed artwork.
+- Hold right mouse and drag to pan. Wheel zooms eight levels from full atlas (128 tiles per block) to exact 1:1 tile. Left drag paints.
+- **Whole-cell mode** is for oceans and major biomes; each 128×128-tile fill is a sparse record. **Fine mode** writes exact tile materials and heights, supporting raise/lower/flatten/smooth, original M69 paint and exact undo.
+- Painting operations are serialized and durable on DK Server, with revision checks and safe collision protections. UI supports export, undo/redo and water-area coverage.
+- Newly authored empty Streaming Cells are **editable globally but are not yet fully playable**, as world traversal and render streaming currently depend partly on the older four-region M68 sample.
 
-Use one coherent toolbar combining the existing Prison Architect-like object/build categories and Cities: Skylines-like terrain brushes.
+## Next development sequence
 
-- Left drag paints terrain, changes elevation or places a structure.
-- Hold right mouse and drag to pan the map. A movement click in play mode is separate.
-- Mouse wheel zooms the map; active object preview rotation follows existing placement-mode rules.
-- Terrain strokes save automatically to the authoritative server in connected play. GitHub Pages is only a browser preview.
-- Provide undo/redo, elevation inspection and full/world-cell export via server.
-- All world state is partitioned into 128×128 Streaming Cells, 16×16 sectors and a 9,216² global coordinate system.
-- Respect actor/structure collision, cardinal movement and server-authoritative revisions.
+1. Convert painted whole-world cells into actual player/NPC-traversable streamed terrain without importing old temple/village scenery.
+2. Implement height-aware cliff rendering and pixel terrain transitions, preserving original sprite scale rather than smooth realistic 3D.
+3. Add hydrology, ocean/river depth and connected river-carving tools with server-authoritative geometry.
+4. Implement caves, enterable underground layers, mountainside entrances and spawner-region authoring.
+5. Add level-footprint validation, genuine ground excavation, construction material stores, visible building stages and paid NPC work.
+6. Continue the UO/Life is Feudal/private-server mod roadmap and NPC-generated differentiated settlements.
 
-## Current boundaries
-
-M69 supports a sparse terrain ledger, material painting, signed height editing, a Landscape menu in the connected existing outdoor editor, limited-area rendering, undo and export. Whole-world navigation, big-brush oceans, realistic height-aware 2.5D terrain, rivers with hydrology, cave authoring, spawner painting and staged construction are **not complete**.
-
-The replacement world should have about one-third ocean, a great navigable river, natural mountains and marshes, six sigil towns (one capital), three villages, three worker camps, and ultimately independent NPC civilization building.
-
-Further work must not reintroduce prefabricated old town/temple geometry. Treat historical architectural notes as archived reference, not active design instructions.
+Use `docs/development-handoff.md` and versioned `docs/releases/` for build-specific notes; keep README short.

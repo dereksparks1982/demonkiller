@@ -18,7 +18,7 @@ const CATEGORIES=[
  ['staff','♟','STAFF',[['place_npc','PLACE ACTOR','♟'],['select','SELECT','⌖'],['inspect','INSPECT','⌕']]],
  ['utilities','⚙','UTILITIES',[['move_fixture','MOVE FIXTURE','✥'],['place_fixture','PLACE FIXTURE','◈'],['inspect','INSPECT','⌕']]],
  ['deployment','⚑','DEPLOYMENT',[['spawn','PLAYER SPAWN','⚑'],['place_object','PLACE SPRITE','◈'],['select','SELECT','⌖']]],
- ['logistics','▤','LOGISTICS',[['export','EXPORT AREA JSON','⇩'],['export_world','EXPORT SERVER TERRAIN','⇩'],['save','SAVE LAYOUT','▣'],['undo','UNDO','↶'],['redo','REDO','↷']]],
+ ['logistics','▤','LOGISTICS',[['world_atlas','WORLD PIXEL PAINTER','▦'],['export','EXPORT AREA JSON','⇩'],['export_world','EXPORT SERVER TERRAIN','⇩'],['save','SAVE LAYOUT','▣'],['undo','UNDO','↶'],['redo','REDO','↷']]],
  ['intelligence','⌕','INTELLIGENCE',[['inspect','INSPECT OBJECT','⌕'],['select','SELECT','⌖']]],
  ['emergencies','⚠','EMERGENCIES',[['place_npc','STAGE ACTOR','♟'],['erase_object','REMOVE ACTOR','⌫']]],
  ['clone','▥','CLONE',[['copy','COPY','▣'],['paste','PASTE','▧'],['duplicate','DUPLICATE','⊞']]],
