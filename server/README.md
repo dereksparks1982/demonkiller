@@ -265,16 +265,10 @@ Caravan safety and shop hours matter. Danger or flight pauses trade; a missing e
 
 `server/caravan-manifests-m25.cjs` keeps a bounded manifest history of 64 genuine M24 merchant journeys, including purchase and close dates in simulated world minutes, cargo serial IDs and interruption reasons. The M24 trade state calls the new module only on trip planning, real item purchase, delivery or cancellation. M24 saves, including a currently active shipment, receive exactly one migrated record. `GET /api/v1/caravans` includes up to three past journey summaries without revealing coordinates of a remote trader. Full world saves continue to be authoritative; nothing creates free stock or gold. Regression coverage is added to `tests/caravan-logistics-m24.cjs`.
 
-### World reset and one-life deletion (M40)
+## M41–M47 persistent UO-style systems
 
-A character is NOT the persistent world. Deleting slot 1 via \`DELETE /api/v1/characters/1\` preserves NPCs, ownership transfers, houses, region changes, economic records, and server time.
+DK Server v2.22.0 adds 59 grouped trainable character skills, seven monster archetypes with wild/occupied ecology, real world-targeted field abilities, mana/reagent based spell casting, shop-funded hunting bounties, server-owned tame wolf companions, and the grain→grist→sacked flour→bread workshop chain. The work includes schema validation and migrations for character skillbooks, fieldcraft, magic, bounties, companions, milling, resource nodes and item types.
 
-\`POST /api/v1/save/reset-world\` is a **destructive owner-only loopback action**. It requires \`X-DK-Control: reset-world\` and exactly:
-\`\`\`json
-{"confirm":"RESET WORLD","expected_revision":123}
-\`\`\`
-Get \`expected_revision\` from \`GET /api/v1/world\` immediately before the action. The request is rejected if another transaction changed the world. The reset runs in the single-writer queue, makes a fresh valid world with no characters, removes the prior snapshot directory and world event journal, and atomically replaces \`world.json\`. The process stays running and uses its newly seeded world. No saved prior-world data is restored.
+Read-only endpoint families: `GET /api/v1/skills`, `/api/v1/creatures`, `/api/v1/spells`, `/api/v1/bounties`, `/api/v1/companions` and `/api/v1/milling`. All mutations travel via existing `POST /api/v1/gameplay` and are checked by the authoritative server. The live world continues when the player is disconnected **only while the DK Server process remains running**.
 
-**GitHub Pages has no server to reset.** The main menu displays the unavailable server option clearly and offers a separate browser-only Start Fresh. Neither action runs without its typed confirmation.
-
-The six-shard GitHub Actions workflow remains \`workflow_dispatch\` only.
+`server/package.json` includes `../tests/uo-expansion-m41-m47.cjs`. The six-shard GitHub Actions workflow is deliberately **manual-only**, and these additions do **not** run hosted CI automatically. The static GitHub Pages preview never substitutes for a running DK Server.

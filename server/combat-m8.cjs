@@ -4,6 +4,9 @@
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
 const SKILLS=require('./skills-m14.cjs');
+const CREATURES=require('./creatures-m42.cjs');
+const BOUNTIES=require('./bounties-m45.cjs');
+const COMPANIONS=require('./companions-m46.cjs');
 const {onDeath:recordMobileDeath,onCreatureDeath:recordMonsterRemains}=require('./mobile-assets-m12.cjs');
 const MAX_CREATURES=48,MAX_DROPS=2048;
 function seed(){return {schema:1,sequence:0,creatures:{},drops:{}};}
@@ -18,10 +21,10 @@ function validate(world){
   Object.keys(s.drops).length>MAX_DROPS)throw Error('Invalid combat world');
  for(const c of Object.values(s.creatures)){
   const a=world.areas[c?.area_id];
-  if(!c||!/^imp_[0-9]+$/.test(c.id)||c.kind!=='imp'||!a||
+  if(!c||!CREATURES.KINDS[c.kind]||!new RegExp('^'+c.kind+'_[0-9]+$').test(c.id)||!a||
    !Number.isInteger(c.x)||!Number.isInteger(c.y)||c.x<0||c.y<0||
    c.x>=a.width||c.y>=a.height||!Number.isInteger(c.health)||
-   c.health<0||c.health>30||typeof c.alive!=='boolean')
+   c.health<0||c.health>CREATURES.config(c.kind).health||typeof c.alive!=='boolean')
    throw Error('Invalid monster record');
  }
  for(const d of Object.values(s.drops)){
@@ -51,30 +54,34 @@ function findOpen(world,area_id,x,y){
   }
  return null;
 }
-function spawn(world,area_id,minute,events,count){
+function spawn(world,area_id,minute,events,count,kind='imp'){
+ const type=CREATURES.config(kind);
  const s=world.living.combat,area=world.areas[area_id];
  if(!area)return;
- const points=area_id===COURT?[[15,18],[48,18],[32,6]]:
-   [[65,84],[38,94],[94,100],[64,112],[30,70]];
+ const points=kind==='imp'?(area_id===COURT?[[15,18],[48,18],[32,6]]:
+   [[65,84],[38,94],[94,100],[64,112],[30,70]]):CREATURES.spawnPoints(area_id);
  for(let i=0;i<count&&Object.keys(s.creatures).length<MAX_CREATURES;i++){
   const [x,y]=points[i%points.length],pt=findOpen(world,area_id,x,y);
   if(!pt)continue;
-  const id='imp_'+(++s.sequence);
-  s.creatures[id]={id,kind:'imp',area_id,x:pt.x,y:pt.y,
-   health:18,alive:true,spawn_minute:minute,last_attack_minute:-1};
-  events.push(event(world,minute,'monster.spawn','An imp entered '+area_id+'.',
+  const id=kind+'_'+(++s.sequence);
+  s.creatures[id]={id,kind,area_id,x:pt.x,y:pt.y,
+   health:type.health,alive:true,spawn_minute:minute,last_attack_minute:-1};
+  events.push(event(world,minute,'monster.spawn',type.name+' entered '+area_id+'.',
    {creature_id:id,area_id,x:pt.x,y:pt.y}));
  }
 }
-function dead(world,creature,minute,events){
+function dead(world,creature,minute,events,killer='world'){
  const s=world.living.combat;creature.health=0;creature.alive=false;
  const id='drop_'+(++s.sequence);
  s.drops[id]={id,area_id:creature.area_id,x:creature.x,y:creature.y,
-  gold:2+creature.id.length%5,item:creature.id.length%2===0?'herbs':'ore',
+  gold:creature.kind==='imp'?2+creature.id.length%5:CREATURES.config(creature.kind).gold,
+  item:creature.kind==='imp'?(creature.id.length%2===0?'herbs':'ore'):
+   CREATURES.config(creature.kind).loot,
   dropped_minute:minute};
  delete s.creatures[creature.id];
  const corpse=recordMonsterRemains(world,creature,minute,events);
- events.push(event(world,minute,'monster.defeated','An imp was defeated.',
+ if(killer==='player')BOUNTIES.onKill(world,creature,minute,events);
+ events.push(event(world,minute,'monster.defeated',CREATURES.config(creature.kind).name+' was defeated.',
   {creature_id:creature.id,drop_id:id,corpse_id:corpse?.id||null,area_id:creature.area_id}));
  const terr=world.living.territories[creature.area_id];
  if(terr?.control==='monsters'&&!Object.values(s.creatures).some(c=>c.alive&&c.area_id===creature.area_id)){
@@ -92,23 +99,68 @@ function tick(world,minute,events){
    spawn(world,terr.id,minute,events,terr.id===COURT?3:5);
   }
  }
+ // New species reinforce an occupied area every ninety simulated minutes.
+ // A few roaming threats inhabit wilderness even before an occupation.
+ // Never spawn around the protected temple / Lilith's willow center.
+ if(minute>0&&minute%120===0)
+  for(const terr of Object.values(l.territories))
+   if(terr.control==='settlers'&&terr.threat>=2){
+    const count=Object.values(l.combat.creatures).filter(m=>
+     m.alive&&m.area_id===terr.id).length;
+    if(count<2)spawn(world,terr.id,minute,events,1,
+      terr.id===COURT?'wolf':'bandit');
+   }
+ if(minute>0&&minute%90===0)
+  for(const terr of Object.values(l.territories))
+   if(terr.control==='monsters'){
+    const stationed=Object.values(l.combat.creatures)
+     .filter(m=>m.alive&&m.area_id===terr.id).length;
+    if(stationed<8){
+     const kind=CREATURES.select(terr.id,minute,l.combat.sequence);
+     spawn(world,terr.id,minute,events,Math.min(2,8-stationed),kind);
+    }
+   }
  if(minute%5!==0)return;
  const c=world.characters['1'];
  for(const monster of Object.values(l.combat.creatures)){
   if(!monster.alive)continue;
-  const guards=Object.values(l.npcs).filter(n=>n.alive&&
-   (n.role==='guard'||n.role==='escort')&&n.area_id===monster.area_id);
+  const nearby=Object.values(l.npcs).filter(n=>n.alive&&n.area_id===monster.area_id&&
+   CREATURES.canSense(monster,n));
+  const guards=nearby.filter(n=>n.role==='guard'||n.role==='escort');
   const nearestGuard=guards.sort((a,b)=>distance(a,monster)-distance(b,monster))[0];
+  const nearestPet=Object.values(l.companions?.pets||{}).filter(p=>p.alive&&
+   CREATURES.canSense(monster,p)).sort((a,b)=>distance(a,monster)-distance(b,monster))[0];
+  const nearestCivilian=nearby.filter(n=>n.role!=='guard'&&n.role!=='escort')
+   .sort((a,b)=>distance(a,monster)-distance(b,monster))[0];
   const player=c?.form==='living'&&!c.crafting?.incapacitated&&
+   !(c.fieldcraft?.hidden_until_minute>minute)&&
    c.area_id===monster.area_id?c:null;
-  const target=player&&distance(player,monster)<=5?player:nearestGuard;
-  if(!target)continue;
+  const target=player&&CREATURES.canSense(monster,player)?player:
+   nearestGuard||nearestPet||nearestCivilian;
+  if(!target){
+   if(minute%15===0){
+    const dirs=[[0,-1],[1,0],[0,1],[-1,0]];
+    const begin=(minute/15+monster.id.length)%4;
+    const area=world.areas[monster.area_id];
+    for(let a=0;a<4;a++){
+     const [dx,dy]=dirs[(begin+a)%4],x=monster.x+dx,y=monster.y+dy;
+     if(traversable(area,x,y,'living')&&
+       !Object.values(l.combat.creatures).some(other=>other.id!==monster.id&&
+        other.alive&&other.area_id===monster.area_id&&other.x===x&&other.y===y)){
+       monster.x=x;monster.y=y;break;
+     }
+    }
+   }
+   continue;
+  }
   if(distance(target,monster)>1){
    const step=chooseStep(world,monster,{area_id:monster.area_id,x:target.x,y:target.y});
    if(step?.area_id===monster.area_id){monster.x=step.x;monster.y=step.y;}
   }
   if(distance(target,monster)<=1){
-   const damage=player===target?3:2;
+   let damage=CREATURES.damage(monster.kind,player===target?'player':'guard');
+   if(player===target&&c.magic?.protection_until_minute>minute)
+    damage=Math.max(1,Math.floor(damage/2));
    if(player===target){
     c.crafting.health=Math.max(0,c.crafting.health-damage);
     if(c.crafting.health===0&&!c.crafting.incapacitated){
@@ -116,6 +168,8 @@ function tick(world,minute,events){
      events.push(event(world,minute,'player.incapacitated',
       'A monster knocked the character unconscious.',{area_id:c.area_id}));
     }
+   }else if(target===nearestPet){
+    COMPANIONS.attacked(world,target,damage,minute,events);
    }else{
     target.health=Math.max(0,target.health-damage);
     if(target.health===0){
@@ -126,13 +180,13 @@ function tick(world,minute,events){
     }
    }
    monster.last_attack_minute=minute;
-   events.push(event(world,minute,'monster.attack','An imp attacked.',
+   events.push(event(world,minute,'monster.attack',CREATURES.config(monster.kind).name+' attacked.',
     {creature_id:monster.id,area_id:monster.area_id,target:player===target?'player':target.id,
       damage}));
   }
   // Guards fight back when a monster is beside them.
   for(const guard of guards)if(guard.alive&&distance(guard,monster)<=1){
-   monster.health=Math.max(0,monster.health-4);
+   monster.health=Math.max(0,monster.health-CREATURES.config(monster.kind).guardDamage);
    if(monster.health===0){dead(world,monster,minute,events);break;}
   }
  }
@@ -153,7 +207,7 @@ function apply(world,command,now=Date.now()){
  const minute=next.living.minute;
  const events=[];
  if(command.action==='attack'){
-  if(typeof command.target_id!=='string'||!/^imp_[0-9]+$/.test(command.target_id))
+  if(typeof command.target_id!=='string'||!/^[a-z]+_[0-9]+$/.test(command.target_id))
    throw Error('Invalid creature target');
   const enemy=s.creatures[command.target_id];
   if(!enemy?.alive||enemy.area_id!==c.area_id||distance(enemy,c)>1)
@@ -162,14 +216,20 @@ function apply(world,command,now=Date.now()){
   if(c.last_attack_utc_ms!==undefined&&now-c.last_attack_utc_ms<900)
    throw Error('You must wait before striking again');
   c.last_attack_utc_ms=now;
-  const damage=c.crafting?.hand==='tools'?8:5;
+  if(c.fieldcraft)c.fieldcraft.hidden_until_minute=-1;
+  const skill=c.crafting?.hand==='tools'?'swordsmanship':'wrestling';
+  const mastery=c.skillbook?.skills?.[skill]?.value||0;
+  const tactics=c.skillbook?.skills?.tactics?.value||0;
+  // Baseline matches old combat; trained skills improve strikes.
+  const damage=(c.crafting?.hand==='tools'?8:5)+Math.floor((mastery+tactics)/400);
   enemy.health=Math.max(0,enemy.health-damage);
   c.skills.combat=(c.skills.combat||0)+1;
-  SKILLS.practice(c,c.crafting?.hand==='tools'?'tactics':'wrestling',minute,
-    'monster:'+enemy.id);
-  events.push(event(next,minute,'player.attack','The character struck an imp.',
+  SKILLS.practice(c,skill,minute,'monster:'+enemy.id);
+  SKILLS.practice(c,'tactics',minute,'combat:'+enemy.id);
+  SKILLS.practice(c,'anatomy',minute,'opponent:'+enemy.kind);
+  events.push(event(next,minute,'player.attack','The character struck '+CREATURES.config(enemy.kind).name+'.',
    {creature_id:enemy.id,damage,area_id:c.area_id}));
-  if(enemy.health===0)dead(next,enemy,minute,events);
+  if(enemy.health===0)dead(next,enemy,minute,events,'player');
  }else{
   if(typeof command.drop_id!=='string'||!/^drop_[0-9]+$/.test(command.drop_id))
    throw Error('Invalid loot target');
@@ -187,4 +247,4 @@ function apply(world,command,now=Date.now()){
  validate(next);
  return {world:next,character:c,event:events.at(-1),events};
 }
-module.exports={seed,ensure,validate,tick,apply,spawn,findOpen};
+module.exports={seed,ensure,validate,tick,apply,spawn,findOpen,dead};

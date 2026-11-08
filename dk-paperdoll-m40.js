@@ -100,21 +100,218 @@ menu('JOURNAL',async()=>{
  }
  show('JOURNAL',recent.length?recent.slice(-50):['Nothing has been recorded this session yet.']);
 },'Open recorded messages and nearby world events');
-menu('SKILLS',async()=>{
+// The entire authoritative UO-scale skillbook, grouped and scrollable,
+// with physical skill use and per-skill up/down/locked training controls.
+const FIELD_ACTIONS=new Set(['tracking','hiding','anatomy','forensic_evaluation','meditation','spirit_speak']);
+function feedback(text){entry(text);const node=document.createElement('p');node.className='dk-paper-feedback';node.textContent=text;content.prepend(node);}
+function button(label,click,disabled=false){
+ const b=document.createElement('button');b.type='button';b.className='dk-paper-action';
+ b.textContent=label;b.disabled=disabled;b.addEventListener('click',click);return b;
+}
+async function showSkillbook(){
  const p=await character();
- let skills=p.skills||{};
+ let data={skills:p.skillbook?.skills||p.skills||{},groups:{}};
  if(connected()){
-  try{const result=await window.DemonKillerServer.skills();skills=result.skills||skills;}
+  try{data=await window.DemonKillerServer.skills();}
   catch(error){show('SKILLS',['Could not load skill records: '+error.message]);return;}
  }
- const rows=Object.entries(skills).sort(([a],[b])=>a.localeCompare(b))
-  .map(([key,v])=>key.toUpperCase()+' · '+
-   (v&&typeof v==='object'?((v.value||0)/10).toFixed(1)+(v.lock?' · '+v.lock.toUpperCase():''):
-    String(v)));
- show('SKILLS',rows.length?rows:['The character has no recorded skills yet.']);
-},'Open character skills');
+ const entries=data.skills||{},groups=data.groups||{All:Object.keys(entries)};
+ show('SKILLS · '+Object.keys(entries).length,
+  ['TOTAL · '+(((data.total||0)/10).toFixed(1))+' / '+
+   (((data.total_cap||7000)/10).toFixed(1))+' skill points',
+   'UO-style skill locks control what can gain and what can decrease at the 700-point cap.']);
+ for(const [heading,names]of Object.entries(groups)){
+  const title=document.createElement('h3');title.className='dk-skill-heading';title.textContent=heading.toUpperCase();
+  content.append(title);
+  for(const skill of names){
+   const detail=entries[skill];if(!detail)continue;
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const value=typeof detail==='object'?detail.value:detail;
+   const name=document.createElement('span');name.textContent=skill.replaceAll('_',' ').toUpperCase()+
+    ' · '+((value||0)/10).toFixed(1);
+   row.append(name);
+   if(detail&&typeof detail==='object'){
+    const directions=['up','locked','down'];
+    const lock=button((detail.lock||'up').toUpperCase(),async()=>{
+     try{
+      const at=directions.indexOf(detail.lock||'up'),next=directions[(at+1)%3];
+      await window.DemonKillerServer.gameAction('skill_lock',{skill,lock:next});
+      await showSkillbook();feedback(skill+' training changed to '+next+'.');
+     }catch(e){feedback(e.message);}
+    },!connected());
+    lock.title='Change the skill training lock: UP → LOCKED → DOWN';
+    row.append(lock);
+   }
+   if(FIELD_ACTIONS.has(skill)){
+    const use=button('USE',async()=>{
+     try{
+      const result=await window.DemonKillerServer.gameAction('use_skill',{skill});
+      await showSkillbook();feedback(result.event?.text||'Used '+skill);
+     }catch(e){feedback(e.message);}
+    },!connected());
+    use.title='Use '+skill+' against the current surrounding world';
+    row.append(use);
+   }
+   content.append(row);
+  }
+ }
+}
+menu('SKILLS',showSkillbook,'Skill groups, training locks, and field skill actions');
+async function showSpellbook(){
+ if(!connected()){show('SPELLBOOK',['Spells require a connected DK Server. The GitHub Pages preview cannot simulate mana or magic.']);return;}
+ try{
+  const api=window.DemonKillerServer,book=await api.spells();
+  show('SPELLBOOK',['MANA · '+book.mana+' / '+book.max_mana,
+   'Cast magic at visible monsters along a north/south or east/west path. Reagents are consumed by the server.']);
+  for(const [id,info]of Object.entries(book.spells||{})){
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const title=document.createElement('span');
+   title.textContent=info.name+' · '+info.mana+' mana · '+info.reagents.herbs+' herbs'+
+    (info.learned?'':' · requires '+(info.min_magery/10).toFixed(1)+' Magery');
+   const cast=button('CAST',async()=>{
+    try{
+     const p=await character(),args={spell:id};
+     if(info.target==='monster'){
+      const list=await api.creatures();
+      const chosen=(list.creatures||[]).filter(m=>m.area_id===p.area_id&&
+       (m.x===p.x||m.y===p.y)&&
+       Math.abs(m.x-p.x)+Math.abs(m.y-p.y)<=info.range)
+       .sort((a,b)=>(Math.abs(a.x-p.x)+Math.abs(a.y-p.y))-
+        (Math.abs(b.x-p.x)+Math.abs(b.y-p.y)))[0];
+      if(!chosen){feedback('No monster in cardinal spell range. Move into a straight line first.');return;}
+      args.target_id=chosen.id;
+     }
+     const result=await api.gameAction('cast_spell',args);
+     await showSpellbook();
+     feedback((result.event?.text||'Spell cast.')+
+      (result.event?.damage?' Damage '+result.event.damage:''));
+    }catch(error){feedback(error.message);}
+   },!info.learned||book.mana<info.mana);
+   row.append(title,cast);content.append(row);
+  }
+ }catch(error){show('SPELLBOOK',['Could not load spells: '+error.message]);}
+}
+menu('SPELLBOOK',showSpellbook,'Server spells, mana, reagents and casting');
+async function showCrafting(){
+ if(!connected()){show('CRAFTING',['Physical crafting and the mill require a running DK Server. The GitHub Pages preview cannot manufacture or save items.']);return;}
+ const api=window.DemonKillerServer;
+ try{
+  const [c,mill]=await Promise.all([character(),api.milling()]);
+  show('CRAFTING & MILLING',[
+   'STATION · '+mill.station_label,
+   'OPERATED BY · '+(mill.operator||'vacant'),
+   'SHOP STOCK · '+JSON.stringify(mill.stock||{}),
+   'YOUR PACK · grain '+(c.inventory?.grain||0)+' · grist '+(c.inventory?.grist||0)+
+   ' · flour '+(c.inventory?.flour||0),
+   'First grind 2 grain into 1 grist with tools equipped. Then sack 1 grist into 1 flour. These take separate world-minute work actions.',
+   'While the living baker is present, NPC milling uses real inventory and wages. The bakery bakes bread from stored flour.'
+  ]);
+  const tasks=[['GRIND GRAIN','mill_grind',null],['SACK FLOUR','mill_sack',null],
+   ['MAKE TORCH','craft','torch'],['MAKE RATIONS','craft','rations'],
+   ['MAKE BANDAGES','craft','bandages'],['SMITH TOOLS','craft','tools']];
+  for(const [label,action,recipe]of tasks){
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const text=document.createElement('span');text.textContent=label;
+   const enabled=(action==='craft'||mill.near_station);
+   const b=button('MAKE',async()=>{
+    try{
+     const r=await api.gameAction(action,recipe?{recipe}:{});
+     await showCrafting();
+     feedback(r.event?.text||'The work is complete.');
+    }catch(error){feedback(error.message);}
+   },!enabled);
+   b.title=enabled?label:'Stand by the village bakery milling station first';
+   row.append(text,b);content.append(row);
+  }
+ }catch(error){show('CRAFTING',['Production records unavailable: '+error.message]);}
+}
+menu('CRAFTING',showCrafting,'Real crafting recipes, grinding grain, sacking flour and NPC production');
+
+async function showAnimals(){
+ if(!connected()){show('ANIMALS',['Tamed animals require the persistent DK Server. No pet is simulated on static GitHub Pages.']);return;}
+ try{
+  const api=window.DemonKillerServer,p=await character();
+  const [record,creatures]=await Promise.all([api.companions(),api.creatures()]);
+  show('ANIMALS · COMPANIONS',[
+   'Owned · '+record.pets.length+' / '+record.max_pets,
+   'Weaken a wild wolf below half health. Stand beside it with produce in your pack and attempt to tame it.',
+   'Tame attempts cost food and can fail. A real pet follows, protects, eats and can die.'
+  ]);
+  for(const wolf of creatures.creatures||[]){
+   if(wolf.kind!=='wolf'||wolf.area_id!==p.area_id||
+    Math.abs(wolf.x-p.x)+Math.abs(wolf.y-p.y)>1)continue;
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const label=document.createElement('span');
+   label.textContent='Wild Wolf · '+wolf.health+' / 24 health';
+   const tame=button('TAME',async()=>{
+    try{
+     const response=await api.gameAction('tame_creature',{target_id:wolf.id});
+     await showAnimals();feedback(response.event?.text||'Animal taming attempted.');
+    }catch(error){feedback(error.message);}
+   },wolf.health>12||!record.can_tame);
+   row.append(label,tame);content.append(row);
+  }
+  for(const pet of record.pets){
+   const label=document.createElement('p');label.textContent=
+    pet.id+' · '+pet.health+' health · '+pet.mode+' · '+pet.loyalty+' loyalty';
+   content.append(label);
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const near=pet.area_id===p.area_id&&Math.abs(pet.x-p.x)+Math.abs(pet.y-p.y)<=2;
+   for(const [label,action] of [['FEED','feed_pet'],['FOLLOW','pet_follow'],
+      ['STAY','pet_stay'],['GUARD','pet_guard'],['RELEASE','release_pet']]){
+    const b=button(label,async()=>{
+     try{
+      if(action==='release_pet'&&!window.confirm('Release your companion into the wild?'))return;
+      const result=await api.gameAction(action,{pet_id:pet.id});
+      await showAnimals();feedback(result.event?.text||'Companion updated.');
+     }catch(error){feedback(error.message);}
+    },!near);
+    row.append(b);
+   }
+   content.append(row);
+  }
+ }catch(error){show('ANIMALS',['Companion records unavailable: '+error.message]);}
+}
+menu('ANIMALS',showAnimals,'UO-style taming, animal care, followers and pet commands');
 menu('GUILD',()=>{},'Guild creation and membership are not implemented yet',false);
-menu('QUESTS',()=>{},'Quest journal is not implemented yet',false);
+async function showQuests(){
+ if(!connected()){show('QUESTS',['Bounty contracts and their rewards are saved by DK Server. The static GitHub Pages preview does not have an authoritative bounty ledger.']);return;}
+ try{
+  const result=await window.DemonKillerServer.bounties();
+  show('TOWN BOUNTY BOARD',[
+   'Active · '+(result.active?result.active.id+' ('+result.active.count+' kills)':'none'),
+   'Collected · '+result.total_claimed+' gold',
+   'Accept a contract at the issuing shop. Kill the creatures yourself and return to that shop for payment.'
+  ]);
+  for(const q of result.contracts){
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const text=document.createElement('span');
+   text.textContent=q.name+' · '+q.required+' '+q.kind+
+    ' · '+q.reward+' gold · '+q.issuer_name;
+   const active=result.active?.id===q.id;
+   let action,caption,disabled;
+   if(active){
+    action='turn_in_bounty';caption='CLAIM';
+    disabled=result.active.count<q.required||!q.near_issuer;
+   }else{
+    action='accept_bounty';caption='ACCEPT';
+    disabled=!!result.active||!q.near_issuer;
+   }
+   const b=button(caption,async()=>{
+    try{
+     const fields=action==='accept_bounty'?{bounty_id:q.id}:{};
+     const event=await window.DemonKillerServer.gameAction(action,fields);
+     await showQuests();feedback(event.event?.text||'Bounty updated.');
+    }catch(e){feedback(e.message);}
+   },disabled);
+   b.title=!q.near_issuer?'Travel near '+q.issuer_name+' to use this contract':
+    active&&disabled?'Finish the remaining kills':caption+' '+q.name;
+   row.append(text,b);content.append(row);
+  }
+ }catch(error){show('QUESTS',['Bounty ledger unavailable: '+error.message]);}
+}
+menu('QUESTS',showQuests,'Persistent monster contracts issued by actual town businesses');
+
 menu('PEACE / WAR',()=>{},'Combat stance is not implemented by the server yet',false);
 menu('STATUS',async()=>{
  const p=await character(),s=p.crafting||{};
@@ -122,6 +319,7 @@ menu('STATUS',async()=>{
   'NAME · '+(p.name||'ADVENTURER'),
   'FORM · '+(p.form||'ghost').toUpperCase(),
   'HEALTH · '+(s.health??'unknown')+'  ENERGY · '+(s.energy??'unknown'),
+  'MANA · '+(p.magic?.mana??'unknown')+' / '+(p.magic?.max_mana??'unknown'),
   'HUNGER · '+(s.hunger??'unknown'),
   'GOLD · '+(p.gold??0)+'  BANK · '+(p.bank_gold??0),
   'LOCATION · '+(p.area_id||'Temple')+(Number.isInteger(p.x)?' ('+p.x+', '+p.y+')':'')

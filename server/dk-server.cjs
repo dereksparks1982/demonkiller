@@ -22,6 +22,11 @@ const {strategy:createSaveStrategy}=require('./save-strategy-m13.cjs');
 const {deleteCharacter}=require('./character-lifecycle-m26.cjs');
 const {backpack:readBackpack}=require('./item-interactions-m27.cjs');
 const {publicRecord:publicSkills}=require('./skills-m14.cjs');
+const CREATURES=require('./creatures-m42.cjs');
+const MAGIC=require('./spells-m44.cjs');
+const BOUNTIES=require('./bounties-m45.cjs');
+const COMPANIONS=require('./companions-m46.cjs');
+const MILLING=require('./milling-m47.cjs');
 const {ensure:ensureLaw,listing:lawListing}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,current:currentDistrict}=require('./region-policies-m16.cjs');
 const {ensure:ensureHousing,listing:housingListing}=require('./housing-m17.cjs');
@@ -155,6 +160,8 @@ async function createDKServer({
     const combatAdded=ensureCombat(world);
     const storageAdded=ensureStorage(world);
     const playerAdded=Object.values(world.characters).some(c=>ensureProgress(c));
+    const bountiesAdded=BOUNTIES.ensure(world);
+    const companionsAdded=COMPANIONS.ensure(world);
     const templeDoor=world.areas[AREA_ID]?.objects.find(o=>o.id==='temple_north_door');
     const courtyardDoor=world.areas[COURT]?.objects.find(o=>o.id==='courtyard_temple_door');
     const doorSynced=Boolean(templeDoor&&courtyardDoor&&courtyardDoor.open!==templeDoor.open);
@@ -167,6 +174,8 @@ async function createDKServer({
     const housingAdded=ensureHousing(world);
     const vendorsAdded=ensureVendors(world);
     const vendorEntitiesAdded=reconcileEntities(world);
+    // Old saves may lack the entity registry until the vendor stage completes.
+    const millingAdded=MILLING.ensure(world);
     const npcCommerceAdded=ensureNpcCommerce(world);
     const workshopsAdded=ensureWorkshops(world);
     const npcAIAdded=ensureMobileAI(world);
@@ -184,7 +193,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -672,6 +681,7 @@ async function createDKServer({
       return sendJSON(res,200,{minute:l.minute,npcs:l.npcs,businesses:l.businesses,
         territories:l.territories,traveling_camps:l.traveling_camps,
         combat:{creatures:l.combat?.creatures||{},drops:l.combat?.drops||{}},
+        companions:l.companions?.pets||{},
         storage:{ground:l.storage?.ground||{}},
         mobile_assets:{corpses:l.mobile_assets?.corpses||{},
           terrain_marks:l.mobile_assets?.terrain_marks||{}},
@@ -717,6 +727,21 @@ async function createDKServer({
       if(!c)return sendJSON(res,404,{error:'No character exists'},method);
       return sendJSON(res,200,lawListing(world),method);
     }
+    if(url.pathname==='/api/v1/creatures'&&!write){
+      const player=world.characters?.['1'];
+      return sendJSON(res,200,CREATURES.listing(world,player?.area_id||null),method);
+    }
+    if(url.pathname==='/api/v1/milling'&&!write)
+      return sendJSON(res,200,MILLING.listing(world),method);
+    if(url.pathname==='/api/v1/companions'&&!write)
+      return sendJSON(res,200,COMPANIONS.listing(world),method);
+    if(url.pathname==='/api/v1/bounties'&&!write)
+      return sendJSON(res,200,BOUNTIES.listing(world),method);
+    if(url.pathname==='/api/v1/spells'&&!write){
+      const player=world.characters?.['1'];
+      if(!player)return sendJSON(res,404,{error:'No character exists'},method);
+      return sendJSON(res,200,MAGIC.publicRecord(player,world.living.minute),method);
+    }
     if(url.pathname==='/api/v1/skills'&&!write){
       const c=world.characters['1'];
       if(!c)return sendJSON(res,404,{error:'No character exists'},method);
@@ -739,7 +764,7 @@ async function createDKServer({
           world_revision:result.world.revision,event:result.event});
       }catch(e){
         if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
-        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock|fine|guard|witness|crime|Stack|stack|incompatible|selected|Selected|Tools|burial|grave|exhausted|disturbed|human body/.test(e.message))
+        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock|fine|guard|witness|crime|Stack|stack|incompatible|selected|Selected|Tools|burial|grave|exhausted|disturbed|human body|mana|spell|Magery|reagent|casting|line of sight|concealment|tracks|remains|meditat|ward|Protection|sight|bounty|contract|reward|companion|wolf|animal|tame|feed|pet|loyalty|mill|grain|grist|flour|bakery|station|sack|herbal|food|wages|cooldown|conscious|weakened|Unknown|Invalid/.test(e.message))
           return sendJSON(res,409,{error:e.message});
         console.error('Player gameplay failed:',e);
         return sendJSON(res,500,{error:'Gameplay transaction was not saved'});

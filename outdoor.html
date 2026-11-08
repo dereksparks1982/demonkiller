@@ -2,9 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Demon Killer | The Living World</title>
 <link rel="stylesheet" href="./outdoor.css">
-<link rel="stylesheet" href="./dk-architect-ui-m39.css?v=1">
-<link rel="stylesheet" href="./dk-paperdoll-m40.css?v=1">
-<link rel="stylesheet" href="./dk-lilith-cinematic-m40.css?v=1"></head>
+<link rel="stylesheet" href="./dk-architect-ui-m39.css?v=1"></head>
 <body>
 <main class="world-app">
  <header class="head"><div><h1>DEMON KILLER</h1><small>DK SOFTWORKS · THE LIVING WORLD</small></div>
@@ -12,10 +10,6 @@
  <div class="layout"><section class="world-pane"><div class="world-title"><strong id="areaName">OUTDOOR REGION</strong>
  <span id="worldStatus">Loading world...</span></div>
  <canvas id="world" width="640" height="640" tabindex="0" aria-label="Overhead world, cardinal directions only"></canvas>
- <section id="lilithPrayer" hidden class="lilith-prayer" aria-live="polite" aria-label="Lilith prays before transforming">
- <strong>LILITH · PRAYER</strong>
- <p id="lilithPrayerText"></p><small class="progress" id="lilithPrayerProgress"></small>
- </section>
  <div class="hints">RIGHT MOUSE · MOVE &nbsp; LEFT CLICK · INSPECT &nbsp; DOUBLE CLICK · USE &nbsp; P · PAPER DOLL &nbsp; I · BACKPACK</div><p class="world-journal" id="hudJournal" role="status" aria-live="polite">Explore the world.</p>
  </section>
  <aside class="world-sidebar" hidden aria-hidden="true"><button id="showBank" type="button">BANK BOX</button>
@@ -120,7 +114,7 @@
  </div><button type="button" id="closeBank">CLOSE BOX</button></section>
  <section class="note">The public GitHub Pages version is a static gameplay preview. It does not impersonate the persistent world server. World time, NPC lives, trade, and mail are authoritative only when the real DK Server is connected.</section>
  </aside></div>
- <section id="paperDoll" class="uo-window paper-doll" hidden aria-label="Character paper doll" role="dialog" aria-modal="false"><header class="uo-window-head"><strong>CHARACTER</strong><button type="button" class="window-close" data-close-window="paperDoll" aria-label="Close paper doll">×</button></header><div class="uo-paper-body"><div class="equipment"><div class="equip-slot" data-equip="head">HEAD</div><div class="equip-slot" data-equip="neck">NECK</div><div class="equip-slot" data-equip="hand">HAND</div><div class="equip-slot" data-equip="chest">CHEST</div></div><div class="paper-figure"><canvas id="paperFigure" width="128" height="192" aria-label="Character paper doll"></canvas><strong id="paperName">ADVENTURER</strong><span id="paperForm">LIVING</span></div><div class="equipment"><div class="equip-slot" data-equip="back">BACK</div><div class="equip-slot" data-equip="ring">RING</div><div class="equip-slot" data-equip="light">LIGHT</div><div class="equip-slot" data-equip="feet">FEET</div></div></div><div class="paper-stats" id="paperStats">Equipment and statistics</div></section>
+ <section id="paperDoll" class="uo-window paper-doll" hidden aria-label="Character paper doll" role="dialog" aria-modal="false"><header class="uo-window-head"><strong>CHARACTER</strong><button type="button" class="window-close" data-close-window="paperDoll" aria-label="Close paper doll">×</button></header><div class="uo-paper-body"><div class="equipment"><div class="equip-slot" data-equip="head">HEAD</div><div class="equip-slot" data-equip="neck">NECK</div><div class="equip-slot" data-equip="hand">HAND</div><div class="equip-slot" data-equip="chest">CHEST</div></div><div class="paper-figure"><canvas id="paperFigure" width="128" height="192" aria-label="Character paper doll"></canvas><strong id="paperName">ADVENTURER</strong><span id="paperForm">LIVING</span></div><div class="equipment"><div class="equip-slot" data-equip="back">BACK</div><div class="equip-slot" data-equip="ring">RING</div><div class="equip-slot" data-equip="light">LIGHT</div><div class="equip-slot" data-equip="feet">FEET</div></div></div><div class="paper-stats" id="paperStats">Equipment and statistics</div><button id="deleteInGameSave" type="button" class="delete-save-button">DELETE SAVE</button></section>
  <section id="backpack" class="uo-window backpack-window" hidden aria-label="Character backpack" role="dialog" aria-modal="false"><header class="uo-window-head"><strong>BACKPACK</strong><button type="button" class="window-close" data-close-window="backpack" aria-label="Close backpack">×</button></header><div class="bag-top"><span>🟡 <strong id="bagGold">0</strong> GOLD</span><span id="bagCapacity">PACK</span></div><div id="bagItems" class="bag-items" aria-label="Items in backpack"></div><div id="bagHelp" class="bag-help">Double-click food to eat, tools to equip, or a torch to light.</div></section>
 </main>
 <script src="./assets/art/dkarchitect/imported/first-catalog.js"></script>
@@ -133,8 +127,7 @@
 <script src="./sector-terrain-m32.js?v=1"></script>
 <script src="./streaming-cell-shells-m33.js?v=1"></script>
 <script src="./streaming-cell-contents-m34.js?v=1"></script>
-<script src="./dk-lilith-cinematic-m40.js?v=1"></script>
-<script src="./outdoor.js?v=0.2.66-lilith-m40"></script>
+<script src="./outdoor.js?v=0.2.65-architect-m39"></script>
 <script src="./dk-architect-exterior-m38.js?v=1"></script>
 <script src="./dk-architect-preview-m37.js?v=m39"></script>
 <script src="./dk-architect-ui-m39.js?v=1"></script>
@@ -160,5 +153,4 @@
 })();
 </script>
 <script src="./outdoor-ui.js?v=0.2.54-m28"></script>
-<script src="./dk-paperdoll-m40.js?v=1"></script>
 </body></html>

@@ -6,7 +6,10 @@ const {regenerate}=require('./gameplay.cjs');
 const {tick:socialTick}=require('./social-m6.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
 const {tick:craftTick}=require('./crafting-m7.cjs');
-const {tick:combatTick}=require('./combat-m8.cjs');
+const {tick:combatTick,dead:monsterDeath}=require('./combat-m8.cjs');
+const COMPANIONS=require('./companions-m46.cjs');
+const MILLING=require('./milling-m47.cjs');
+const MAGIC=require('./spells-m44.cjs');
 const {tick:storageTick}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,runMinute:runScheduled}=require('./world-scheduler-m11.cjs');
@@ -124,6 +127,7 @@ function changeStatus(n,desired,minute,living,allEvents){
 function minuteTick(world,m,generated){
  const living=world.living,t=m%DAY,day=t<360;
  regenerate(world,m,generated);
+ MAGIC.tick(world,m);
  socialTick(world,m,generated);
  craftTick(world,m,generated);
  NPCHARVEST.plan(world,m,generated);
@@ -159,6 +163,7 @@ function minuteTick(world,m,generated){
   }
  }
  NPCHARVEST.process(world,m,generated);
+ MILLING.run(world,m,generated);
  CARAVAN.process(world,m,generated);
  if(m%15===0){
   for(const shop of Object.values(living.businesses)){
@@ -197,6 +202,7 @@ function minuteTick(world,m,generated){
   }
  }
  combatTick(world,m,generated);
+ COMPANIONS.tick(world,m,generated,monsterDeath);
  lawTick(world,m,generated);
  storageTick(world,m,generated);
  runScheduled(world,m,generated);

@@ -6,7 +6,7 @@ const {reconcile,counts}=require('./entity-registry-m10.cjs');
 const RECIPES=Object.freeze({
  village_smithy:{label:'Smithing',ingredients:{ore:2,wood:1},
   output:'tools',quantity:1,wage:2},
- village_bakery:{label:'Baking',ingredients:{produce:2},
+ village_bakery:{label:'Baking',ingredients:{flour:2},
   output:'bread',quantity:2,wage:2},
  village_tavern:{label:'Cooking',ingredients:{produce:2},
   output:'meals',quantity:1,wage:2}

@@ -25,6 +25,9 @@ const {ensure:ensureScavengers,validate:validateScavengers}=require('./scavenger
 const {ensure:ensureBurials,validate:validateBurials}=require('./burials-m30.cjs');
 const {ensure:ensureCells,validate:validateCells,onPlayerMove:cellMove}=require('./streaming-cells-m33.cjs');
 const {ensure:ensureInteriors,validate:validateInteriors}=require('./interior-drafts-m35.cjs');
+const BOUNTIES=require('./bounties-m45.cjs');
+const COMPANIONS=require('./companions-m46.cjs');
+const MILLING=require('./milling-m47.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -106,6 +109,9 @@ function makeWorld(now = Date.now()) {
   ensureBurials(result);
   ensureCells(result);
   ensureInteriors(result);
+  BOUNTIES.ensure(result);
+  COMPANIONS.ensure(result);
+  MILLING.ensure(result);
   return result;
 }
 
@@ -188,6 +194,9 @@ function validateWorld(world) {
   validateBurials(world);
   validateCells(world);
   validateInteriors(world);
+  BOUNTIES.validate(world);
+  COMPANIONS.validate(world);
+  MILLING.validate(world);
   return world;
 }
 
@@ -295,6 +304,8 @@ function applyCharacterAction(world, slot, command) {
       character.x=x; character.y=y; character.facing=command.direction;
     }
   }
+  if(command.action==='move'&&character.fieldcraft)
+   character.fieldcraft.hidden_until_minute=-1;
   character.revision++;
   next.characters[String(slot)] = character;
   const districtEvents=onPlayerMove(next,previous);

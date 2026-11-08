@@ -1,10 +1,23 @@
 'use strict';
 // M14: independently implemented UO-inspired skill growth and skill locks.
 // Fixed tenths of a point: 1000 = 100.0, total skill cap = 700.0.
-const SKILL_NAMES=Object.freeze([
- 'herbalism','lumberjacking','mining','trading','blacksmithing',
- 'cooking','healing','wrestling','tactics','survival'
-]);
+// M41: a full UO-inspired trade/war/magic/rogue skillbook. No RunUO code.
+const SKILL_GROUPS=Object.freeze({
+ combat:['wrestling','swordsmanship','fencing','mace_fighting','archery',
+  'tactics','anatomy','parrying','healing','resisting_spells','focus'],
+ magic:['magery','meditation','evaluating_intelligence','inscription',
+  'necromancy','spirit_speak','chivalry','spellweaving'],
+ gathering:['herbalism','lumberjacking','mining','fishing','farming','tracking',
+  'forensic_evaluation','animal_lore','camping'],
+ crafting:['blacksmithing','carpentry','tailoring','tinkering','cooking','milling',
+  'alchemy','bowcraft','fletching','cartography','item_identification',
+  'taste_identification','arms_lore','survival'],
+ roguery:['hiding','stealth','detect_hidden','lockpicking','remove_trap',
+  'snooping','stealing','poisoning'],
+ social:['trading','begging','musicianship','peacemaking','provocation',
+  'discordance','animal_taming','veterinary','leadership']
+});
+const SKILL_NAMES=Object.freeze(Object.values(SKILL_GROUPS).flat());
 const LOCKS=Object.freeze(['up','down','locked']);
 const INDIVIDUAL_CAP=1000,TOTAL_CAP=7000;
 function clean(skill){return SKILL_NAMES.includes(skill);}
@@ -19,7 +32,16 @@ function legacyValue(value){
 }
 function ensure(character){
  if(!character)return false;
- if(character.skillbook)return false;
+ if(character.skillbook){
+  const book=character.skillbook;
+  if(book.schema!==1||!book.skills||Array.isArray(book.skills))
+   throw Error('Cannot migrate malformed skillbook');
+  let changed=false;
+  for(const name of SKILL_NAMES)if(!book.skills[name]){
+   book.skills[name]=initial();changed=true;
+  }
+  return changed;
+ }
  const exp=character.skills||{},craft=character.crafting||{};
  const old={herbalism:legacyValue(exp.foraging),trading:legacyValue(exp.commerce),
    tactics:legacyValue(exp.combat),survival:legacyValue(craft.skill)};
@@ -87,6 +109,7 @@ function publicRecord(character){
  if(!character)return null;
  ensure(character);
  return {schema:1,total_cap:TOTAL_CAP,total:total(character),
+   groups:SKILL_GROUPS,
    skills:Object.fromEntries(SKILL_NAMES.map(name=>{
     const s=character.skillbook.skills[name];
     return [name,{value:s.value,lock:s.lock,uses:s.uses}];
@@ -116,5 +139,5 @@ function applyLock(world,command){
  validate(player);
  return {world:next,character:player,event:e};
 }
-module.exports={SKILL_NAMES,LOCKS,INDIVIDUAL_CAP,TOTAL_CAP,
+module.exports={SKILL_NAMES,SKILL_GROUPS,LOCKS,INDIVIDUAL_CAP,TOTAL_CAP,
  ensure,validate,total,practice,publicRecord,applyLock};

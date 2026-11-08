@@ -16,7 +16,8 @@ test('M14 uses fixed tenths, individual skill caps and an exact 700-point total 
  const w=world(),b=w.characters['1'].skillbook;
  assert.equal(b.schema,1);
  assert.equal(b.total_cap,7000);
- assert.equal(Object.keys(b.skills).length,10);
+ assert.equal(Object.keys(b.skills).length,S.SKILL_NAMES.length);
+ assert(S.SKILL_NAMES.length>=50,'The UO-scale skillbook needs diverse professions');
  assert.equal(S.total(w.characters['1']),0);
  assert.equal(S.ensure(w.characters['1']),false);
  assert.doesNotThrow(()=>W.validateWorld(w));
@@ -48,7 +49,8 @@ test('Practice requires real world minute and target, suppresses identical macro
 });
 test('Training locks stop gains; down-skills are sacrificed only at the total cap',()=>{
  const c=world().characters['1'];
- for(const name of S.SKILL_NAMES.slice(0,7))c.skillbook.skills[name].value=1000;
+ for(const name of ['lumberjacking','mining','trading','blacksmithing',
+  'cooking','healing','tactics'])c.skillbook.skills[name].value=1000;
  c.skillbook.skills.lumberjacking.lock='down';
  assert.equal(S.total(c),7000);
  const gain=S.practice(c,'wrestling',10,'imp_1');
@@ -81,7 +83,8 @@ test('Skill lock actions persist atomically and reject client-invented skill lev
  assert.equal(r.event.type,'skill.lock.changed');
  assert.throws(()=>G.apply(w,{action:'skill_lock',skill:'mining',lock:'up',value:999}),
   /Invalid/);
- assert.throws(()=>G.apply(w,{action:'skill_lock',skill:'magery',lock:'up'}),/Invalid/);
+ assert.equal(G.apply(w,{action:'skill_lock',skill:'magery',lock:'locked'}).character.skillbook.skills.magery.lock,'locked');
+ assert.throws(()=>G.apply(w,{action:'skill_lock',skill:'fake_skill',lock:'up'}),/Invalid/);
  assert.throws(()=>G.apply(r.world,{action:'skill_lock',skill:'mining',lock:'locked'}),/already/);
  assert.doesNotThrow(()=>W.validateWorld(r.world));
 });

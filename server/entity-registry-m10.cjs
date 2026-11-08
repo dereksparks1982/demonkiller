@@ -4,7 +4,7 @@
 // moves between pack, equipment, bank, ground, and one village chest.
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const ITEM_TYPES=Object.freeze(['herbs','wood','ore','bread','tools','produce','meals',
-  'torches','rations','bandages']);
+  'torches','rations','bandages','grain','grist','flour']);
 const KNOWN=new Set(ITEM_TYPES),PACK='pack_1',VAULT='vault_1',
   HAND='hand_1',LIGHT='light_1',CHEST='chest_village_1';
 const LIMIT=8192,REF_LIMIT=16384,GROUND_LIMIT=1024;

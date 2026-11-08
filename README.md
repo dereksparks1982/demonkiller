@@ -1,26 +1,27 @@
 # Demon Killer
 
-Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-down pixel art, Streaming Cells, and an independent persistent-world server in development.
+Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-down pixel art, Streaming Cells and an independent persistent-world server in development.
 
-[Play Demon Killer](https://dereksparks1982.github.io/demonkiller/)
+[Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
-## DK Architect
+## One DK Architect, real saves and the opening ritual
 
-Press **F8** or click **ARCHITECT** in the temple or outdoors for the same Prison Architect-style construction categories, searchable approved art, building tools, and editor commands. In the browser preview, map edits save in Firefox; export them via **Logistics → Export Map JSON** for integration. A connected DK Server validates permanent world edits.
+Press **F8** or **ARCHITECT** in the temple or outdoors to use the same Prison Architect-style construction menus. The browser preview stores local map drafts that can be exported as JSON. The first temple exit shows Lilith's prayer and the **approved** golden ghost-world or black living-world weeping-willow transformation.
 
-## Lilith's courtyard prayer (M40)
+The paper doll has Ultima Online-style commands, without destructive save buttons. **Main Menu → Options → Save Management** separates character deletion (world preserved), server-world reset (requires an actual connected server) and Start Fresh (browser-only on GitHub Pages).
 
-On the first temple exit, the character becomes hidden and controls lock. The camera moves ahead and follows Lilith up the existing courtyard path. She speaks **three lines of prayer in a visible dialogue box** inside the otherwise empty stone circle, then transforms using the six approved sprite stages for the current state. **Dead/ghost = healthy golden willow (green dress). Living = black diseased willow (red dress).** The camera then returns to the character and control resumes. Later visits show the completed tree, not the scene.
+## DK Server M41–M47: Seven connected gameplay slices
 
-## UO-style paper doll
+- **59 trainable skills**, 100.0 individual/700.0 overall caps, groups, training locks and existing-save migration.
+- **Seven persistent monster species** with different strengths, patrols, NPC threats, loot and decay.
+- **Active field skills**: tracking, hiding, anatomy, forensic evaluation, meditation, Spirit Speak and Animal Lore.
+- **Magic**: mana, reagents, cardinal line of sight, Magic Arrow, Fireball, Heal, Protection and Night Sight.
+- **Monster bounties**: real shop-issued quests; player kills counted and rewards paid from existing business funds.
+- **Tameable wolves**: feed, follow, guard, stay, release, fight and leave persistent remains.
+- **Grain milling**: harvest grain, grind it into grist, sack flour, and bake bread. Player or physically present NPC baker can run the work; wages, ingredients and serially tracked goods are real.
 
-Press **P** in either region for the same Classic Ultima Online-inspired paper-doll menu. Its Help, Journal, Skills, Status, Backpack, Profile, Options and Log Out actions use existing Demon Killer functions. Guild, Quests, and Peace/War are shown as unavailable until their real gameplay systems are built. **There is no Delete Save button on the paper doll.** Options opens Save Management at the main menu; Log Out leaves the character/world intact.
+Use **P → Skills, Spellbook, Quests, Animals or Crafting** on a **connected DK Server** for these gameplay actions. The dedicated mill building, more kinds of magic, guilds, and the entire original Ultima Online feature set are **not** complete yet. The first milling station uses the **existing village bakery**, without changing the owner-approved village layout.
 
-## Save Management
+**Important:** GitHub Pages is a static **preview**. It does not host a persistent server, so it cannot run the independent NPC economy or save authoritative monster/pet states. The server needs to be running separately to simulate events while you are away. This release does not deploy a public server.
 
-Under **Main Menu → Options → Save Management**:
-- **Delete Character:** deletes only the character and their belongings; the persistent world keeps its history, economy and NPCs.
-- **Reset Server World:** requires a real connected DK Server and typed \`RESET WORLD\`. Clears its world, character, history, previous checkpoints and journal.
-- **Start Fresh:** typed \`START FRESH\` clears character and browser drafts, plus the world **only when a server is actually connected**. On GitHub Pages it clears browser saves only, because the static preview has no server.
-
-GitHub Actions' six-shard regression workflow is **manual-only**; no hosted test runs are required for this build.
+The six-shard GitHub Actions regression workflow remains **manual-only**, to conserve Actions minutes. New Node tests are included in the repository but are not automatically run on pushes.

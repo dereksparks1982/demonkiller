@@ -10,11 +10,16 @@ const ITEMS=require('./item-interactions-m27.cjs');
 const MOBILE=require('./mobile-assets-m12.cjs');
 const BURIALS=require('./burials-m30.cjs');
 const SKILLS=require('./skills-m14.cjs');
+const FIELD=require('./field-skills-m43.cjs');
+const MAGIC=require('./spells-m44.cjs');
+const BOUNTIES=require('./bounties-m45.cjs');
+const COMPANIONS=require('./companions-m46.cjs');
+const MILLING=require('./milling-m47.cjs');
 const LAW=require('./law-m15.cjs');
 const HOUSING=require('./housing-m17.cjs');
 const VENDORS=require('./vendors-m18.cjs');
-const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages']);
-const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4};
+const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages','grain','grist','flour']);
+const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4,grain:2,grist:3,flour:4};
 const NODES=[
  ['courtyard_herbs_west',COURT,18,32,'herbs',6],
  ['courtyard_herbs_east',COURT,45,33,'herbs',6],
@@ -22,7 +27,8 @@ const NODES=[
  ['village_herbs',VILLAGE,85,71,'herbs',8],
  ['village_ore',VILLAGE,90,57,'ore',5],
  ['village_wood',VILLAGE,20,62,'wood',8],
- ['village_produce',VILLAGE,80,73,'produce',8]
+ ['village_produce',VILLAGE,80,73,'produce',8],
+ ['village_grain',VILLAGE,80,73,'grain',8]
 ];
 function ensureProgress(character){
  if(!character)return false;
@@ -36,6 +42,8 @@ function ensureProgress(character){
  if(character.skills.combat===undefined){character.skills.combat=0;changed=true;}
  if(CRAFT.ensure(character))changed=true;
  if(SKILLS.ensure(character))changed=true;
+ if(FIELD.ensure(character))changed=true;
+ if(MAGIC.ensure(character))changed=true;
  return changed;
 }
 function ensureResources(world){
@@ -57,6 +65,8 @@ function validateProgress(character){
  }
  CRAFT.validate(character);
  SKILLS.validate(character);
+ FIELD.validate(character);
+ MAGIC.validate(character);
  if(character.last_attack_utc_ms!==undefined&&(!Number.isSafeInteger(character.last_attack_utc_ms)||character.last_attack_utc_ms<0))throw Error('Invalid attack timestamp');
  for(const key of ['gold','bank_gold'])
   if(character[key]!==undefined&&(!Number.isSafeInteger(character[key])||
@@ -89,6 +99,11 @@ function apply(world,command,now=Date.now()){
  if(['buy_house','sell_house','set_house_public'].includes(command?.action))return HOUSING.apply(world,command);
  if(command?.action==='pay_fine')return LAW.payFine(world,command);
  if(command?.action==='skill_lock')return SKILLS.applyLock(world,command);
+ if(command?.action==='use_skill')return FIELD.apply(world,command);
+ if(command?.action==='cast_spell')return MAGIC.apply(world,command,now);
+ if(['accept_bounty','turn_in_bounty'].includes(command?.action))return BOUNTIES.apply(world,command);
+ if(['tame_creature','feed_pet','release_pet','pet_follow','pet_stay','pet_guard'].includes(command?.action))return COMPANIONS.apply(world,command);
+ if(['mill_grind','mill_sack'].includes(command?.action))return MILLING.apply(world,command);
  if(command?.action==='loot_corpse')return MOBILE.loot(world,command);
  if(command?.action==='bury_corpse')return BURIALS.bury(world,command);
  if(command?.action==='move_item')return ENTITIES.transfer(world,command);
@@ -122,7 +137,8 @@ function apply(world,command,now=Date.now()){
    throw Error('Your pack is full');
   n.remaining--;c.inventory[n.type]++;
   c.gather_after_minute=minute;c.skills.foraging+=c.crafting?.hand==='tools'?2:1;
-  SKILLS.practice(c,n.type==='herbs'?'herbalism':n.type==='wood'?'lumberjacking':'mining',
+  SKILLS.practice(c,n.type==='grain'?'farming':n.type==='herbs'?'herbalism':
+    n.type==='wood'?'lumberjacking':n.type==='ore'?'mining':'farming',
     minute,'resource:'+n.id);
   item=n.type;
  }else if(action==='buy'){
@@ -146,8 +162,9 @@ function apply(world,command,now=Date.now()){
   if(!TYPES.has(item)||!Number.isInteger(qty)||qty<1||qty>10)
    throw Error('Invalid item or quantity');
   const accepted={
-   village_smithy:['wood','ore'],village_market:['herbs','produce'],
-   courtyard_market:['herbs'],village_bakery:['produce'],
+   village_smithy:['wood','ore'],village_market:['herbs','produce','grain','flour'],
+   village_bakery:['grain','flour'],
+   courtyard_market:['herbs'],
    village_tavern:['meals','produce']
   }[shop.id]||[];
   if(!accepted.includes(item))throw Error('This merchant does not buy that item');

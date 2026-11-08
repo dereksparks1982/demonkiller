@@ -1,0 +1,143 @@
+'use strict';
+// M41-M47 regression contracts. Run locally with Node, never automatically
+// through GitHub Actions (owner requires manual-only hosted CI).
+const test=require('node:test'),assert=require('node:assert/strict');
+const W=require('../server/world.cjs'),R=require('../server/regions.cjs');
+const GAME=require('../server/gameplay.cjs'),SKILLS=require('../server/skills-m14.cjs');
+const COMBAT=require('../server/combat-m8.cjs'),CREATURES=require('../server/creatures-m42.cjs');
+const FIELD=require('../server/field-skills-m43.cjs');
+const MAGIC=require('../server/spells-m44.cjs'),BOUNTIES=require('../server/bounties-m45.cjs');
+const PETS=require('../server/companions-m46.cjs');
+const MILL=require('../server/milling-m47.cjs'),ENTITIES=require('../server/entity-registry-m10.cjs');
+const NOW=Date.UTC(2026,10,7,17);
+const make=()=>{
+ const result=W.createCharacter(W.makeWorld(NOW),1,'ELIAS',NOW).world;
+ const c=result.characters['1'];
+ c.form='living';c.opening_state='resurrected';
+ return result;
+};
+function playerAt(w,area_id,x,y){
+ const c=w.characters['1'];c.area_id=area_id;c.x=x;c.y=y;
+ c.region_id=require('../server/region-policies-m16.cjs').regionAt(w,area_id,x,y).id;
+ return c;
+}
+test('M41 creates the grouped UO-scale skillbook and preserves gains from older saves',()=>{
+ const w=make(),c=w.characters['1'];
+ assert(SKILLS.SKILL_NAMES.length>=59);
+ assert(Object.keys(c.skillbook.skills).length>=59);
+ assert.equal(c.skillbook.total_cap,7000);
+ c.skillbook.skills.wrestling.value=100;
+ const earlier=c.skillbook.skills.wrestling.uses;
+ delete c.skillbook.skills.magery;
+ assert.equal(SKILLS.ensure(c),true);
+ assert.equal(c.skillbook.skills.wrestling.value,100);
+ assert.equal(c.skillbook.skills.wrestling.uses,earlier);
+ assert.equal(c.skillbook.skills.magery.value,0);
+ assert.equal(SKILLS.ensure(c),false);
+ assert.equal(SKILLS.publicRecord(c).groups.crafting.includes('milling'),true);
+ W.validateWorld(w);
+});
+test('M42 persists seven species and keeps legacy imp combat, loot and beast remains',()=>{
+ const w=make(),events=[];
+ assert.equal(Object.keys(CREATURES.KINDS).length,7);
+ w.living.territories[R.COURT].control='monsters';
+ w.living.minute=1;
+ COMBAT.spawn(w,R.COURT,1,events,1,'wolf');
+ const wolf=Object.values(w.living.combat.creatures)[0];
+ assert(wolf&&wolf.kind==='wolf'&&wolf.health===24);
+ COMBAT.dead(w,wolf,1,events);
+ const corpse=Object.values(w.living.mobile_assets.corpses).find(c=>c.creature_id===wolf.id);
+ assert(corpse);assert.equal(corpse.species,'beast');
+ assert.equal(corpse.name,'Wolf');
+ assert(Object.values(w.living.combat.drops).some(d=>d.item==='herbs'));
+ W.validateWorld(w);
+});
+test('M43 skill commands have real targets, persisted cooldowns and anti-macro gains',()=>{
+ let w=make(),c=playerAt(w,R.COURT,15,17);
+ w.living.territories[R.COURT].control='monsters';
+ w.living.minute=1;
+ COMBAT.spawn(w,R.COURT,1,[],1);
+ const result=GAME.apply(w,{action:'use_skill',skill:'tracking'});
+ assert.equal(result.event.type,'player.skill.tracking');
+ assert.equal(result.character.fieldcraft.last_skill,'tracking');
+ w=result.world;
+ assert.throws(()=>GAME.apply(w,{action:'use_skill',skill:'tracking'}),/cooldown/);
+ w.living.minute+=5;
+ assert.throws(()=>GAME.apply(w,{action:'use_skill',skill:'hiding'}),/monster/);
+ W.validateWorld(w);
+});
+test('M44 magic consumes mana and herbs, heals, validates LOS and retains cooldown',()=>{
+ let w=make(),c=playerAt(w,R.COURT,20,40);
+ c.crafting.health=60;c.inventory.herbs=4;
+ const action={action:'cast_spell',spell:'heal'};
+ const result=GAME.apply(w,action,NOW+100000);
+ assert(result.character.crafting.health>60);
+ assert(result.character.magic.mana<40);
+ assert.equal(result.character.inventory.herbs,3);
+ assert.equal(w.characters['1'].crafting.health,60,'original world remains immutable');
+ assert.throws(()=>GAME.apply(result.world,action,NOW+100100),/wait/);
+ assert.equal(MAGIC.lineOfSight({width:4,height:4,
+  floor:Array(16).fill('grass'),walls:Array(16).fill(0)}, {x:0,y:1},{x:3,y:1}),true);
+ W.validateWorld(result.world);
+});
+test('M45 bounty kills are player-only and real shop funds pay the reward',()=>{
+ let w=make(),c=playerAt(w,R.VILLAGE,54,103),bank=w.living.businesses.village_bank;
+ const initialGold=c.gold,initialBank=bank.coins;
+ w=GAME.apply(w,{action:'accept_bounty',bounty_id:'hunt_wolves'}).world;
+ assert.equal(w.living.bounties.active.count,0);
+ assert.throws(()=>GAME.apply(w,{action:'turn_in_bounty'}),/not completed/);
+ BOUNTIES.onKill(w,{kind:'wolf',id:'wolf_501'},1,[]);
+ BOUNTIES.onKill(w,{kind:'wolf',id:'wolf_502'},2,[]);
+ w.living.minute=2;
+ w=GAME.apply(w,{action:'turn_in_bounty'}).world;
+ assert(!w.living.bounties.active);
+ assert.equal(w.characters['1'].gold,initialGold+14);
+ assert.equal(w.living.businesses.village_bank.coins,initialBank-14);
+ W.validateWorld(w);
+});
+test('M46 weakened wolves can be tamed, fed, commanded and released',()=>{
+ let w=make();const c=w.characters['1'];
+ w.living.minute=2;
+ const events=[];COMBAT.spawn(w,R.COURT,1,events,1,'wolf');
+ const wolf=Object.values(w.living.combat.creatures)[0];
+ const p=playerAt(w,R.COURT,wolf.x,wolf.y-1);
+ p.inventory.produce=3;wolf.health=8;
+ const tamed=GAME.apply(w,{action:'tame_creature',target_id:wolf.id});
+ assert.equal(Object.keys(tamed.world.living.companions.pets).length,1);
+ assert.equal(tamed.world.living.combat.creatures[wolf.id],undefined);
+ w=tamed.world;const id=Object.keys(w.living.companions.pets)[0];
+ w=GAME.apply(w,{action:'pet_stay',pet_id:id}).world;
+ assert.equal(w.living.companions.pets[id].mode,'stay');
+ w=GAME.apply(w,{action:'feed_pet',pet_id:id}).world;
+ assert(w.living.companions.pets[id].health>8);
+ w=GAME.apply(w,{action:'release_pet',pet_id:id}).world;
+ assert.equal(Object.keys(w.living.companions.pets).length,0);
+ assert(Object.values(w.living.combat.creatures).some(m=>m.kind==='wolf'));
+ W.validateWorld(w);
+});
+test('M47 grain → grist → flour is two player actions, and NPC wages buy physical work',()=>{
+ let w=make(),c=w.characters['1'];const shop=w.living.businesses.village_bakery;
+ const building=w.areas[R.VILLAGE].objects.find(o=>o.id===shop.id);
+ const at=building.door?{x:building.door.x,y:building.door.y+1}:building;
+ c=playerAt(w,R.VILLAGE,at.x,at.y);
+ c.crafting.hand='tools';c.inventory.grain=4;
+ w=GAME.apply(w,{action:'mill_grind'}).world;
+ assert.equal(w.characters['1'].inventory.grain,2);
+ assert.equal(w.characters['1'].inventory.grist,1);
+ w.living.minute=1;
+ w=GAME.apply(w,{action:'mill_sack'}).world;
+ assert.equal(w.characters['1'].inventory.flour,1);
+ assert.equal(w.characters['1'].inventory.grist,0);
+ const bakery=w.living.businesses.village_bakery,worker=w.living.npcs[bakery.owner_id];
+ worker.area_id=R.VILLAGE;worker.x=at.x;worker.y=at.y;
+ bakery.open=true;bakery.other_stock.grain=4;
+ ENTITIES.reconcile(w);
+ const coins=bakery.coins;
+ w.living.minute=30;MILL.run(w,30,[]);
+ assert.equal(bakery.other_stock.grist,1);
+ w.living.minute=60;MILL.run(w,60,[]);
+ assert.equal(bakery.other_stock.flour,1);
+ assert.equal(bakery.coins,coins-4);
+ assert.equal(w.living.milling.shops.village_bakery.sacked,1);
+ ENTITIES.counts(w);W.validateWorld(w);
+});

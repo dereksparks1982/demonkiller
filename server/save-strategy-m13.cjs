@@ -78,13 +78,6 @@ function strategy({dataDir,validateWorld,durableWrite,now=Date.now,keep=BACKUPS,
      await fs.rm(path.join(dir,old.name+'.sha256'),{force:true});
    }
  }
- // Used ONLY for a confirmed full-world reset. Old checkpoints must not be
- // mistaken for snapshots of a new world that happens to reuse revision 0.
- async function prepareWorldReset(){
-   await fs.rm(dir,{recursive:true,force:true});
-   await fs.mkdir(dir,{recursive:true,mode:0o700});
-   lastBackupRevision=-1;lastError=null;backupsCreated=0;
- }
  async function save(world,{forceBackup=false}={}){
    validateWorld(world);
    const body=JSON.stringify(world,null,2)+'\n';
@@ -118,7 +111,7 @@ function strategy({dataDir,validateWorld,durableWrite,now=Date.now,keep=BACKUPS,
      current_revision:world?.revision??null,
      recovery_policy:'Never automatically replace or roll back the one-life world'};
  }
- return {init,save,checkpoint,status,prune,prepareWorldReset};
+ return {init,save,checkpoint,status,prune};
 }
 module.exports={BACKUPS,REVISION_SPACING,MAX_BACKUP_BYTES,digest,
  readCheckpoints,strategy};

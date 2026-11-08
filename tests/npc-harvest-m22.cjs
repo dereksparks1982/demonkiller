@@ -49,6 +49,13 @@ test('Market grower gathers physically from a limited patch and brings same item
  assert(result.events.some(e=>e.type==='npc.harvest.delivered'));
  assert.equal(w.living.npc_harvest.delivered,1);
 });
+test('Baker physically harvests grain for the milling supply chain',()=>{
+ const w=fixture(),before=w.living.businesses.village_bakery.other_stock.grain||0;
+ const result=advanceGoal(w,'baker','village_grain');
+ assert.equal(result.shop.other_stock.grain,before+1);
+ assert.equal(result.shop.stock,40,'Grain is not bread until milled and baked');
+ assert.equal(w.entity_registry.items[result.serial].type,'grain');
+});
 test('Traveling herbalist gathers and stocks the existing courtyard market',()=>{
  const w=fixture(),old=w.living.businesses.courtyard_market.stock;
  const result=advanceGoal(w,'herbalist','courtyard_herbs_west');

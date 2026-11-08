@@ -3,7 +3,7 @@
 // Item counts, bank access, pickup distance and decay belong to the server.
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const ITEMS=Object.freeze(['herbs','wood','ore','bread','tools','produce','meals',
- 'torches','rations','bandages']);
+ 'torches','rations','bandages','grain','grist','flour']);
 const ACCEPTED=new Set(ITEMS),VAULT_CAP=500,PACK_CAP=200;
 const GROUND_CAP=1024,DECAY_MINUTES=360;
 const emptyVault=()=>Object.fromEntries(ITEMS.map(item=>[item,0]));

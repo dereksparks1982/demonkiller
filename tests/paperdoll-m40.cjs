@@ -18,7 +18,11 @@ test('Paper doll contains actual UO Classic command rail, not invented save dele
  for(const name of ['HELP','OPTIONS','LOG OUT','JOURNAL','SKILLS',
    'GUILD','QUESTS','PEACE / WAR','STATUS','BACKPACK','PROFILE'])
    assert(code.includes("menu('"+name+"'"),name+' missing from classic-style menu');
- assert(code.includes("menu('GUILD',()=>{},")&&code.includes("menu('QUESTS',()=>{},"));
+ assert(code.includes("menu('GUILD',()=>{},"));
+ assert(code.includes("menu('QUESTS',showQuests,"));
+ assert(code.includes("menu('SPELLBOOK',showSpellbook,"));
+ assert(code.includes("menu('ANIMALS',showAnimals,"));
+ assert(code.includes("menu('CRAFTING',showCrafting,"));
  assert(code.includes("menu('PEACE / WAR',()=>{},"));
  assert(code.includes('DemonKillerServer.skills()'));
  assert(code.includes('./index.html?view=options'));

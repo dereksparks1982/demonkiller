@@ -6,6 +6,7 @@ const {location,total,CAPACITY}=require('./vendors-m18.cjs');
 const {counts,reconcile}=require('./entity-registry-m10.cjs');
 const HARVESTERS=Object.freeze({
  herbalist:{shop_id:'courtyard_market',nodes:['courtyard_herbs_west'],target:80},
+ baker:{shop_id:'village_bakery',nodes:['village_grain'],target:80},
  market_vendor:{shop_id:'village_market',nodes:['village_produce'],target:80},
  blacksmith:{shop_id:'village_smithy',nodes:['village_ore','village_wood'],target:18}
 });

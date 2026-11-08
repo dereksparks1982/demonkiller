@@ -6,6 +6,7 @@ const {PACK,reconcile}=require('./entity-registry-m10.cjs');
 const {onNpcDeath:enterHousingEstate}=require('./housing-m17.cjs');
 const LAW=require('./law-m15.cjs');
 const Decay=require('./corpse-decay-m29.cjs');
+const CREATURES=require('./creatures-m42.cjs');
 const PROVISIONS=Object.freeze({
  bank:'bread',bakery:'bread',smithy:'tools',market:'produce',
  guard:'tools',caretaker:'herbs',courier:'bread',caravan:'produce',
@@ -102,12 +103,13 @@ function onCreatureDeath(world,creature,minute,out){
  if(Object.keys(m.corpses).length>=MAX_CORPSES&&!reserve(world,minute,out))
   return null;
  const id='corpse_'+(++m.sequence);
- const corpse={id,npc_id:null,creature_id:creature.id,name:'Imp',
+ const species=CREATURES.config(creature.kind);
+ const corpse={id,npc_id:null,creature_id:creature.id,name:species.name,
   area_id:creature.area_id,x:creature.x,y:creature.y,
   created_minute:minute,coins:0,bag_id:null,
-  ...Decay.configure({kind:'monster',species:'demon',area_id:creature.area_id,minute})};
+  ...Decay.configure({kind:'monster',species:species.corpse,area_id:creature.area_id,minute})};
  m.corpses[id]=corpse;
- out.push(record(world,minute,'monster.corpse','An imp left remains on the ground.',
+ out.push(record(world,minute,'monster.corpse',species.name+' left remains on the ground.',
   {corpse_id:id,creature_id:creature.id,area_id:creature.area_id}));
  return corpse;
 }

@@ -51,15 +51,15 @@ test('Smithy consumes actual ore and wood, pays worker, creates durable tools',(
  assert.equal(w.living.workshops.shops[shop.id].made,1);
  E.counts(w);W.validateWorld(w);
 });
-test('Bakery and tavern turn physically bought produce into saleable food',()=>{
+test('Bakery converts sacked flour to bread while the tavern cooks produce',()=>{
  const w=world(),events=[];
- add(w,'village_bakery',{produce:2});
+ add(w,'village_bakery',{flour:2});
  add(w,'village_tavern',{produce:2});
  const made=X.run(w,120,events);
  assert.equal(made,3);
  assert.equal(w.living.businesses.village_bakery.stock,42);
  assert.equal(w.living.businesses.village_tavern.stock,41);
- assert.equal(w.living.businesses.village_bakery.other_stock.produce,0);
+ assert.equal(w.living.businesses.village_bakery.other_stock.flour,0);
  assert.equal(w.living.businesses.village_tavern.other_stock.produce,0);
  assert.equal(events.length,2);
  assert.equal(w.living.workshops.total_units,3);
@@ -80,7 +80,7 @@ test('Cannot produce with missing ingredients, a dead worker or occupied distric
 });
 test('World-minute scheduler produces once at due time and does not replay',()=>{
  const w=world(),events=[];
- add(w,'village_bakery',{produce:2});
+ add(w,'village_bakery',{flour:2});
  for(let minute=1;minute<=120;minute++){
   S.runMinute(w,minute,events);w.living.minute=minute;
  }

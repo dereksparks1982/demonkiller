@@ -24,3 +24,17 @@
  .dk-paper-extended .paper-figure canvas{max-width:112px}
  .dk-paper-card{max-height:55vh}
 }
+
+/* M41-M44 grouped UO skillbook, training locks and a real spellbook. */
+.dk-paper-card-body{max-height:55vh;overflow:auto;overscroll-behavior:contain}
+.dk-skill-heading{padding:8px 2px 4px;margin:7px 0 2px;border-bottom:1px solid #8d794f;
+ font:700 11px monospace;letter-spacing:.08em;color:#f2d491}
+.dk-skill-row{display:flex;align-items:center;gap:7px;justify-content:space-between;
+ margin:3px 0;padding:4px 3px;border-bottom:1px solid #4b434c;color:#e2ddcc;font:10px/1.25 monospace}
+.dk-skill-row>span{flex:1;min-width:100px;overflow-wrap:anywhere}
+.dk-paper-action{border:1px solid #a48c63;background:#334c54;color:#f3dfb9;
+ cursor:pointer;min-width:43px;padding:6px 4px;font:700 10px monospace}
+.dk-paper-action:disabled{opacity:.42;cursor:not-allowed}
+.dk-paper-action:hover:not(:disabled){background:#476c7a}
+.dk-paper-feedback{border:1px solid #85684e;background:#3d3027;color:#ffdda8;
+ padding:8px;margin:4px 0 8px;font:11px/1.35 monospace}
