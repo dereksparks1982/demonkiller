@@ -513,7 +513,7 @@ async function createDKServer({
       }catch(error){
         if(/Stale exterior revision/.test(error.message))
           return sendJSON(res,409,{error:error.message},method);
-        if(/exterior|Exterior|Door|door|Building|building|Fixture|fixture|ground|Ground|Invalid|Unknown|Unsupported|protected|Cannot/.test(error.message))
+        if(/exterior|Exterior|Door|door|Building|building|Fixture|fixture|ground|Ground|Invalid|Unknown|Unsupported|protected|Cannot|object|Object|Tile|tile|wall|Wall|asset|Asset|Unapproved|Duplicate|already|blocked|overlap|placement|spawn|rotation|map boundary/.test(error.message))
           return sendJSON(res,422,{error:error.message},method);
         console.error('Exterior edit save failed:',error);
         return sendJSON(res,500,{error:'Exterior edit could not be saved'},method);

@@ -99,6 +99,8 @@ function traversable(area,x,y,form='living'){
  if(area.objects.some(o=>o.type==='willow'&&
    x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1)))return false;
  if(form==='living'&&area.objects.some(o=>o.type==='well'&&x===o.x&&y===o.y))return false;
+ if(form==='living'&&area.objects.some(o=>o.type==='architect_prop'&&o.solidOverride&&
+  x>=o.x&&y>=o.y&&x<o.x+(o.w||1)&&y<o.y+(o.h||1)))return false;
  return true;
 }
 function portal(world,areaId,x,y){

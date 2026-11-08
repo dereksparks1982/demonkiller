@@ -553,6 +553,7 @@
   // Missing or slow-loading images use the existing primitive Canvas fallback.
   const spriteCache=new Map();
   let spriteRefreshScheduled=false;
+  let architectMovePreview=null;
   function sprite(path) {
     if(typeof Image==='undefined')return null;
     if(spriteCache.has(path))return spriteCache.get(path);
@@ -775,6 +776,18 @@
         ctx.strokeRect(o.x*TILE+2,o.y*TILE+2,w*TILE-4,h*TILE-4);
       }}
       if(corner){ctx.strokeStyle='#e5bfd8';ctx.lineWidth=3;ctx.strokeRect(corner.x*TILE+2,corner.y*TILE+2,TILE-4,TILE-4);}
+    }
+    if(architectMovePreview&&mode==='edit'){
+      const p=architectMovePreview;
+      const target=objectAtId(p.id),valid=target&&canPlace({...target,x:p.x,y:p.y},p.id);
+      if(target){
+        const [w,h]=dims(target);
+        ctx.save();ctx.fillStyle=valid?'rgba(75,202,121,.3)':'rgba(236,86,82,.3)';
+        ctx.fillRect(p.x*TILE,p.y*TILE,w*TILE,h*TILE);
+        ctx.strokeStyle=valid?'#89eba3':'#f77b7b';ctx.lineWidth=3;
+        ctx.strokeRect(p.x*TILE+1,p.y*TILE+1,w*TILE-2,h*TILE-2);
+        ctx.restore();
+      }
     }
     if(hover&&mode==='edit'){
       if(tool==='place'&&CATALOG[current]||tool==='paste'&&architectClipboard){
@@ -1928,6 +1941,32 @@
       });
     renderCultJournal();
   }
+  // M39: the shared Architect controller uses this tiny region adapter for
+  // pointer dragging. The temple keeps its original scene and undo stack.
+  window.DKTempleArchitectBridge=Object.freeze({
+    hit:(x,y)=>{
+      const o=inside(x,y)?objectAt(x,y):null;
+      if(!o)return null;
+      const [w,h]=dims(o);return {id:o.id,x:o.x,y:o.y,w,h};
+    },
+    preview:(id,x,y)=>{
+      const o=objectAtId(id);
+      if(!o||mode!=='edit')return {ok:false,error:'Choose an object in Architect Mode'};
+      const ok=canPlace({...o,x,y},id);
+      architectMovePreview={id,x,y};
+      draw();return {ok,error:ok?null:'The placement is blocked or outside this room'};
+    },
+    move:(id,x,y)=>{
+      architectMovePreview=null;
+      const o=objectAtId(id);
+      if(!o||mode!=='edit')return false;
+      if(!canPlace({...o,x,y},id))return false;
+      const moved=transact(()=>{o.x=x;o.y=y;},
+        'Moved '+(CATALOG[o.type]?.label||'object')+' with DK Architect.');
+      selectedId=null;draw();return moved;
+    },
+    cancel:()=>{architectMovePreview=null;draw();}
+  });
   if(SERVER){
     (async()=>{
       try{

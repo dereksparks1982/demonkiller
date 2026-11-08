@@ -11,7 +11,7 @@ const KEY='dkSoftworks.demonkiller.architect.outdoorDraft.m37.';
 const allowed=new Set([R.COURT,R.VILLAGE]);
 const building=new Set(['house','bank','bakery','smithy','tavern']);
 const fixture=new Set(['well','stall']);
-const ground=new Set(['grass','path','dirt','garden','stone']);
+const ground=new Set(['grass','path','dirt','garden','stone','dark','cracked','sigil']);
 const layerKeys=['floor','walls','wallStyles','wallVariants','wallPacks','wallRotations','floorArt'];
 const blank={floor:'grass',walls:0,wallStyles:'clean',wallVariants:null,
  wallPacks:'ox72i',wallRotations:0,floorArt:null};
@@ -59,6 +59,8 @@ function apply(area,action,fields){
  const {x,y,object_id}=fields;
  if(action==='move_building'){
   GEOMETRY.move(area,object_id,x,y);
+ }else if(['place_prop','move_prop','rotate_prop','remove_prop'].includes(action)){
+  GEOMETRY.propEdit(area,action,fields);
  }else if(action==='move_fixture'){
   const o=getObject(area,object_id,fixture);
   if(!safe(area,x,y)||area.walls[pos(area,x,y)]||
@@ -77,6 +79,12 @@ function apply(area,action,fields){
    if(o.door)area.walls[pos(area,o.door.x,o.door.y)]=1;
    o.door={x,y};area.walls[pos(area,x,y)]=0;
   }
+ }else if(action==='restore_tiles'){
+  GEOMETRY.restoreTiles(area,fields.tiles);
+ }else if(action==='set_spawn'){
+  GEOMETRY.setSpawn(area,x,y);
+ }else if(action==='wall_batch'){
+  GEOMETRY.wallBatch(area,fields.tiles,fields.erase,fields);
  }else if(['paint_wall','erase_wall','wall_line','room_outline'].includes(action)){
   GEOMETRY.wallEdit(area,action,fields);
  }else if(action==='paint_ground'||action==='paint_rectangle'){
@@ -89,7 +97,11 @@ function apply(area,action,fields){
    const i=pos(area,xx,yy);
    if(area.walls[i]||area.floor[i]==='roof'||area.objects.some(o=>
     overlaps(footprint(o),{x:xx,y:yy,w:1,h:1})))continue;
-   area.floor[i]=fields.floor;area.floorArt[i]=null;count++;
+   if(fields.floorArt){
+    const art=window.DKArchitectDungeon?.entries?.[fields.floorArt];
+    if(!art||art.category!=='floor')throw Error('Unapproved floor artwork');
+   }
+   area.floor[i]=fields.floor;area.floorArt[i]=fields.floorArt||null;count++;
   }
   if(!count)throw Error('No editable ground found');
  }else throw Error('Unsupported editor operation');

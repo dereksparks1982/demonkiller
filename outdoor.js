@@ -232,7 +232,14 @@ function floor(x,y){
   px('#26252c',x*TILE,y*TILE,TILE,TILE);return;
  }
  const colors={grass:'#36663b',path:'#716a61',garden:'#446f40',
-  stone:'#625d64',roof:'#443940'};
+  dirt:'#66513d',stone:'#625d64',roof:'#443940',
+  dark:'#25232d',cracked:'#42414a',sigil:'#45313c'};
+ const tileArt=area.floorArt?.[y*area.width+x];
+ if(tileArt&&D?.draw(ctx,tileArt,x*TILE,y*TILE,TILE,TILE,performance.now()/1000))return;
+ if(['dark','cracked','sigil'].includes(f)){
+  const image=ready('temple/floors/floor_'+f+'_south.png');
+  if(image){ctx.drawImage(image,x*TILE,y*TILE,TILE,TILE);return;}
+ }
  px(colors[f]||'#345d3b',x*TILE,y*TILE,TILE,TILE);
  const seed=(x*23+y*13+x*y*7)%17;
  if(f==='grass'||f==='garden'){
@@ -284,7 +291,42 @@ function willow(x,y,phase){
   for(let i=-2;i<=2;i++)px('#222125',cx+i*17-3,cy-31-Math.abs(i)*2,6,4);
  }
 }
+function drawArchitectProp(o){
+ const C=window.DKArchitectCatalog;
+ if(!C||!o)return;
+ const id=o.assetType,dir=['north','east','south','west'][o.r||0],
+  x=o.x*TILE,y=o.y*TILE,w=(o.w||1)*TILE,h=(o.h||1)*TILE;
+ if(id==='imported'){
+  if(D?.drawObject(ctx,{type:'imported',assetId:o.assetId,x:o.x,y:o.y,r:o.r},performance.now()/1000))return;
+ }
+ let path=null;
+ if(id==='scenery'){
+  const entry=C.sprites[o.spriteId];
+  path=entry?.path|| (entry?.prefix?entry.prefix+dir+'.png':entry?.sheet)||null;
+ }else{
+  const def=C.objects[id];
+  if(def){
+   const folder=def.category==='relics'?'ritual':def.category==='structure'?
+    'structure':'furniture';
+   const base=id==='crystal'?'crystal_active':id;
+   path='temple/'+folder+'/'+base+'_'+dir+'.png';
+  }
+ }
+ if(path){
+  const sprite=ready(path);
+  if(sprite){
+   if(id==='scenery'&&C.sprites[o.spriteId]?.sheet)
+    ctx.drawImage(sprite,0,0,32,32,x,y,w,h);
+   else ctx.drawImage(sprite,x,y,w,h);
+   return;
+  }
+ }
+ // Missing art never changes collision or silently paints a large placeholder.
+ px('#23242d',x+6,y+6,Math.max(10,w-12),Math.max(10,h-12));
+ px('#c5a76e',x+Math.min(11,w/3),y+Math.min(10,h/3),Math.max(4,w/3),Math.max(4,h/3));
+}
 function drawObject(o){
+ if(o.type==='architect_prop'){drawArchitectProp(o);return;}
  if(o.type==='willow'){
   const phase=lilithPhase==='playing'?
    Math.min(1,(performance.now()-animStart)/6200):1;

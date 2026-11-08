@@ -2,13 +2,18 @@
 // M36: author-owned exterior edits. Server world stays authoritative.
 // All edits are one transaction; building cells retain their stable IDs.
 const {COURT,VILLAGE}=require('./regions.cjs');
+// The same approved catalogue and dungeon art definitions are available to Node.
+require('../assets/art/dkarchitect/imported/first-catalog.js');
+require('../assets/art/dkarchitect/imported/catalog.js');
+require('../dk-dungeon-art.js');
+require('../dk-architect-catalog-m39.js');
 const GEOMETRY=require('../dk-architect-exterior-m38.js');
 const BUILDINGS=new Set(['house','bank','bakery','smithy','tavern']);
 const FIXTURES=new Set(['well','stall']);
 const TILE_FIELDS=['floor','walls','wallStyles','wallVariants','wallPacks','wallRotations','floorArt'];
 const BASE={floor:'grass',walls:0,wallStyles:'clean',wallVariants:null,
  wallPacks:'ox72i',wallRotations:0,floorArt:null};
-const GROUND=new Set(['grass','path','garden','dirt','stone']);
+const GROUND=new Set(['grass','path','garden','dirt','stone','dark','cracked','sigil']);
 const DECOR=new Set(['grass','dirt']);
 function integer(v){return Number.isSafeInteger(v);}
 function at(a,x,y){return y*a.width+x;}
@@ -25,10 +30,11 @@ function editable(area,id,types){
  if(!object||!types.has(object.type))throw Error('Unknown or protected exterior object');
  return object;
 }
-function commandKeys(command,fields){
- const actual=Object.keys(command).sort().join(',');
- const expected=['action','area_id','expected_revision',...fields].sort().join(',');
- if(actual!==expected)throw Error('Invalid exterior edit parameters');
+function commandKeys(command,fields,optional=[]){
+ const actual=Object.keys(command),expected=['action','area_id','expected_revision',...fields];
+ if(expected.some(k=>!actual.includes(k))||
+  actual.some(k=>!expected.includes(k)&&!optional.includes(k)))
+  throw Error('Invalid exterior edit parameters');
 }
 function blank(area,x,y){
  const i=at(area,x,y);
@@ -110,16 +116,34 @@ function edit(world,command){
  const action=command.action,id=command.area_id;
  const specs={move_building:['object_id','x','y'],move_fixture:['object_id','x','y'],
   set_door:['object_id','x','y'],remove_door:['object_id'],
+  set_spawn:['x','y'],restore_tiles:['tiles'],
+  place_prop:['id','assetType','assetId','spriteId','r','x','y'],
+  move_prop:['object_id','x','y'],
+  rotate_prop:['object_id','r'],remove_prop:['object_id'],
   paint_wall:['x','y'],erase_wall:['x','y'],
   wall_line:['x','y','w','h'],room_outline:['x','y','w','h'],
+  wall_batch:['tiles','erase'],
   paint_ground:['x','y','floor'],paint_rectangle:['x','y','w','h','floor']};
  if(!Object.hasOwn(specs,action))throw Error('Unsupported exterior edit action');
- commandKeys(command,specs[action]);
+ commandKeys(command,specs[action],
+ ['paint_wall','wall_line','room_outline','wall_batch'].includes(action)?['wallPack','wallAsset','rotation']:
+ ['paint_ground','paint_rectangle'].includes(action)?['floorArt']:[]);
  const next=structuredClone(world),area=areaFor(next,id);
  let target=null;
  if(action==='move_building'){
   target=GEOMETRY.move(area,command.object_id,command.x,command.y);
   syncAttached(next,target,id);
+ }else if(['place_prop','move_prop','rotate_prop','remove_prop'].includes(action)){
+  target=GEOMETRY.propEdit(area,action,command);
+  if(action!=='remove_prop'&&target.solidOverride){
+   const char=next.characters?.['1'];
+   if(char?.area_id===id&&GEOMETRY.overlaps(GEOMETRY.rect(target),
+     {x:char.x,y:char.y,w:1,h:1}))
+    throw Error('Cannot place a solid object on the player');
+   if(Object.values(next.living?.npcs||{}).some(n=>n.alive&&n.area_id===id&&
+    GEOMETRY.overlaps(GEOMETRY.rect(target),{x:n.x,y:n.y,w:1,h:1})))
+    throw Error('Cannot place a solid object on a resident');
+  }
  }else if(action==='move_fixture'){
   target=editable(area,command.object_id,FIXTURES);
   if(!integer(command.x)||!integer(command.y))throw Error('Invalid fixture coordinates');
@@ -158,6 +182,12 @@ function edit(world,command){
    target.door=null;
   }
   syncAttached(next,target,id);
+ }else if(action==='restore_tiles'){
+  GEOMETRY.restoreTiles(area,command.tiles);
+ }else if(action==='set_spawn'){
+  GEOMETRY.setSpawn(area,command.x,command.y);
+ }else if(action==='wall_batch'){
+  GEOMETRY.wallBatch(area,command.tiles,command.erase,command);
  }else if(['paint_wall','erase_wall','wall_line','room_outline'].includes(action)){
   GEOMETRY.wallEdit(area,action,command);
  }else{
@@ -174,7 +204,11 @@ function edit(world,command){
    if(area.walls[i]||area.floor[i]==='roof'||area.objects.some(o=>
     overlaps(rect(o),{x,y,w:1,h:1})))continue;
    if(area.floor[i]===command.floor)continue;
-   area.floor[i]=command.floor;area.floorArt[i]=null;changed++;
+   if(command.floorArt){
+    const art=globalThis.DKArchitectDungeon?.entries?.[command.floorArt];
+    if(!art||art.category!=='floor')throw Error('Unapproved floor artwork');
+   }
+   area.floor[i]=command.floor;area.floorArt[i]=command.floorArt||null;changed++;
   }
   if(!changed)throw Error('Ground brush found no editable tiles');
  }
