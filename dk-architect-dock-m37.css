@@ -1,5 +1,5 @@
 /* DK Architect M37: a bottom construction bar, not a floating legacy editor. */
-#dkArchitectDock[hidden],#dkOutdoorArchitect[hidden]{display:none!important}
+#dkArchitectDock[hidden],#dkOutdoorArchitect[hidden],#dkBuildPalette[hidden]{display:none!important}
 #dkArchitectDock{position:fixed;z-index:80;bottom:0;left:0;right:0;color:#e3eaf1;background:#1c2c3e;border-top:4px solid #557da2;box-shadow:0 -6px 24px #000c;font:11px/1.25 monospace;display:flex;flex-direction:column}
 #dkArchitectDock *{box-sizing:border-box}
 .dk-dock-head{display:flex;align-items:center;gap:10px;padding:5px 12px;background:#17232e;border-bottom:1px solid #53687c}

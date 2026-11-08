@@ -42,7 +42,7 @@ function choose(object){
   'FOOTPRINT: '+(object.w||1)+' × '+(object.h||1)+'\n'+
   'POSITION: '+object.x+', '+object.y+'\n'+
   (object.door?'DOOR: '+object.door.x+', '+object.door.y:'NO DOOR')+
-  '\nSaved to DK Server.':'Choose a building or fixture. The temple, paths, and willow are protected.';
+  (localDraft?'\nBrowser draft; export JSON.':'\nSaved to DK Server.'):'Choose a building or fixture. The temple, paths, and willow are protected.';
  draw();
 }
 function modeSet(next){
@@ -297,14 +297,15 @@ function groupSet(name){
  document.querySelectorAll('[data-tool]').forEach(b=>{
   b.hidden=!GROUPS[name].includes(b.dataset.tool);
  });
+ if(!GROUPS[name].includes(mode))modeSet(GROUPS[name][0]);
  status(name.toUpperCase()+' TOOLS · use the choices above and click or drag on the map.');
 }
 document.querySelectorAll('[data-group]').forEach(b=>
  b.addEventListener('click',()=>groupSet(b.dataset.group)));
 groupSet('foundations');
 document.addEventListener('keydown',e=>{
+ if(e.key==='F8'&&!e.repeat){e.preventDefault();exitArchitect();return;}
  if(e.target?.matches?.('input,select,textarea')||e.ctrlKey||e.altKey||e.metaKey)return;
- if(e.key==='F8'){e.preventDefault();exitArchitect();return;}
  if(e.key==='Escape'){drag=null;choose(null);return;}
  if(e.key==='z'||e.key==='Z'){history('undo');return;}
  if(e.key==='y'||e.key==='Y'){history('redo');return;}
