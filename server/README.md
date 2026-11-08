@@ -1,4 +1,4 @@
-# DK Server M53 | Physical Snooping, Stealing and Witnessed Crime (v2.28.0)
+# DK Server M54 | Physical Weapons, Armor, Ammo and Durability (v2.29.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -294,3 +294,9 @@ New local regression contracts: `tests/customer-service-m51.cjs` and `tests/stea
 Living players can snoop the real NPC backpack registry at close range and inspect specific durable item serials. A time-limited observation record, Stealing skill, real world-minute cooldown, NPC proximity, cargo reservation, and physical item ledger determine whether one unit can be taken. A successful pickpocket transfers an actual item or splits a stack by a unique serial, and the world event archive records the outcome. Failed attempts cannot mint items. In guarded districts, witnesses and the failed theft's victim may report an M15 pickpocket case, raising the same heat/fines that existing guards pursue and collect.
 
 Use the existing `POST /api/v1/gameplay` actions `snoop_npc` and `pickpocket` from the paper doll's new THIEVING section. Character migration adds thievery observation history, while old saves validate before runtime migration. The new regression suite is `tests/thievery-m53.cjs`. GitHub Actions remains manual-only.
+
+## M54 forged weapons and actual item-serial equipment
+
+Seven forgeable item types (sword, mace, spear, bow, arrows, buckler and iron armor) use the same real backpack, ore, wood and herb inventories. New three-slot armory equipment is stored by physical serial, with wear retained on the item across equip/unequip and saves. Actual combat changes damage, weapon skill, bow line of sight and arrow consumption, and absorbs damage through armor and a probabilistic shield parry. Broken items are destroyed without minting substitutes. Character retirement cleans personal armor containers.
+
+Use `GET /api/v1/armory` and `POST /api/v1/gameplay` actions `forge_gear`, `equip_gear` and `unequip_gear`. P → ARMORY shows the workflow on a connected DK Server. Source: `server/armory-m54.cjs`; regression suite: `tests/armory-m54.cjs`. GitHub Actions remains manual-only; no player/server end-to-end test is claimed.

@@ -12,6 +12,7 @@ const BURIALS=require('./burials-m30.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const FIELD=require('./field-skills-m43.cjs');
 const THIEVERY=require('./thievery-m53.cjs');
+const ARMORY=require('./armory-m54.cjs');
 const MAGIC=require('./spells-m44.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
@@ -23,7 +24,8 @@ const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const LAW=require('./law-m15.cjs');
 const HOUSING=require('./housing-m17.cjs');
 const VENDORS=require('./vendors-m18.cjs');
-const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages','grain','grist','flour']);
+const TYPES=new Set(['herbs','wood','ore','bread','tools','produce','meals','torches','rations','bandages','grain','grist','flour',
+ 'short_sword','mace','spear','bow','arrows','buckler','iron_armor']);
 const VALUES={herbs:3,wood:2,ore:4,bread:2,tools:8,produce:2,meals:4,grain:2,grist:3,flour:4};
 const NODES=[
  ['courtyard_herbs_west',COURT,18,32,'herbs',6],
@@ -49,6 +51,7 @@ function ensureProgress(character){
  if(SKILLS.ensure(character))changed=true;
  if(FIELD.ensure(character))changed=true;
  if(THIEVERY.ensure(character))changed=true;
+ if(ARMORY.ensureCharacter(character))changed=true;
  if(MAGIC.ensure(character))changed=true;
  return changed;
 }
@@ -108,6 +111,8 @@ function apply(world,command,now=Date.now()){
  if(command?.action==='skill_lock')return SKILLS.applyLock(world,command);
  if(command?.action==='use_skill')return FIELD.apply(world,command);
  if(['snoop_npc','pickpocket'].includes(command?.action))return THIEVERY.apply(world,command);
+ if(['forge_gear','equip_gear','unequip_gear'].includes(command?.action))
+  return ARMORY.act(world,command);
  if(command?.action==='cast_spell')return MAGIC.apply(world,command,now);
  if(['accept_bounty','turn_in_bounty'].includes(command?.action))return BOUNTIES.apply(world,command);
  if(['tame_creature','feed_pet','release_pet','pet_follow','pet_stay','pet_guard'].includes(command?.action))return COMPANIONS.apply(world,command);

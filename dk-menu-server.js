@@ -91,6 +91,7 @@
     async milling() { return request('/api/v1/milling'); },
     async playerBusiness() { return request('/api/v1/player-business'); },
     async maintenance() { return request('/api/v1/maintenance'); },
+    async armory() { return request('/api/v1/armory'); },
     async law() { return request('/api/v1/law'); },
     async items() { return request('/api/v1/entities/items'); },
     async inventory() { return request('/api/v1/inventory'); },

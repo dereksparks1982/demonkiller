@@ -7,6 +7,8 @@ const SKILLS=require('./skills-m14.cjs');
 const CREATURES=require('./creatures-m42.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
+const ARMORY=require('./armory-m54.cjs');
+const ENTITIES=require('./entity-registry-m10.cjs');
 const {onDeath:recordMobileDeath,onCreatureDeath:recordMonsterRemains}=require('./mobile-assets-m12.cjs');
 const MAX_CREATURES=48,MAX_DROPS=2048;
 function seed(){return {schema:1,sequence:0,creatures:{},drops:{}};}
@@ -43,6 +45,16 @@ function event(world,minute,type,text,details={}){
  return e;
 }
 function distance(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);}
+function bowLineClear(area,a,b){
+ if(a.x!==b.x&&a.y!==b.y)return false;
+ const dx=Math.sign(b.x-a.x),dy=Math.sign(b.y-a.y);
+ let x=a.x+dx,y=a.y+dy;
+ while(x!==b.x||y!==b.y){
+  if(!traversable(area,x,y,'living'))return false;
+  x+=dx;y+=dy;
+ }
+ return true;
+}
 function findOpen(world,area_id,x,y){
  const area=world.areas[area_id];
  if(!area)return null;
@@ -162,6 +174,7 @@ function tick(world,minute,events){
    if(player===target&&c.magic?.protection_until_minute>minute)
     damage=Math.max(1,Math.floor(damage/2));
    if(player===target){
+    damage=ARMORY.defend(world,c,damage,events,monster.id);
     c.crafting.health=Math.max(0,c.crafting.health-damage);
     if(c.crafting.health===0&&!c.crafting.incapacitated){
      c.crafting.incapacitated=true;
@@ -209,26 +222,37 @@ function apply(world,command,now=Date.now()){
  if(command.action==='attack'){
   if(typeof command.target_id!=='string'||!/^[a-z]+_[0-9]+$/.test(command.target_id))
    throw Error('Invalid creature target');
-  const enemy=s.creatures[command.target_id];
-  if(!enemy?.alive||enemy.area_id!==c.area_id||distance(enemy,c)>1)
-   throw Error('Move beside a living monster');
+  const enemy=s.creatures[command.target_id],weapon=ARMORY.equipped(next,c,'weapon');
+  const range=weapon?.range||1,dist=enemy?distance(enemy,c):Infinity;
+  if(!enemy?.alive||enemy.area_id!==c.area_id||dist<1||dist>range)
+   throw Error(range>1?'Move within weapon range':'Move beside a living monster');
+  if(weapon?.type==='bow'&&!bowLineClear(next.areas[c.area_id],c,enemy))
+   throw Error('A bow requires cardinal line of sight');
+  if(weapon?.type==='bow'&&!(c.inventory?.arrows>0))
+   throw Error('You have no arrows');
   if(!Number.isFinite(now)||now<0)throw Error('Invalid attack clock');
   if(c.last_attack_utc_ms!==undefined&&now-c.last_attack_utc_ms<900)
    throw Error('You must wait before striking again');
   c.last_attack_utc_ms=now;
-  if(c.fieldcraft)c.fieldcraft.hidden_until_minute=-1;
-  const skill=c.crafting?.hand==='tools'?'swordsmanship':'wrestling';
+  if(c.fieldcraft){
+   c.fieldcraft.hidden_until_minute=-1;c.fieldcraft.stealth_steps=0;
+  }
+  const skill=weapon?.skill||(c.crafting?.hand==='tools'?'swordsmanship':'wrestling');
   const mastery=c.skillbook?.skills?.[skill]?.value||0;
   const tactics=c.skillbook?.skills?.tactics?.value||0;
-  // Baseline matches old combat; trained skills improve strikes.
-  const damage=(c.crafting?.hand==='tools'?8:5)+Math.floor((mastery+tactics)/400);
+  const damage=(weapon?.damage||(c.crafting?.hand==='tools'?8:5))+
+   Math.floor((mastery+tactics)/400);
+  if(weapon?.type==='bow')c.inventory.arrows--;
   enemy.health=Math.max(0,enemy.health-damage);
+  if(weapon)ARMORY.wear(next,c,'weapon',1,events);
+  if(weapon?.type==='bow')ENTITIES.reconcile(next);
   c.skills.combat=(c.skills.combat||0)+1;
   SKILLS.practice(c,skill,minute,'monster:'+enemy.id);
   SKILLS.practice(c,'tactics',minute,'combat:'+enemy.id);
   SKILLS.practice(c,'anatomy',minute,'opponent:'+enemy.kind);
   events.push(event(next,minute,'player.attack','The character struck '+CREATURES.config(enemy.kind).name+'.',
-   {creature_id:enemy.id,damage,area_id:c.area_id}));
+   {creature_id:enemy.id,damage,area_id:c.area_id,weapon:weapon?.type||null,
+    ranged:weapon?.type==='bow'}));
   if(enemy.health===0)dead(next,enemy,minute,events,'player');
  }else{
   if(typeof command.drop_id!=='string'||!/^drop_[0-9]+$/.test(command.drop_id))

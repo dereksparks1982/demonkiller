@@ -31,6 +31,7 @@ const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
+const ARMORY=require('./armory-m54.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -117,6 +118,7 @@ function makeWorld(now = Date.now()) {
   MILLING.ensure(result);
   BUSINESS.ensure(result);
   MAINTENANCE.ensure(result);
+  ARMORY.ensure(result);
   return result;
 }
 
@@ -204,6 +206,7 @@ function validateWorld(world) {
   MILLING.validate(world);
   BUSINESS.validate(world);
   MAINTENANCE.validate(world);
+  ARMORY.validate(world);
   return world;
 }
 
@@ -220,6 +223,7 @@ function createCharacter(world, slot, name, now = Date.now()) {
   const next = structuredClone(world);
   next.characters[String(slot)] = character;
   reconcileEntities(next);
+  ARMORY.ensure(next);
   ensureDistricts(next);
   ensureCells(next);
   next.revision++;

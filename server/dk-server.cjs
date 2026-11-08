@@ -29,6 +29,7 @@ const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
+const ARMORY=require('./armory-m54.cjs');
 const {ensure:ensureLaw,listing:lawListing}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,current:currentDistrict}=require('./region-policies-m16.cjs');
 const {ensure:ensureHousing,listing:housingListing}=require('./housing-m17.cjs');
@@ -180,6 +181,7 @@ async function createDKServer({
     const millingAdded=MILLING.ensure(world);
     const businessAdded=BUSINESS.ensure(world);
     const maintenanceAdded=MAINTENANCE.ensure(world);
+    const armoryAdded=ARMORY.ensure(world);
     const npcCommerceAdded=ensureNpcCommerce(world);
     const workshopsAdded=ensureWorkshops(world);
     const npcAIAdded=ensureMobileAI(world);
@@ -197,7 +199,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -735,6 +737,8 @@ async function createDKServer({
       const player=world.characters?.['1'];
       return sendJSON(res,200,CREATURES.listing(world,player?.area_id||null),method);
     }
+    if(url.pathname==='/api/v1/armory'&&!write)
+      return sendJSON(res,200,ARMORY.listing(world),method);
     if(url.pathname==='/api/v1/maintenance'&&!write)
       return sendJSON(res,200,MAINTENANCE.listing(world),method);
     if(url.pathname==='/api/v1/player-business'&&!write)
@@ -772,7 +776,7 @@ async function createDKServer({
           world_revision:result.world.revision,event:result.event});
       }catch(e){
         if(/Invalid/.test(e.message))return sendJSON(res,422,{error:e.message});
-        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock|fine|guard|witness|crime|Stack|stack|incompatible|selected|Selected|Tools|burial|grave|exhausted|disturbed|human body|mana|spell|Magery|reagent|casting|line of sight|concealment|tracks|remains|meditat|ward|Protection|sight|bounty|contract|reward|companion|wolf|animal|tame|feed|pet|loyalty|mill|grain|grist|flour|bakery|station|sack|herbal|food|wages|cooldown|conscious|weakened|Unknown|Invalid|customer|purchase|counter|storefront|snoop|steal|pickpocket|NPC|belongings|examining/.test(e.message))
+        if(/closer|bank|ghost|Ghost|closed|enough|stock|depleted|wait|full|paused|own|near|business|pack|balance|ingredients|equipment|hungry|bandages|unconscious|smithy|slot|recipe|monster|loot|striking|fight|item|chest|vault|ground|container|equip|stored|corpse|body|dead|skill|training|lock|fine|guard|witness|crime|Stack|stack|incompatible|selected|Selected|Tools|burial|grave|exhausted|disturbed|human body|mana|spell|Magery|reagent|casting|line of sight|concealment|tracks|remains|meditat|ward|Protection|sight|bounty|contract|reward|companion|wolf|animal|tame|feed|pet|loyalty|mill|grain|grist|flour|bakery|station|sack|herbal|food|wages|cooldown|conscious|weakened|Unknown|Invalid|customer|purchase|counter|storefront|snoop|steal|pickpocket|NPC|belongings|examining|weapon|armor|armory|forge|bow|arrows|durability|equipment|Backpack/.test(e.message))
           return sendJSON(res,409,{error:e.message});
         console.error('Player gameplay failed:',e);
         return sendJSON(res,500,{error:'Gameplay transaction was not saved'});

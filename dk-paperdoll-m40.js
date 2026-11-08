@@ -441,6 +441,62 @@ async function showThievery(observation=null){
  }catch(error){show('THIEVING',['NPC belongings unavailable: '+error.message]);}
 }
 menu('THIEVING',()=>showThievery(),'Inspect actual NPC backpacks, take a risk and face living witnesses');
+
+async function showArmory(){
+ if(!connected()){show('ARMORY',['Real weapon crafting, equipping and durability require the persistent DK Server.']);return;}
+ const api=window.DemonKillerServer;
+ try{
+  const [gear,inventory]=await Promise.all([api.armory(),api.inventory()]);
+  show('ARMORY · WEAPONS & ARMOR',[
+   'Your sword, mace, spear or bow changes the combat skill and damage. Bows need arrows and an unobstructed cardinal path.',
+   'Shields can block damage; armor absorbs it. All equipped items wear down with use. Unequipping does not repair them.',
+   'Craft metal gear at the village smithy using real supplies; arrows and bows use wood and herbs.'
+  ]);
+  for(const [slot,worn] of Object.entries(gear.equipped||{})){
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const text=document.createElement('span');text.textContent=slot.toUpperCase()+' · '+
+    (worn?worn.type+' · '+worn.durability+'/100':'empty');
+   row.append(text);
+   if(worn)row.append(button('UNEQUIP',async()=>{
+    try{const result=await api.gameAction('unequip_gear',{slot});
+     await showArmory();feedback(result.event?.text||'Equipment removed.');
+    }catch(error){feedback(error.message);}
+   }));
+   content.append(row);
+  }
+  const forgeHeading=document.createElement('h3');forgeHeading.className='dk-skill-heading';
+  forgeHeading.textContent='CRAFT PHYSICAL EQUIPMENT';content.append(forgeHeading);
+  for(const [name,recipe] of Object.entries(gear.recipes||{})){
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const label=document.createElement('span');label.textContent=
+    name.replaceAll('_',' ')+' · '+Object.entries(recipe.input)
+     .map(([type,n])=>n+' '+type).join(', ')+(recipe.smith?' · SMITHY':'');
+   row.append(label,button('MAKE',async()=>{
+    try{
+     const result=await api.gameAction('forge_gear',{recipe:name});
+     await showArmory();feedback(result.event?.text||'Equipment crafted.');
+    }catch(error){feedback(error.message);}
+   }));content.append(row);
+  }
+  const packHeading=document.createElement('h3');packHeading.className='dk-skill-heading';
+  packHeading.textContent='WEAPONS IN YOUR BACKPACK';content.append(packHeading);
+  for(const item of inventory.backpack||[]){
+   if(!Object.hasOwn(gear.gear||{},item.type))continue;
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const label=document.createElement('span');label.textContent=
+    item.type.replaceAll('_',' ')+' · '+item.serial+' · qty '+item.amount;
+   row.append(label,button('EQUIP',async()=>{
+    try{
+     const result=await api.gameAction('equip_gear',{serial:item.serial});
+     await showArmory();feedback(result.event?.text||'Equipment worn.');
+    }catch(error){feedback(error.message);}
+   },item.amount!==1));
+   content.append(row);
+  }
+ }catch(error){show('ARMORY',['Equipment records unavailable: '+error.message]);}
+}
+menu('ARMORY',showArmory,'Physical weapons, metalwork, armor, shields and lasting durability');
+
 menu('GUILD',()=>{},'Guild creation and membership are not implemented yet',false);
 async function showQuests(){
  if(!connected()){show('QUESTS',['Bounty contracts and their rewards are saved by DK Server. The static GitHub Pages preview does not have an authoritative bounty ledger.']);return;}

@@ -98,7 +98,8 @@ function apply(world,command){
   const item=command.item_type;
   const slot=item==='tools'?'hand':item==='torches'?'light':null;
   if(!slot)throw Error('Invalid equip item');
-  if(c[slot])throw Error('This equipment slot is occupied');
+  if(c[slot]||(slot==='hand'&&player.armory?.slots?.weapon))
+   throw Error('This equipment slot is occupied');
   if((player.inventory[item]||0)<1)throw Error('You do not own the equipment');
   player.inventory[item]--;c[slot]=item;
   if(item==='torches')c.torch_until_minute=minute+90;

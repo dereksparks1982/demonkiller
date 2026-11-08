@@ -63,6 +63,8 @@ function take(world,command){
   if(item.parent!==R.PACK)throw Error('Item is not in your backpack');
   const destination=item.type==='tools'?R.HAND:item.type==='torches'?R.LIGHT:null;
   if(!destination)throw Error('This item cannot be equipped');
+  if(destination===R.HAND&&c.armory?.slots?.weapon)
+   throw Error('Put away the weapon before equipping tools');
   const result=R.transfer(world,{action:'move_item',serial:item.serial,
     quantity:1,destination});
   result.event.type='item.equipped';result.event.text='Equipment was worn.';

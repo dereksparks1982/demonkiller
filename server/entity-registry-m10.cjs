@@ -4,7 +4,8 @@
 // moves between pack, equipment, bank, ground, and one village chest.
 const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const ITEM_TYPES=Object.freeze(['herbs','wood','ore','bread','tools','produce','meals',
-  'torches','rations','bandages','grain','grist','flour']);
+  'torches','rations','bandages','grain','grist','flour',
+  'short_sword','mace','spear','bow','arrows','buckler','iron_armor']);
 const KNOWN=new Set(ITEM_TYPES),PACK='pack_1',VAULT='vault_1',
   HAND='hand_1',LIGHT='light_1',CHEST='chest_village_1';
 const LIMIT=8192,REF_LIMIT=16384,GROUND_LIMIT=1024;
@@ -55,6 +56,14 @@ function targets(world,registry){
       add(PACK,type,amount);
     if(player.crafting?.hand)add(HAND,player.crafting.hand,1);
     if(player.crafting?.light)add(LIGHT,player.crafting.light,1);
+    for(const [slot,parent]of Object.entries({weapon:'armory_weapon_1',
+      offhand:'armory_offhand_1',armor:'armory_armor_1'})){
+      const serial=player.armory?.slots?.[slot];
+      if(serial){const item=registry.items[serial];
+       if(!item||item.parent!==parent)throw Error('Equipped weapon serial is missing');
+       add(parent,item.type,1);
+      }
+    }
   }
   for(const [type,amount] of Object.entries(world.living?.storage?.vaults?.['1']||{}))
     add(VAULT,type,amount);
@@ -202,6 +211,10 @@ function validate(world){
       !Number.isSafeInteger(item.created_minute)||item.created_minute<0)
       throw Error('Invalid item entity');
     verifySerial(id);
+    if(item.durability!==undefined&&
+      (!['short_sword','mace','spear','bow','buckler','iron_armor'].includes(item.type)||
+       !Number.isSafeInteger(item.durability)||item.durability<1||item.durability>100))
+      throw Error('Invalid durable equipment metadata');
     if(!Object.hasOwn(r.containers,item.parent)){
       if(!/^ground_[1-9][0-9]*$/.test(item.parent)||
         !world.living?.storage?.ground?.[item.parent])
@@ -210,7 +223,7 @@ function validate(world){
     byParent[item.parent]=(byParent[item.parent]||0)+item.amount;
   }
   for(const [id,c] of Object.entries(r.containers)){
-    if(!c||c.id!==id||!['pack','bank','equip','chest','npc_pack','house_store','vendor_stock'].includes(c.kind)||
+    if(!c||c.id!==id||!['pack','bank','equip','armory_equip','chest','npc_pack','house_store','vendor_stock'].includes(c.kind)||
       !Number.isInteger(c.capacity)||c.capacity<1||c.capacity>500||
       (['chest','house_store','vendor_stock'].includes(c.kind)&&(!world.areas?.[c.area_id]||
         !Number.isInteger(c.x)||!Number.isInteger(c.y)||
@@ -218,6 +231,8 @@ function validate(world){
         c.y>=world.areas[c.area_id].height)))
       throw Error('Invalid world container');
     if((byParent[id]||0)>c.capacity)throw Error('Entity container capacity exceeded');
+    if(c.kind==='armory_equip'&&(!['weapon','offhand','armor'].includes(c.slot)||
+      c.capacity!==1||c.owner!=='1'))throw Error('Invalid equipment container');
   }
   if((byParent[HAND]||0)>1||(byParent[LIGHT]||0)>1)
     throw Error('Invalid equipped stack');
