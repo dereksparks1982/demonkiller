@@ -34,6 +34,12 @@ const groups=[
   actions:[['PLAYER SPAWN','tool:spawn'],['PLACE ORIGINAL SPRITE','uoPlace']]},
  {id:'logistics',icon:'▥',label:'LOGISTICS',category:'items',
   actions:[['PLACE EQUIPMENT','uoPlace'],['PICK TILE','uoPick'],['SAVE ROOM','save'],['EXPORT JSON','export']]},
+ {id:'intelligence',icon:'⌁',label:'INTELLIGENCE',category:null,
+  actions:[['CHECK ACCESS','uoInspect'],['PICK EXISTING','uoPick']]},
+ {id:'emergencies',icon:'⚠',label:'EMERGENCIES',category:'npcs',
+  actions:[['STAGE ENEMY ACTOR','uoPlace'],['REMOVE STAGED ACTOR','uoDelete']]},
+ {id:'clone',icon:'▧',label:'CLONE',category:null,
+  actions:[['COPY OBJECT','uoCopy'],['PASTE OBJECT','inspectorPaste'],['DUPLICATE','duplicate']]},
  {id:'planning',icon:'⌕',label:'PLANNING',category:null,
   actions:[['SELECT','uoSelect'],['CHECK ACCESS','uoInspect'],['UNDO','uoUndo'],['REDO','uoRedo'],['EXPORT JSON','export']]}
 ];

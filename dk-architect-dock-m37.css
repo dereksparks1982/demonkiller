@@ -15,7 +15,7 @@
 #dkArchitectDock #uoPaletteList{display:flex!important;align-items:center;gap:4px;min-height:60px;width:max-content}
 #dkArchitectDock #uoPaletteList button{flex:0 0 auto}
 .dk-dock-tabs{display:flex;gap:3px;align-items:stretch;overflow-x:auto;padding:7px 6px 6px;background:#182c47;min-height:72px}
-.dk-dock-tab{border:2px solid #7599b8;border-radius:2px;background:#22548b;color:#e1e8f0;min-width:94px;padding:5px 8px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;font:700 10px monospace;letter-spacing:.03em;cursor:pointer}
+.dk-dock-tab{border:2px solid #7599b8;border-radius:2px;background:#22548b;color:#e1e8f0;min-width:76px;padding:5px 8px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;font:700 10px monospace;letter-spacing:.03em;cursor:pointer}
 .dk-dock-tab span{font:26px/1 monospace}
 .dk-dock-tab[aria-selected=true],.dk-dock-tab:hover{background:#3879bf;border-color:#f3d793;color:#fff1c5}
 .dk-dock-footer{padding:4px 10px;color:#c9bba3;background:#181d28;font:10px monospace;min-height:19px}

@@ -16,7 +16,7 @@ test('M37 temple Architect button opens a bottom construction dock, not old floa
  assert.match(dock,/originalViewport=\$\('uoPaletteViewport'\)/);
  assert.match(dock,/palette\.append\(originalViewport\)/);
  for(const group of ['foundations','materials','rooms','objects','staff',
-  'utilities','deployment','logistics','planning'])
+  'utilities','deployment','logistics','intelligence','emergencies','clone','planning'])
   assert(dock.includes("id:'"+group+"'"),'Missing tab '+group);
  assert.match(css,/body\.dk-architect-v37 #architectWindow\{display:none!important\}/);
  assert.match(css,/#dkArchitectDock\{position:fixed;z-index:80;bottom:0/);
@@ -45,7 +45,7 @@ test('M37 outdoor build bar shows categorized buttons and functional tool submen
  const html=read('dk-architect-outdoors-m36.html'),
   js=read('dk-architect-outdoors-m36.js');
  for(const group of ['foundations','materials','rooms','objects','staff',
-  'utilities','deployment','logistics','planning'])
+  'utilities','deployment','logistics','intelligence','emergencies','clone','planning'])
   assert(html.includes('data-group="'+group+'"'),'Missing bottom category '+group);
  for(const mode of ['select','move','door','erase','ground','inspect'])
   assert(html.includes('data-tool="'+mode+'"'),'Missing subtool '+mode);

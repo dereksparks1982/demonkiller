@@ -288,6 +288,8 @@ const GROUPS={
  utilities:['ground','inspect'],
  deployment:['select','inspect'],
  logistics:['inspect','select'],
+ intelligence:['inspect','select'],
+ emergencies:['inspect','select'],
  planning:['inspect','select','move','ground']
 };
 function groupSet(name){

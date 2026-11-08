@@ -17,7 +17,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-acti
 #inspector{position:absolute;right:12px;top:12px;width:220px;max-width:45vw;background:#24212be9;border:2px solid #a08064;padding:12px;font:12px/1.5 monospace;pointer-events:none;white-space:pre-line}
 #status{position:absolute;bottom:12px;left:12px;max-width:80%;padding:7px 10px;background:#171419ed;border:1px solid #a78c6a;color:#e6d7b7;font:12px monospace;pointer-events:none}
 #tools{background:#111b2a;border-top:3px solid #6088ac;min-height:76px;display:flex;align-items:stretch;gap:4px;padding:7px 5px;flex-wrap:nowrap;overflow-x:auto}
-.tool{display:grid;place-items:center;align-content:center;min-width:96px;min-height:63px;gap:3px;background:linear-gradient(#174178,#082140);border:2px solid #6e9cca;border-radius:3px;color:#e8efff;font:bold 10px monospace;letter-spacing:.06em}
+.tool{display:grid;place-items:center;align-content:center;min-width:82px;min-height:63px;gap:3px;background:linear-gradient(#174178,#082140);border:2px solid #6e9cca;border-radius:3px;color:#e8efff;font:bold 10px monospace;letter-spacing:.06em}
 .tool span{font-size:25px;line-height:1}.tool.active{background:linear-gradient(#2670b9,#194f88);border-color:#d6b56c;color:#fff2bd}
 #toolOptions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px;background:#202534;border-top:1px solid #536482;min-height:74px}#subtools{display:flex;align-items:center;gap:5px;flex-wrap:wrap;width:100%}#subtools button{padding:6px 10px;font-size:11px;border-color:#789bbc}#subtools button.active{border-color:#dfbf6e;background:#305883}#subtools button[hidden]{display:none!important}
 #toolOptions label{display:flex;align-items:center;gap:5px;font-size:12px}
@@ -63,6 +63,9 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-acti
  <button class="tool" data-group="utilities"><span>✣</span>UTILITIES</button>
  <button class="tool" data-group="deployment"><span>⚑</span>DEPLOYMENT</button>
  <button class="tool" data-group="logistics"><span>▥</span>LOGISTICS</button>
+ <button class="tool" data-group="intelligence"><span>⌁</span>INTELLIGENCE</button>
+ <button class="tool" data-group="emergencies"><span>⚠</span>EMERGENCIES</button>
+ <button class="tool" data-group="clone" disabled title="Building cloning is not yet supported by the persistent world">▧<br>CLONE</button>
  <button class="tool" data-group="planning"><span>⌕</span>PLANNING</button>
 </nav>
 <script src="./world-regions.js"></script>
