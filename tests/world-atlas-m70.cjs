@@ -23,8 +23,8 @@ test('M70 full-world atlas is exactly 72 by 72 Streaming Cells and starts unpain
  assert.equal(ATLAS.coverage(w).water_percent,0);
  const data=ATLAS.view(w,{x:0,y:0,scale:128,columns:72,rows:72});
  assert.equal(data.tiles.length,72);assert.equal(data.tiles[0].length,72);
- assert.equal(data.tiles[0][0].material,null);
- assert.equal(data.tiles[71][71].material,null);
+ assert.equal(data.tiles[0][0].material,'grass');
+ assert.equal(data.tiles[71][71].material,'grass');
  assert.equal(data.format,'dk.world.atlas.m70');
 });
 test('M70 fill one third of world ocean with 1728 compact cell records',()=>{
@@ -37,7 +37,7 @@ test('M70 fill one third of world ocean with 1728 compact cell records',()=>{
  assert.equal(ATLAS.coverage(result.world).water_percent,33.3333);
  assert.equal(ATLAS.coverage(w).water_percent,0);
  assert.equal(TERRAIN.readTile(result.world,71*128+127,9215).material,'sea');
- assert.equal(TERRAIN.readTile(result.world,0,0).material,null);
+ assert.equal(TERRAIN.readTile(result.world,0,0).material,'grass');
  assert.equal(WORLD.validateWorld(result.world),result.world);
 });
 test('M70 paint and exact undo preserve the server world in cells and fine overrides',()=>{
@@ -52,7 +52,7 @@ test('M70 paint and exact undo preserve the server world in cells and fine overr
   expected_revision:w.revision,tiles:painted.undo_cells});
  assert.equal(TERRAIN.readTile(restored.world,30*128+64,30*128+64).material,'river',
   'Fine terrain paint must survive cell undo');
- assert.equal(TERRAIN.readTile(restored.world,30*128+65,30*128+65).material,null);
+ assert.equal(TERRAIN.readTile(restored.world,30*128+65,30*128+65).material,'grass');
  assert.equal(ATLAS.coverage(restored.world).water_tiles,1);
  assert.equal(WORLD.validateWorld(restored.world),restored.world);
 });

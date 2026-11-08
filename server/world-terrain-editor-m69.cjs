@@ -9,16 +9,24 @@ const MATERIALS=new Set([
  'sea','beach','river','lake','deepwater','marsh','bog','reed','bridge'
 ]);
 const SOLID=new Set(['cliff','boulder','crevasse','sea','river','lake','deepwater']);
+const DEFAULTS=Object.freeze({material:'grass',elevation:0});
 const valid=n=>Number.isSafeInteger(n);
 const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
-function blank(){return {schema:SCHEMA,sectors:{},cells:{}};}
+function blank(){return {schema:SCHEMA,defaults:{...DEFAULTS},sectors:{},cells:{}};}
 function validate(world){
  const terrain=world?.world_grid?.terrain;
  if(terrain===undefined)return true; // M67/M68 saves acquire an empty ledger.
  if(!terrain||terrain.schema!==SCHEMA||!terrain.sectors||
   typeof terrain.sectors!=='object'||Array.isArray(terrain.sectors)||
-  Object.keys(terrain).some(k=>!['schema','sectors','cells'].includes(k)))
+  Object.keys(terrain).some(k=>!['schema','defaults','sectors','cells'].includes(k)))
   throw Error('Invalid world terrain ledger');
+ if(terrain.defaults!==undefined&&(
+  !terrain.defaults||typeof terrain.defaults!=='object'||
+  Array.isArray(terrain.defaults)||
+  Object.keys(terrain.defaults).sort().join(',')!=='elevation,material'||
+  terrain.defaults.material!==DEFAULTS.material||
+  terrain.defaults.elevation!==DEFAULTS.elevation))
+  throw Error('Invalid terrain world defaults');
  if(terrain.cells!==undefined){
   if(!terrain.cells||typeof terrain.cells!=='object'||Array.isArray(terrain.cells))
    throw Error('Invalid painted cells');
@@ -61,10 +69,14 @@ function ensure(world){
   world.world_grid.terrain=blank();return true;
  }
  validate(world);
+ let changed=false;
  if(world.world_grid.terrain.cells===undefined){
-  world.world_grid.terrain.cells={};return true;
+  world.world_grid.terrain.cells={};changed=true;
  }
- return false;
+ if(world.world_grid.terrain.defaults===undefined){
+  world.world_grid.terrain.defaults={...DEFAULTS};changed=true;
+ }
+ return changed;
 }
 function address(x,y){
  GRID.tile(x,y);
@@ -86,8 +98,8 @@ function areaTile(world,x,y){
 function readTile(world,x,y){
  const a=areaTile(world,x,y),o=override(world,x,y);
  return {x,y,material:o?.material??world.world_grid?.terrain?.cells?.[
-   Math.floor(x/GRID.CELL)+'.'+Math.floor(y/GRID.CELL)]??(a?.area.floor[a.index]??null),
-  elevation:o?.elevation??(a?.area.elevation?.[a.index]??0),
+   Math.floor(x/GRID.CELL)+'.'+Math.floor(y/GRID.CELL)]??DEFAULTS.material,
+  elevation:o?.elevation??DEFAULTS.elevation,
   override:o?{...o}:null,sector:address(x,y).sector,
   materialized:Boolean(a)};
 }
@@ -186,8 +198,10 @@ function edit(world,command){
   if(obstructed(world,pos.x,pos.y,material??current.material))
    throw Error('Terrain edit would obstruct a character, fixture or building plan');
   const next={};
-  if(material!==null)next.material=material;
-  if(elevation!==null)next.elevation=elevation;
+  const cellBase=world.world_grid?.terrain?.cells?.[
+    Math.floor(pos.x/GRID.CELL)+'.'+Math.floor(pos.y/GRID.CELL)]??DEFAULTS.material;
+  if(material!==null&&material!==cellBase)next.material=material;
+  if(elevation!==null&&elevation!==DEFAULTS.elevation)next.elevation=elevation;
   updates.push({x:pos.x,y:pos.y,previous:prev?{...prev}:null,next});
  }
  const changed=updates.filter(u=>
@@ -209,7 +223,7 @@ function edit(world,command){
   if(a){
    if(u.next.material!==undefined)a.area.floor[a.index]=u.next.material;
    else if(previous?.material!==undefined)a.area.floor[a.index]=
-     world.world_grid?.terrain?.cells?.[Math.floor(u.x/GRID.CELL)+'.'+Math.floor(u.y/GRID.CELL)]??M68.tile(u.x,u.y);
+     nextWorld.world_grid?.terrain?.cells?.[Math.floor(u.x/GRID.CELL)+'.'+Math.floor(u.y/GRID.CELL)]??M68.tile(u.x,u.y);
    if(u.next.elevation!==undefined||previous?.elevation!==undefined){
     if(!Array.isArray(a.area.elevation))
      a.area.elevation=Array(a.area.width*a.area.height).fill(0);
@@ -257,6 +271,7 @@ function exportData(world,cx=null,cy=null){
   }
  }
  return {format:'dk.world.terrain.m69',world_revision:world.revision,
+  defaults:structuredClone(data.defaults??DEFAULTS),
   dimensions:{width:GRID.WIDTH,height:GRID.HEIGHT,
    tile_size:GRID.TILE,sector_size:GRID.SECTOR,cell_size:GRID.CELL},
   scope:cx===null?'all':{cell_x:cx,cell_y:cy},
@@ -266,5 +281,5 @@ function exportData(world,cx=null,cy=null){
   building_drafts:cx===null?structuredClone(world.world_grid?.buildings||{}):null,
   legacy_scenes_imported:false};
 }
-module.exports={SCHEMA,MATERIALS,SOLID,MAX_BRUSH,blank,ensure,validate,
+module.exports={SCHEMA,MATERIALS,SOLID,MAX_BRUSH,DEFAULTS,blank,ensure,validate,
  address,override,readTile,inspect,brushTiles,edit,sector,exportData};

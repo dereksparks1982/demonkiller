@@ -68,7 +68,11 @@ function cellMaterial(world,cx,cy){
 function editCells(world,c){
  if(!world?.world_grid||c?.expected_revision!==world.revision)
   throw Error('Stale world revision');
- const targets=validateCellCommand(c),cells=world.world_grid.terrain?.cells||{};
+ const inputs=validateCellCommand(c),cells=world.world_grid.terrain?.cells||{};
+ // "Paint grass" restores the implicit grass plane instead of serializing
+ // 16,384 redundant grass tiles for every cleared ocean cell.
+ const targets=c.action==='fill_cells'&&c.material===TERRAIN.DEFAULTS.material?
+  inputs.map(t=>({...t,material:null})):inputs;
  const requested=targets.filter(t=>(cells[key(t.cx,t.cy)]??null)!==t.material);
  const skipped=requested.filter(t=>impassableBlocked(world,t.cx,t.cy,t.material));
  const blocked=new Set(skipped.map(t=>key(t.cx,t.cy)));
@@ -115,8 +119,8 @@ function view(world,{x,y,scale,columns,rows}={}){
    if(px>=GRID.WIDTH||py>=GRID.HEIGHT){row.push(null);continue;}
    const o=TERRAIN.override(world,px,py),base=world.world_grid?.terrain?.cells?.[
      Math.floor(px/GRID.CELL)+'.'+Math.floor(py/GRID.CELL)]??null;
-   row.push({material:o?.material??base,
-     elevation:o?.elevation??0,
+   row.push({material:o?.material??base??TERRAIN.DEFAULTS.material,
+     elevation:o?.elevation??TERRAIN.DEFAULTS.elevation,
      painted:Boolean(o||base),
      // The old 4-cell M68 scene is intentionally not the new world atlas.
      cell_x:Math.floor(px/GRID.CELL),cell_y:Math.floor(py/GRID.CELL)});
@@ -126,37 +130,44 @@ function view(world,{x,y,scale,columns,rows}={}){
  return {format:'dk.world.atlas.m70',revision:world.revision,
   width:GRID.WIDTH,height:GRID.HEIGHT,
   tile_size:GRID.TILE,cell_size:GRID.CELL,sector_size:GRID.SECTOR,
-  x,y,scale,columns,rows,tiles};
+  x,y,scale,columns,rows,tiles,defaults:TERRAIN.DEFAULTS};
 }
 function coverage(world){
  const terrain=world.world_grid?.terrain||{},cells=terrain.cells||{};
- let water=0,authored=0;
- const materials={};
- const cellArea=GRID.CELL*GRID.CELL;
+ const total=GRID.WIDTH*GRID.HEIGHT,cellArea=GRID.CELL*GRID.CELL;
+ const base=TERRAIN.DEFAULTS.material,materials={[base]:total};
+ let authored=0,water=SEA.has(base)?total:0;
  for(const type of Object.values(cells)){
-  authored+=cellArea;if(SEA.has(type))water+=cellArea;
+  authored+=cellArea;
+  materials[base]-=cellArea;
   materials[type]=(materials[type]||0)+cellArea;
+  if(SEA.has(type))water+=cellArea;
+  if(SEA.has(base))water-=cellArea;
  }
  for(const [name,sector] of Object.entries(terrain.sectors||{})){
   const [sx,sy]=name.split('.').map(Number);
   for(const [idx,value]of Object.entries(sector.tiles)){
-   if(value.material===undefined)continue;
    const x=sx*GRID.SECTOR+Number(idx)%GRID.SECTOR,
-     y=sy*GRID.SECTOR+Math.floor(Number(idx)/GRID.SECTOR),
-     base=cells[Math.floor(x/GRID.CELL)+'.'+Math.floor(y/GRID.CELL)]??null;
-   if(base===value.material)continue;
-   if(base){materials[base]--;if(SEA.has(base))water--;}
-   else authored++;
-   materials[value.material]=(materials[value.material]||0)+1;
-   if(SEA.has(value.material))water++;
+    y=sy*GRID.SECTOR+Math.floor(Number(idx)/GRID.SECTOR),
+    cell=cells[Math.floor(x/GRID.CELL)+'.'+Math.floor(y/GRID.CELL)]??null;
+   if(cell===null)authored++;
+   const old=cell??base,material=value.material??old;
+   if(material===old)continue;
+   materials[old]--;
+   materials[material]=(materials[material]||0)+1;
+   if(SEA.has(old))water--;
+   if(SEA.has(material))water++;
   }
  }
- const total=GRID.WIDTH*GRID.HEIGHT;
- return {world_tiles:total,authored_tiles:authored,water_tiles:water,
-  water_percent:Number((water/total*100).toFixed(4)),
-  target_water_percent:33.3333,
-  materials,
-  note:'Authored paints only; the four M68 preview regions are not imported.'};
+ return {
+  world_tiles:total,authored_tiles:authored,
+  default_material:base,default_elevation:TERRAIN.DEFAULTS.elevation,
+  unedited_tiles:total-authored,
+  grass_tiles:materials.grass||0,
+  water_tiles:water,water_percent:Number((water/total*100).toFixed(4)),
+  target_water_percent:33.3333,materials,
+  note:'Unpainted terrain is flat grass. Coverage counts authored cell and tile overrides; legacy preview scenery is separate.'
+ };
 }
 module.exports={view,editCells,coverage,validateCellCommand,cellMaterial,
  MAX_CELLS_PER_EDIT,SCALE_LEVELS};

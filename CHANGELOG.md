@@ -1,3 +1,15 @@
+## v0.2.69 / M71 | 2026-11-08 | Flat green default world
+
+- The entire new **9,216 × 9,216 tile world** now starts as **flat grass at elevation 0**, including coordinates temporarily overlapping old M68 wilderness samples in the atlas. No oceans, mountains, rivers or settlements are automatically generated into the replacement atlas.
+- Authoritative `world_grid.terrain.defaults={material:'grass',elevation:0}` is attached to newly created and migrated worlds without erasing existing painted cell materials, per-tile overrides, heights or building drafts. Older terrain ledgers without the field upgrade safely and validation enforces the baseline.
+- DK Server terrain inspection and atlas viewport return grass/zero for every untouched valid coordinate. Exported JSON includes exact implicit defaults so geography can be reconstructed without serializing **84,934,656** grass tiles.
+- Whole-cell grass painting removes a prior ocean/biome fill, restoring default land with reversible undo. Fine grass paint over cell-filled water creates only necessary overrides; identical/default fine paints and height-zero restoration do not create redundant entries.
+- Corrected atlas coverage: base grass represents the unedited world, water counts painted bodies, and authored versus inherited tile counts stay distinct. Fine terrain materials and height-only edits are counted.
+- The DK Architect World Pixel Painter clearly labels the flat green starting plane while retaining intentionally simple pixel art, right-drag panning, left-drag painting, zoom, server autosave and export.
+- Added M71 tests for world corners, all zoom levels, coverage, ocean-to-grass rollback, tile/elevation edits, save migration/validation, browser integration and API export/restart. Updated M69/M70 regressions to expect grass instead of an empty atlas.
+- **Legacy caveat:** The separate temporary M68 playable outdoor prototype may still display its older procedural floor art; connected gameplay streaming of new atlas tiles, terrain-driven elevation/movement and hydrology are not completed in M71. No new artwork or prefabs.
+- Isolated JavaScript/V8 cross-module checks passed; complete Node regression and visual browser tests still require a source checkout.
+
 ## v0.2.68 / M70 | 2026-11-08 | DK Architect whole-world pixel painter
 
 - Built the first whole-atlas **DK Architect World Pixel Painter** for all 9,216×9,216 logical tiles (72×72 Streaming Cells), with a direct launcher from main menu Options / persistent server and from the in-game F8 Logistics panel.

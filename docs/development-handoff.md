@@ -4,7 +4,7 @@ This document is the working continuity reference if a conversation thread fills
 
 ## Source and release discipline
 
-Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The current M70 release target is game **0.2.68**, server **2.31.14**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
+Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The current M71 release target is game **0.2.69**, server **2.31.15**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
@@ -21,6 +21,16 @@ Do not build until explicitly instructed. When authorized: inspect current HEAD,
 - Kilns and heavy industrial equipment should have **very rare** breakdowns after years, not constantly wear out. M50/M66 failures need rebalancing.
 - NPCs must autonomously found differentiated settlements, disagree and secede, trade and make peace or war, operate companies and continue independent lives. Avoid WorldBox's arbitrary population blobs and repetitive all-out war.
 - Study the full private-server mod list in the master roadmap, prioritizing Nerun's Distro, OWLTR, FS-ATS, Xanthos Evo/Shrink, Knives Town Houses and Knives Chat. Do not copy proprietary UO art or unsuitable GPL code into commercial game source.
+
+## M71: flat-green world baseline (November 8, 2026)
+
+**Owner decision:** The replacement 9,216×9,216 world starts as one uninterrupted green grass plane at elevation 0, then the owner shapes it by painting land, oceans, rivers and mountains. Do NOT pre-generate an ornate map, prefabricated towns, rivers or ocean, and do not make the terrain visually more detailed than the intentionally basic 32×32 pixel NPC sprites.
+
+The schema-1 terrain ledger now has `defaults:{material:'grass',elevation:0}`. The loader migrates older save ledgers without clearing authored `cells`, `sectors` or building records. Server tile reads, atlas viewport and JSON export all honor the implicit baseline. Whole-cell grass paint removes a previous ocean/biome fill rather than saving 16,384 grass tiles; fine grass-over-ocean overrides and signed elevations remain separately available. New coverage reports true base grass, painted water and authored/unedited counts.
+
+**Acceptance:** isolated V8 checks passed for baseline edges, 33.3333% ocean fill, returning whole painted cells to grass, undo, fine edits, elevation restore, exact export defaults and migration. `tests/grass-plane-m71.cjs` adds Node API and restart checks, but full Node regression and live browser tests are still required. Old M68 temporary gameplay regions remain technically separate; do not claim their existing art was replaced.
+
+**Next implementation:** connect the replacement world atlas to freely traversable server-owned terrain areas while maintaining sparse green defaults; add safe slope/elevation rules and simple low-detail pixel cliffs after that.
 
 ## M70 added whole-world authoring (November 8, 2026)
 

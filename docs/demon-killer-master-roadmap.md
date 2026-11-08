@@ -131,15 +131,17 @@ Additional UO principles worth reviving: single-world Felucia-like risk rather t
 
 **Then, in dependency order (numbers are provisional):**
 - **M70 delivered foundation:** whole-world DK Architect viewport, zoomed-out navigation, giant ocean/biome cell brushes, server-authored sparse terrain outside the four M68 regions and authored land/water coverage counters. Gameplay streaming into those unmaterialized regions remains pending.
-- **M71:** 2.5D height-aware renderer, slope and cliff collision, autotiling, coherent mountain shape/shading and seam tests.
-- **M72:** water physics, sea level, coastlines, broad river carving, depth and connected navigable Great River.
-- **M73:** underground cells, cave entrances, mines, tunnels, supports and collapse ecology.
-- **M74–M75:** Nerun/XmlSpawner2/UORespawn-inspired spawn-area editor, habitats, seasons, wandering, conditions, AI and event persistence.
-- **M76–M77:** Life is Feudal-inspired terrain-footprint validation, soil excavation, leveling, foundations, staged material delivery, active build labor and durable equipment.
-- **M78–M80:** authentic item-quality economy, OWLTR/BOD jobs, logistics, farming/forestry/mining, worker camps, physical transport and river commerce.
-- **M81–M82:** FS-ATS/Xanthos animal lineage, husbandry, breeding, taming, companion employment.
-- **M83–M85:** Knives' Town Houses, UO Builder/Achitect properties, rental, player-made buildings, independent NPC companies and worker delegation.
-- **M86 onward:** autonomous city founding, faction disagreements, differentiation of settlements, meaningful diplomacy and wars, refuge/rebuilding, Knives Chat and extensible world events; culminate in integration tests and release criteria.
+- **M71 delivered:** flat grass at elevation zero across all 9,216² coordinates, implicit server default and reversible sparse edits. Authoring foundation only; old M68 runtime remains.
+- **M72:** Materialize and stream terrain for playable player/NPC movement across newly authored/default world cells, with no old-town prefabs.
+- **M73:** Elevation-aware movement, deliberately low-detail pixel cliff/slope transitions, collision, terrain consistency across cell seams and tests. Do not impose realistic or polished textures.
+- **M74:** Water depths, ocean and river-carving tools, flowing connected Great River, tributaries and coastline transition rules.
+- **M75:** Underground cells, cave entrances, mines, tunnels, supports and collapse ecology.
+- **M76–M77:** Nerun/XmlSpawner2/UORespawn-inspired region spawners, habitats, seasons, wandering, conditional events, persistence.
+- **M78–M79:** Life is Feudal-inspired terrain-footprint validation, soil excavation, leveling, foundations, staged material delivery, active construction labor and durable heavy equipment.
+- **M80–M82:** Quality-based economy, OWLTR/BOD jobs, logistics, forestry, mining/farming, worker camps, carts and river commerce.
+- **M83–M84:** FS-ATS/Xanthos animal lineage, husbandry, taming, breeding, companion training and care.
+- **M85–M87:** Knives' Town Houses, UO Builder properties, rental, player-owned constructions, independent NPC companies and worker delegation.
+- **M88 onward:** Autonomous city founding, political disagreements and secession, differentiated settlements, meaningful diplomacy/war, refugees/rebuilding, Knives Chat and extensible world events; conclude with integration and acceptance tests.
 - **Legacy migration gate:** retire the former temple/village runtime after old economy, character, creature, inventory and save dependencies have been migrated or explicitly reset by the owner.
 
 Every slice should update technical docs and release notes, add focused regression contracts, test where execution is possible, update the brief user-facing README only when player-facing controls actually change, then commit and verify GitHub. Never claim visual/UI acceptance from source-only checks.

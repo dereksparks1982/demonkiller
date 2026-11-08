@@ -54,8 +54,10 @@ test('M69 paint across two 128-tile regions changes authoritative terrain and co
  assert.equal(WORLD.validateWorld(edited.world),edited.world);
  const restored=TERRAIN.edit(edited.world,{action:'restore',
   expected_revision:edited.revision,tiles:edited.undo});
- assert.equal(TERRAIN.readTile(restored.world,x,y).material,baseLeft);
- assert.equal(TERRAIN.readTile(restored.world,x+1,y).material,baseRight);
+ assert.equal(TERRAIN.readTile(restored.world,x,y).material,'grass');
+ assert.equal(TERRAIN.readTile(restored.world,x+1,y).material,'grass');
+ assert.equal(restored.world.areas[M68.id(12,15)].floor[(y%128)*128+127],baseLeft);
+ assert.equal(restored.world.areas[M68.id(13,15)].floor[(y%128)*128],baseRight);
  assert.equal(TERRAIN.validate(restored.world),true);
 });
 

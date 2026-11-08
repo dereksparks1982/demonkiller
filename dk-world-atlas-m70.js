@@ -61,12 +61,11 @@
  function render(){
   if(!open||!ctx)return;
   ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,SIZE,SIZE);
-  ctx.fillStyle='#24282c';ctx.fillRect(0,0,SIZE,SIZE);
+  ctx.fillStyle=PALETTE.grass;ctx.fillRect(0,0,SIZE,SIZE);
   if(frame&&frame.x===x&&frame.y===y&&frame.scale===scale){
    for(let row=0;row<DIM;row++)for(let col=0;col<DIM;col++){
     const value=frame.tiles[row]?.[col];
-    const color=value?.material?PALETTE[value.material]||'#83798a':
-      ((col+row)%2?'#292d31':'#25282e');
+    const color=value?.material?PALETTE[value.material]||'#83798a':PALETTE.grass;
     ctx.fillStyle=color;ctx.fillRect(gridLine(col),gridLine(row),PIXEL,PIXEL);
     if(scale<=4&&value?.material&&ACCENT[value.material]){
      const salt=((x+col*scale)*17+(y+row*scale)*13)%7;
@@ -236,7 +235,7 @@
   panel.setAttribute('aria-label','DK Architect whole world pixel painter');
   const materialOptions=TYPES.map(m=>'<option value="'+m+'">'+(LABELS[m]||m.toUpperCase())+'</option>').join('');
   panel.innerHTML='<header><strong>DK ARCHITECT · WORLD PAINTER</strong>'+
-   '<span>9,216 × 9,216 TILES · ORIGINAL PIXEL ART</span>'+
+   '<span>9,216 × 9,216 TILES · FLAT GRASS START</span>'+
    '<button type="button" data-close>CLOSE ATLAS</button></header>'+
    '<div class="dk-atlas-toolbar"><label>PAINT <select data-tool>'+materialOptions+
    '<option value="raise_elevation">RAISE GROUND</option>'+
@@ -261,7 +260,7 @@
    ' Zoom in and choose INDIVIDUAL TILES to refine coastlines and elevations.</p>'+
    '<strong data-water>0% WATER</strong><strong data-authored>0 TILES PAINTED</strong>'+
    '<p data-position></p><p data-status role="status" aria-live="polite">World atlas loading…</p>'+
-   '<p>Unpainted squares are empty world design space, not prebuilt scenery.</p>'+
+   '<p>Every tile starts as green GRASS at elevation 0. Paint oceans, rivers and mountains yourself.</p>'+
    '</div></div>';
   document.body.append(panel);canvas=$('[data-canvas]');ctx=canvas.getContext('2d');
   canvas.addEventListener('contextmenu',e=>e.preventDefault());

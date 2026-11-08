@@ -2,9 +2,10 @@
 
 The old temple-only editor proposal has been retired and preserved under `docs/history/architect-plan-temple-era.md`. The authoritative owner-approved design lives in [the master roadmap](demon-killer-master-roadmap.md).
 
-## Implemented foundation through M70
+## Implemented foundation through M71
 
 - The logical world grid is 9,216×9,216 tiles, each 32px in original top-down art scale, addressed through 128×128 Streaming Cells and 16×16 sectors.
+- **M71 default:** Every unpainted tile in the replacement atlas is green grass at elevation 0, without any generated mountains, ocean or buildings. The server stores one default plus sparse changes rather than 84.9 million grass tiles. Painting whole Streaming Cells back to grass removes their cell material overrides, leaving fine details and height changes individually editable.
 - The **M70 World Pixel Painter** can open directly from the connected server's main menu **Options → Persistent World → Open DK Architect** or from F8 **Logistics → World Pixel Painter**.
 - It is intentionally simpler in visual detail than Ultima Online and uses the same hard-edged 32×32 character pixel vocabulary: 72×72 block world overview, no gradient, no GPU art model, no smoothed artwork.
 - Hold right mouse and drag to pan. Wheel zooms eight levels from full atlas (128 tiles per block) to exact 1:1 tile. Left drag paints.

@@ -1,6 +1,6 @@
 # Demon Killer World Server
 
-This directory contains the Node.js 20+ authoritative world simulator for Demon Killer. It owns the single-player world save, terrain edits, NPC activity, persistence, and streaming data. No external npm dependencies are needed.
+This directory contains the Node.js 20+ authoritative world simulator for Demon Killer. It owns the single-player world save, terrain edits, NPC activity, persistence, and streaming data. No external npm dependencies are needed. New world-atlas terrain has a persistent default of **grass at elevation 0** for all 84,934,656 logical tiles. Only authored changes are stored, so no giant grass array is allocated. Painting a whole cell back to grass removes its cell override; per-tile elevation/material overrides remain independently editable.
 
 To run from a source checkout: `node server/dk-server.cjs`. The default listener is **127.0.0.1:8766**. The game served by that process is the supported connected client. **GitHub Pages is a static browser preview and does not host this server.** Do not expose the loopback API to the public internet; remote hosting requires authentication and additional security.
 
