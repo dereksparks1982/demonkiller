@@ -88,6 +88,11 @@
     async streamingCells(radius=24){
       return request('/api/v1/streaming-cells?radius='+encodeURIComponent(radius));
     },
+    async cellContents(cursor=null,radius=24){
+      const url='/api/v1/streaming-cells/contents?radius='+encodeURIComponent(radius)+
+        (cursor?'&cursor='+encodeURIComponent(cursor):'');
+      return request(url);
+    },
     async sectorManifest(area){
       return request('/api/v1/sectors/manifest?area='+encodeURIComponent(area));
     },
@@ -135,7 +140,7 @@
     }
     try {
       const [health, worldClock, saves] = await Promise.all([client.health(), client.clock(), client.saveStatus()]);
-      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<33) throw Error('DK Server needs M33 or later');
+      if(!/^local-m[0-9]+$/.test(health.build||'') || Number(health.build.slice(7))<34) throw Error('DK Server needs M34 or later');
       status.textContent = worldClock.running
         ? 'RUNNING · DK Server is connected and world time is advancing'
         : 'PAUSED · DK Server is connected; the world is frozen';
