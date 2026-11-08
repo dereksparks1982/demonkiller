@@ -9,6 +9,7 @@ const {tick:craftTick}=require('./crafting-m7.cjs');
 const {tick:combatTick,dead:monsterDeath}=require('./combat-m8.cjs');
 const SPAWNERS=require('./spawners-m59.cjs');
 const GUARDS=require('./guard-watch-m61.cjs');
+const GARRISON=require('./garrison-m62.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
@@ -141,7 +142,8 @@ function minuteTick(world,m,generated){
   if(!n.alive)continue;
   if(npcSenseDue(world,n,m))NPCAI.sense(world,n,m,generated);
   const state=world.living.npc_ai?.brains[n.id]?.mode||'work';
-  const desired=NPCAI.destination(world,n)||npcDestination(n,m,world);
+  const desired=GARRISON.destination(world,n)||NPCAI.destination(world,n)||
+    npcDestination(n,m,world);
   const status=state==='flee'?'fleeing':state==='defend'?'defending':
    state==='recover'?'recovering':n.area_id!==desired.area_id?'traveling':
    n.x===desired.x&&n.y===desired.y?(day?'working':'resting'):'walking';
@@ -190,6 +192,7 @@ function minuteTick(world,m,generated){
  }
  NPCCOMMERCE.plan(world,m,generated);
  NPCCOMMERCE.purchase(world,m,generated);
+ GARRISON.tick(world,m,generated);
  if(m%60===0){
   for(const terr of Object.values(living.territories)){
    const roll=rng(living);
@@ -242,6 +245,7 @@ function advance(world,now=Date.now(),limit=180){
  ensureScheduler(next);
  SPAWNERS.ensure(next);
  GUARDS.ensure(next);
+ GARRISON.ensure(next);
  ensureMobileAssets(next);
  ensureLaw(next);
  ensureDistricts(next);

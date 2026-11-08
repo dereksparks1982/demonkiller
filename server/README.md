@@ -1,6 +1,12 @@
-# DK Server M61 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M62 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M62 recovery economy: guards pay for their own care
+
+`server/garrison-m62.cjs` extends the M61 guard watch with an independent **server-side garrison medical ledger**. Injured guards and escorts can walk to real existing stores when a remedy is in stock, the settlement is not occupied, the shop is staffed and open, and the patient has enough coins. Remedies are one bandage (market), one meal (tavern), or two herbs (courtyard market), each consumed from actual unique item serials and the vendor stock mirror. No care occurs remotely or while the store is closed. Shop money increases by exactly the amount removed from the guard's personal coins, accounting for player-business pricing. Personally operated businesses are not silently served by the simulation. Repeated ticks cannot double-treat a patient.
+
+Garrison records migrate old worlds non-destructively and are strictly validated, including timing, healing and cost totals. Read-only `GET /api/v1/garrison` lists patients and aggregated expense/healing history for the current area. Eight regression tests are added in `tests/garrison-m62.cjs`; no new player-facing control or city scene is introduced.
 
 ## M61 active NPC guard watch
 

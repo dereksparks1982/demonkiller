@@ -4,6 +4,12 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M62 | Paid medical care and physical garrison supplies
+
+Guards and escorts wounded in battle now seek an **actual staffed, open storefront** when treatment is available and affordable. Their recovery is not a free world-tick heal: village market bandages, tavern meals or courtyard herbal supplies are physically consumed by serial, while actual NPC coins transfer into the shop treasury. A medic's supply stock and the buyer's position must be valid. Player-operated businesses requiring personal service are not bypassed. Occupied settlements, closed shops, exhausted stock, missing money and distant patients prevent treatment.
+
+The server records medical transactions and accumulated care in a validated garrison ledger. Guards can travel toward viable care through the existing cardinal NPC navigator. Sentry defense, faction succession, normal NPC commerce and workshops share the same item registry. No extra play-screen buttons are added. Read-only diagnostics: `GET /api/v1/garrison`.
+
 ## M61 | Persistent settlement guard watch
 
 Guard and escort NPCs now keep real server-owned duty records, alarm targets, combat counters and last-action minutes. A sentry spots a hostile through the actual area terrain, shares a recent alarm with nearby colleagues, advances toward the enemy on navigable cardinal ground, and strikes within melee reach. Badly wounded guards withdraw from attacking; the existing citizen/NPC succession system can recruit a successor when a guard dies. Strikes occur at most once per guard per five-world-minute combat step; a duplicate tick or browser reload cannot invent extra attacks. Deaths use the **same combat corpse, loot, territory liberation and decay system** as player kills.

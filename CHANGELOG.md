@@ -1,5 +1,13 @@
 # Demon Killer Changelog
 
+## v0.2.60 / M62 | 2026-11-08 | Resource-backed garrison medical care
+
+- New saved garrison care records: treatment timing, spent coins, healing totals and patients, with idempotent migration.
+- Wounded guards and escorts can travel to an open market/tavern using existing cardinal routing, obtain paid treatment only while physically near a staffed storefront and consume real bandages, meals or herbs from stock.
+- The same unique item serial ledger and shop gold balances change as an atomic server transaction. Player-run stores are not bypassed.
+- War damage and settlement occupation can suspend recovery. No free healing, infinite supplies, war-mode changes, HUD buttons or new art.
+- Eight regression contracts cover economy, medical supply depletion, migration, cooldowns and invalid/stale state.
+
 ## v0.2.59 / M61 | 2026-11-08 | Active settlement guard watches
 
 - Moved guard offense out of the monster turn loop and into one world-owned, exact-once defensive pass per combat interval.
