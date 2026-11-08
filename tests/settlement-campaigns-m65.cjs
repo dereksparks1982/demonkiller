@@ -79,6 +79,12 @@ test('M65 a recovering town must be stable, restaffed and have returned survivor
  }
  w.living.businesses.village_market.open=true;
  w.living.minute=105;CAMP.tick(w,105,out);
+ assert.equal(r.phase,'rebuilding','Damaged buildings also block recovery');
+ // This M65 fixture simulates a fully funded/completed M66 repair.
+ // M66's own tests verify real goods, wages, work time and travel.
+ for(const site of Object.values(w.living.reconstruction.sites))
+  if(site.area_id===id)site.damage=0;
+ w.living.minute=110;CAMP.tick(w,110,out);
  assert.equal(r.phase,'peace');
  assert.equal(r.recoveries,1);
  assert(out.some(e=>e.type==='settlement.recovered'));

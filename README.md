@@ -4,6 +4,16 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M66 | Physical rebuilding with serialized materials and paid crews
+
+A monster occupation now leaves **physical damage records against actual shop and service buildings**. M65's recovery ledger cannot declare peace merely because residents return and a business briefly opens: every damaged site must also finish reconstruction. The normal shop-hour and manual production rules keep damaged workshops, the mill and destroyed storefronts closed until their structural condition is restored. Existing M50 equipment breakdowns remain separate from building damage, so a rebuilt smithy may still need a machinery repair.
+
+**Construction is real server work, not a timer that manufactures resources.** Each region receives one saved work order at a time. The village blacksmith and courtyard caretaker can be assigned to the reconstruction site. The worker walks to an actual supply storefront, takes **two wood and one tool** from serialized vendor stock into a persistent NPC cargo backpack, travels through the ordinary cardinal pathfinder to the damaged building, and works there for **30 simulated minutes** before restoring at most **25 structural condition**. Goods are consumed only when that work finishes. The damaged business pays the supplier its actual price and pays **6 gold wages** on completion, so the purchasing business loses money, the supplier earns money and the worker receives wages. A shop supplied by itself has no artificial self-payment. Historical work orders, construction costs and condition changes are saved.
+
+The village smithy already gathers wood and produces tools through the existing resource harvesting and workshop systems. When the blacksmith has an active harvest trip, harvesting takes priority so reconstruction cannot starve its own supply. The courtyard needs genuine supplies stocked at its market, creating a meaningful logistics problem rather than imaginary deliveries. A closed shop, fleeing supplier, hostile occupation, absent/dead worker, insufficient stock, unpaid wages or disabled player-business assistant can interrupt construction. A killed carrier's actual paid freight stays recorded under their NPC custody; a future worker must acquire new resources. No owner-controlled business is silently debited when its assistant is disabled.
+
+**Read-only diagnostic:** `GET /api/v1/reconstruction` reports damaged sites, contracts, supplier materials, worker condition, money spent and recent events. No additional HUD buttons, imported art, cutscene edits or save resets. Existing browser play remains on GitHub.
+
 ## M65 | Integrated siege recovery and authoritative per-minute simulation
 
 **World catch-up fix:** Every simulated minute now updates the authoritative `living.minute` before the NPC, combat, economy, scheduling, and event work for that minute. A runtime drift guard prevents future regressions. This makes multi-minute simulation batches consistent with small successive time advances, so healing, traffic, saving and world clocks no longer refer to different minutes within the same tick.

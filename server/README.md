@@ -1,6 +1,16 @@
-# DK Server M65 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M66 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M66 physical construction and resource-backed settlement rebuilding
+
+`server/reconstruction-m66.cjs` persists the structural condition of real world buildings. A campaign transition to monster occupation damages two selected village business sites or one courtyard shop. Damage is recorded, not drawn as new art, and damaged stores remain shut until repairs. The M50 production-wear machinery layer is orthogonal: both the building and the machinery must be functional for production.
+
+The reconstruction controller assigns up to one saved contract per region. The village blacksmith/courtyard keeper visits a real shop supply position, purchases two wood and one tool, and moves the original item serials or valid split-stack serials into an NPC-owned backpack. The worker follows the existing cardinal pathfinder to the site, then remains there for 30 simulated minutes before consuming that freight and earning 6 coins from the site's treasury. Each successful step restores 25 structural points. Purchase prices follow the source's configured player-business price tier. Supplier shop coins/sales, buyer expenses, labor wages, site records, physical stock mirrors and serialized item registry are updated in the same world operation. Repeated ticks cannot duplicate purchases or wages.
+
+Construction is suspended by occupation, missing supplies, insufficient money, absent supplier staffing, unavailable owner-approved assistants, or absent/dead crews. A deceased carrier's unrecovered physical cargo is not silently returned or re-created. Staff with active timber/ore harvest jobs may finish their harvest before beginning construction, so repairs depend on the existing raw-material economy rather than stopping it.
+
+`server/settlement-campaigns-m65.cjs` requires **all damaged sites repaired** in addition to existing 90-minute stability, worker return and shop reopening rules. `living-world.cjs` gives reconstruction assignments a higher movement priority than normal daily schedules, while still preserving refuge escape priority. Manual and automated workshop/mill production must pass a structural-integrity check. Diagnostics: **GET /api/v1/reconstruction** (read-only). Tests: `tests/reconstruction-m66.cjs` and updated M65 contract.
 
 ## M65 settlement campaigns and world-minute integration correction
 

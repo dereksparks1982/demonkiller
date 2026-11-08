@@ -2,6 +2,7 @@
 // M65: server-authoritative settlement campaigns and meaningful post-siege recovery.
 // No RunUO source; derives state from saved territory, guard, refugee and business records.
 const {COURT,VILLAGE}=require('./regions.cjs');
+const REBUILD=require('./reconstruction-m66.cjs');
 const AREAS=Object.freeze([COURT,VILLAGE]);
 const PHASES=Object.freeze(['peace','occupied','rebuilding']);
 const STABLE_MINUTES=90,INTERVAL=5;
@@ -23,7 +24,9 @@ function population(world,area){
   absent,displaced,dead:civilians.length-survivors.length,
   guard_count:soldiers.length,living_guards:soldiers.filter(alive).length,
   hostile,shops:shops.length,open_shops:open,
-  guard_kills:world.living.guard_watch?.total_kills||0};
+  guard_kills:world.living.guard_watch?.total_kills||0,
+  damaged_sites:Object.values(world.living.reconstruction?.sites||{})
+   .filter(r=>r.area_id===area&&r.damage>0).length};
 }
 function entry(world,id){
  const occupied=world.living.territories[id]?.control==='monsters';
@@ -97,6 +100,7 @@ function tick(world,minute,out){
    if(r.phase!=='occupied'){
     r.phase='occupied';r.phase_since_minute=minute;
     r.last_occupied_minute=minute;r.occupations++;
+    REBUILD.damageArea(world,id,minute,out);
     log(world,minute,'settlement.siege_started',id,stats,out);transitions++;
    }
    continue;
@@ -108,7 +112,8 @@ function tick(world,minute,out){
   }
   if(r.phase==='rebuilding'&&
     minute-r.phase_since_minute>=STABLE_MINUTES&&
-    stats.absent===0&&(stats.shops===0||stats.open_shops>0)){
+    stats.absent===0&&REBUILD.regionComplete(world,id)&&
+    (stats.shops===0||stats.open_shops>0)){
    r.phase='peace';r.phase_since_minute=minute;
    r.last_recovered_minute=minute;r.recoveries++;
    log(world,minute,'settlement.recovered',id,stats,out);transitions++;

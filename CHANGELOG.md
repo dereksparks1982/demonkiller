@@ -1,5 +1,15 @@
 # Demon Killer Changelog
 
+## v0.2.64 / M66 | 2026-11-08 | Real-material reconstruction of ruined settlements
+
+- Sieges now damage actual village/courtyard business sites and immediately close them; each region has saved site integrity, repair history, work orders and recorded losses.
+- Worker-owned rebuilding jobs acquire two wood and one tool from existing serialized vendor inventory; real workers carry the same serials to the site through cardinal navigation before 30-minute, paid labor restores 25 structural points.
+- Businesses pay the supplier's configured prices and six gold labor wages; suppliers and employees receive the transferred coins. No free material replenishment or imaginary repair crews.
+- Player-owned businesses respect assistant service and pricing choices; an NPC harvester completes active timber gathering before beginning reconstruction supply runs.
+- An occupied town, unpaid wages, unavailable supplies, closed/uncrewed source or dead workman can halt the job. Missing cargo is not fabricated; dead workers' freight stays under its last real custody.
+- Rebuilt structures are required for normal shop opening, manual smith/bakery/tavern work, milling and M65's restored-peace outcome. M50 equipment repairs remain distinct.
+- New read-only `GET /api/v1/reconstruction`, strict legacy-save migration/validation and 14 M66 regression contracts. Updated the M65 campaign test to account for real building repairs.
+
 ## v0.2.63 / M65 | 2026-11-08 | Integrated siege simulation and per-minute clock correction
 
 - Fixed the authoritative world clock during multi-minute catch-up: each minute is recorded **before** running NPC, combat, guard, refugee, traffic, commerce, and scheduler systems. Frozen batch endpoint avoids extending the loop accidentally.

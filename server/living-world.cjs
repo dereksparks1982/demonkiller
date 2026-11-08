@@ -13,6 +13,7 @@ const GARRISON=require('./garrison-m62.cjs');
 const REFUGEES=require('./refugees-m63.cjs');
 const TRAFFIC=require('./npc-traffic-m64.cjs');
 const CAMPAIGNS=require('./settlement-campaigns-m65.cjs');
+const REBUILD=require('./reconstruction-m66.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
@@ -147,7 +148,8 @@ function minuteTick(world,m,generated){
   if(!n.alive)continue;
   if(npcSenseDue(world,n,m))NPCAI.sense(world,n,m,generated);
   const state=world.living.npc_ai?.brains[n.id]?.mode||'work';
-  const desired=REFUGEES.destination(world,n)||GARRISON.destination(world,n)||
+  const desired=REFUGEES.destination(world,n)||REBUILD.destination(world,n)||
+    GARRISON.destination(world,n)||
     NPCAI.destination(world,n)||
     npcDestination(n,m,world);
   const status=state==='flee'?'fleeing':state==='defend'?'defending':
@@ -188,7 +190,7 @@ function minuteTick(world,m,generated){
    const staffed=owned?Boolean(BUSINESS.presence(world,shop)):
     employee?.alive&&employee.area_id===shop.area_id&&
      Math.abs(employee.x-at.x)+Math.abs(employee.y-at.y)<=6;
-   const open=day&&!occupied&&staffed&&
+   const open=day&&!occupied&&staffed&&REBUILD.operational(world,shop)&&
      (owned||living.npc_ai?.brains[shop.owner_id]?.mode!=='flee');
    if(shop.open!==open){
     shop.open=!!open;
@@ -222,6 +224,7 @@ function minuteTick(world,m,generated){
  }
  combatTick(world,m,generated);
  MAINTENANCE.tick(world,m,generated);
+ if(m%REBUILD.INTERVAL===0)REBUILD.tick(world,m,generated);
  ARMORER.tick(world,m,generated);
  COMPANIONS.tick(world,m,generated,monsterDeath);
  lawTick(world,m,generated);
@@ -258,6 +261,7 @@ function advance(world,now=Date.now(),limit=180){
  REFUGEES.ensure(next);
  TRAFFIC.ensure(next);
  CAMPAIGNS.ensure(next);
+ REBUILD.ensure(next);
  ensureMobileAssets(next);
  ensureLaw(next);
  ensureDistricts(next);

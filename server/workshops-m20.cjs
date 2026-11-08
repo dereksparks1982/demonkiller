@@ -6,6 +6,7 @@ const {reconcile,counts}=require('./entity-registry-m10.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const PLAYERBUSINESS=require('./player-business-m48.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
+const REBUILD=require('./reconstruction-m66.cjs');
 const RECIPES=Object.freeze({
  village_smithy:{label:'Smithing',ingredients:{ore:2,wood:1},
   output:'tools',quantity:1,wage:2},
@@ -69,7 +70,8 @@ function run(world,minute,out){
     worker=shop?world.living.npcs[shop.owner_id]:null;
   if(!shop||!PLAYERBUSINESS.productionEnabled(world,shop)||
      (PLAYERBUSINESS.owned(world,shop)&&!PLAYERBUSINESS.owned(world,shop).assistant_enabled)||
-     !MAINTENANCE.operational(world,shop)||!worker?.alive||!shop.open||
+     !MAINTENANCE.operational(world,shop)||!REBUILD.operational(world,shop)||
+     !worker?.alive||!shop.open||
      world.living.territories[shop.area_id]?.control!=='settlers')continue;
   const at=location(world,shop);
   if(worker.area_id!==shop.area_id||
@@ -148,6 +150,8 @@ function applyPlayer(world,command){
   throw Error('You must own this workshop to operate its machinery');
  if(!MAINTENANCE.operational(world,previousShop))
   throw Error('The workshop machinery is broken and needs repair');
+ if(!REBUILD.operational(world,previousShop))
+  throw Error('The workshop building must be reconstructed before production');
  if(!BUSINESS.atShop(world,prior,previousShop))
   throw Error('Stand by the workshop station to operate it');
  if(world.living.territories[previousShop.area_id]?.control!=='settlers')

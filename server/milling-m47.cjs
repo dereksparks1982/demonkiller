@@ -9,6 +9,7 @@ const {reconcile,counts}=require('./entity-registry-m10.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const PLAYERBUSINESS=require('./player-business-m48.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
+const REBUILD=require('./reconstruction-m66.cjs');
 const BUSINESS='village_bakery',MAX_RUNS=1e7;
 const OUTPUTS=Object.freeze({
  grind:Object.freeze({input:'grain',need:2,output:'grist',amount:1}),
@@ -59,6 +60,8 @@ function apply(world,command){
   throw Error('Go to the village bakery milling station first');
  if(!MAINTENANCE.operational(world,world.living.businesses[BUSINESS]))
   throw Error('The mill machinery is broken and needs repair');
+ if(!REBUILD.operational(world,world.living.businesses[BUSINESS]))
+  throw Error('The mill building must be reconstructed first');
  const next=structuredClone(world),c=next.characters['1'],minute=next.living.minute;
  ensure(next);SKILLS.ensure(c);
  const step=command.action==='mill_grind'?OUTPUTS.grind:OUTPUTS.sack;
@@ -105,7 +108,8 @@ function run(world,minute,out){
  const shop=world.living.businesses[BUSINESS],worker=shop&&world.living.npcs[shop.owner_id];
  if(!shop||!PLAYERBUSINESS.productionEnabled(world,shop)||
   (PLAYERBUSINESS.owned(world,shop)&&!PLAYERBUSINESS.owned(world,shop).assistant_enabled)||
-  !MAINTENANCE.operational(world,shop)||!worker?.alive||!shop.open||
+  !MAINTENANCE.operational(world,shop)||!REBUILD.operational(world,shop)||
+   !worker?.alive||!shop.open||
   shop.coins<2||world.living.territories[shop.area_id]?.control!=='settlers')
   return 0;
  const spot=location(world,shop);
