@@ -27,7 +27,7 @@ test('M35 architect uses queued patch edits, drag painting, rectangle paint and 
  assert.match(src,/jobs\.splice\(0,32\)/);
  assert.match(src,/room\.layers\[layer\]\[idx\]=v/);
  assert.match(src,/room\.objects\.push\(object\)/);
- assert.match(src,/expected_revision/);
+ assert.match(src,/room\?\.revision\|\|0/,'the editor submits the current draft revision');
  assert.match(src,/api\.editInteriorDraft\(/);
  assert.doesNotThrow(()=>new vm.Script(src,{filename:'dk-architect-interiors-m35.js'}));
 });
