@@ -1,4 +1,4 @@
-# DK Server M52 | Persistent UO-Style Business, Customer Service and Stealth (v2.27.0)
+# DK Server M53 | Physical Snooping, Stealing and Witnessed Crime (v2.28.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -288,3 +288,9 @@ Player-owned shops now queue a real arriving NPC buyer and wait for an owner-iss
 A skill-level-sensitive Stealth mode extends M43 Hide over a limited number of legal cardinal movement steps and breaks on close monster detection or exhaustion. Outdoor Camping consumes one physical wood and restores bounded health/energy. The two new usable skills have server-owned anti-repeat progression and old fieldcraft records migrate without loss. The paper-doll skill actions and business screens use the same server API, not client-generated simulation.
 
 New local regression contracts: `tests/customer-service-m51.cjs` and `tests/stealth-camping-m52.cjs`. GitHub Actions remains manual-only. Neither the static GitHub Pages preview nor a source audit is equivalent to an always-on hosted world.
+
+## M53 real thievery and guarded-region law
+
+Living players can snoop the real NPC backpack registry at close range and inspect specific durable item serials. A time-limited observation record, Stealing skill, real world-minute cooldown, NPC proximity, cargo reservation, and physical item ledger determine whether one unit can be taken. A successful pickpocket transfers an actual item or splits a stack by a unique serial, and the world event archive records the outcome. Failed attempts cannot mint items. In guarded districts, witnesses and the failed theft's victim may report an M15 pickpocket case, raising the same heat/fines that existing guards pursue and collect.
+
+Use the existing `POST /api/v1/gameplay` actions `snoop_npc` and `pickpocket` from the paper doll's new THIEVING section. Character migration adds thievery observation history, while old saves validate before runtime migration. The new regression suite is `tests/thievery-m53.cjs`. GitHub Actions remains manual-only.

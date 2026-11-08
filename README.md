@@ -10,7 +10,7 @@ Press **F8** or **ARCHITECT** in the temple or outdoors to use the same Prison A
 
 The paper doll has Ultima Online-style commands, without destructive save buttons. **Main Menu → Options → Save Management** separates character deletion (world preserved), server-world reset (requires an actual connected server) and Start Fresh (browser-only on GitHub Pages).
 
-## DK Server M41–M52: Twelve connected gameplay slices
+## DK Server M41–M53: Thirteen connected gameplay slices
 
 - **59 trainable skills**, 100.0 individual/700.0 overall caps, groups, training locks and existing-save migration.
 - **Seven persistent monster species** with different strengths, patrols, NPC threats, loot and decay.
@@ -25,8 +25,9 @@ The paper doll has Ultima Online-style commands, without destructive save button
 - **Breakdowns and maintenance**: production wears machinery, monster raids can damage it, and work stops until you use a tool or pay an actual worker for repairs.
 - **Owner-served NPC customers**: NPCs really wait to be served when you're at your own counter. They leave if ignored or pay your assistant when you leave.
 - **Stealth and camping**: Hide, sneak limited cardinal steps with real monster detection, and consume wood to set up a restorative outdoor camp.
+- **Snooping and stealing**: inspect actual NPC backpacks, try to take known item serials, and face witness reports and guard fines.
 
-Use **P → Skills, Spellbook, Quests, Animals, Crafting or BUSINESS** on a **connected DK Server** for these gameplay actions. The dedicated mill building, more kinds of magic, guilds, and the entire original Ultima Online feature set are **not** complete yet. The first milling station uses the **existing village bakery**, without changing the owner-approved village layout.
+Use **P → Skills, Spellbook, Quests, Animals, Crafting, BUSINESS or THIEVING** on a **connected DK Server** for these gameplay actions. The dedicated mill building, more kinds of magic, guilds, and the entire original Ultima Online feature set are **not** complete yet. The first milling station uses the **existing village bakery**, without changing the owner-approved village layout.
 
 **Important:** GitHub Pages is a static **preview**. It does not host a persistent server, so it cannot run the independent NPC economy or save authoritative monster/pet states. The server needs to be running separately to simulate events while you are away. This release does not deploy a public server.
 

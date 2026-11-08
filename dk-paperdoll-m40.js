@@ -389,6 +389,58 @@ async function showAnimals(){
  }catch(error){show('ANIMALS',['Companion records unavailable: '+error.message]);}
 }
 menu('ANIMALS',showAnimals,'UO-style taming, animal care, followers and pet commands');
+
+async function showThievery(observation=null){
+ if(!connected()){
+  show('THIEVING',['Snooping and stealing require a real DK Server. The browser preview does not hold NPC inventories.']);
+  return;
+ }
+ try{
+  const api=window.DemonKillerServer,[p,world]=await Promise.all([character(),api.living()]);
+  show('THIEVING · SNOOPING & STEALING',[
+   'Stand within two tiles of an NPC to examine their personal backpack.',
+   'Select a known item while adjacent to attempt a one-item pickpocket. Success depends on Stealing skill.',
+   'Witnesses may report you to the village guard; a failed theft can alert the victim.',
+   'Never steal from private player saves. All item transfers, law cases and penalties belong to DK Server.'
+  ]);
+  for(const n of Object.values(world.npcs||{})){
+   if(!n.alive||n.area_id!==p.area_id||
+     Math.abs(n.x-p.x)+Math.abs(n.y-p.y)>2)continue;
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const label=document.createElement('span');
+   label.textContent=n.name+' · '+n.role+' · ('+n.x+', '+n.y+')';
+   const snoop=button('SNOOP',async()=>{
+    try{
+     const r=await api.gameAction('snoop_npc',{npc_id:n.id});
+     await showThievery({npc_id:n.id,npc_name:n.name,items:r.event?.items||[]});
+     feedback(r.event?.text||'Backpack inspected.');
+    }catch(error){feedback(error.message);}
+   });
+   row.append(label,snoop);content.append(row);
+  }
+  if(observation){
+   const title=document.createElement('h3');
+   title.className='dk-skill-heading';
+   title.textContent='INSPECTED PACK · '+observation.npc_name;
+   content.append(title);
+   for(const item of observation.items){
+    const row=document.createElement('div');row.className='dk-skill-row';
+    const label=document.createElement('span');
+    label.textContent=item.amount+' × '+item.type+' · '+item.serial;
+    const steal=button('PICKPOCKET',async()=>{
+     try{
+      const r=await api.gameAction('pickpocket',
+       {npc_id:observation.npc_id,serial:item.serial});
+      await showThievery();
+      feedback(r.event?.text||'Pickpocket attempt completed.');
+     }catch(error){feedback(error.message);}
+    },false);
+    row.append(label,steal);content.append(row);
+   }
+  }
+ }catch(error){show('THIEVING',['NPC belongings unavailable: '+error.message]);}
+}
+menu('THIEVING',()=>showThievery(),'Inspect actual NPC backpacks, take a risk and face living witnesses');
 menu('GUILD',()=>{},'Guild creation and membership are not implemented yet',false);
 async function showQuests(){
  if(!connected()){show('QUESTS',['Bounty contracts and their rewards are saved by DK Server. The static GitHub Pages preview does not have an authoritative bounty ledger.']);return;}

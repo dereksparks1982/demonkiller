@@ -11,6 +11,7 @@ const MOBILE=require('./mobile-assets-m12.cjs');
 const BURIALS=require('./burials-m30.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const FIELD=require('./field-skills-m43.cjs');
+const THIEVERY=require('./thievery-m53.cjs');
 const MAGIC=require('./spells-m44.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
@@ -47,6 +48,7 @@ function ensureProgress(character){
  if(CRAFT.ensure(character))changed=true;
  if(SKILLS.ensure(character))changed=true;
  if(FIELD.ensure(character))changed=true;
+ if(THIEVERY.ensure(character))changed=true;
  if(MAGIC.ensure(character))changed=true;
  return changed;
 }
@@ -70,6 +72,7 @@ function validateProgress(character){
  CRAFT.validate(character);
  SKILLS.validate(character);
  FIELD.validate(character);
+ THIEVERY.validate(character);
  MAGIC.validate(character);
  if(character.last_attack_utc_ms!==undefined&&(!Number.isSafeInteger(character.last_attack_utc_ms)||character.last_attack_utc_ms<0))throw Error('Invalid attack timestamp');
  for(const key of ['gold','bank_gold'])
@@ -104,6 +107,7 @@ function apply(world,command,now=Date.now()){
  if(command?.action==='pay_fine')return LAW.payFine(world,command);
  if(command?.action==='skill_lock')return SKILLS.applyLock(world,command);
  if(command?.action==='use_skill')return FIELD.apply(world,command);
+ if(['snoop_npc','pickpocket'].includes(command?.action))return THIEVERY.apply(world,command);
  if(command?.action==='cast_spell')return MAGIC.apply(world,command,now);
  if(['accept_bounty','turn_in_bounty'].includes(command?.action))return BOUNTIES.apply(world,command);
  if(['tame_creature','feed_pet','release_pet','pet_follow','pet_stay','pet_guard'].includes(command?.action))return COMPANIONS.apply(world,command);

@@ -35,7 +35,7 @@ function validate(world){
  }
  for(const [id,c] of Object.entries(law.cases)){
   if(!/^case_[1-9][0-9]*$/.test(id)||!c||c.id!==id||
-    c.kind!=='corpse_theft'||c.area_id!==VILLAGE||
+    !['corpse_theft','pickpocket'].includes(c.kind)||c.area_id!==VILLAGE||
     !Number.isSafeInteger(c.minute)||c.minute<0||
     !Number.isSafeInteger(c.fine)||c.fine<0||c.fine>THEFT_FINE||
     typeof c.reported!=='boolean'||!Array.isArray(c.witnesses)||
@@ -88,6 +88,38 @@ function reportCorpseLoot(world,corpse,minute,out){
   p.last_crime_minute=minute;
   const reputation=world.living.social?.reputation;
   if(reputation)reputation.town=Math.max(-1000,reputation.town-5);
+ }
+ validate(world);return crime;
+}
+function reportPickpocket(world,npc,minute,out,{failed=false}={}){
+ ensure(world);
+ if(!guarded(world,npc.area_id,npc.x,npc.y))return null;
+ const seen=witnesses(world,npc.area_id,npc.x,npc.y,npc.id);
+ if(failed&&!seen.includes(npc.id))seen.push(npc.id);
+ seen.sort();
+ const l=world.living,law=l.law,id='case_'+(++law.sequence);
+ const crime={id,kind:'pickpocket',npc_id:npc.id,area_id:VILLAGE,
+  minute,fine:seen.length?THEFT_FINE:0,reported:seen.length>0,
+  witnesses:seen};
+ law.cases[id]=crime;
+ if(Object.keys(law.cases).length>MAX_CASES){
+  const oldest=Object.keys(law.cases)
+   .sort((a,b)=>Number(a.slice(5))-Number(b.slice(5)))[0];
+  delete law.cases[oldest];
+ }
+ const e=log(world,minute,seen.length?'law.crime.reported':'law.crime.unwitnessed',
+  seen.length?'A witness reported attempted theft from '+npc.name+'.':
+   'A pickpocket went unreported in the village.',
+  {kind:'pickpocket',case_id:id,npc_id:npc.id,area_id:VILLAGE,
+   report_count:seen.length});
+ out.push(e);
+ if(seen.length){
+  const p=law.player;p.fines=Math.min(1e7,p.fines+THEFT_FINE);
+  p.heat=Math.min(100,p.heat+20);
+  p.wanted_until_minute=Math.max(p.wanted_until_minute,minute+180);
+  p.last_crime_minute=minute;
+  if(l.social?.reputation)
+   l.social.reputation.town=Math.max(-1000,l.social.reputation.town-5);
  }
  validate(world);return crime;
 }
@@ -165,5 +197,5 @@ function listing(world){
        reported:x.reported,number_of_witnesses:x.witnesses.length,fine:x.fine})),
    revision:world.revision};
 }
-module.exports={THEFT_FINE,WITNESS_RANGE,ensure,validate,guarded,
- reportCorpseLoot,tick,payFine,listing};
+module.exports={THEFT_FINE,WITNESS_RANGE,ensure,validate,guarded,witnesses,
+ reportCorpseLoot,reportPickpocket,tick,payFine,listing};
