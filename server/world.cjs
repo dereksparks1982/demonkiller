@@ -24,6 +24,7 @@ const {ensure:ensureCaravans,validate:validateCaravans}=require('./caravan-logis
 const {ensure:ensureScavengers,validate:validateScavengers}=require('./scavengers-m30.cjs');
 const {ensure:ensureBurials,validate:validateBurials}=require('./burials-m30.cjs');
 const {ensure:ensureCells,validate:validateCells,onPlayerMove:cellMove}=require('./streaming-cells-m33.cjs');
+const {ensure:ensureInteriors,validate:validateInteriors}=require('./interior-drafts-m35.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -104,6 +105,7 @@ function makeWorld(now = Date.now()) {
   ensureScavengers(result);
   ensureBurials(result);
   ensureCells(result);
+  ensureInteriors(result);
   return result;
 }
 
@@ -185,6 +187,7 @@ function validateWorld(world) {
   validateScavengers(world);
   validateBurials(world);
   validateCells(world);
+  validateInteriors(world);
   return world;
 }
 
