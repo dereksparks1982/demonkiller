@@ -35,6 +35,7 @@ const {ensure:ensureCaravans,listing:caravanListing}=require('./caravan-logistic
 const {ensure:ensureScavengers}=require('./scavengers-m30.cjs');
 const {ensure:ensureBurials}=require('./burials-m30.cjs');
 const {ensure:ensureCells,streamingView:cellView,onPlayerMove:trackCellMove}=require('./streaming-cells-m33.cjs');
+const {createTracker:createCellContentsTracker}=require('./cell-contents-m34.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8766;
@@ -189,6 +190,7 @@ async function createDKServer({
   let spatialCache = null;
   // View cursors and sector geometry are derived in memory, never saved.
   const sectorTracker=createInterestTracker({now});
+  const cellContentsTracker=createCellContentsTracker({now});
   const eventLog=path.join(dataDir,'world-events.ndjson');
   async function appendEvents(events){
     if(!events?.length)return;
@@ -358,7 +360,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m33', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m34', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -425,6 +427,21 @@ async function createDKServer({
     }
     if(url.pathname==='/api/v1/schedule'&&!write){
       return sendJSON(res,200,{...schedulerListing(world),revision:world.revision},method);
+    }
+    if(url.pathname==='/api/v1/streaming-cells/contents'&&!write){
+      if(!world.characters['1'])
+        return sendJSON(res,404,{error:'No character exists'},method);
+      const input=url.searchParams.get('radius'),radius=input===null?24:Number(input);
+      const cursor=url.searchParams.get('cursor');
+      if(!Number.isSafeInteger(radius)||radius<8||radius>32)
+        return sendJSON(res,422,{error:'Invalid streaming contents radius'},method);
+      try{return sendJSON(res,200,cellContentsTracker.poll(world,{radius,cursor}),method);}
+      catch(error){
+        if(/Invalid streaming contents|Invalid streaming cell content|No playable streaming/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Streaming-cell contents failed:',error);
+        return sendJSON(res,500,{error:'Streaming-cell contents unavailable'},method);
+      }
     }
     if(url.pathname==='/api/v1/streaming-cells'&&!write){
       if(!world.characters['1'])
