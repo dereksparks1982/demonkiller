@@ -22,7 +22,7 @@ test('M34 client materializes, updates and evicts authoritative world objects',(
  }]}));
  assert.equal(second.entity_count,1);
  assert.equal(client.visible('npc',{area_id:'dk.village.001',x:54,y:103})[0].x,56);
- client.apply(delta({reset:false,upsert:[],removed:['npc:baker'],cell_removed:['dk.cell.village']}));
+ client.apply(delta({reset:false,upsert:[],cell_upsert:[],removed:['npc:baker'],cell_removed:['dk.cell.village']}));
  assert.equal(client.visible('npc',{area_id:'dk.village.001',x:54,y:103}).length,0);
  assert.equal(client.stats().cell_count,0);
  client.reset();assert.equal(client.stats().entity_count,0);
