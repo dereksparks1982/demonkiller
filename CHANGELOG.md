@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.57 / M59 | 2026-11-07 | Durable creature spawner controls
+
+- Added four persisted regional creature spawners with exact-once world-minute dispatch, saved due times and regional population limits.
+- Monster invasions seed one immediate bounded wave. Occupied regions receive species-rotating reinforcements every 90 simulated minutes, without spawning on crowded tiles.
+- Ordinary wilderness spawns are gated by regional threat, remain under a population cap and use a 120-minute schedule.
+- Liberating an occupied region persists a 120-minute grace period before enemies can reoccupy it through the spawner. Existing monster bodies and loot remain in world terrain.
+- Spawn placement excludes player/NPC tiles and already-occupied monster positions. Existing M58 saves migrate non-destructively. Malformed spawner ledgers reject world validation.
+- Added read-only server spawner diagnostics and focused M59 regression contracts. No new on-screen buttons or imported assets.
+
 ## v0.2.56 / M58 | 2026-11-07 | Original MIDI title and overworld soundtracks
 
 - Added the exact owner-approved **The Land Beyond the Altar** overworld MIDI and the original dark title score **The Oath Beneath the Ashes** to `assets/audio/music/`.

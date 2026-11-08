@@ -5,6 +5,7 @@ const {COURT,VILLAGE,traversable}=require('./regions.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const CREATURES=require('./creatures-m42.cjs');
+const SPAWNERS=require('./spawners-m59.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const ARMORY=require('./armory-m54.cjs');
@@ -55,32 +56,42 @@ function bowLineClear(area,a,b){
  }
  return true;
 }
-function findOpen(world,area_id,x,y){
+function findOpen(world,area_id,x,y,occupied=new Set()){
  const area=world.areas[area_id];
  if(!area)return null;
  for(let radius=0;radius<=12;radius++)for(let dy=-radius;dy<=radius;dy++)
   for(let dx=-radius;dx<=radius;dx++){
    if(Math.abs(dx)+Math.abs(dy)!==radius)continue;
    const tx=x+dx,ty=y+dy;
-   if(traversable(area,tx,ty,'living'))return {x:tx,y:ty};
+   if(!traversable(area,tx,ty,'living')||occupied.has(tx+','+ty))continue;
+   const p=world.characters?.['1'];
+   if(p?.area_id===area_id&&p.x===tx&&p.y===ty)continue;
+   if(Object.values(world.living.npcs||{}).some(n=>
+    n.alive&&n.area_id===area_id&&n.x===tx&&n.y===ty))continue;
+   return {x:tx,y:ty};
   }
  return null;
 }
 function spawn(world,area_id,minute,events,count,kind='imp'){
  const type=CREATURES.config(kind);
  const s=world.living.combat,area=world.areas[area_id];
- if(!area)return;
+ if(!area)return 0;
  const points=kind==='imp'?(area_id===COURT?[[15,18],[48,18],[32,6]]:
    [[65,84],[38,94],[94,100],[64,112],[30,70]]):CREATURES.spawnPoints(area_id);
+ const occupied=new Set(Object.values(s.creatures).filter(c=>c.alive&&
+  c.area_id===area_id).map(c=>c.x+','+c.y));
+ let created=0;
  for(let i=0;i<count&&Object.keys(s.creatures).length<MAX_CREATURES;i++){
-  const [x,y]=points[i%points.length],pt=findOpen(world,area_id,x,y);
+  const [x,y]=points[i%points.length],pt=findOpen(world,area_id,x,y,occupied);
   if(!pt)continue;
+  occupied.add(pt.x+','+pt.y);created++;
   const id=kind+'_'+(++s.sequence);
   s.creatures[id]={id,kind,area_id,x:pt.x,y:pt.y,
    health:type.health,alive:true,spawn_minute:minute,last_attack_minute:-1};
   events.push(event(world,minute,'monster.spawn',type.name+' entered '+area_id+'.',
    {creature_id:id,area_id,x:pt.x,y:pt.y}));
  }
+ return created;
 }
 function dead(world,creature,minute,events,killer='world'){
  const s=world.living.combat;creature.health=0;creature.alive=false;
@@ -98,6 +109,7 @@ function dead(world,creature,minute,events,killer='world'){
  const terr=world.living.territories[creature.area_id];
  if(terr?.control==='monsters'&&!Object.values(s.creatures).some(c=>c.alive&&c.area_id===creature.area_id)){
   terr.control='settlers';terr.threat=2;terr.last_raid=minute;
+  SPAWNERS.suppressAfterLiberation(world,creature.area_id,minute);
   events.push(event(world,minute,'territory.liberated',
    'The last imp was driven from '+creature.area_id+'.',
    {area_id:creature.area_id,control:'settlers'}));
@@ -106,32 +118,7 @@ function dead(world,creature,minute,events,killer='world'){
 function tick(world,minute,events){
  const l=world.living;
  if(!l?.combat)return;
- for(const terr of Object.values(l.territories)){
-  if(terr.control==='monsters'&&!Object.values(l.combat.creatures).some(c=>c.alive&&c.area_id===terr.id)){
-   spawn(world,terr.id,minute,events,terr.id===COURT?3:5);
-  }
- }
- // New species reinforce an occupied area every ninety simulated minutes.
- // A few roaming threats inhabit wilderness even before an occupation.
- // Never spawn around the protected temple / Lilith's willow center.
- if(minute>0&&minute%120===0)
-  for(const terr of Object.values(l.territories))
-   if(terr.control==='settlers'&&terr.threat>=2){
-    const count=Object.values(l.combat.creatures).filter(m=>
-     m.alive&&m.area_id===terr.id).length;
-    if(count<2)spawn(world,terr.id,minute,events,1,
-      terr.id===COURT?'wolf':'bandit');
-   }
- if(minute>0&&minute%90===0)
-  for(const terr of Object.values(l.territories))
-   if(terr.control==='monsters'){
-    const stationed=Object.values(l.combat.creatures)
-     .filter(m=>m.alive&&m.area_id===terr.id).length;
-    if(stationed<8){
-     const kind=CREATURES.select(terr.id,minute,l.combat.sequence);
-     spawn(world,terr.id,minute,events,Math.min(2,8-stationed),kind);
-    }
-   }
+ SPAWNERS.tick(world,minute,events,spawn);
  if(minute%5!==0)return;
  const c=world.characters['1'];
  for(const monster of Object.values(l.combat.creatures)){

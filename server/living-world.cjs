@@ -7,6 +7,7 @@ const {tick:socialTick}=require('./social-m6.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
 const {tick:craftTick}=require('./crafting-m7.cjs');
 const {tick:combatTick,dead:monsterDeath}=require('./combat-m8.cjs');
+const SPAWNERS=require('./spawners-m59.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
@@ -238,6 +239,7 @@ function advance(world,now=Date.now(),limit=180){
  if(!count)return {world,events:[],minutes:0};
  const next=structuredClone(world),events=[];
  ensureScheduler(next);
+ SPAWNERS.ensure(next);
  ensureMobileAssets(next);
  ensureLaw(next);
  ensureDistricts(next);

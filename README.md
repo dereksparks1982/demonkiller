@@ -4,6 +4,10 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M59 | Persistent creature spawning and regional ecology
+
+Demon Killer's world now has four server-owned **creature spawners** for courtyard/village wilderness and monster-held territory. Spawn schedules, created counts and liberation cooldowns are saved as world data; viewing the map or reloading cannot reset timers or manufacture enemies. Wild creatures appear only when regional threat is high enough. Occupied towns receive an initial siege wave and bounded reinforcements, while clearing the last hostile grants a two-hour-in-world grace period even if the area is conquered again immediately. Spawn placement respects cardinal terrain, living NPCs, the player and other creatures. A read-only `GET /api/v1/spawners` reports population, caps and next scheduled time for diagnosis. Existing characters, shops, physical loot, corpses, scripts and opening cinematic remain unchanged. This follows RunUO's durable-world design principles without importing RunUO code.
+
 ## Original MIDI score | M58
 
 **Title screen:** *The Oath Beneath the Ashes*, an original 78 BPM dark-fantasy score (church organ, distant choir, funeral bells, strings and ritual percussion). **Overworld:** *The Land Beyond the Altar*, the owner-approved original 114 BPM exploration theme. Both are committed as editable Standard MIDI Files in `assets/audio/music/` and played locally using `dk-midi-soundtrack.js` with Web Audio, without downloading a soundfont or an external service. The menu's saved **Music** toggle and volume setting carry into the courtyard, village and other outdoor regions. Audio begins after the browser permits playback, resumes when a player interacts, and stops on page exit. The existing Forsaken Temple soundtrack is separate and unchanged. No additional gameplay buttons were added.

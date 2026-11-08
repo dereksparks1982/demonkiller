@@ -1,6 +1,14 @@
-# DK Server M56 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M59 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M59 durable spawner authority
+
+Server-owned `server/spawners-m59.cjs` stores an exact-once regional spawning schedule in the same persisted world as monster combat. Four controllers cover courtyard/village siege and wilderness populations. The siege branch spawns an immediate invasion wave with timed reinforcements (90 world minutes, region population limit 8). Wilderness branches may add wolf/bandit threats every 120 world minutes when regional threat is at least two (cap two). Both use actual traversability and avoid placing a creature atop a living NPC, player, or already-occupied creature tile.
+
+Defeating the last occupant still liberates the territory, but saves a 120-minute reoccupation grace period. Replaying a tick, reopening a scene or restarting from a saved snapshot cannot duplicate that interval's creatures. All scheduling remains subordinate to the persisted world clock. Older world snapshots gain missing controllers without replacing existing enemies or character/business state; invalid controllers block world validation.
+
+`GET /api/v1/spawners` is read-only, returning per-region population, next due time, number created, and grace-period expiry. No client spawner mutation route was added. `tests/spawners-m59.cjs` covers migration, seed, exact-once behavior, bounds, resource-safe placement, grace and malformed saves. GitHub Actions remains manual-only.
 
 ## Lifetime and saved data
 

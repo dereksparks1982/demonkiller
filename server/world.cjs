@@ -7,6 +7,7 @@ const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
 const {ensureSocial,validateSocial}=require('./social-m6.cjs');
 const {ensure:ensureCombat,validate:validateCombat}=require('./combat-m8.cjs');
+const SPAWNERS=require('./spawners-m59.cjs');
 const {ensure:ensureStorage,validate:validateStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,validate:validateEntities}=require('./entity-registry-m10.cjs');
 const {ensure:ensureScheduler,validate:validateScheduler}=require('./world-scheduler-m11.cjs');
@@ -96,6 +97,7 @@ function makeWorld(now = Date.now()) {
   ensureResources(result);
   ensureSocial(result);
   ensureCombat(result);
+  SPAWNERS.ensure(result);
   ensureStorage(result);
   reconcileEntities(result);
   ensureScheduler(result);
@@ -187,6 +189,7 @@ function validateWorld(world) {
   if(world.living)validateLiving(world.living);
   validateSocial(world);
   validateCombat(world);
+  SPAWNERS.validate(world);
   validateStorage(world);
   validateEntities(world);
   validateScheduler(world);
