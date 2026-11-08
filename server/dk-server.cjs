@@ -35,6 +35,7 @@ const {ensure:ensureCaravans,listing:caravanListing}=require('./caravan-logistic
 const {ensure:ensureScavengers}=require('./scavengers-m30.cjs');
 const {ensure:ensureBurials}=require('./burials-m30.cjs');
 const {ensure:ensureCells,streamingView:cellView,onPlayerMove:trackCellMove}=require('./streaming-cells-m33.cjs');
+const INTERIORS=require('./interior-drafts-m35.cjs');
 const {createTracker:createCellContentsTracker}=require('./cell-contents-m34.cjs');
 
 const DEFAULT_HOST = '127.0.0.1';
@@ -174,6 +175,7 @@ async function createDKServer({
     const scavengersAdded=ensureScavengers(world);
     const burialsAdded=ensureBurials(world);
     const cellsAdded=ensureCells(world);
+    const interiorsAdded=INTERIORS.ensure(world);
     assertEntityCounts(world);
     // A stopped world stays frozen. No NPC catch-up or world time is simulated
     // during an intentional server shutdown or an offline host restart.
@@ -181,7 +183,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||playerAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -255,6 +257,21 @@ async function createDKServer({
       catch(error){console.error('Character deletion archive failed:',error);}
       for(const viewer of streams)push(viewer,'world.character.deleted',
         {slot,world_revision:world.revision});
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});
+    return pending;
+  }
+  async function saveInteriorDraft(command){
+    const pending=writeQueue.then(async()=>{
+      // Authoring is independent of the world-running toggle. A paused
+      // persistent world must still allow safe interior editing.
+      const result=INTERIORS.edit(world,command);
+      validateWorld(result.world);
+      await snapshots.save(result.world,{forceBackup:true});
+      world=result.world;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('Interior draft event archive failed:',error);}
       return result;
     });
     writeQueue=pending.catch(()=>{});
@@ -360,7 +377,7 @@ async function createDKServer({
       return;
     }
     if (url.pathname === '/api/v1/health' && !write) return sendJSON(res, 200,
-      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m34', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
+      { name: 'DK Server', service: 'demon-killer', mode: 'server-saves', build: 'local-m35', online: true, background_world: true, world_running: worldClock(world,now()).running }, method);
     if (url.pathname === '/api/v1/world' && !write) return sendJSON(res, 200, snapshot(), method);
     if (url.pathname === '/api/v1/clock' && !write) return sendJSON(res, 200, worldClock(world, now()), method);
     if(url.pathname==='/api/v1/areas'&&!write)
@@ -427,6 +444,39 @@ async function createDKServer({
     }
     if(url.pathname==='/api/v1/schedule'&&!write){
       return sendJSON(res,200,{...schedulerListing(world),revision:world.revision},method);
+    }
+    if(url.pathname==='/api/v1/architect/interiors'&&!write){
+      return sendJSON(res,200,INTERIORS.listing(world),method);
+    }
+    if(url.pathname==='/api/v1/architect/interiors/draft'&&!write){
+      const cell_id=url.searchParams.get('cell_id');
+      if(!cell_id)return sendJSON(res,422,{error:'Missing building cell ID'},method);
+      try{return sendJSON(res,200,INTERIORS.read(world,cell_id),method);}
+      catch(e){
+        if(/Unknown building/.test(e.message))
+          return sendJSON(res,404,{error:e.message},method);
+        return sendJSON(res,422,{error:'Invalid interior draft request'},method);
+      }
+    }
+    if(url.pathname==='/api/v1/architect/interiors/draft'&&method==='POST'){
+      if(req.headers['x-dk-architect']!=='draft')
+        return sendJSON(res,403,{error:'Interior editing requires DK Architect control'});
+      let command;try{command=await readJSON(req);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message});}
+      try{
+        const result=await saveInteriorDraft(command);
+        return sendJSON(res,200,{cell_id:result.draft.cell_id,
+          draft_revision:result.draft.revision,
+          world_revision:result.world.revision,
+          event:result.event},method);
+      }catch(error){
+        if(/Stale interior draft/.test(error.message))
+          return sendJSON(res,409,{error:error.message},method);
+        if(/Invalid interior|Interior|Unknown building|Duplicate|Unsupported interior/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Interior draft save failed:',error);
+        return sendJSON(res,500,{error:'Interior draft could not be saved'},method);
+      }
     }
     if(url.pathname==='/api/v1/streaming-cells/contents'&&!write){
       if(!world.characters['1'])
