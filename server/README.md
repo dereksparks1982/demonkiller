@@ -1,6 +1,14 @@
-# DK Server M59 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
+# DK Server M60 | Persistent Carcass Harvesting, Hunting and Meat Trade (v2.31.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M60 character war stance and persistent creature decision-making
+
+The player's `war_mode` flag is an authoritative, optional legacy-save field defaulted to false during character migration. `POST /api/v1/characters/1/actions` accepts exactly `{"action":"toggle_war"}`, which changes only the character stance after the opening ritual is complete; extra fields are rejected. The browser's Tab / Alt+C keys use this command. Outdoors a double-click attack is issued from War Mode; ordinary Peace Mode double-clicks on creatures inspect them instead. Existing intentional explicit attack commands remain backward compatible.
+
+`server/monster-ai-m60.cjs` adds one small persisted intelligence record per living monster, including bounded home coordinates, pursuit/search/return/retreat modes and remembered target. Sight uses the actual collision map. A target outside the monster's leash is not chased indefinitely; searching expires after fifteen simulated minutes. Injured creatures can retreat. Existing M59 spawner IDs, actual monsters, generated items, mobile remains and businesses are unaffected. `GET /api/v1/monster-ai` reports current creature modes read-only.
+
+These systems are advanced by the same deterministic world clock as the rest of DK Server. No decorative UI controls were added beyond a short non-interactive War/Peace indicator; the on-demand UO shortcut views live in browser presentation code. Regression: `tests/uo-controls-m60.cjs`, plus existing M59/M21/M8 suites. Automated GitHub Actions remains opt-in/manual; no claim that all suites have executed inside a browser is made.
 
 ## M59 durable spawner authority
 

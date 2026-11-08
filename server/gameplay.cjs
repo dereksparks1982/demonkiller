@@ -51,6 +51,7 @@ function ensureProgress(character){
   if(character[key]===undefined){character[key]=value;changed=true;}
  if(!character.skills){character.skills={foraging:0,commerce:0};changed=true;}
  if(character.skills.combat===undefined){character.skills.combat=0;changed=true;}
+  if(character.war_mode===undefined){character.war_mode=false;changed=true;}
  if(CRAFT.ensure(character))changed=true;
  if(SKILLS.ensure(character))changed=true;
  if(FIELD.ensure(character))changed=true;

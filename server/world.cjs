@@ -150,7 +150,8 @@ function validateWorld(world) {
         (character.crystal_spent !== undefined && typeof character.crystal_spent !== 'boolean') ||
         (character.courtyard_visit_count !== undefined &&
           (!Number.isSafeInteger(character.courtyard_visit_count)||character.courtyard_visit_count<0)) ||
-        (character.lilith_branch !== undefined &&
+        (character.war_mode !== undefined && typeof character.war_mode !== 'boolean') ||
+         (character.lilith_branch !== undefined &&
           !['golden','sickly'].includes(character.lilith_branch)) ||
         !Number.isSafeInteger(character.revision) || character.revision < 1 ||
         !Number.isFinite(Date.parse(character.created_at_utc)))
@@ -227,7 +228,7 @@ function createCharacter(world, slot, name, now = Date.now()) {
   if (!Number.isFinite(now) || now < 0) throw new Error('Invalid creation timestamp');
   const character = {slot, name: name.trim().toUpperCase(), revision: 1,
     created_at_utc: new Date(now).toISOString(), area_id: AREA_ID,
-    form: 'ghost', opening_state: 'not_started', x: 8, y: 12, facing: 'north', crystal_spent: false};
+    form: 'ghost', opening_state: 'not_started', x: 8, y: 12, facing: 'north', crystal_spent: false, war_mode: false};
   ensureProgress(character);
   const next = structuredClone(world);
   next.characters[String(slot)] = character;
@@ -243,13 +244,14 @@ function createCharacter(world, slot, name, now = Date.now()) {
 
 function playableCharacter(character) {
   return { ...character, x: character.x ?? 8, y: character.y ?? 12,
-    facing: character.facing ?? 'north', crystal_spent: character.crystal_spent ?? false };
+    facing: character.facing ?? 'north', crystal_spent: character.crystal_spent ?? false,
+     war_mode: character.war_mode === true };
 }
 
 function applyCharacterAction(world, slot, command) {
   if (slot !== 1) throw new Error('Invalid character slot');
   if (!command || typeof command !== 'object' || Array.isArray(command) ||
-      !['move','finish_opening','resurrect','toggle_door'].includes(command.action))
+      !['move','finish_opening','resurrect','toggle_door','toggle_war'].includes(command.action))
     throw new Error('Invalid character action');
   const expected = command.action === 'move' ? 'action,direction' : 'action';
   if (Object.keys(command).sort().join(',') !== expected)
@@ -273,7 +275,11 @@ function applyCharacterAction(world, slot, command) {
     character.form = 'living'; character.opening_state = 'resurrected';
     character.crystal_spent = true; character.x = 8; character.y = 7;
     character.facing = 'south';
-  } else if(command.action === 'toggle_door') {
+  } else if(command.action === 'toggle_war') {
+     // War mode is saved with the character, not just a browser effect.
+     if(character.opening_state==='not_started')throw Error('Opening ritual not complete');
+     character.war_mode=!character.war_mode;
+   } else if(command.action === 'toggle_door') {
     if (character.opening_state === 'not_started') throw new Error('Opening ritual not complete');
     const nearTemple = character.area_id===AREA_ID &&
       Math.abs(character.x-8)+Math.abs(character.y)<=1;

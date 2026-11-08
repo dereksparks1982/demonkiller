@@ -149,6 +149,26 @@
   let rightMouseHeld = false, rightPointer = null, lastFrameTime = 0;
   let clickDestination = null, rightPressFrame = 0;
   let opening = null, ritual = null;
+   // UO keyboard controls share the existing temple sprite and server character.
+   const uoControls=window.DKUOControls?.mount({
+    scope:'temple',getPlayer:()=>scene.player,
+    getArea:()=>({width:N,height:N,floor:scene.floor,walls:scene.walls}),
+    locked:()=>Boolean(opening||ritual)||Boolean(SERVER&&!serverReady)||serverBusy||
+     $('cultJournal')?.hidden===false,
+    editing:()=>mode==='edit',notify:message,
+    toggleWar:async()=>{
+     if(SERVER){
+      const next=await SERVER.action(activeSlot,'toggle_war');
+      scene.player.war_mode=next.war_mode===true;
+     }else{scene.player.war_mode=!scene.player.war_mode;persistCharacter();}
+     return scene.player.war_mode;
+    },
+    musicChanged:(enabled)=>{
+     const button=$('templeMusicToggle');
+     if(button&&button.getAttribute('aria-pressed')!==(enabled?'true':'false'))
+      button.click();
+    }
+   });
   // Slow, irregular flicker uses the two approved gold crystal frames.
   // This is only presentation state; unused soul crystals stay full.
   let crystalBright = true, crystalFlickerTime = 1.2;
@@ -912,7 +932,7 @@
       let old={};try{old=JSON.parse(localStorage.getItem(key)||'null')||{};}catch(_){}
       localStorage.setItem(key,JSON.stringify({
         area_id:'dk.courtyard.lilith.001',x:32,y:47,facing:'north',
-        form:scene.player.form,doorOpen:true,
+        form:scene.player.form,war_mode:scene.player.war_mode===true,doorOpen:true,
         firstCourtyardSeen:Boolean(old.firstCourtyardSeen)
       }));
     }
@@ -1411,7 +1431,7 @@
   }
   function reset() {
     undoStack.push(clone(scene));if(undoStack.length>70)undoStack.shift();
-    redoStack=[];scene=fresh();mode='walk';selectedId=null;corner=null;dirty=true;opening=null;ritual=null;resetVisual();
+    redoStack=[];scene=fresh();mode='walk';selectedId=null;corner=null;dirty=true;opening=null;ritual=null;resetVisual();uoControls?.sync();
     if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function')startOpening();
     draw();message('Sacrificial temple reset. You awaken as a ghost once more. Saved browser layout remains intact until you press Save.');
   }
@@ -1952,7 +1972,9 @@
           return;
         }
         scene=fresh();
-        scene.player={x:character.x,y:character.y,facing:character.facing,form:character.form};
+        scene.player={x:character.x,y:character.y,facing:character.facing,form:character.form,
+          war_mode:character.war_mode===true,name:character.name};
+         uoControls?.sync();
         scene.introSeen=character.opening_state!=='not_started';
         if(scene.introSeen){
           const door=scene.objects.find(o=>o.id==='temple_north_door');
@@ -1975,6 +1997,7 @@
     })();
   }else{
     restoreCharacter();
+    uoControls?.sync();
     mountCultJournal();
     if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
     palette();draw();

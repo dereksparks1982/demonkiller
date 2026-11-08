@@ -1,5 +1,14 @@
 # Demon Killer Changelog
 
+## v0.2.58 / M60 | 2026-11-08 | UO keyboard controls and persistent combat behavior
+
+- Tab/Alt+C toggles a saved character War/Peace stance across temple and overworld; double-clicking a creature attacks only while the browser is in War Mode, otherwise inspects. T selects nearest hostile; L attacks last target.
+- Mapped Alt+P/I/K/J/R/S/B/O/X, Alt+D backpack alias, Alt+Enter fullscreen and ? reference. Added keyboard-only windows and a small non-button stance status badge; kept P/I/C/B/F8 and cardinal movement intact.
+- Added per-monster behavioral memory: visible-target pursuit, blocked-line-of-sight awareness, limited searching, injury retreats, home-bound return and deterministic patrolling.
+- Monster intelligence state migrates alongside M59 spawners and persists with each world creature. A read-only inspection route exposes behavior without permitting client state edits.
+- Added seven M60 regression cases for key mapping, war mode authority, save migration, AI and browser/server contract wiring.
+- No new art, audio, cult script, Lilith transition or game-save resets. No GPL RunUO code imported.
+
 ## v0.2.57 / M59 | 2026-11-07 | Durable creature spawner controls
 
 - Added four persisted regional creature spawners with exact-once world-minute dispatch, saved due times and regional population limits.

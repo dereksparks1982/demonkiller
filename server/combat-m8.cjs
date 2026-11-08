@@ -6,6 +6,7 @@ const {chooseStep}=require('./npc-navigation-m6.cjs');
 const SKILLS=require('./skills-m14.cjs');
 const CREATURES=require('./creatures-m42.cjs');
 const SPAWNERS=require('./spawners-m59.cjs');
+const MONSTER_AI=require('./monster-ai-m60.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const ARMORY=require('./armory-m54.cjs');
@@ -15,7 +16,10 @@ const MAX_CREATURES=48,MAX_DROPS=2048;
 function seed(){return {schema:1,sequence:0,creatures:{},drops:{}};}
 function ensure(world){
  if(!world.living.combat){world.living.combat=seed();return true;}
- return false;
+ let migrated=false;
+ for(const m of Object.values(world.living.combat.creatures||{}))
+  if(MONSTER_AI.ensure(m,world.living.minute))migrated=true;
+ return migrated;
 }
 function validate(world){
  const s=world.living?.combat;if(!s)return true;
@@ -38,6 +42,7 @@ function validate(world){
    d.gold<0||d.gold>100||!['ore','herbs','wood'].includes(d.item))
    throw Error('Invalid ground loot');
  }
+ MONSTER_AI.valid(world);
  return true;
 }
 function event(world,minute,type,text,details={}){
@@ -88,6 +93,7 @@ function spawn(world,area_id,minute,events,count,kind='imp'){
   const id=kind+'_'+(++s.sequence);
   s.creatures[id]={id,kind,area_id,x:pt.x,y:pt.y,
    health:type.health,alive:true,spawn_minute:minute,last_attack_minute:-1};
+  MONSTER_AI.ensure(s.creatures[id],world.living.minute);
   events.push(event(world,minute,'monster.spawn',type.name+' entered '+area_id+'.',
    {creature_id:id,area_id,x:pt.x,y:pt.y}));
  }
@@ -123,40 +129,27 @@ function tick(world,minute,events){
  const c=world.characters['1'];
  for(const monster of Object.values(l.combat.creatures)){
   if(!monster.alive)continue;
-  const nearby=Object.values(l.npcs).filter(n=>n.alive&&n.area_id===monster.area_id&&
-   CREATURES.canSense(monster,n));
+  const nearby=Object.values(l.npcs).filter(n=>n.alive&&
+   n.area_id===monster.area_id&&CREATURES.canSense(monster,n));
   const guards=nearby.filter(n=>n.role==='guard'||n.role==='escort');
-  const nearestGuard=guards.sort((a,b)=>distance(a,monster)-distance(b,monster))[0];
-  const nearestPet=Object.values(l.companions?.pets||{}).filter(p=>p.alive&&
-   CREATURES.canSense(monster,p)).sort((a,b)=>distance(a,monster)-distance(b,monster))[0];
-  const nearestCivilian=nearby.filter(n=>n.role!=='guard'&&n.role!=='escort')
-   .sort((a,b)=>distance(a,monster)-distance(b,monster))[0];
-  const player=c?.form==='living'&&!c.crafting?.incapacitated&&
-   !(c.fieldcraft?.hidden_until_minute>minute)&&
-   c.area_id===monster.area_id?c:null;
-  const target=player&&CREATURES.canSense(monster,player)?player:
-   nearestGuard||nearestPet||nearestCivilian;
-  if(!target){
-   if(minute%15===0){
-    const dirs=[[0,-1],[1,0],[0,1],[-1,0]];
-    const begin=(minute/15+monster.id.length)%4;
-    const area=world.areas[monster.area_id];
-    for(let a=0;a<4;a++){
-     const [dx,dy]=dirs[(begin+a)%4],x=monster.x+dx,y=monster.y+dy;
-     if(traversable(area,x,y,'living')&&
-       !Object.values(l.combat.creatures).some(other=>other.id!==monster.id&&
-        other.alive&&other.area_id===monster.area_id&&other.x===x&&other.y===y)){
-       monster.x=x;monster.y=y;break;
-     }
-    }
+  const decision=MONSTER_AI.decide(world,monster,minute,events);
+  const target=decision.target;
+  const player=decision.targetType==='player'?c:null;
+  const nearestPet=decision.targetType==='pet'?target:null;
+  if(decision.mode==='retreat'&&decision.threat){
+   const escape=MONSTER_AI.retreatStep(world,monster,decision.threat);
+   if(escape){monster.x=escape.x;monster.y=escape.y;}
+  }else if(decision.goal&&distance(monster,decision.goal)>1){
+   const step=chooseStep(world,monster,decision.goal);
+   if(step?.area_id===monster.area_id&&
+    !MONSTER_AI.occupied(world,monster,step.x,step.y)){
+    monster.x=step.x;monster.y=step.y;
    }
-   continue;
+  }else if(decision.mode==='patrol'){
+   const walk=MONSTER_AI.patrolStep(world,monster,minute);
+   if(walk){monster.x=walk.x;monster.y=walk.y;}
   }
-  if(distance(target,monster)>1){
-   const step=chooseStep(world,monster,{area_id:monster.area_id,x:target.x,y:target.y});
-   if(step?.area_id===monster.area_id){monster.x=step.x;monster.y=step.y;}
-  }
-  if(distance(target,monster)<=1){
+  if(target&&decision.mode==='pursue'&&distance(target,monster)<=1){
    let damage=CREATURES.damage(monster.kind,player===target?'player':'guard');
    if(player===target&&c.magic?.protection_until_minute>minute)
     damage=Math.max(1,Math.floor(damage/2));

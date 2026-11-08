@@ -4,6 +4,28 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M60 | Classic UO controls, War Mode and creature intelligence
+
+**Tab** and **Alt+C** toggle a persistent **War / Peace** stance. Creature double-clicks inspect in Peace Mode or initiate an attack in War Mode; pressing **T** selects the nearest visible hostile and **L** repeats the last selected target attack. The existing **right-mouse movement, left-click inspection, double-click interaction, P paper doll, I backpack, C cult dossier, B burial and F8 Architect** remain. Both the temple and overworld now understand the common UO keyboard controls:
+
+| Shortcut | Demon Killer behavior |
+|---|---|
+| Tab / Alt+C | War / Peace mode (saved on the server character, or browser-preview character) |
+| P / Alt+P | Paper doll |
+| I / Alt+I / Alt+D | Backpack |
+| Alt+K / Alt+S | Skills / character status |
+| Alt+J / Alt+R | Journal / radar map; repeat Alt+R to enlarge |
+| Alt+B | Spellbook |
+| Alt+O | Music options |
+| Alt+Enter | Browser fullscreen request |
+| Alt+X | Confirm return to title screen |
+| T / L in War Mode | Select nearest hostile / attack selected last target |
+| ? / Escape | Keyboard reference / close the shortcut window |
+
+Shortcut windows appear only when requested. The play screen gains a small **WAR / PEACE** status label, **not another action-button toolbar**. Movement, game editing, Lilith's cinematics and item double-click meanings remain intact. Features without a working authoritative action, such as NPC PvP attacks or UO speech macros, are not simulated as fake controls.
+
+**Monster AI** now maintains each creature's saved home position, current behavioral mode, last known target location and sighting time. Creatures pursue visible targets, search briefly after losing sight, withdraw when seriously injured and return toward home rather than chasing across the entire world. Server read-only diagnostics: `GET /api/v1/monster-ai`. Existing monsters migrate without losing identity, loot or location.
+
 ## M59 | Persistent creature spawning and regional ecology
 
 Demon Killer's world now has four server-owned **creature spawners** for courtyard/village wilderness and monster-held territory. Spawn schedules, created counts and liberation cooldowns are saved as world data; viewing the map or reloading cannot reset timers or manufacture enemies. Wild creatures appear only when regional threat is high enough. Occupied towns receive an initial siege wave and bounded reinforcements, while clearing the last hostile grants a two-hour-in-world grace period even if the area is conquered again immediately. Spawn placement respects cardinal terrain, living NPCs, the player and other creatures. A read-only `GET /api/v1/spawners` reports population, caps and next scheduled time for diagnosis. Existing characters, shops, physical loot, corpses, scripts and opening cinematic remain unchanged. This follows RunUO's durable-world design principles without importing RunUO code.

@@ -13,7 +13,8 @@ const MIME = Object.freeze({
 const ROOT_FILES = new Set([
   'index.html','test-center.html','test-center.js','test-center.css',
   'cult-system.js','cult-network.js','cult-journal.css',
-  'citizen-population.js','temple-music.js','dk-midi-soundtrack.js','dk-dungeon-art.js',
+  'citizen-population.js','temple-music.js','dk-midi-soundtrack.js',
+  'dk-uo-controls-m60.js','dk-uo-controls-m60.css','dk-dungeon-art.js',
   'dk-skills.js','dk-menu-server.js','world-regions.js','outdoor.html','outdoor.js','outdoor.css',
   'dk-lilith-cinematic-m40.js','dk-lilith-cinematic-m40.css',
   'outdoor-ui.js','temple-ui.js','temple-ui.css','sector-terrain-m32.js','streaming-cell-shells-m33.js','streaming-cell-contents-m34.js','dk-architect-interiors-m35.html','dk-architect-interiors-m35.js',

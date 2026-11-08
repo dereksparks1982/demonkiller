@@ -1,0 +1,24 @@
+/* DK Softworks M60: keyboard-only UO classic windows and readable War Mode status. */
+.dk-war-badge{display:inline-flex;align-items:center;padding:3px 7px;
+ border:1px solid #586751;border-radius:3px;color:#bbd1b3;background:#0e1910;
+ font:700 11px/1.4 monospace;letter-spacing:.06em;white-space:nowrap;
+ pointer-events:none;user-select:none}
+.dk-war-badge.active{color:#ffd6cc;background:#4b191b;border-color:#aa4647}
+.dk-shortcut-window{position:fixed;z-index:998;top:12vh;left:50%;transform:translateX(-50%);
+ width:min(420px,94vw);max-height:75vh;overflow:hidden;background:#1d1922;color:#ede0c9;
+ border:3px solid #a18457;box-shadow:0 0 0 4px #131018,0 10px 50px #000b;
+ font:13px/1.5 monospace}
+.dk-shortcut-window[hidden]{display:none!important}
+.dk-shortcut-title{display:flex;align-items:center;justify-content:space-between;
+ padding:7px 11px;background:#332732;border-bottom:2px solid #8d6c4b}
+.dk-shortcut-title strong{font-size:16px;color:#f2d69c}
+.dk-shortcut-title button{border:1px solid #c9a776;background:#25202a;color:#f6e4cd;
+ font:700 20px monospace;cursor:pointer;line-height:1;min-width:28px;min-height:28px}
+.dk-shortcut-title button:focus-visible{outline:2px solid #ffde9c}
+.dk-shortcut-body{padding:12px 14px;overflow-y:auto;max-height:calc(75vh - 50px)}
+.dk-shortcut-body p{padding:2px 0;margin:4px 0;border-bottom:1px solid #ffffff13}
+.dk-shortcut-body small{display:block;margin-top:8px;color:#bfb4a4}
+.dk-shortcut-body label{display:flex;align-items:center;gap:8px;margin:9px 0}
+.dk-shortcut-body .dk-volume-label{display:flex;flex-direction:column;align-items:stretch}
+.dk-shortcut-body input[type=range]{width:100%;accent-color:#b79657}
+.dk-radar{display:block;margin:auto;image-rendering:pixelated;max-width:100%;border:2px solid #73654c}

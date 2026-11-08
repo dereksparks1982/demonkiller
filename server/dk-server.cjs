@@ -13,6 +13,7 @@ const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.c
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
 const {ensure:ensureCombat}=require('./combat-m8.cjs');
 const SPAWNERS=require('./spawners-m59.cjs');
+const MONSTER_AI=require('./monster-ai-m60.cjs');
 const {ensure:ensureStorage}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities,counts:assertEntityCounts,inspect:inspectEntities}=require('./entity-registry-m10.cjs');
 const {build:buildSectorIndex,lookup:sectorLookup}=require('./sectors-m10.cjs');
@@ -738,6 +739,10 @@ async function createDKServer({
       const c=world.characters['1'];
       if(!c)return sendJSON(res,404,{error:'No character exists'},method);
       return sendJSON(res,200,lawListing(world),method);
+    }
+    if(url.pathname==='/api/v1/monster-ai'&&!write){
+      const character=world.characters?.['1'];
+      return sendJSON(res,200,MONSTER_AI.listing(world,character?.area_id||null),method);
     }
     if(url.pathname==='/api/v1/spawners'&&!write)
       return sendJSON(res,200,SPAWNERS.listing(world),method);

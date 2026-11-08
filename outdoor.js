@@ -1060,7 +1060,8 @@ function returnTemple(){
   const data=JSON.parse(localStorage.getItem(TEMPLE_SAVE)||'null');
   const saved=data?.slots?.[0]?.scene;
   if(saved){
-   saved.player={x:8,y:1,facing:'south',form:player.form};
+   saved.player={x:8,y:1,facing:'south',form:player.form,
+     war_mode:player.war_mode===true};
    saved.introSeen=true;
    const door=saved.objects?.find(o=>o.id==='temple_north_door');
    if(door)door.open=doorOpen;
@@ -1149,8 +1150,13 @@ function inspect(x,y,doubleClick){
  if(item.pet)return message('Tamed wolf · '+item.pet.health+
   ' health · '+item.pet.mode+' · '+item.pet.loyalty+' loyalty. Use ANIMALS in your paper doll.');
  if(item.creature){
-  if(doubleClick&&SERVER)return takeAction('attack',{target_id:item.creature.id});
-  return message(item.creature.kind.replaceAll('_',' ').toUpperCase()+' · '+item.creature.health+' health. Double-click beside it to attack.');
+  if(doubleClick){
+    if(!uoControls?.isWar())return message('Peace Mode: '+item.creature.kind+
+     '. Press TAB for War Mode, then double-click to attack.');
+    uoControls.rememberTarget(item.creature.id);
+    if(SERVER)return takeAction('attack',{target_id:item.creature.id});
+   }
+  return message(item.creature.kind.replaceAll('_',' ').toUpperCase()+' · '+item.creature.health+' health. In War Mode, double-click beside it to attack.');
  }
  if(item.loot){
   if(doubleClick&&SERVER)return takeAction('loot',{drop_id:item.loot.id});
@@ -1247,7 +1253,45 @@ function pointerMove(dt){
  visual.x=nx;visual.y=ny;
  player.facing=direction;
 }
-canvas.addEventListener('contextmenu',e=>e.preventDefault());
+// UO-style shortcuts share the same saved character War/Peace state.
+ const uoControls=window.DKUOControls?.mount({
+  scope:'outdoor',getPlayer:()=>player,getArea:()=>area,
+  locked:()=>lilithPhase==='playing'||busy,
+  editing:()=>Boolean(window.DKOutdoorArchitect?.isOpen?.()),
+  toggleWar:async()=>{
+   if(!player)throw Error('The world is still loading');
+   if(SERVER){
+    const next=await SERVER.action(slot,'toggle_war');
+    player.war_mode=next.war_mode===true;
+   }else{player.war_mode=!player.war_mode;persistPreview();}
+   return player.war_mode;
+  },
+  notify:message,
+  attackLast:id=>{
+   const c=id&&living?.combat?.creatures?.[id];
+   if(!c?.alive||c.area_id!==player?.area_id)
+    return message('Your last target is not nearby.');
+   if(!SERVER)return message('Combat requires an authoritative world connection.');
+   takeAction('attack',{target_id:id});
+  },
+  targetNearest:()=>{
+   if(!player)return;
+   const choices=Object.values(living?.combat?.creatures||{})
+    .filter(c=>c.alive&&c.area_id===player.area_id)
+    .sort((a,b)=>(Math.abs(a.x-player.x)+Math.abs(a.y-player.y))-
+       (Math.abs(b.x-player.x)+Math.abs(b.y-player.y))||
+       a.id.localeCompare(b.id));
+   const closest=choices[0];
+   if(!closest||Math.abs(closest.x-player.x)+Math.abs(closest.y-player.y)>12)
+    return message('No hostile creature within targeting distance.');
+   uoControls?.rememberTarget(closest.id);
+   message('Target selected: '+closest.kind+' ('+closest.id+'). Press L to attack.');
+  },
+  musicChanged:(enabled,volume)=>{
+   MUSIC?.setVolume(volume);if(enabled)startOutdoorMusic();else MUSIC?.stop();
+  }
+ });
+ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('mousedown',e=>{if(lilithPhase==='playing')return;if(e.button===2){e.preventDefault();pointer=pointerPosition(e);rightHeld=true;canvas.focus();}});
 canvas.addEventListener('mousemove',e=>{if(rightHeld)pointer=pointerPosition(e);});
 document.addEventListener('mouseup',e=>{if(e.button===2)rightHeld=false;});
@@ -1345,6 +1389,7 @@ async function begin(){
   if(SERVER){
    await SERVER.startWorld();
    player=await SERVER.getCharacter(slot);
+    uoControls?.sync();
    if(player.area_id===R.TEMPLE){location.href='./test-center.html?dkSlot='+slot+'&walk=continuous1';return;}
    // M57 uses its own completion key so a cutscene skipped by the broken
    // older build is shown once, even when that build marked the visit complete.
@@ -1365,6 +1410,7 @@ async function begin(){
    player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
     {area_id:R.COURT,x:32,y:47,facing:'north',form:'ghost'};
    doorOpen=saved?.doorOpen!==false;
+    uoControls?.sync();
    cinematicKey='dkSoftworks.demonkiller.lilith.completed.m57.preview.'+slot;
    firstVisit=player.area_id===R.COURT&&
     localStorage.getItem(cinematicKey)!=='complete';
