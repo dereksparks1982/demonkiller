@@ -38,7 +38,7 @@ test('M35 DK Server exposes guarded interior endpoints without publishing a room
  assert.match(server,/req\.headers\['x-dk-architect'\]!=='draft'/);
  assert.match(server,/saveInteriorDraft\(command\)/);
  assert.match(server,/await snapshots\.save\(result\.world,\{forceBackup:true\}\)/);
- assert.match(server,/build: 'local-m35'/);
+ assert.match(server,/build: 'local-m36'/);
  assert.match(api,/async interiorCells\(\)/);
  assert.match(api,/async interiorDraft\(cell_id\)/);
  assert.match(api,/async editInteriorDraft\(action,cell_id,expected_revision,fields=\{\}\)/);

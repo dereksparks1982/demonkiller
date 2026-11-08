@@ -30,7 +30,7 @@ test('M30 server advertises graves and scavenger mobiles with nearby sector quer
  const server=src('server/dk-server.cjs'),sector=src('server/sectors-m10.cjs');
  assert.match(server,/burials:l\.burials\?\.records\|\|\{\}/);
  assert.match(server,/scavengers:l\.scavengers\?\.visitors\|\|\{\}/);
- assert.match(server,/build: 'local-m35'/);
+ assert.match(server,/build: 'local-m36'/);
  assert.match(sector,/kind:'grave'/);
  assert.match(sector,/kind:'scavenger'/);
  const reference=src('server/entity-registry-m10.cjs');
