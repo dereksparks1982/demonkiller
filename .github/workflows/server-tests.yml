@@ -12,6 +12,7 @@ on:
       - 'outdoor-ui.js'
       - 'sector-terrain-m32.js'
       - 'streaming-cell-shells-m33.js'
+      - 'streaming-cell-contents-m34.js'
       - 'world-regions.js'
       - 'dk-menu-server.js'
       - '.github/workflows/server-tests.yml'
