@@ -9,6 +9,8 @@ const {tick:craftTick}=require('./crafting-m7.cjs');
 const {tick:combatTick,dead:monsterDeath}=require('./combat-m8.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
+const BUSINESS=require('./player-business-m48.cjs');
+const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const MAGIC=require('./spells-m44.cjs');
 const {tick:storageTick}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
@@ -169,10 +171,12 @@ function minuteTick(world,m,generated){
   for(const shop of Object.values(living.businesses)){
    const occupied=living.territories[shop.area_id]?.control!=='settlers';
    const employee=living.npcs[shop.owner_id],at=shopLocation(world,shop);
-   const staffed=employee?.alive&&employee.area_id===shop.area_id&&
+   const owned=BUSINESS.owned(world,shop);
+   const staffed=owned?Boolean(BUSINESS.presence(world,shop)):
+    employee?.alive&&employee.area_id===shop.area_id&&
      Math.abs(employee.x-at.x)+Math.abs(employee.y-at.y)<=6;
    const open=day&&!occupied&&staffed&&
-     living.npc_ai?.brains[shop.owner_id]?.mode!=='flee';
+     (owned||living.npc_ai?.brains[shop.owner_id]?.mode!=='flee');
    if(shop.open!==open){
     shop.open=!!open;
     generated.push(event(living,m,'business.hours',
@@ -189,6 +193,7 @@ function minuteTick(world,m,generated){
    terr.threat=Math.max(0,Math.min(20,terr.threat+(roll<.62?1:-1)));
    if(terr.control==='settlers'&&terr.threat>=10){
     terr.control='monsters';terr.last_raid=m;
+    MAINTENANCE.damageArea(world,terr.id,m,generated);
     generated.push(event(living,m,'territory.fallen',
       terr.id+' has been overrun by monsters.',
       {area_id:terr.id,control:'monsters'}));
@@ -202,6 +207,7 @@ function minuteTick(world,m,generated){
   }
  }
  combatTick(world,m,generated);
+ MAINTENANCE.tick(world,m,generated);
  COMPANIONS.tick(world,m,generated,monsterDeath);
  lawTick(world,m,generated);
  storageTick(world,m,generated);

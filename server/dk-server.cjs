@@ -27,6 +27,8 @@ const MAGIC=require('./spells-m44.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
+const BUSINESS=require('./player-business-m48.cjs');
+const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const {ensure:ensureLaw,listing:lawListing}=require('./law-m15.cjs');
 const {ensure:ensureDistricts,current:currentDistrict}=require('./region-policies-m16.cjs');
 const {ensure:ensureHousing,listing:housingListing}=require('./housing-m17.cjs');
@@ -176,6 +178,8 @@ async function createDKServer({
     const vendorEntitiesAdded=reconcileEntities(world);
     // Old saves may lack the entity registry until the vendor stage completes.
     const millingAdded=MILLING.ensure(world);
+    const businessAdded=BUSINESS.ensure(world);
+    const maintenanceAdded=MAINTENANCE.ensure(world);
     const npcCommerceAdded=ensureNpcCommerce(world);
     const workshopsAdded=ensureWorkshops(world);
     const npcAIAdded=ensureMobileAI(world);
@@ -193,7 +197,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||doorSynced)world.revision++;
+    if(regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -731,6 +735,10 @@ async function createDKServer({
       const player=world.characters?.['1'];
       return sendJSON(res,200,CREATURES.listing(world,player?.area_id||null),method);
     }
+    if(url.pathname==='/api/v1/maintenance'&&!write)
+      return sendJSON(res,200,MAINTENANCE.listing(world),method);
+    if(url.pathname==='/api/v1/player-business'&&!write)
+      return sendJSON(res,200,BUSINESS.listing(world),method);
     if(url.pathname==='/api/v1/milling'&&!write)
       return sendJSON(res,200,MILLING.listing(world),method);
     if(url.pathname==='/api/v1/companions'&&!write)

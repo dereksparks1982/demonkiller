@@ -3,8 +3,9 @@
 // Independent UO-inspired mobile/vendor interaction; same one-world authority.
 const {merchandises,location}=require('./vendors-m18.cjs');
 const {reconcile}=require('./entity-registry-m10.cjs');
+const BUSINESS=require('./player-business-m48.cjs');
 const FOOD=new Set(['bread','produce','meals','rations']);
-const SHOPPERS=new Set(['guard','caravan','escort']);
+const SHOPPERS=new Set(['guard','caravan','escort','courier','caretaker','herbalist','smithy','bakery','market','tavern','bank']);
 const PRICE=Object.freeze({bread:2,produce:2,meals:4});
 const MAX_GOALS=40;
 function ensure(world){
@@ -37,7 +38,8 @@ function plan(world,minute,out){
   const choices=Object.values(world.living.businesses)
     .filter(shop=>merchandises(shop)&&FOOD.has(shop.product)&&
       shop.area_id===n.area_id&&shop.open&&shop.stock>0&&
-      n.coins>=PRICE[shop.product])
+      (!BUSINESS.owned(world,shop)||BUSINESS.presence(world,shop))&&
+      n.coins>=BUSINESS.price(world,shop,PRICE[shop.product]))
     .map(shop=>({shop,at:location(world,shop)}))
     .sort((a,b)=>distance(n,a.at.x,a.at.y)-distance(n,b.at.x,b.at.y)||
       a.shop.id.localeCompare(b.shop.id));
@@ -69,8 +71,9 @@ function purchase(world,minute,out){
   }
   const point=location(world,shop);
   if(n.area_id!==shop.area_id||distance(n,point.x,point.y)>1)continue;
-  const price=PRICE[shop.product];
+  const price=BUSINESS.price(world,shop,PRICE[shop.product]);
   if(!shop.open||shop.stock<1||!price||n.coins<price||
+     (BUSINESS.owned(world,shop)&&!BUSINESS.presence(world,shop))||
      shop.coins+price>1e9){
    delete state.goals[id];continue;
   }
@@ -95,12 +98,14 @@ function purchase(world,minute,out){
       parent:backpack,created_minute:minute};
   }
   n.coins-=price;shop.coins+=price;shop.stock--;shop.sales++;
+  const serving=BUSINESS.owned(world,shop)?BUSINESS.presence(world,shop):null;
+  if(BUSINESS.owned(world,shop))BUSINESS.recordSale(world,shop,serving,price,out);
   state.last_purchase[id]=minute;state.purchases++;
   delete state.goals[id];
   out.push(event(world,minute,'business.trade',
     n.name+' bought '+shop.product+' at '+shop.name+'.',
     {npc_id:id,business_id:shop.id,area_id:shop.area_id,
-      item_serial:serial,units:1,revenue:price}));
+      item_serial:serial,units:1,revenue:price,served_by:serving||shop.owner_id}));
  }
 }
 function consume(world,n,minute,out){

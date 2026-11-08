@@ -28,6 +28,8 @@ const {ensure:ensureInteriors,validate:validateInteriors}=require('./interior-dr
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
+const BUSINESS=require('./player-business-m48.cjs');
+const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -112,6 +114,8 @@ function makeWorld(now = Date.now()) {
   BOUNTIES.ensure(result);
   COMPANIONS.ensure(result);
   MILLING.ensure(result);
+  BUSINESS.ensure(result);
+  MAINTENANCE.ensure(result);
   return result;
 }
 
@@ -197,6 +201,8 @@ function validateWorld(world) {
   BOUNTIES.validate(world);
   COMPANIONS.validate(world);
   MILLING.validate(world);
+  BUSINESS.validate(world);
+  MAINTENANCE.validate(world);
   return world;
 }
 

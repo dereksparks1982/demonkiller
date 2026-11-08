@@ -227,6 +227,107 @@ async function showCrafting(){
 }
 menu('CRAFTING',showCrafting,'Real crafting recipes, grinding grain, sacking flour and NPC production');
 
+async function showBusinesses(){
+ if(!connected()){
+  show('BUSINESS',['Ownership, stock, assistants and NPC purchases require a real DK Server. The static Pages preview is not an economy server.']);return;
+ }
+ try{
+  const api=window.DemonKillerServer,[report,p,maintenance]=await Promise.all([api.playerBusiness(),character(),api.maintenance()]);
+  show('BUSINESS · OWNERSHIP',[
+   'At a storefront you can purchase an existing business from its proprietor.',
+   'When present, you serve real NPC shoppers; when absent, the hired assistant keeps the counter running.',
+   'The employee keeps the existing schedule and payroll. Store funds, merchandise and your personal gold remain separate.',
+   'Gold · '+(p.gold||0)+' · Owned businesses · '+Object.keys(report.ownership||{}).length,
+   'No new buildings are placed automatically. Architect controls the village layout.'
+  ]);
+  for(const b of report.businesses){
+   const title=document.createElement('h3');title.className='dk-skill-heading';
+   title.textContent=b.name.toUpperCase()+' · '+(b.owner?'OWNED':'AVAILABLE');
+   content.append(title);
+   const detail=document.createElement('p');
+   detail.textContent='Price to acquire '+b.cost+' gold · Treasury '+b.coins+
+    ' · Stock '+b.stock+' · On duty '+(b.on_duty||'nobody');
+   content.append(detail);
+   if(!b.owner){
+    content.append(button('BUY EXISTING BUSINESS',async()=>{
+     try{
+      const r=await api.gameAction('buy_business',{business_id:b.id});
+      await showBusinesses();feedback(r.event?.text||'Business acquired.');
+     }catch(e){feedback(e.message);}
+    },!b.near||p.gold<b.cost));
+    continue;
+   }
+   const machine=(maintenance.shops||[]).find(m=>m.id===b.id);
+   if(machine){
+    const status=document.createElement('p');status.textContent=
+     'MACHINERY · '+(machine.broken?'BROKEN':'WORKING')+
+     ' · wear '+machine.wear+'/100 · repairs '+machine.repairs+
+     (machine.pending?' · hired repair expected after world minute '+machine.pending.due:'');
+    content.append(status);
+    if(machine.broken){
+     const repairButtons=document.createElement('div');repairButtons.className='dk-skill-row';
+     for(const [label,action]of [['REPAIR (1 TOOL)','repair_workshop'],['HIRE REPAIRER (20G)','hire_repair']]){
+      const control=button(label,async()=>{
+       try{
+        const result=await api.gameAction(action,{business_id:b.id});
+        await showBusinesses();feedback(result.event?.text||'Repairs arranged.');
+       }catch(error){feedback(error.message);}
+      },!b.near||(action==='hire_repair'&&!!machine.pending));
+      repairButtons.append(control);
+     }
+     content.append(repairButtons);
+    }
+   }
+   if(['village_bakery','village_smithy','village_tavern'].includes(b.id))
+    content.append(button('OPERATE WORKSHOP',async()=>{
+     try{
+      const r=await api.gameAction('run_workshop',{business_id:b.id});
+      await showBusinesses();feedback(r.event?.text||'Manual production finished.');
+     }catch(e){feedback(e.message);}
+    },!b.near));
+   const controls=document.createElement('div');controls.className='dk-skill-row';
+   const operations=[
+    ['ASSISTANT '+(b.assistant_enabled?'ON':'OFF'),'set_assistant',
+     {enabled:!b.assistant_enabled}],
+    ['PRODUCTION '+(b.production_enabled?'ON':'OFF'),'set_production',
+     {enabled:!b.production_enabled}],
+    ['PRICE '+b.price_mode.toUpperCase(),'set_business_price',
+     {price_mode:b.price_mode==='standard'?'premium':b.price_mode==='premium'?'budget':'standard'}],
+    ['INVEST 10 GOLD','invest_business',{amount:10}],
+    ['DRAW 10 GOLD','draw_business',{amount:10}]
+   ];
+   for(const [label,action,data]of operations)
+    controls.append(button(label,async()=>{
+     try{
+      const r=await api.gameAction(action,{business_id:b.id,...data});
+      await showBusinesses();feedback(r.event?.text||'Business updated.');
+     }catch(e){feedback(e.message);}
+    },!b.near));
+   content.append(controls);
+   const items=new Set([b.product||'bread',...Object.keys(b.other_stock||{})]);
+   items.add('grain');items.add('flour');items.add('produce');items.add('wood');items.add('ore');
+   const stock=document.createElement('div');stock.className='dk-skill-row';
+   const select=document.createElement('select');select.setAttribute('aria-label','Business item');
+   for(const item of items){
+    const opt=document.createElement('option');opt.value=item;opt.textContent=item;select.append(opt);
+   }
+   const quantity=document.createElement('input');quantity.type='number';quantity.min='1';
+   quantity.max='20';quantity.value='1';quantity.style.width='43px';quantity.setAttribute('aria-label','Quantity');
+   for(const [label,action]of [['STOCK','stock_business'],['TAKE','take_business_stock']])
+    stock.append(button(label,async()=>{
+     try{
+      const r=await api.gameAction(action,{business_id:b.id,
+       item_type:select.value,quantity:Number(quantity.value)});
+      await showBusinesses();feedback(r.event?.text||'Physical stock moved.');
+     }catch(e){feedback(e.message);}
+    },!b.near));
+   stock.prepend(select,quantity);content.append(stock);
+  }
+ }catch(error){show('BUSINESS',['Server management unavailable: '+error.message]);}
+}
+menu('BUSINESS',showBusinesses,'Own existing shops, operate the counter, manage assistants, stock, prices and gold');
+
+
 async function showAnimals(){
  if(!connected()){show('ANIMALS',['Tamed animals require the persistent DK Server. No pet is simulated on static GitHub Pages.']);return;}
  try{

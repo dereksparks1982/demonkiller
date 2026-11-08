@@ -3,6 +3,9 @@
 // Recipes are server-authored; no player-supplied outputs or RunUO GPL code.
 const {location,CAPACITY,total}=require('./vendors-m18.cjs');
 const {reconcile,counts}=require('./entity-registry-m10.cjs');
+const SKILLS=require('./skills-m14.cjs');
+const PLAYERBUSINESS=require('./player-business-m48.cjs');
+const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const RECIPES=Object.freeze({
  village_smithy:{label:'Smithing',ingredients:{ore:2,wood:1},
   output:'tools',quantity:1,wage:2},
@@ -19,9 +22,14 @@ function ensure(world){
   world.living.workshops={schema:1,production_runs:0,total_units:0,shops:{}};
   changed=true;
  }
- for(const id of IDS)if(!world.living.workshops.shops[id]){
-  world.living.workshops.shops[id]={id,made:0,paid:0,last_minute:-1};
-  changed=true;
+ for(const id of IDS){
+  if(!world.living.workshops.shops[id]){
+   world.living.workshops.shops[id]={id,made:0,paid:0,last_minute:-1};
+   changed=true;
+  }
+  const row=world.living.workshops.shops[id];
+  if(row.player_runs===undefined){row.player_runs=0;changed=true;}
+  if(row.player_last_minute===undefined){row.player_last_minute=-1;changed=true;}
  }
  return changed;
 }
@@ -51,7 +59,9 @@ function run(world,minute,out){
  for(const id of IDS){
   const recipe=RECIPES[id],shop=world.living.businesses[id],
     worker=shop?world.living.npcs[shop.owner_id]:null;
-  if(!shop||!worker?.alive||!shop.open||
+  if(!shop||!PLAYERBUSINESS.productionEnabled(world,shop)||
+     (PLAYERBUSINESS.owned(world,shop)&&!PLAYERBUSINESS.owned(world,shop).assistant_enabled)||
+     !MAINTENANCE.operational(world,shop)||!worker?.alive||!shop.open||
      world.living.territories[shop.area_id]?.control!=='settlers')continue;
   const at=location(world,shop);
   if(worker.area_id!==shop.area_id||
@@ -83,6 +93,7 @@ function run(world,minute,out){
       ingredients:recipe.ingredients,input_serials:taken,
       output_type:recipe.output,output_quantity:recipe.quantity,
       output_serial:serial,wage:recipe.wage}));
+  MAINTENANCE.onProduction(world,shop,minute,out,'workshop');
  }
  if(produced)counts(world);
  return produced;
@@ -97,7 +108,10 @@ function validate(world){
   const s=w.shops[id];
   if(!s||s.id!==id||!Number.isSafeInteger(s.made)||s.made<0||
    !Number.isSafeInteger(s.paid)||s.paid<0||
-   !Number.isSafeInteger(s.last_minute)||s.last_minute<-1)
+   !Number.isSafeInteger(s.last_minute)||s.last_minute<-1||
+   (s.player_runs!==undefined&&(!Number.isSafeInteger(s.player_runs)||s.player_runs<0))||
+   (s.player_last_minute!==undefined&&(!Number.isSafeInteger(s.player_last_minute)||
+    s.player_last_minute<-1)))
    throw Error('Invalid workshop record');
  }
  return true;
@@ -110,4 +124,63 @@ function listing(world){
    recipe:RECIPES[id],made:state?.shops[id]?.made||0,
    last_minute:state?.shops[id]?.last_minute??-1}))};
 }
-module.exports={RECIPES,ensure,validate,run,listing};
+
+function applyPlayer(world,command){
+ if(!command||typeof command!=='object'||Array.isArray(command)||
+  Object.keys(command).sort().join(',')!=='action,business_id'||
+  command.action!=='run_workshop'||!IDS.includes(command.business_id))
+  throw Error('Invalid manual workshop command');
+ if(!world.runtime?.running)throw Error('World is paused');
+ const prior=world.characters?.['1'];
+ if(!prior||prior.form!=='living'||prior.crafting?.incapacitated)
+  throw Error('Only a conscious living character can operate a workshop');
+ const BUSINESS=require('./player-business-m48.cjs');
+ const previousShop=world.living.businesses[command.business_id];
+ if(!BUSINESS.owned(world,previousShop))
+  throw Error('You must own this workshop to operate its machinery');
+ if(!MAINTENANCE.operational(world,previousShop))
+  throw Error('The workshop machinery is broken and needs repair');
+ if(!BUSINESS.atShop(world,prior,previousShop))
+  throw Error('Stand by the workshop station to operate it');
+ if(world.living.territories[previousShop.area_id]?.control!=='settlers')
+  throw Error('The settlement is occupied');
+ const next=structuredClone(world),c=next.characters['1'];
+ ensure(next);SKILLS.ensure(c);
+ const id=command.business_id,shop=next.living.businesses[id],recipe=RECIPES[id];
+ const state=next.living.workshops,row=state.shops[id],minute=next.living.minute;
+ if(row.player_last_minute>=minute)
+  throw Error('Work on this station requires another world minute');
+ if(Object.entries(recipe.ingredients).some(([type,amount])=>
+  (shop.other_stock?.[type]||0)<amount))
+  throw Error('The workshop lacks physical ingredients');
+ const inputTotal=Object.values(recipe.ingredients).reduce((n,a)=>n+a,0);
+ if(total(shop)-inputTotal+recipe.quantity>CAPACITY)
+  throw Error('The finished goods would overflow the storeroom');
+ reconcile(next);
+ const bag='vendor_stock_'+id,reg=next.entity_registry,taken=[];
+ for(const [type,amount]of Object.entries(recipe.ingredients)){
+  taken.push(...consume(reg,bag,type,amount));
+  shop.other_stock[type]-=amount;
+ }
+ const serial='ent_'+reg.next_serial++;
+ reg.items[serial]={serial,kind:'item',type:recipe.output,
+  amount:recipe.quantity,parent:bag,created_minute:minute};
+ shop.stock+=recipe.quantity;
+ row.player_runs++;row.player_last_minute=minute;
+ row.made+=recipe.quantity;row.last_minute=minute;
+ state.production_runs++;state.total_units+=recipe.quantity;
+ const profession=id==='village_smithy'?'blacksmithing':'cooking';
+ const gained=SKILLS.practice(c,profession,minute,'manual:'+id);
+ const l=next.living,e={id:'event_'+(++l.event_sequence),minute,
+  type:'workshop.player.production',slot:1,business_id:id,area_id:shop.area_id,
+  input_serials:taken,output_serial:serial,output_type:recipe.output,
+  output_quantity:recipe.quantity,skill_gain:gained.gained,
+  text:'You operated the '+recipe.label.toLowerCase()+' station at '+shop.name+'.'};
+ l.events.push(e);if(l.events.length>512)l.events.shift();
+ const following=[];
+ MAINTENANCE.onProduction(next,shop,minute,following,'manual');
+ c.revision++;next.revision++;
+ counts(next);validate(next);
+ return {world:next,character:c,event:e,events:[e,...following]};
+}
+module.exports={RECIPES,ensure,validate,run,listing,applyPlayer};

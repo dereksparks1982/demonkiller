@@ -1,4 +1,4 @@
-# DK Server M24 | Physical Caravan Trade and Cross-Region Supply (v0.2.46)
+# DK Server M50 | Persistent UO-Style Businesses and Workshop Maintenance (v2.25.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -272,3 +272,11 @@ DK Server v2.22.0 adds 59 grouped trainable character skills, seven monster arch
 Read-only endpoint families: `GET /api/v1/skills`, `/api/v1/creatures`, `/api/v1/spells`, `/api/v1/bounties`, `/api/v1/companions` and `/api/v1/milling`. All mutations travel via existing `POST /api/v1/gameplay` and are checked by the authoritative server. The live world continues when the player is disconnected **only while the DK Server process remains running**.
 
 `server/package.json` includes `../tests/uo-expansion-m41-m47.cjs`. The six-shard GitHub Actions workflow is deliberately **manual-only**, and these additions do **not** run hosted CI automatically. The static GitHub Pages preview never substitutes for a running DK Server.
+
+## M48–M50 real player businesses, operated workshops and failures
+
+Five existing merchandise shops can be bought from a living NPC, with real currency transfer and persistent single-character ownership. Existing NPC job holders remain assistants so M23 succession, M22 harvesting, M19 real shopping and M20 scheduled production still work. Player presence at the storefront takes priority for NPC service. Shops can be managed through strict API actions for price mode, operator/production switches, currency and inventory transfers. Character deletion removes only that character's title, not the physical business or its inventory.
+
+The bakery, smithy and tavern now accept `run_workshop` only for a nearby living owner with real ingredients and a usable machine. Bakery bread still requires M47-milled flour. Workshop wear is applied on actual production; failures stop both automatic and manual work. Town raids also damage machines. `repair_workshop` consumes an item; `hire_repair` reserves actual company money and can complete when the NPC is alive and physically at the machine. Existing NPC-owned businesses can self-repair when funded. Gameplay and history are validated with saved states.
+
+New read-only endpoints: `GET /api/v1/player-business`, `GET /api/v1/maintenance`. New actions use the existing `POST /api/v1/gameplay` route. `npm --prefix server test` includes `tests/business-m48-m50.cjs`. The six-shard GitHub Actions workflow remains manual-only. Source/isolated simulations do not substitute for end-to-end server/browser testing.

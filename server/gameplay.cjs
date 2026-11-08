@@ -15,6 +15,9 @@ const MAGIC=require('./spells-m44.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
+const BUSINESS=require('./player-business-m48.cjs');
+const WORKSHOPS=require('./workshops-m20.cjs');
+const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const LAW=require('./law-m15.cjs');
 const HOUSING=require('./housing-m17.cjs');
 const VENDORS=require('./vendors-m18.cjs');
@@ -104,6 +107,12 @@ function apply(world,command,now=Date.now()){
  if(['accept_bounty','turn_in_bounty'].includes(command?.action))return BOUNTIES.apply(world,command);
  if(['tame_creature','feed_pet','release_pet','pet_follow','pet_stay','pet_guard'].includes(command?.action))return COMPANIONS.apply(world,command);
  if(['mill_grind','mill_sack'].includes(command?.action))return MILLING.apply(world,command);
+ if(command?.action==='run_workshop')return WORKSHOPS.applyPlayer(world,command);
+ if(['repair_workshop','hire_repair'].includes(command?.action))
+  return MAINTENANCE.apply(world,command);
+ if(['buy_business','set_business_price','set_assistant','set_production',
+  'invest_business','draw_business','stock_business','take_business_stock'].includes(command?.action))
+  return BUSINESS.apply(world,command);
  if(command?.action==='loot_corpse')return MOBILE.loot(world,command);
  if(command?.action==='bury_corpse')return BURIALS.bury(world,command);
  if(command?.action==='move_item')return ENTITIES.transfer(world,command);
