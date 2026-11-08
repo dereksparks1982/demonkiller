@@ -111,7 +111,7 @@
   try{
    const result=await api.editInteriorDraft(command.action,entry.cell_id,
     room?.revision||0,command.fields||{});
-   room.revision=result.draft_revision;
+   if(room)room.revision=result.draft_revision;
    configureSize();
    return result;
   }catch(error){
