@@ -5,24 +5,6 @@ const $=id=>document.getElementById(id);
 // Temple windows are declared in the HTML so shortcuts work on initial load.
 const paper=$('templePaper'),bag=$('templeBag');
 
-$('templeDeleteSave').addEventListener('click',async()=>{
- const server=window.DemonKillerServer;
- const live=!!server&&new URLSearchParams(location.search).has('dkSlot');
- const record=localRecord();
- let name=record.name||'this character';
- try{
-  if(live){const c=await server.getCharacter(Number(new URLSearchParams(location.search).get('dkSlot')));name=c.name;}
- }catch(error){$('status').textContent='Cannot load character to delete: '+error.message;return;}
- if(!window.confirm('Permanently delete '+name+' and all their belongings? The world remains. This cannot be undone.'))return;
- const button=$('templeDeleteSave');button.disabled=true;
- try{
-  if(live)await server.deleteCharacter(1,name);
-  for(const key of ['dkSoftworks.demonkiller.characters.v1','dkSoftworks.demonkiller.activeCharacter.v1','dkSoftworks.demonkiller.outdoors.preview.v1','dkSoftworks.demonkiller.testCenter.v1','dkSoftworks.demonkiller.architectLocalBackup.v1'])
-   localStorage.removeItem(key);
-  location.replace('./index.html');
- }catch(error){$('status').textContent='Delete failed: '+error.message;button.disabled=false;}
-});
-
 let layer=30,latest='';
 function toggle(win){win.hidden=!win.hidden;if(!win.hidden){win.style.zIndex=String(++layer);update();}}
 // P and I are keyboard-only controls while playing.

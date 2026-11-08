@@ -55,6 +55,11 @@ label{cursor:pointer}
 .dk-world-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:4px}
 .dk-world-controls button{margin:4px}
 #dkServerOptions small{display:block}
+#dkSaveManagement{border-color:#9b654e}
+#dkSaveManagement .danger{background:#68292c;border-color:#bc745e}
+#dkSaveManagement .danger:disabled{opacity:.4;cursor:not-allowed}
+#dkSaveManagement small{display:block;color:#c9b9ad;font-size:12px;line-height:1.5}
+#dkSaveManagementStatus{min-height:36px;color:#ead5b0;font-size:12px}
 </style>
 <noscript><style>.art-loading #home{visibility:visible}</style></noscript>
 </head>
@@ -108,6 +113,17 @@ label{cursor:pointer}
 <button id="dkServerCheckpoint" class="action secondary" type="button" disabled>SAVE WORLD CHECKPOINT</button>
 </div>
 <small id="dkServerHelp" class="music-volume-hint">The persistent world requires a hosted DK Server. This menu will report whether one is connected.</small>
+</fieldset>
+<fieldset id="dkSaveManagement">
+<legend>Save Management</legend>
+<p><strong>CHARACTER SAVE</strong> and <strong>WORLD SAVE</strong> are different records. Your persistent world continues changing while its server runs, even when you're away.</p>
+<div class="dk-world-controls">
+<button id="dkDeleteCharacter" class="action secondary" type="button">DELETE CHARACTER</button>
+<button id="dkResetWorld" class="action danger" type="button">RESET SERVER WORLD</button>
+<button id="dkStartFresh" class="action danger" type="button">START FRESH</button>
+</div>
+<small>Delete Character preserves the world. Reset Server World destroys that world, its characters, businesses, events, and checkpoints. Start Fresh additionally clears all browser character and DK Architect map drafts.</small>
+<p id="dkSaveManagementStatus" role="status" aria-live="polite">Checking save locations...</p>
 </fieldset>
 <button class="action secondary back" type="button">BACK</button>
 </section>
@@ -197,21 +213,81 @@ function readSlots(){
  return [null];
 }
 function writeSlots(slots){localStorage.setItem(SLOTS_KEY,JSON.stringify({version:1,slots}));}
-function eraseLocalCharacter(){for(const key of [SLOTS_KEY,ACTIVE_KEY,'dkSoftworks.demonkiller.outdoors.preview.v1','dkSoftworks.demonkiller.testCenter.v1','dkSoftworks.demonkiller.architectLocalBackup.v1'])localStorage.removeItem(key);}
-$('deleteSave').addEventListener('click',async()=>{
+function clearMatching(prefixes){
+ const matches=[];for(let i=0;i<localStorage.length;i++){
+  const key=localStorage.key(i);
+  if(key&&prefixes.some(prefix=>key.startsWith(prefix)))matches.push(key);
+ }
+ for(const key of matches)localStorage.removeItem(key);
+}
+function eraseLocalCharacter(){
+ for(const key of [SLOTS_KEY,ACTIVE_KEY,
+  'dkSoftworks.demonkiller.outdoors.preview.v1',
+  'dkSoftworks.demonkiller.testCenter.v1',
+  'dkSoftworks.demonkiller.architectLocalBackup.v1'])
+  localStorage.removeItem(key);
+ clearMatching(['dkSoftworks.demonkiller.lilith.completed.m40.']);
+ try{sessionStorage.removeItem('dk.lilith.entry.1');}catch(_){}
+}
+function eraseBrowserWorld(){
+ clearMatching(['dkSoftworks.demonkiller.architect.outdoorDraft.',
+  'dkSoftworks.demonkiller.architect.interiorDraft.',
+  'dkSoftworks.demonkiller.worldPreview.']);
+}
+function saveNotice(msg){$('dkSaveManagementStatus').textContent=msg;}
+$('dkResetWorld').disabled=!SERVER;
+saveNotice(SERVER?'Server world reset is available after a typed confirmation.':
+ 'No connected DK Server. Reset Server World is unavailable here; Start Fresh resets browser preview data only.');
+async function deleteSavedCharacter(){
  let record;
  try{record=SERVER?((await SERVER.listCharacters())['1']||null):readSlots()[0];}
- catch(error){notice('Could not read character: '+error.message);return;}
- if(!record){notice('There is no saved character to delete.');return;}
- if(!window.confirm('Permanently delete '+record.name+' and their belongings? The world will remain. This cannot be undone.'))return;
- const button=$('deleteSave');button.disabled=true;
+ catch(error){saveNotice('Cannot read character: '+error.message);return;}
+ if(!record){saveNotice('There is no saved character to delete.');return;}
+ if(!window.confirm('Delete '+record.name+' and their belongings? The world remains, including its NPCs and economy. This cannot be undone.'))return;
+ const buttons=[$('deleteSave'),$('dkDeleteCharacter')];buttons.forEach(b=>b.disabled=true);
  try{
   if(SERVER)await SERVER.deleteCharacter(1,record.name);
   eraseLocalCharacter();
   await openSlots('new');
-  notice('Character deleted. The persistent world was preserved.');
- }catch(error){notice('Delete failed: '+error.message);}
- finally{button.disabled=false;}
+  saveNotice('Character deleted. The persistent world was preserved.');
+  notice('Character deleted. The world remains.');
+ }catch(error){saveNotice('Character deletion FAILED: '+error.message);}
+ finally{buttons.forEach(b=>b.disabled=false);}
+}
+$('deleteSave').addEventListener('click',deleteSavedCharacter);
+$('dkDeleteCharacter').addEventListener('click',deleteSavedCharacter);
+async function confirmedWorldReset(){
+ if(!SERVER)throw Error('GitHub Pages does not have a DK Server to reset.');
+ const snapshot=await SERVER.world();
+ return SERVER.resetWorld(snapshot.revision);
+}
+$('dkResetWorld').addEventListener('click',async()=>{
+ if(!SERVER){saveNotice('No DK Server connected; nothing was erased on a server.');return;}
+ const phrase=window.prompt('WARNING: This erases the ENTIRE persistent world, its character, NPCs, economy, history and ALL old checkpoints. Type RESET WORLD:');
+ if(phrase!=='RESET WORLD'){saveNotice('World reset cancelled.');return;}
+ const btn=$('dkResetWorld');btn.disabled=true;
+ try{
+  await confirmedWorldReset();
+  eraseLocalCharacter();eraseBrowserWorld();show('home');
+  saveNotice('The server world has been restored to its original state.');
+  notice('Server world reset. Begin a new character in the temple.');
+ }catch(error){saveNotice('World reset FAILED: '+error.message);}
+ finally{btn.disabled=!SERVER;}
+});
+$('dkStartFresh').addEventListener('click',async()=>{
+ const message=SERVER?
+ 'This resets the SERVER WORLD and browser saves. Type START FRESH:':
+ 'No DK Server is connected. This deletes only the browser character, courtyard preview, Lilith scene progress and Architect drafts. Type START FRESH:';
+ if(window.prompt(message)!=='START FRESH'){saveNotice('Start Fresh cancelled.');return;}
+ const btn=$('dkStartFresh');btn.disabled=true;
+ try{
+  if(SERVER)await confirmedWorldReset();
+  eraseLocalCharacter();eraseBrowserWorld();show('home');
+  saveNotice(SERVER?'Server world and browser saves were reset.':'Browser preview reset. No server world was touched.');
+  notice(SERVER?'Fresh world ready. Begin in the temple.':
+   'Browser preview reset. Begin in the temple; no server world was changed.');
+ }catch(error){saveNotice('Start Fresh FAILED: '+error.message);}
+ finally{btn.disabled=false;}
 });
 // The retired browser prototype save is discarded once when this interface first opens.
 const UO_MIGRATION='dkSoftworks.demonkiller.uoReset.v1';
@@ -289,6 +365,7 @@ document.querySelector('[data-action=new]').addEventListener('click',()=>openSlo
 document.querySelector('[data-action=continue]').addEventListener('click',()=>openSlots('continue'));
 document.querySelector('[data-action=options]').addEventListener('click',()=>show('optionsScreen'));
 document.querySelector('[data-action=quit]').addEventListener('click',()=>show('quitScreen'));
+if(typeof URLSearchParams==='function'&&new URLSearchParams(location.search||'').get('view')==='options')show('optionsScreen');
 $('musicEnabled').addEventListener('change',()=>{saveMenuPrefs();syncMenuMusic();});
 $('musicVolume').addEventListener('input',()=>{applyMenuVolume();saveMenuPrefs();});
 $('musicVolume').addEventListener('change',()=>{applyMenuVolume();saveMenuPrefs();});

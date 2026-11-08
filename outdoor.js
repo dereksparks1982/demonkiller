@@ -4,10 +4,11 @@
 (function(){
 'use strict';
 const R=window.DemonKillerRegions,D=window.DKArchitectDungeon||null;
+const CINEMATIC=window.DKLilithCinematic;
 const q=new URLSearchParams(location.search),slot=Number(q.get('dkSlot')||1);
 const SERVER=window.DemonKillerServer&&q.has('dkSlot')?window.DemonKillerServer:null;
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d');
-if(!R||!ctx)return;
+if(!R||!ctx||!CINEMATIC)return;
 const PREVIEW_KEY='dkSoftworks.demonkiller.outdoors.preview.v1';
 const TEMPLE_SAVE='dkSoftworks.demonkiller.characters.v1';
 const TILE=32,VIEW=20;
@@ -18,6 +19,7 @@ let architectCamera=null,architectZoom=1;
 const visual={x:0,y:0,queue:[]};
 function resetVisual(){if(player){visual.x=player.x;visual.y=player.y;visual.queue.length=0;}}
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
+let cinematicKey=null;
 const cellShells=window.DKStreamingCellShells?.create({maxShells:256})||null;
 const cellContents=window.DKCellContents?.create()||null;
 let cellContentsPending=false,cellContentsErrors=0;
@@ -164,7 +166,7 @@ function title(){return area?.area_id===R.COURT?'LILITH\u2019S COURTYARD':
 function persistPreview(){
  if(SERVER||!player)return;
  localStorage.setItem(PREVIEW_KEY,JSON.stringify({...player,
-  doorOpen,firstCourtyardSeen:true}));
+  doorOpen,firstCourtyardSeen:!firstVisit}));
 }
 function previewArea(id){
  const template=R.templates[id];if(!template)throw Error('Unknown preview region');
@@ -212,7 +214,40 @@ async function loadArea(id){
  draw();
  if(SERVER){void refreshCellView();void refreshCellContents();}
 }
+function cinematicState(now=performance.now()){
+ return CINEMATIC.at(Math.max(0,now-animStart),player?.form||'ghost',player?.y??47);
+}
+function startLilith(){
+ firstVisit=true;lilithPhase='playing';animStart=performance.now();
+ rightHeld=false;pointer=null;visual.queue.length=0;
+ const prayer=$('lilithPrayer');if(prayer)prayer.hidden=true;
+ image(CINEMATIC.SHEET); // Only the approved transformation sheet.
+}
+function updateLilith(now){
+ if(lilithPhase!=='playing')return;
+ rightHeld=false;pointer=null;
+ const state=cinematicState(now),dialog=$('lilithPrayer');
+ if(dialog){
+  dialog.hidden=state.stage!=='prayer';
+  if(state.stage==='prayer'){
+   $('lilithPrayerText').textContent=state.prayer;
+   $('lilithPrayerProgress').textContent='PRAYER · '+(state.prayerLine+1)+' / '+CINEMATIC.PRAYER.length;
+  }
+ }
+ if(!state.done)return;
+ lilithPhase='finished';firstVisit=false;
+ try{if(cinematicKey)localStorage.setItem(cinematicKey,'complete');}catch(_){}
+ persistPreview();
+ message(player.form==='ghost'?'Lilith has become the golden weeping willow.':
+  'Lilith has become the black, diseased weeping willow.');
+}
 function viewCamera(){
+ if(lilithPhase==='playing'){
+  const scene=cinematicState();
+  camera.x=Math.max(0,Math.min(Math.max(0,area.width-VIEW),scene.cameraX-VIEW/2));
+  camera.y=Math.max(0,Math.min(Math.max(0,area.height-VIEW),scene.cameraY-VIEW/2));
+  return;
+ }
  if(architectCamera){
   const span=VIEW/architectZoom;
   camera.x=Math.max(0,Math.min(Math.max(0,area.width-span),architectCamera.x));
@@ -258,38 +293,10 @@ function drawWall(x,y){
  px('#4c4650',x*TILE+3,y*TILE+14,26,16);
  px('#a79ba3',x*TILE+2,y*TILE+2,28,3);
 }
-function willow(x,y,phase){
- const golden=player.form==='ghost',cx=(x+1.5)*TILE,cy=(y+1.5)*TILE;
- const adult=phase>=1;
- if(!adult){
-  // Four-direction Lilith reference from the established temple art pack.
-  const filename='characters/crystal-woman/crystal_woman_south.png';
-  const woman=ready(filename);
-  if(woman&&golden)ctx.drawImage(woman,cx-16,cy-20,32,32);
-  else{
-   px('#7f332c',cx-5,cy-17,11,6);
-   px('#d9ac88',cx-4,cy-10,8,8);
-   px(golden?'#336b36':'#913336',cx-7,cy-2,14,17);
-   px('#34292d',cx-5,cy+12,4,4);px('#34292d',cx+2,cy+12,4,4);
-  }
-  return;
- }
- const amount=Math.max(0,Math.min(1,(phase-.6)/.4));
- px(golden?'#946024':'#302b2e',cx-6,cy-6,12,32);
- px(golden?'#a46d29':'#4b3e41',cx-12,cy+13,24,4);
- if(amount<.4)return;
- ctx.strokeStyle=golden?'#b78635':'#40383d';ctx.lineWidth=4;
- for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(cx,cy);
-  ctx.lineTo(cx+i*15,cy-26-Math.abs(i)*2);ctx.stroke();}
- if(golden){
-  for(let i=-3;i<=3;i++){
-   const bx=cx+i*12,by=cy-30-Math.round((3-Math.abs(i))*4);
-   px('#d8a739',bx-7,by-7,14,13);px('#f4cf57',bx-4,by-5,8,7);
-   px('#ae862d',bx-3,by+7,3,12+Math.abs(i)*2);
-  }
- }else{
-  for(let i=-2;i<=2;i++)px('#222125',cx+i*17-3,cy-31-Math.abs(i)*2,6,4);
- }
+function willow(x,y,stage=5){
+ const sheet=ready(CINEMATIC.SHEET);if(!sheet)return;
+ const row=player?.form==='living'?1:0;
+ CINEMATIC.drawTree(ctx,sheet,row,stage,(x+1.5)*TILE,(y+3)*TILE);
 }
 function drawArchitectProp(o){
  const C=window.DKArchitectCatalog;
@@ -328,9 +335,9 @@ function drawArchitectProp(o){
 function drawObject(o){
  if(o.type==='architect_prop'){drawArchitectProp(o);return;}
  if(o.type==='willow'){
-  const phase=lilithPhase==='playing'?
-   Math.min(1,(performance.now()-animStart)/6200):1;
-  willow(o.x,o.y,phase);return;
+  const index=lilithPhase==='playing'?cinematicState().treeFrame:5;
+  if(index>=0)willow(o.x,o.y,index);
+  return;
  }
  if(o.type==='gate'||o.type==='door'){
   const open=o.type==='gate'?true:doorOpen;
@@ -777,6 +784,11 @@ function draw(){
  drawGroundItems();
  drawChest();
  drawHouseSigns();
+ if(lilithPhase==='playing'){
+  const sheet=ready(CINEMATIC.SHEET);
+  if(sheet)CINEMATIC.drawLilith(ctx,sheet,cinematicState());
+ }
+ if(lilithPhase!=='playing'){
  const spriteGroup=player.form==='ghost'?'ghost':'human';
  const pImg=ready('characters/'+spriteGroup+'/'+spriteGroup+'_'+player.facing+'.png');
  const drawX=Math.round(visual.x*TILE),drawY=Math.round(visual.y*TILE);
@@ -784,6 +796,7 @@ function draw(){
  else{
   px('#342b30',drawX+9,drawY+20,14,10);
   px(player.form==='ghost'?'#bbc6ed':'#b4826b',drawX+9,drawY+8,14,14);
+ }
  }
  ctx.restore();
  $('characterStatus').textContent=player.form.toUpperCase()+' · ('+player.x+', '+player.y+
@@ -1068,6 +1081,7 @@ async function toggleDoor(){
  draw();
 }
 function inspect(x,y,doubleClick){
+ if(lilithPhase==='playing')return;
  const item=actorAt(x,y);if(!item)return message('Nothing notable here.');
  if(item.grave)return message(item.grave.name+
   ' rests beneath a '+item.grave.stage+' grave. The stone remains in the world.');
@@ -1147,6 +1161,7 @@ function pointerPosition(e){
  return {x:(e.clientX-r.left)/r.width*VIEW,y:(e.clientY-r.top)/r.height*VIEW};
 }
 function pointerMove(dt){
+ if(lilithPhase==='playing')return;
  if(!rightHeld||!pointer||busy||!player||!area||dt<=0)return;
  // The cursor is screen-relative as the camera follows the character.
  const dx=camera.x+pointer.x-(visual.x+.5);
@@ -1189,12 +1204,12 @@ function pointerMove(dt){
  player.facing=direction;
 }
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
-canvas.addEventListener('mousedown',e=>{if(e.button===2){e.preventDefault();pointer=pointerPosition(e);rightHeld=true;canvas.focus();}});
+canvas.addEventListener('mousedown',e=>{if(lilithPhase==='playing')return;if(e.button===2){e.preventDefault();pointer=pointerPosition(e);rightHeld=true;canvas.focus();}});
 canvas.addEventListener('mousemove',e=>{if(rightHeld)pointer=pointerPosition(e);});
 document.addEventListener('mouseup',e=>{if(e.button===2)rightHeld=false;});
 window.addEventListener('blur',()=>{rightHeld=false;});
-canvas.addEventListener('click',e=>{if(e.button!==0)return;const p=targetTile(e);if(p)inspect(p.x,p.y,false);canvas.focus();});
-canvas.addEventListener('dblclick',e=>{if(e.button!==0)return;const p=targetTile(e);if(p)inspect(p.x,p.y,true);});
+canvas.addEventListener('click',e=>{if(lilithPhase==='playing'||e.button!==0)return;const p=targetTile(e);if(p)inspect(p.x,p.y,false);canvas.focus();});
+canvas.addEventListener('dblclick',e=>{if(lilithPhase==='playing'||e.button!==0)return;const p=targetTile(e);if(p)inspect(p.x,p.y,true);});
 document.addEventListener('keydown',e=>{
  const tag=e.target?.tagName;
  if(e.ctrlKey||e.altKey||e.metaKey)return;
@@ -1206,6 +1221,7 @@ document.addEventListener('keydown',e=>{
   location.href='./dk-architect-outdoors-m36.html?dkSlot='+slot+'&area_id='+encodeURIComponent(area.area_id);
   return;
  }
+ if(lilithPhase==='playing')return;
  if(e.key.toLowerCase()==='b'&&!e.repeat){e.preventDefault();buryCorpse();return;}
  const dir={ArrowUp:'north',w:'north',ArrowDown:'south',s:'south',
   ArrowLeft:'west',a:'west',ArrowRight:'east',d:'east'}[e.key.length===1?e.key.toLowerCase():e.key];
@@ -1273,8 +1289,8 @@ function advanceVisual(dt){
 function frame(now){
  if(now-lastDraw>=16){
   const dt=lastDraw?Math.min((now-lastDraw)/1000,.06):0;
-  pointerMove(dt);
-  advanceVisual(dt);
+  if(lilithPhase==='playing')updateLilith(now);
+  else{pointerMove(dt);advanceVisual(dt);}
   if(area)draw();
   lastDraw=now;
  }
@@ -1286,11 +1302,11 @@ async function begin(){
    await SERVER.startWorld();
    player=await SERVER.getCharacter(slot);
    if(player.area_id===R.TEMPLE){location.href='./test-center.html?dkSlot='+slot+'&walk=continuous1';return;}
+   cinematicKey='dkSoftworks.demonkiller.lilith.completed.m40.server.'+
+    slot+'.'+(player.created_at_utc||player.name||'character');
+   if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&
+    localStorage.getItem(cinematicKey)!=='complete')startLilith();
    doorOpen=true;await loadArea(player.area_id);
-   const last=Number(sessionStorage.getItem('dk.lilith.entry.'+slot)||0);
-   if(player.area_id===R.COURT&&player.courtyard_visit_count===1&&last!==1){
-    firstVisit=true;sessionStorage.setItem('dk.lilith.entry.'+slot,'1');
-   }
    await Promise.all([refreshLiving(),refreshGameplay(),refreshSocial(),refreshSector(),refreshSchedule(),refreshSkills(),refreshLaw(),refreshDistrict(),refreshHousing(),refreshVendors(),refreshNpcCommerce(),refreshWorkshops(),refreshNpcAI(),refreshNpcHarvest(),refreshNpcSuccession(),refreshCaravans()]);
    await refreshSectorInterest();
    setInterval(refreshSectorInterest,1750);
@@ -1304,6 +1320,8 @@ async function begin(){
     {area_id:R.COURT,x:32,y:47,facing:'north',form:'ghost'};
    doorOpen=saved?.doorOpen!==false;
    firstVisit=!saved?.firstCourtyardSeen&&player.area_id===R.COURT;
+   cinematicKey='dkSoftworks.demonkiller.lilith.completed.m40.preview.'+slot;
+   if(firstVisit)startLilith();
    await loadArea(player.area_id);
    persistPreview();
    $('worldStatus').textContent='BROWSER PREVIEW';
@@ -1330,15 +1348,8 @@ async function begin(){
    for(const id of ['gatherButton','buyButton','sellButton','depositButton','withdrawButton','talkButton','contractButton','deliverButton','craftTorch','craftRations','craftBandages','eatFood','equipTools','equipTorch','restButton','attackButton','lootButton','lootCorpse','dropItem','pickItem','storeItem','takeItem','chestStore','chestTake','buyHouse','sellHouse','houseAccess','homeStore','homeTake'])
      $(id).disabled=true;
   }
-  if(firstVisit){
-   lilithPhase='playing';animStart=performance.now();
-   message(player.form==='ghost'?
-    'Lilith stands in a green dress. Her form begins to take root.':
-    'Lilith stands in a red dress. Her limbs darken and twist.');
-   setTimeout(()=>{lilithPhase='finished';message(player.form==='ghost'?
-     'Lilith has become the golden weeping willow.':
-     'Lilith has become the sickly black weeping willow.');},6300);
-  }else message('Explore the world. Houses have true exterior footprints.');
+  if(firstVisit)message('The camera follows Lilith north along the path to the courtyard circle.');
+  else message('Explore the world. Houses have true exterior footprints.');
   canvas.focus();requestAnimationFrame(frame);
  }catch(e){message('The region could not open: '+e.message);$('worldStatus').textContent='LOAD FAILED';}
 }

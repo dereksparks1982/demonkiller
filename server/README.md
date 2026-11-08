@@ -264,3 +264,17 @@ Caravan safety and shop hours matter. Danger or flight pauses trade; a missing e
 ## M25: Caravan manifests (v0.2.47)
 
 `server/caravan-manifests-m25.cjs` keeps a bounded manifest history of 64 genuine M24 merchant journeys, including purchase and close dates in simulated world minutes, cargo serial IDs and interruption reasons. The M24 trade state calls the new module only on trip planning, real item purchase, delivery or cancellation. M24 saves, including a currently active shipment, receive exactly one migrated record. `GET /api/v1/caravans` includes up to three past journey summaries without revealing coordinates of a remote trader. Full world saves continue to be authoritative; nothing creates free stock or gold. Regression coverage is added to `tests/caravan-logistics-m24.cjs`.
+
+### World reset and one-life deletion (M40)
+
+A character is NOT the persistent world. Deleting slot 1 via \`DELETE /api/v1/characters/1\` preserves NPCs, ownership transfers, houses, region changes, economic records, and server time.
+
+\`POST /api/v1/save/reset-world\` is a **destructive owner-only loopback action**. It requires \`X-DK-Control: reset-world\` and exactly:
+\`\`\`json
+{"confirm":"RESET WORLD","expected_revision":123}
+\`\`\`
+Get \`expected_revision\` from \`GET /api/v1/world\` immediately before the action. The request is rejected if another transaction changed the world. The reset runs in the single-writer queue, makes a fresh valid world with no characters, removes the prior snapshot directory and world event journal, and atomically replaces \`world.json\`. The process stays running and uses its newly seeded world. No saved prior-world data is restored.
+
+**GitHub Pages has no server to reset.** The main menu displays the unavailable server option clearly and offers a separate browser-only Start Fresh. Neither action runs without its typed confirmation.
+
+The six-shard GitHub Actions workflow remains \`workflow_dispatch\` only.

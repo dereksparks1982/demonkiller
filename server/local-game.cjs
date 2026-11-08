@@ -24,7 +24,9 @@ const ROOT_FILES = new Set([
    'dk-architect-game-m38.js',
    'dk-architect-catalog-m39.js','dk-architect-core-m39.js',
    'dk-architect-ui-m39.js','dk-architect-ui-m39.css',
-   'dk-architect-temple-host-m39.js','dk-architect-world-host-m39.js'
+   'dk-architect-temple-host-m39.js','dk-architect-world-host-m39.js',
+    'dk-lilith-cinematic-m40.js','dk-lilith-cinematic-m40.css',
+ 'dk-paperdoll-m40.js','dk-paperdoll-m40.css'
 ]);
 
 function localRequestAllowed(req, port) {

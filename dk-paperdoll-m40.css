@@ -1,0 +1,26 @@
+/* Classic UO inspired: fixed right-side paper-doll command rail. */
+.dk-paper-extended{width:min(470px,calc(100vw - 24px))!important;padding-right:112px!important}
+.dk-paper-extended .uo-paper-body{max-width:340px}
+.dk-paper-actions{position:absolute;top:38px;right:8px;width:98px;display:grid;gap:4px}
+.dk-paper-actions button{padding:6px 3px;min-height:27px;cursor:pointer;
+ background:linear-gradient(#4c6070,#263749);color:#f8e6c3;
+ border:2px ridge #8da4ac;font:700 10px/1.25 monospace;letter-spacing:.02em}
+.dk-paper-actions button:hover:not(:disabled){background:#4c6680;color:white}
+.dk-paper-actions button:disabled{opacity:.45;cursor:not-allowed}
+.dk-paper-card{position:fixed;z-index:56;max-width:calc(100vw - 18px);
+ max-height:66vh;overflow:auto;box-shadow:0 12px 30px #000e;background:#211d29;
+ color:#ecdabe;border:3px ridge #a58b60;padding:7px 11px;font:12px/1.5 monospace}
+.dk-paper-card[hidden]{display:none!important}
+.dk-paper-card header{display:flex;justify-content:space-between;align-items:center;
+ border-bottom:1px solid #81715f;color:#f4d58b;padding:4px 0}
+.dk-paper-card header button{font:22px monospace;color:#f3d591;background:none;border:0;cursor:pointer}
+.dk-paper-card-body p{white-space:pre-wrap;overflow-wrap:anywhere;padding:4px 0;margin:4px 0;
+ border-bottom:1px solid #6f586344}
+@media(max-width:530px){
+ .dk-paper-extended{padding-right:87px!important}
+ .dk-paper-actions{width:78px;right:3px;gap:3px}
+ .dk-paper-actions button{font-size:8px;min-height:24px;padding:4px 2px}
+ .dk-paper-extended .uo-paper-body{grid-template-columns:1fr 112px 1fr}
+ .dk-paper-extended .paper-figure canvas{max-width:112px}
+ .dk-paper-card{max-height:55vh}
+}

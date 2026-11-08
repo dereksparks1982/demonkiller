@@ -42,6 +42,13 @@
     },
     async health() { return request('/api/v1/health'); },
     async saveStatus() { return request('/api/v1/save/status'); },
+    async resetWorld(expected_revision) {
+      return request('/api/v1/save/reset-world',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-Control':'reset-world'},
+        body:JSON.stringify({confirm:'RESET WORLD',expected_revision})
+      });
+    },
     async checkpoint() {
       return request('/api/v1/save/checkpoint', {
         method:'POST',headers:{'X-DK-Control':'checkpoint'}

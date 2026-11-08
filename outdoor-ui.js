@@ -30,22 +30,6 @@ async function itemAction(action,fields){
 }
 
 const pref='dkSoftworks.demonkiller.uoWindows.v1';
-$('deleteInGameSave').addEventListener('click',async()=>{
- const current=state(),server=window.DemonKillerServer;
- const name=current.player?.name||
-  (()=>{try{return JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.characters.v1')||'null')?.slots?.[0]?.name;}catch(_){return null;}})()||'this character';
- if(!window.confirm('Permanently delete '+name+' and all their belongings? The world remains. This cannot be undone.'))return;
- const button=$('deleteInGameSave');button.disabled=true;
- try{
-  if(current.serverConnected){
-   if(!server||!current.player?.name)throw Error('Character record is not ready');
-   await server.deleteCharacter(1,current.player.name);
-  }
-  for(const key of ['dkSoftworks.demonkiller.characters.v1','dkSoftworks.demonkiller.activeCharacter.v1','dkSoftworks.demonkiller.outdoors.preview.v1','dkSoftworks.demonkiller.testCenter.v1','dkSoftworks.demonkiller.architectLocalBackup.v1'])localStorage.removeItem(key);
-  window.location.replace('./index.html');
- }catch(error){$('hudJournal').textContent='Delete failed: '+error.message;button.disabled=false;}
-});
-
 function state(){return window.DKOutdoorState?.()||{};}
 let topLayer=30;
 // Window open/close controls are initialized inline in outdoor.html, independent of this script.

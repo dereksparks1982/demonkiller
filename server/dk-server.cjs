@@ -192,8 +192,8 @@ async function createDKServer({
   let server, writeQueue = Promise.resolve(), stopping = false;
   let spatialCache = null;
   // View cursors and sector geometry are derived in memory, never saved.
-  const sectorTracker=createInterestTracker({now});
-  const cellContentsTracker=createCellContentsTracker({now});
+  let sectorTracker=createInterestTracker({now});
+  let cellContentsTracker=createCellContentsTracker({now});
   const eventLog=path.join(dataDir,'world-events.ndjson');
   async function appendEvents(events){
     if(!events?.length)return;
@@ -259,6 +259,35 @@ async function createDKServer({
       for(const viewer of streams)push(viewer,'world.character.deleted',
         {slot,world_revision:world.revision});
       return result;
+    });
+    writeQueue=pending.catch(()=>{});
+    return pending;
+  }
+  async function saveResetWorld(expectedRevision){
+    // The reset is serialized with character actions, simulation ticks and
+    // Architect edits. No stale browser may overwrite a newer world revision.
+    const pending=writeQueue.then(async()=>{
+      if(stopping)throw Error('DK Server is shutting down');
+      if(!Number.isSafeInteger(expectedRevision)||expectedRevision!==world.revision)
+        throw Error('World revision changed. Refresh Options before resetting.');
+      const fresh=makeWorld(now());
+      validateWorld(fresh);
+      // Previous backups and journal belong to the old world and must not be
+      // replayed into the fresh seed. The writer lock is deliberately retained.
+      // Commit the new primary save atomically BEFORE retiring the old
+      // checkpoint directory. A failed primary write leaves recovery intact.
+      const saved=await snapshots.save(fresh);
+      world=fresh;
+      await snapshots.prepareWorldReset();
+      await snapshots.checkpoint(fresh);
+      await fs.rm(eventLog,{force:true});
+      spatialCache=null;
+      sectorTracker=createInterestTracker({now});
+      cellContentsTracker=createCellContentsTracker({now});
+      for(const viewer of streams)push(viewer,'world.reset',
+        {world_revision:world.revision,characters_deleted:true});
+      return {world_revision:world.revision,
+        characters_deleted:true,backup_error:saved.backup_error||null};
     });
     writeQueue=pending.catch(()=>{});
     return pending;
@@ -450,6 +479,25 @@ async function createDKServer({
       }catch(e){
         console.error('World checkpoint failed:',e);
         return sendJSON(res,500,{error:'World checkpoint could not be saved'});
+      }
+    }
+    if(url.pathname==='/api/v1/save/reset-world'&&method==='POST'){
+      if(req.headers['x-dk-control']!=='reset-world')
+        return sendJSON(res,403,{error:'World reset requires the explicit Options control'},method);
+      let body;
+      try{body=await readJSON(req);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
+      if(!body||Object.keys(body).sort().join(',')!=='confirm,expected_revision'||
+        body.confirm!=='RESET WORLD'||!Number.isSafeInteger(body.expected_revision))
+        return sendJSON(res,422,{error:'Type RESET WORLD and supply the current world revision'},method);
+      try{
+        const result=await saveResetWorld(body.expected_revision);
+        return sendJSON(res,200,{reset:true,...result},method);
+      }catch(error){
+        if(/revision changed|shutting down/.test(error.message))
+          return sendJSON(res,409,{error:error.message},method);
+        console.error('Full world reset failed:',error);
+        return sendJSON(res,500,{error:'World reset could not complete; previous save may still exist'},method);
       }
     }
     if(url.pathname==='/api/v1/corpses'&&!write){
