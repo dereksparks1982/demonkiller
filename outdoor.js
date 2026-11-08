@@ -18,6 +18,39 @@ const visual={x:0,y:0,queue:[]};
 function resetVisual(){if(player){visual.x=player.x;visual.y=player.y;visual.queue.length=0;}}
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
 const cellShells=window.DKStreamingCellShells?.create({maxShells:256})||null;
+const cellContents=window.DKCellContents?.create()||null;
+let cellContentsPending=false,cellContentsErrors=0;
+async function refreshCellContents(){
+ if(!SERVER||!player||!area||!cellContents||cellContentsPending)return;
+ cellContentsPending=true;
+ const requestedArea=area.area_id;
+ try{
+  const snapshot=await SERVER.cellContents(cellContents.stats().cursor,24);
+  if(!area||area.area_id!==requestedArea||snapshot.area_id!==requestedArea){
+   cellContents.reset();return;
+  }
+  cellContents.apply(snapshot);cellContentsErrors=0;
+  // Fixture doors remain world-owned. Copy only their current visible
+  // presentation flags, never positions, collision or room geometry.
+  const byId=new Map(area.objects.map(o=>[o.id,o]));
+  for(const fixture of cellContents.fixtures()){
+   const object=byId.get(fixture.id);
+   if(!object)continue;
+   if(Object.prototype.hasOwnProperty.call(fixture,'open')&&
+    Object.prototype.hasOwnProperty.call(object,'open'))
+    object.open=fixture.open;
+   if(Object.prototype.hasOwnProperty.call(fixture,'locked')&&
+    Object.prototype.hasOwnProperty.call(object,'locked'))
+    object.locked=fixture.locked;
+   if(fixture.id==='courtyard_temple_door'&&typeof fixture.open==='boolean')
+    doorOpen=fixture.open;
+  }
+  draw();
+ }catch(_){
+  if(++cellContentsErrors>=2){cellContents.reset();cellContentsErrors=0;}
+ }finally{cellContentsPending=false;}
+}
+
 let cellViewPending=false;
 async function refreshCellView(){
  if(!SERVER||!area||!cellShells||cellViewPending)return;
@@ -68,6 +101,14 @@ function prefetchTerrain(){
 }
 
 function nearbyDisplay(kind,fallback){
+ // M34 authoritative Streaming Cell contents replace broader region scans
+ // when the current player view has been freshly materialized.
+ const materialized=cellContents?.visible(kind,player,12);
+ if(materialized!==null&&materialized!==undefined){
+  if(kind==='scavenger')
+   return materialized.map(o=>({...o,kind:o.species||o.type}));
+  return materialized;
+ }
  const view=sectorView;
  if(!view||!area||!player||view.area_id!==area.area_id||
     Math.abs(player.x-view.origin.x)>12||
@@ -155,12 +196,12 @@ async function loadArea(id){
  area=nextArea;
  if(!area||!area.floor||area.floor.length!==area.width*area.height)
   throw Error('Invalid region geometry');
- if(changed){resetVisual();sectorView=null;sectorCursor=null;cellShells?.reset();}
+ if(changed){resetVisual();sectorView=null;sectorCursor=null;cellShells?.reset();cellContents?.reset();}
  $('areaName').textContent=title();
  const door=area.objects.find(o=>o.id==='courtyard_temple_door');
  if(door){if(SERVER)doorOpen=!!door.open;else door.open=doorOpen;}
  draw();
- if(SERVER)void refreshCellView();
+ if(SERVER){void refreshCellView();void refreshCellContents();}
 }
 function viewCamera(){
  // Follow the interpolated actor, not the next authoritative tile.
@@ -1187,6 +1228,7 @@ async function begin(){
    await refreshSectorInterest();
    setInterval(refreshSectorInterest,1750);
    setInterval(refreshCellView,4500);
+   setInterval(refreshCellContents,1900);
    setInterval(refreshLiving,10000);setInterval(refreshGameplay,10000);
    setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);setInterval(refreshWorkshops,15000);setInterval(refreshNpcAI,10000);setInterval(refreshNpcHarvest,15000);setInterval(refreshNpcSuccession,15000);setInterval(refreshCaravans,15000);
   }else{
