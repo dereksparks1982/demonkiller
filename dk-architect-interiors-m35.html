@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DK Architect | Streaming Cell Drafts</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#17151a;color:#e4ded5}
+*{box-sizing:border-box}body{margin:0}header{padding:14px 20px;background:#29232d;border-bottom:2px solid #9c805d;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+h1{font-size:20px;margin:0;color:#d9b890}header p{margin:0;color:#aaa1a4;font-size:13px}
+.layout{display:grid;grid-template-columns:280px minmax(360px,1fr) 270px;min-height:calc(100vh - 65px)}aside{background:#241f27;padding:18px;display:grid;align-content:start;gap:13px;border-right:1px solid #665a63}
+aside:last-child{border-left:1px solid #665a63;border-right:0}
+label{display:grid;gap:5px;font-size:13px;color:#c6bab0}select,input,button{font:inherit;background:#342c35;color:#f1e7dc;border:1px solid #766254;padding:8px;min-width:0}
+button{cursor:pointer}button:hover{border-color:#d2a66c}button:disabled{opacity:.5;cursor:not-allowed}
+button.primary{background:#604935;border-color:#c39866}h2{margin:8px 0 0;font-size:14px;color:#d9b890}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.workspace{padding:14px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.legend{font-size:12px;color:#b7aa9b;line-height:1.5}.panel{padding:10px;border:1px solid #5b4d55;background:#211d23}
+canvas{width:100%;height:auto;max-height:calc(100vh - 190px);background:#101117;image-rendering:pixelated;border:1px solid #957a5d;touch-action:none;cursor:crosshair}
+#status{white-space:pre-wrap;min-height:24px;font-size:13px;color:#d5bf96}#roomSize{font-size:13px;color:#bcb3b1}
+#titleNote{font-size:12px;color:#c2a77c}a{color:#d9b890}
+@media(max-width:1020px){.layout{grid-template-columns:1fr}aside{border:0;border-bottom:1px solid #665a63}canvas{max-height:70vh}}
+</style>
+</head>
+<body>
+<header><h1>DK ARCHITECT <small>· Interior Drafts</small></h1><p>Persistent room blueprints. Unpublished interiors are not playable.</p></header>
+<div class="layout">
+<aside>
+<h2>Building cell</h2>
+<label>Exterior <select id="cells"></select></label>
+<div id="roomSize">Choose an existing building.</div>
+<h2>New room draft</h2>
+<label>Room title <input id="roomTitle" value="Untitled Room" maxlength="48"></label>
+<div class="row">
+<label>Width <input id="roomWidth" type="number" min="4" max="64" value="12"></label>
+<label>Height <input id="roomHeight" type="number" min="4" max="64" value="10"></label>
+</div>
+<button id="createDraft" class="primary">Create saved draft</button>
+<button id="reloadDraft">Reload saved draft</button>
+<h2>Tools</h2>
+<label>Mode <select id="mode">
+<option value="paint">Paint tiles</option><option value="rectangle">Rectangle paint</option>
+<option value="place">Place object</option><option value="erase">Remove object</option>
+</select></label>
+<label>Tile layer <select id="layer">
+<option value="floor">Floor</option><option value="walls">Wall</option>
+<option value="wallStyles">Wall style</option><option value="wallRotations">Wall rotation</option>
+</select></label>
+<label>Tile value <select id="value"></select></label>
+<button id="savePaint" class="primary">Save pending tile edits</button>
+<div id="pending">0 unsaved tile edits</div>
+<div class="legend">Left-drag to paint. Rectangle mode paints a full area. Right-drag pans. Mouse wheel rotates the object preview in placement mode.</div>
+</aside>
+<main class="workspace">
+<div class="panel" id="titleNote">Drafts are saved to the local DK Server's world.json, never to a second save file.</div>
+<canvas id="map" width="1000" height="700" tabindex="0" aria-label="Room floor editor"></canvas>
+<div id="status" role="status" aria-live="polite">Connecting to the local DK Server…</div>
+</main>
+<aside>
+<h2>Place an object</h2>
+<label>Object type <select id="objectType">
+<option value="altar">Altar (2×3)</option><option value="brazier">Brazier</option>
+<option value="crystal">Crystal</option><option value="runestone">Runestone</option>
+<option value="chest">Chest</option><option value="coffin">Coffin (1×2)</option>
+<option value="pew">Pew (2×1)</option><option value="pillar">Pillar</option>
+<option value="statue">Statue</option><option value="candle">Candle</option>
+<option value="table">Table (2×2)</option><option value="chair">Chair</option>
+<option value="bed">Bed (2×3)</option><option value="rug">Rug (2×2)</option>
+<option value="crate">Crate</option><option value="barrel">Barrel</option>
+<option value="sconce">Sconce</option><option value="bookcase">Bookcase (2×1)</option>
+<option value="door">Interior door</option>
+</select></label>
+<label>Object ID <input id="objectId" value="furniture_1" maxlength="80" pattern="[a-z0-9_-]+"></label>
+<div class="row">
+<label>Rotation <input id="rotation" type="number" min="0" max="3" value="0"></label>
+<label>Zoom <input id="zoom" type="number" min="14" max="44" value="26"></label>
+</div>
+<button id="rename">Save room title</button>
+<h2>Draft safety</h2>
+<p class="legend">Only building cells may have drafts. A draft can have a different interior size from its exterior footprint. There is no automatic interior portal and no published-room command in this build.</p>
+<p class="legend">Use this editor from the local DK Server, not the static website. Every save checks the draft revision and rejects stale edits.</p>
+</aside>
+</div>
+<script src="./dk-menu-server.js?v=m35"></script>
+<script src="./dk-architect-interiors-m35.js?v=1"></script>
+</body>
+</html>
