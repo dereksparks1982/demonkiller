@@ -13,6 +13,7 @@ const SKILLS=require('./skills-m14.cjs');
 const FIELD=require('./field-skills-m43.cjs');
 const THIEVERY=require('./thievery-m53.cjs');
 const ARMORY=require('./armory-m54.cjs');
+const ARMORER=require('./armorer-m55.cjs');
 const MAGIC=require('./spells-m44.cjs');
 const BOUNTIES=require('./bounties-m45.cjs');
 const COMPANIONS=require('./companions-m46.cjs');
@@ -113,6 +114,8 @@ function apply(world,command,now=Date.now()){
  if(['snoop_npc','pickpocket'].includes(command?.action))return THIEVERY.apply(world,command);
  if(['forge_gear','equip_gear','unequip_gear'].includes(command?.action))
   return ARMORY.act(world,command);
+ if(['repair_by_hand','salvage_gear','submit_repair','collect_repair'].includes(command?.action))
+  return ARMORER.apply(world,command);
  if(command?.action==='cast_spell')return MAGIC.apply(world,command,now);
  if(['accept_bounty','turn_in_bounty'].includes(command?.action))return BOUNTIES.apply(world,command);
  if(['tame_creature','feed_pet','release_pet','pet_follow','pet_stay','pet_guard'].includes(command?.action))return COMPANIONS.apply(world,command);

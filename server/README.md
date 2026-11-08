@@ -1,4 +1,4 @@
-# DK Server M54 | Physical Weapons, Armor, Ammo and Durability (v2.29.0)
+# DK Server M55 | Independent World Smith, Item Repair Contracts and Salvage (v2.30.0)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
 
@@ -300,3 +300,9 @@ Use the existing `POST /api/v1/gameplay` actions `snoop_npc` and `pickpocket` fr
 Seven forgeable item types (sword, mace, spear, bow, arrows, buckler and iron armor) use the same real backpack, ore, wood and herb inventories. New three-slot armory equipment is stored by physical serial, with wear retained on the item across equip/unequip and saves. Actual combat changes damage, weapon skill, bow line of sight and arrow consumption, and absorbs damage through armor and a probabilistic shield parry. Broken items are destroyed without minting substitutes. Character retirement cleans personal armor containers.
 
 Use `GET /api/v1/armory` and `POST /api/v1/gameplay` actions `forge_gear`, `equip_gear` and `unequip_gear`. P → ARMORY shows the workflow on a connected DK Server. Source: `server/armory-m54.cjs`; regression suite: `tests/armory-m54.cjs`. GitHub Actions remains manual-only; no player/server end-to-end test is claimed.
+
+## M55 physical blacksmithing service and repair jobs
+
+The village smith now accepts a damaged item by real serial in exchange for 12 gold; the owner's backpack and smithy treasury both change. The item moves to a registered smith work-order container and remains there while a saved world job runs. After at least 60 running world minutes a physically present living smith can consume one actual vendor-stock ore/wood item, receive three real wage gold from the shop and restore durability on the same serial. Finished gear moves to a separate pickup container until collected. Jobs stall if the village is occupied, machinery is broken, no material exists, the employee cannot work or the player-owner disabled assistant service.
+
+Owners may repair unequipped gear themselves with equipped tools and one actual ore/wood from their pack, or permanently salvage the item for one lower-yield raw material. Character deletion clears uncollected private repair goods, not businesses or NPCs. Older saves migrate two registered custody containers and the persistent repair ledger. New read-only route `GET /api/v1/armorer`; game actions `repair_by_hand`, `submit_repair`, `collect_repair`, `salvage_gear` are server-authoritative. Existing ARMORY paper-doll controls expose these workflows. Source: `server/armorer-m55.cjs`, tests: `tests/armorer-m55.cjs`. GitHub Actions remains manual-only.

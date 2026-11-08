@@ -446,11 +446,12 @@ async function showArmory(){
  if(!connected()){show('ARMORY',['Real weapon crafting, equipping and durability require the persistent DK Server.']);return;}
  const api=window.DemonKillerServer;
  try{
-  const [gear,inventory]=await Promise.all([api.armory(),api.inventory()]);
+  const [gear,inventory,smith]=await Promise.all([api.armory(),api.inventory(),api.armorer()]);
   show('ARMORY · WEAPONS & ARMOR',[
    'Your sword, mace, spear or bow changes the combat skill and damage. Bows need arrows and an unobstructed cardinal path.',
    'Shields can block damage; armor absorbs it. All equipped items wear down with use. Unequipping does not repair them.',
-   'Craft metal gear at the village smithy using real supplies; arrows and bows use wood and herbs.'
+   'Craft metal gear at the village smithy using real supplies; arrows and bows use wood and herbs.',
+   'Smith repairs: travel to the village smithy to repair damaged gear by hand, salvage it, or pay an NPC to repair it while you are away.'
   ]);
   for(const [slot,worn] of Object.entries(gear.equipped||{})){
    const row=document.createElement('div');row.className='dk-skill-row';
@@ -478,6 +479,29 @@ async function showArmory(){
     }catch(error){feedback(error.message);}
    }));content.append(row);
   }
+  const smithInfo=document.createElement('h3');smithInfo.className='dk-skill-heading';
+  smithInfo.textContent='VILLAGE SMITH · REPAIR ORDERS';content.append(smithInfo);
+  const smithStatus=document.createElement('p');
+  smithStatus.textContent='Near smith: '+(smith.near_smith?'yes':'no')+
+   ' · available: '+(smith.smith_available?'yes':'no')+
+   ' · fee: '+smith.fee+' gold · ore available: '+(smith.materials?.ore||0)+
+   ' · repair time: '+smith.duration+' world minutes';
+  content.append(smithStatus);
+  for(const order of smith.orders||[]){
+   const row=document.createElement('div');row.className='dk-skill-row';
+   const label=document.createElement('span');
+   label.textContent=order.type.replaceAll('_',' ')+' · '+order.id+' · '+
+    order.status.toUpperCase()+
+    (order.status==='working'?' · due after minute '+order.due_minute:' · ready for collection');
+   row.append(label);
+   if(order.status==='ready')row.append(button('COLLECT',async()=>{
+    try{
+     const result=await api.gameAction('collect_repair',{order_id:order.id});
+     await showArmory();feedback(result.event?.text||'Repaired item collected.');
+    }catch(error){feedback(error.message);}
+   },!smith.near_smith));
+   content.append(row);
+  }
   const packHeading=document.createElement('h3');packHeading.className='dk-skill-heading';
   packHeading.textContent='WEAPONS IN YOUR BACKPACK';content.append(packHeading);
   for(const item of inventory.backpack||[]){
@@ -491,6 +515,22 @@ async function showArmory(){
      await showArmory();feedback(result.event?.text||'Equipment worn.');
     }catch(error){feedback(error.message);}
    },item.amount!==1));
+   const original=(smith.pack_gear||[]).find(x=>x.serial===item.serial);
+   if(original&&item.amount===1){
+    const damaged=original.durability<100;
+    for(const [caption,action]of [
+     ['REPAIR BY HAND','repair_by_hand'],
+     ['LEAVE WITH SMITH','submit_repair'],
+     ['SALVAGE','salvage_gear']
+    ])row.append(button(caption,async()=>{
+     try{
+      if(action==='salvage_gear'&&!window.confirm(
+       'Dismantle '+item.type+' permanently for one raw material?'))return;
+      const result=await api.gameAction(action,{serial:item.serial});
+      await showArmory();feedback(result.event?.text||'Smith work updated.');
+     }catch(error){feedback(error.message);}
+    },!smith.near_smith||((action!=='salvage_gear')&&!damaged)));
+   }
    content.append(row);
   }
  }catch(error){show('ARMORY',['Equipment records unavailable: '+error.message]);}

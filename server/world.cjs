@@ -32,6 +32,7 @@ const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
 const ARMORY=require('./armory-m54.cjs');
+const ARMORER=require('./armorer-m55.cjs');
 const AREA_ID=TEMPLE;
 const GRID_SIZE = 16;
 const TILE_SIZE = 32;
@@ -119,6 +120,7 @@ function makeWorld(now = Date.now()) {
   BUSINESS.ensure(result);
   MAINTENANCE.ensure(result);
   ARMORY.ensure(result);
+  ARMORER.ensure(result);
   return result;
 }
 
@@ -207,6 +209,7 @@ function validateWorld(world) {
   BUSINESS.validate(world);
   MAINTENANCE.validate(world);
   ARMORY.validate(world);
+  ARMORER.validate(world);
   return world;
 }
 
@@ -224,6 +227,7 @@ function createCharacter(world, slot, name, now = Date.now()) {
   next.characters[String(slot)] = character;
   reconcileEntities(next);
   ARMORY.ensure(next);
+  ARMORER.ensure(next);
   ensureDistricts(next);
   ensureCells(next);
   next.revision++;

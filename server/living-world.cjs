@@ -11,6 +11,7 @@ const COMPANIONS=require('./companions-m46.cjs');
 const MILLING=require('./milling-m47.cjs');
 const BUSINESS=require('./player-business-m48.cjs');
 const MAINTENANCE=require('./business-maintenance-m50.cjs');
+const ARMORER=require('./armorer-m55.cjs');
 const MAGIC=require('./spells-m44.cjs');
 const {tick:storageTick}=require('./storage-m9.cjs');
 const {reconcile:reconcileEntities}=require('./entity-registry-m10.cjs');
@@ -208,6 +209,7 @@ function minuteTick(world,m,generated){
  }
  combatTick(world,m,generated);
  MAINTENANCE.tick(world,m,generated);
+ ARMORER.tick(world,m,generated);
  COMPANIONS.tick(world,m,generated,monsterDeath);
  lawTick(world,m,generated);
  storageTick(world,m,generated);

@@ -3,6 +3,7 @@
 // Independently implemented; the game world is never reset during deletion.
 const {reconcile,counts,PACK,VAULT,HAND,LIGHT,CHEST}=require('./entity-registry-m10.cjs');
 const ARMORY=require('./armory-m54.cjs');
+const ARMORER=require('./armorer-m55.cjs');
 const {validateWorld}=require('./world.cjs');
 function deleteCharacter(world,slot,name){
  if(slot!==1)throw Error('Invalid character slot');
@@ -20,7 +21,10 @@ function deleteCharacter(world,slot,name){
  // no pending order belongs to the retired character any longer.
  if(l.npc_trade?.pending_sales)l.npc_trade.pending_sales={};
  // Remove only the selected character's custody, never world loot or NPC goods.
- const owned=new Set([PACK,VAULT,HAND,LIGHT,CHEST,...Object.values(ARMORY.SLOTS)]);
+ const owned=new Set([PACK,VAULT,HAND,LIGHT,CHEST,...Object.values(ARMORY.SLOTS),
+  ARMORER.WORK,ARMORER.PICKUP]);
+ // Pending repair items are retired with this character, never inherited.
+ if(l.armorer)l.armorer.orders={};
  for(const house of Object.values(l.housing?.records||{})){
   if(house.owner?.kind!=='player'||house.owner.slot!==1)continue;
   owned.add(house.storage_id);
