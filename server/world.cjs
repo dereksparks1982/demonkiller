@@ -2,7 +2,7 @@
 
 // DK Server's first immutable-area snapshot mirrors the approved playable
 // Forsaken Temple. No player-character progression is shared or invented here.
-const {TEMPLE,COURT,VILLAGE,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
+const {TEMPLE,COURT,VILLAGE,TERRAIN,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
 const WORLD_GRID=require('./world-grid-m67.cjs');
 const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
@@ -97,7 +97,8 @@ function makeWorld(now = Date.now()) {
     created_at_utc: new Date(now).toISOString(),
     clock_anchor_utc: new Date(now).toISOString(),
     revision: 0,
-    areas: { [AREA_ID]: templeTemplate(),[COURT]:courtyard(),[VILLAGE]:village() },
+    areas: { [AREA_ID]: templeTemplate(),[COURT]:courtyard(),[VILLAGE]:village(),
+      ...Object.fromEntries(TERRAIN.IDS.map(id=>[id,TERRAIN.generate(id)])) },
     characters: {},living:seed(),
     runtime: { running: true, elapsed_ms: 0, resumed_at_utc: new Date(now).toISOString() }
   };
@@ -152,7 +153,7 @@ function validateWorld(world) {
   for (const [slot, character] of Object.entries(world.characters)) {
     if (!/^[123]$/.test(slot) || !character || character.slot !== Number(slot) ||
         typeof character.name !== 'string' || !/^[A-Z0-9 _-]{1,8}$/.test(character.name) ||
-        ![AREA_ID,COURT,VILLAGE].includes(character.area_id) ||
+        ![AREA_ID,COURT,...TERRAIN.IDS].includes(character.area_id) ||
         !['ghost','living'].includes(character.form) ||
         !['not_started','complete','resurrected'].includes(character.opening_state) ||
         (character.opening_state === 'resurrected') !== (character.form === 'living') ||
@@ -202,6 +203,7 @@ function validateWorld(world) {
   WORLD_GRID.validate(world);
   if(world.areas[COURT])checkRegion(world.areas[COURT]);
   if(world.areas[VILLAGE])checkRegion(world.areas[VILLAGE]);
+  for(const id of TERRAIN.IDS)if(world.areas[id])checkRegion(world.areas[id]);
   if(world.living)validateLiving(world.living);
   validateSocial(world);
   validateCombat(world);
@@ -316,10 +318,14 @@ function applyCharacterAction(world, slot, command) {
     const [dx,dy] = moves[command.direction];
     const x=character.x+dx, y=character.y+dy;
     const currentArea=next.areas[character.area_id];
-    if(!currentArea||x<0||y<0||x>=currentArea.width||y>=currentArea.height)
-      throw new Error('Movement blocked by the region boundary');
+    if(!currentArea)throw new Error('Unknown world region');
     const regionPortal=portal(next,character.area_id,x,y);
+    if(!regionPortal&&(x<0||y<0||x>=currentArea.width||y>=currentArea.height))
+      throw new Error('Movement blocked by the world boundary');
     if(regionPortal?.blocked)throw new Error('Movement blocked by the closed door');
+    if(regionPortal&&regionPortal.area_id!==AREA_ID&&
+       !traversable(next.areas[regionPortal.area_id],regionPortal.x,regionPortal.y,character.form))
+      throw new Error('The destination terrain is impassable');
     if(character.area_id===AREA_ID &&
        (currentArea.walls[y*16+x] && !(x===8 && y===0)))
       throw new Error('Movement blocked by temple walls');

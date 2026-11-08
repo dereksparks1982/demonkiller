@@ -3,12 +3,13 @@
 // Distinct from 16x16 terrain sectors: cells are variable-sized named world units.
 // All geometry and doors remain server-owned in world.areas; this module
 // persists only cell visits/identity, never duplicate terrain or inventory.
-const {TEMPLE,COURT,VILLAGE}=require('./regions.cjs');
+const {TEMPLE,COURT,VILLAGE,TERRAIN}=require('./regions.cjs');
 const SCHEMA=1,MAX_CELLS=512,MAX_RECORDS=512,MAX_LINKS=64;
 const ROOT_IDS=Object.freeze({
  [TEMPLE]:'dk.cell.temple',
  [COURT]:'dk.cell.courtyard',
- [VILLAGE]:'dk.cell.village'
+ [VILLAGE]:'dk.cell.village',
+ ...Object.fromEntries(TERRAIN.IDS.map(id=>{const p=TERRAIN.coords(id);return [id,'dk.cell.world.'+p.col+'.'+p.row];}))
 });
 const BUILDINGS=new Set(['temple_exterior','house','bank','bakery','smithy','tavern']);
 const FORMS=new Set(['active','near','dormant']);
@@ -60,6 +61,29 @@ function catalogue(world){
     links.push(edge);
    }
   }
+ }
+ // Wilderness Streaming Cells are actual adjacent coordinate chunks, not
+ // painted regions. Each edge joins its neighbor in the same master grid.
+ for(const area_id of TERRAIN.IDS){
+  const home=roots[area_id],p=TERRAIN.coords(area_id);
+  if(!home)continue;
+  for(const [dx,dy,edge] of [[1,0,'east'],[-1,0,'west'],[0,1,'south'],[0,-1,'north']]){
+   const target=TERRAIN.neighbor(area_id,dx,dy);
+   if(!target||!roots[target])continue;
+   links.push({id:area_id+':'+edge,from:home,to:roots[target],area_id,
+    object_id:'boundary_'+edge,at:{
+     x:dx>0?127:dx<0?0:64,y:dy>0?127:dy<0?0:64},
+    open:true,kind:'world_edge'});
+  }
+ }
+ if(roots[COURT]&&roots[TERRAIN.id(12,15)]){
+  links.push({id:COURT+':north_world',from:roots[COURT],
+   to:roots[TERRAIN.id(12,15)],area_id:COURT,
+   object_id:'woodland_path',at:{x:32,y:0},open:true,kind:'world_edge'});
+  links.push({id:TERRAIN.id(12,15)+':temple_south',
+   from:roots[TERRAIN.id(12,15)],to:roots[COURT],
+   area_id:TERRAIN.id(12,15),object_id:'woodland_path',
+   at:{x:64,y:127},open:true,kind:'world_edge'});
  }
  if(Object.keys(cells).length>MAX_CELLS||links.length>MAX_LINKS)
   throw Error('Streaming cell catalogue limit exceeded');

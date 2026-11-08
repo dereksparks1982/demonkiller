@@ -4,6 +4,7 @@
 (function(){
 'use strict';
 const R=window.DemonKillerRegions,D=window.DKArchitectDungeon||null;
+const TERRAIN=window.DKWorldTerrain||null;
 const CINEMATIC=window.DKLilithCinematic;
  // The same original MIDI score plays in every outdoor region.
  const MUSIC=window.DKMidiSoundtrack?.create({
@@ -179,8 +180,9 @@ function image(path){
 }
 function ready(path){const img=image(path);return img.complete&&img.naturalWidth?img:null;}
 function message(text){$('message').textContent=text;}
-function title(){return area?.area_id===R.COURT?'LILITH\u2019S COURTYARD':
-  area?.area_id===R.VILLAGE?'THE VILLAGE':'OUTDOOR REGION';}
+function title(){return TERRAIN?.isWorldArea(area?.area_id)?
+ 'UNTAMED WILDERNESS · '+area.area_id:
+ area?.area_id===R.COURT?'TEMPLE WOODLAND':'OUTDOOR REGION';}
 function persistPreview(){
  if(SERVER||!player)return;
  localStorage.setItem(PREVIEW_KEY,JSON.stringify({...player,
@@ -290,6 +292,9 @@ function floor(x,y){
   // Explicit unready tile; never silently invent grass or wall collision.
   px('#26252c',x*TILE,y*TILE,TILE,TILE);return;
  }
+ const origin=TERRAIN?.coords(area.area_id);
+ if(origin&&TERRAIN.draw(ctx,f,x*TILE,y*TILE,
+  origin.x+x,origin.y+y))return;
  const colors={grass:'#36663b',path:'#716a61',garden:'#446f40',
   dirt:'#66513d',stone:'#625d64',roof:'#443940',
   dark:'#25232d',cracked:'#42414a',sigil:'#45313c'};
@@ -357,6 +362,24 @@ function drawArchitectProp(o){
  px('#c5a76e',x+Math.min(11,w/3),y+Math.min(10,h/3),Math.max(4,w/3),Math.max(4,h/3));
 }
 function drawObject(o){
+ if(o.type==='camp_tent'){
+  const x=o.x*TILE,y=o.y*TILE,w=(o.w||4)*TILE,h=(o.h||3)*TILE;
+  px('#3a3029',x,y,w,h);px('#765739',x+8,y+7,w-16,h-14);
+  px('#9d8051',x+16,y+10,w-32,9);
+  px('#4b3629',x+w/2-12,y+h-26,24,24);
+  px('#d1ad6a',x+7,y+7,7,h-14);px('#bb9666',x+w-14,y+7,7,h-14);
+  return;
+ }
+ if(o.type==='campfire'){
+  const x=o.x*TILE,y=o.y*TILE;
+  px('#5a4b38',x+6,y+18,21,7);px('#f5b448',x+11,y+9,12,12);
+  px('#ee6a28',x+15,y+5,5,14);return;
+ }
+ if(o.type==='logpile'){
+  const x=o.x*TILE,y=o.y*TILE;
+  for(let j=0;j<3;j++){px('#5b3c2b',x+3,y+8+j*7,26,6);
+   px('#ab8b5c',x+4,y+10+j*7,5,3);}return;
+ }
  if(o.type==='architect_prop'){drawArchitectProp(o);return;}
  if(o.type==='willow'){
   const index=lilithPhase==='playing'?cinematicState().treeFrame:5;
@@ -867,6 +890,7 @@ function actorAt(x,y){
  if(npc)return {npc};
  const object=area.objects.find(o=>o.type==='willow'&&x>=o.x&&x<o.x+3&&y>=o.y&&y<o.y+3||
   o.door&&o.door.x===x&&o.door.y===y||
+  (o.type==='camp_tent'&&x>=o.x&&y>=o.y&&x<o.x+(o.w||1)&&y<o.y+(o.h||1))||
   o.x===x&&o.y===y);
  return object?{object}:null;
 }
@@ -1051,7 +1075,8 @@ async function refreshLiving(){
 }
 function previewWorld(){
  return {areas:{[R.TEMPLE]:{objects:[{id:'temple_north_door',open:doorOpen}]},
-  [R.COURT]:R.courtyard(),[R.VILLAGE]:R.village()}};
+  [R.COURT]:{objects:[]},
+  ...Object.fromEntries((TERRAIN?.IDS||[]).map(id=>[id,{objects:[]}]))}};
 }
 function returnTemple(){
  rightHeld=false;
@@ -1098,6 +1123,9 @@ async function step(direction){
   if(link){
    player={...player,...link};
    if(player.area_id===R.TEMPLE){returnTemple();return;}
+   const dest=R.templates[player.area_id]?.();
+   if(!R.traversable(dest,player.x,player.y,player.form))
+    return message('The destination terrain is impassable.');
    await loadArea(player.area_id);
   }else if(R.traversable(area,x,y,player.form)){
    player.x=x;player.y=y;player.facing=direction;
@@ -1174,6 +1202,9 @@ function inspect(x,y,doubleClick){
  }else if(o.type==='willow')
   message(player.form==='ghost'?'Lilith has become a golden weeping willow.':
     'Lilith has become a sickly black weeping willow.');
+ else if(o.type==='camp_tent')
+  message((o.name||'Worker camp')+' · '+(o.resource||'general')+
+   ' gathering outpost. This is a full-size camp, not a map marker.');
  else if(o.type==='bank'&&doubleClick)openBank();
  else message(o.type.toUpperCase()+' · '+o.id);
 }
@@ -1407,7 +1438,7 @@ async function begin(){
    setInterval(refreshSocial,15000);setInterval(refreshSector,15000);setInterval(refreshSchedule,15000);setInterval(refreshSkills,15000);setInterval(refreshLaw,15000);setInterval(refreshDistrict,15000);setInterval(refreshHousing,15000);setInterval(refreshVendors,15000);setInterval(refreshNpcCommerce,15000);setInterval(refreshWorkshops,15000);setInterval(refreshNpcAI,10000);setInterval(refreshNpcHarvest,15000);setInterval(refreshNpcSuccession,15000);setInterval(refreshCaravans,15000);
   }else{
    const saved=JSON.parse(localStorage.getItem(PREVIEW_KEY)||'null');
-   player=saved&&[R.COURT,R.VILLAGE].includes(saved.area_id)?saved:
+   player=saved&&[R.COURT,...(TERRAIN?.IDS||[])].includes(saved.area_id)?saved:
     {area_id:R.COURT,x:32,y:47,facing:'north',form:'ghost'};
    doorOpen=saved?.doorOpen!==false;
     uoControls?.sync();

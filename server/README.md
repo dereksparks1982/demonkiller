@@ -1,6 +1,14 @@
-# DK Server M67 | Empty Replacement-World Grid (v2.31.11)
+# DK Server M68 | First Playable World-Grid Terrain (v2.31.12)
 
 **Node.js 20+**, CommonJS, no external npm dependencies and no additional dashboard. This is the engine-free single-player authority for Demon Killer, presently **restricted to loopback**. The public GitHub Pages game does not have a deployed persistent backend.
+
+## M68 | First materialized playable world-grid terrain
+
+M67 creates the durable empty 4096×4096 world plan. M68 **does not replace or reset that plan**; it materializes its first four 128×128 global cells at world columns 12–13, rows 14–15. Their IDs are the exact M67 format, `dk.cell.world.c.r`, and each loads 16×16 terrain sectors using the existing streaming endpoints. The same `dk-world-terrain-m68.js` module is shared by Node and the browser, keeping hills, water, coastlines, roads and glacial areas deterministic from world coordinates. World terrain blockers use the existing authoritative cardinal movement validation.
+
+Legacy village structures are removed from the generated and loaded outdoor geometry. The old village entrance is no longer connected, and only the approved Forsaken Temple is kept as an old building. The former populated courtyard is now open woodland around Lilith's original willow and temple door. The server retains a disconnected, empty village area ID plus old economic records to avoid breaking M66 migrations; this is not new playable town terrain. Old saves undergo a physical layout migration.
+
+The three work camps are inspectable, actual multi-tile overhead fixtures for future workforce and resource economy builds. They do not yet produce goods or contain simulated employees. Future terrain regions and all six major towns and three villages remain unbuilt. Eight new tests in `tests/world-terrain-m68.cjs` check the generated boundaries, major biomes, legacy buildings removed, cell identity and player routing. Source syntax and isolated route tests passed; the entire server test suite and live browser end-to-end acceptance are still pending.
 
 ## M67 code-only replacement-world topology
 

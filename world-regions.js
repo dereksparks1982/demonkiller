@@ -4,6 +4,9 @@ const TEMPLE='dk.temple.sacrifice.001';
 const COURT='dk.courtyard.lilith.001';
 const VILLAGE='dk.village.001';
 const TILE=32;
+const TERRAIN=(typeof module!=='undefined'&&module.exports)?
+ require('./dk-world-terrain-m68.js'):
+ (typeof window!=='undefined'?window.DKWorldTerrain:null);
 function grid(id,width,height,base='grass'){
  const n=width*height;
  const a={schema:1,area_id:id,tile_size:TILE,width,height,
@@ -29,64 +32,51 @@ function grid(id,width,height,base='grass'){
  return {area:a,at,put,wall,fill,box};
 }
 function courtyard(){
- const {area:a,at,put,wall,fill,box}=grid(COURT,64,64);
- // The temple has the full footprint of its existing 16x16 interior.
+ const {area:a,put,wall,box}=grid(COURT,64,64);
+ // This is now ONLY wild temple grounds. All four houses, vendor stalls,
+ // village gate and the old paved settlement have been removed.
+ // The surviving temple exterior retains the exact approved 16x16 footprint.
  box(24,48,16,16,'temple_exterior','temple_exterior');
  wall(32,48,0);put(32,48,'stone');put(32,47,'path');
- a.objects.push({id:'courtyard_temple_door',type:'door',x:32,y:48,r:0,open:false,link:TEMPLE});
- // North gate leads to the village. It is a real traversable portal.
- wall(32,0,0);put(32,0,'path');
- a.objects.push({id:'courtyard_village_gate',type:'gate',x:32,y:0,r:0,open:true,link:VILLAGE});
- for(let y=1;y<=47;y++)for(let x=31;x<=33;x++)put(x,y,'path');
- for(let x=6;x<=58;x++)for(let y=26;y<=28;y++)put(x,y,'path');
- // Circular stone walk, 3x3 willow center. Both forms share an anchor.
+ a.objects.push({id:'courtyard_temple_door',type:'door',
+  x:32,y:48,r:0,open:false,link:TEMPLE});
+ // The old Lilith sequence still lands at the same willow/camera position,
+ // but its surroundings are now forested open land, not a former village.
  const cx=32,cy=27;
- for(let y=12;y<=42;y++)for(let x=15;x<=49;x++){
+ for(let y=4;y<=47;y++)for(let x=0;x<64;x++){
   const d=Math.hypot(x-cx,y-cy);
-  if(d>=7&&d<9.3)put(x,y,'path');
+  if((x>=30&&x<=34&&x<34&&y>=27)||(d>=7&&d<9))
+   put(x,y,'path');
   else if(d<7)put(x,y,'garden');
+  else if((x*13+y*19)%23===0)put(x,y,'heath');
+  else if((x*7+y*11)%31===0)put(x,y,'forest');
  }
- for(let y=20;y<=34;y++)for(let x=31;x<=33;x++)
-  if(Math.hypot(x-cx,y-cy)>2)put(x,y,'path');
- a.objects.push({id:'lilith_willow',type:'willow',x:31,y:26,w:3,h:3,world_form:'unresolved'});
- // Four houses with actual exterior footprints, not one tile houses.
- box(5,6,12,10,'house','courtyard_house_nw');
- box(47,6,12,10,'house','courtyard_house_ne');
- box(5,37,12,10,'house','courtyard_house_sw');
- box(47,37,12,10,'house','courtyard_house_se');
- a.objects.push({id:'courtyard_well',type:'well',x:49,y:28,r:0});
- a.objects.push({id:'courtyard_market',type:'stall',x:10,y:25,r:0});
+ for(let y=0;y<=47;y++)for(let x=31;x<=33;x++)put(x,y,'path');
+ wall(32,0,0);put(32,0,'path');
+ a.objects.push({id:'lilith_willow',type:'willow',x:31,y:26,
+  w:3,h:3,world_form:'unresolved'});
  a.spawn={x:32,y:47};
  return a;
 }
+// Retired, unreachable region ID retained temporarily for server save
+// compatibility. NONE of the previous town's physical buildings or streets.
 function village(){
- const {area:a,put,wall,fill,box}=grid(VILLAGE,128,128);
- // The southern gate connects to the courtyard. The village really is larger.
- wall(64,127,0);put(64,127,'path');
- a.objects.push({id:'village_courtyard_gate',type:'gate',x:64,y:127,r:0,open:true,link:COURT});
- for(let y=2;y<128;y++)for(let x=63;x<=65;x++)put(x,y,'path');
- for(let x=12;x<116;x++)for(let y=62;y<=65;y++)put(x,y,'path');
- // Streets do not imply doors are already enterable.
- const houses=[
-  [16,18,16,12,'house','village_house_1'],[43,18,16,12,'house','village_house_2'],
-  [76,18,16,12,'house','village_house_3'],[98,18,16,12,'house','village_house_4'],
-  [16,73,16,12,'house','village_house_5'],[96,75,16,12,'house','village_house_6'],
-  [44,89,20,14,'bank','village_bank'],
-  [79,88,16,12,'bakery','village_bakery'],
-  [16,99,18,14,'smithy','village_smithy'],
-  [98,98,17,15,'tavern','village_tavern']
- ];
- for(const args of houses)box(...args);
- a.objects.push({id:'village_well',type:'well',x:66,y:63,r:0});
- a.objects.push({id:'village_market',type:'stall',x:70,y:68,r:0});
- a.spawn={x:64,y:126};
+ const {area:a}=grid(VILLAGE,128,128,'grass');
  return a;
 }
-const templates=Object.freeze({[COURT]:courtyard,[VILLAGE]:village});
+const templates=Object.freeze({[COURT]:courtyard,[VILLAGE]:village,
+ ...Object.fromEntries((TERRAIN?.IDS||[]).map(id=>[id,()=>TERRAIN.generate(id)]))});
 function ensureRegions(world){
  let changed=false;
  for(const [id,fn] of Object.entries(templates)){
   if(!world.areas[id]){world.areas[id]=fn();changed=true;}
+ }
+ // The previous village terrain and its 10 buildings are discarded even for
+ // old saves. Server economy records are retained for compatibility until
+ // the later settlements/economy migration. The region is disconnected.
+ const old=world.areas[VILLAGE];
+ if(old?.objects?.length){
+  world.areas[VILLAGE]=village();changed=true;
  }
  return changed;
 }
@@ -96,6 +86,8 @@ function traversable(area,x,y,form='living'){
  const idx=y*area.width+x;
  if(area.walls[idx])return false;
  if(['roof','temple_roof'].includes(area.floor[idx]))return false;
+ if(TERRAIN?.isWorldArea(area.area_id)&&
+  !TERRAIN.traversableType(area.floor[idx]))return false;
  if(area.objects.some(o=>o.type==='willow'&&
    x>=o.x&&x<o.x+(o.w||1)&&y>=o.y&&y<o.y+(o.h||1)))return false;
  if(form==='living'&&area.objects.some(o=>o.type==='well'&&x===o.x&&y===o.y))return false;
@@ -116,10 +108,23 @@ function portal(world,areaId,x,y){
   if(!door?.open)return {blocked:true};
   return {area_id:TEMPLE,x:8,y:1,facing:'south'};
  }
- if(areaId===COURT&&x===32&&y===0)
-  return {area_id:VILLAGE,x:64,y:126,facing:'north'};
- if(areaId===VILLAGE&&x===64&&y===127)
-  return {area_id:COURT,x:32,y:1,facing:'south'};
+ // Courtyard is placed immediately south of global tile (1600,2047).
+ if(areaId===COURT&&x===32&&y===-1)
+  return {area_id:TERRAIN.id(12,15),x:64,y:127,facing:'north'};
+ if(TERRAIN?.isWorldArea(areaId)){
+  const p=TERRAIN.coords(areaId);
+  const side=x<0?[-1,0]:x>=TERRAIN.SIZE?[1,0]:
+   y<0?[0,-1]:y>=TERRAIN.SIZE?[0,1]:null;
+  if(!side)return null;
+  if(p.col===12&&p.row===15&&side[1]===1&&x>=63&&x<=65)
+   return {area_id:COURT,x:32,y:0,facing:'south'};
+  const other=TERRAIN.neighbor(areaId,side[0],side[1]);
+  if(!other||!world.areas[other])return null;
+  return {area_id:other,
+   x:x<0?TERRAIN.SIZE-1:x>=TERRAIN.SIZE?0:x,
+   y:y<0?TERRAIN.SIZE-1:y>=TERRAIN.SIZE?0:y,
+   facing:side[0]>0?'east':side[0]<0?'west':side[1]>0?'south':'north'};
+ }
  return null;
 }
 function checkRegion(area){
@@ -135,6 +140,6 @@ function checkRegion(area){
  }
  return area;
 }
-const api=Object.freeze({TEMPLE,COURT,VILLAGE,TILE,templates,courtyard,village,ensureRegions,traversable,portal,checkRegion});
+const api=Object.freeze({TEMPLE,COURT,VILLAGE,TILE,TERRAIN,templates,courtyard,village,ensureRegions,traversable,portal,checkRegion});
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.DemonKillerRegions=api;

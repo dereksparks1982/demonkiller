@@ -1,3 +1,14 @@
+## 0.2.66 | M68 (2026-11-08)
+
+- Replaced the previously populated outdoor courtyard with wooded temple grounds. Retained only the temple exterior and Lilith's willow; removed the courtyard homes, stalls and old gateway.
+- Retired the old village's physical street and building geometry and disconnected the old village from player travel. Legacy server economy and NPC state remain quarantined until migration.
+- Materialized four true top-down 128×128 wilderness regions (65,536 walkable/blocked tile positions) from M67's 4096×4096 world grid. Ocean, beach, forests, highlands, glacier, mountains, rivers, marsh and bridges are now actual ground tiles.
+- Added boundary-accurate cardinal world traversal, an entry path from the temple grounds and consistent 16×16 sector-stream geometry.
+- Matched live Streaming Cell IDs to M67's `dk.cell.world.<column>.<row>` addressing. Generated visual tiles are identical in the browser and server.
+- Introduced three physical overhead work-camp sites (timber, quarry, marsh), without generating their future workers or economy yet.
+- Added eight regression tests for preservation, geography, terrain boundaries, world-grid IDs, actor movement and browser integration.
+- Preserved M67's blank unallocated map-plan and building draft registry. No new raster world-map image.
+
 ## 0.2.65 | M67 (2026-11-08)
 
 - Introduced a clean 4096 × 4096 global world-grid model, partitioned into 16-tile sectors and 128-tile Streaming Cells, without importing the retired temple, courtyard or village scenery.

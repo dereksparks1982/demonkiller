@@ -1,7 +1,7 @@
 'use strict';
 // DK Server M16: RunUO-inspired priority subregions, independently implemented.
 // Every map keeps its own dimensions; the world decides current region policy.
-const {TEMPLE,COURT,VILLAGE}=require('./regions.cjs');
+const {TEMPLE,COURT,VILLAGE,TERRAIN}=require('./regions.cjs');
 const DEFINITIONS=Object.freeze([
  {id:'dk.region.temple.sanctuary',area_id:TEMPLE,name:'Forsaken Temple',
   priority:10,bounds:[0,0,15,15],guarded:false,housing:false},
@@ -9,8 +9,8 @@ const DEFINITIONS=Object.freeze([
   priority:90,bounds:[25,19,40,36],guarded:false,housing:false},
  {id:'dk.region.courtyard.temple_grounds',area_id:COURT,name:'Temple Grounds',
   priority:80,bounds:[20,38,43,63],guarded:false,housing:false},
- {id:'dk.region.courtyard.homes',area_id:COURT,name:'Courtyard Homes',
-  priority:15,bounds:[0,0,63,63],guarded:false,housing:true},
+ {id:'dk.region.courtyard.homes',area_id:COURT,name:'Ancient Temple Woodland',
+  priority:15,bounds:[0,0,63,63],guarded:false,housing:false},
  {id:'dk.region.village.bank',area_id:VILLAGE,name:'Bank Quarter',
   priority:90,bounds:[43,86,66,110],guarded:true,housing:false},
  {id:'dk.region.village.market',area_id:VILLAGE,name:'Market Square',
@@ -19,8 +19,13 @@ const DEFINITIONS=Object.freeze([
   priority:80,bounds:[16,102,45,126],guarded:true,housing:false},
  {id:'dk.region.village.north_gate',area_id:VILLAGE,name:'Northern Gate',
   priority:70,bounds:[55,0,75,33],guarded:true,housing:false},
- {id:'dk.region.village.homes',area_id:VILLAGE,name:'Village Residential',
-  priority:10,bounds:[0,0,127,127],guarded:true,housing:true}
+ {id:'dk.region.village.homes',area_id:VILLAGE,name:'Retired Settlement',
+  priority:10,bounds:[0,0,127,127],guarded:false,housing:false},
+ ...TERRAIN.IDS.map((area_id,i)=>({
+  id:'dk.region.overworld.'+i,area_id,name:[
+   'Western Forest','Frozen Highlands','West Marshes','Eastern Wilderness'
+  ][i],priority:10,bounds:[0,0,127,127],guarded:false,housing:false
+ }))
 ]);
 const IDS=new Set(DEFINITIONS.map(d=>d.id));
 const INDEX=Object.freeze(Object.fromEntries(DEFINITIONS.map(d=>[d.id,d])));

@@ -4,6 +4,16 @@ Demon Killer is a Gothic fantasy RPG by DK Softworks, built with original top-do
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M68 | Walkable top-down wilderness replaces the former village
+
+**The only previous building carried into the playable world is the Forsaken Temple.** Its original 16×16 interior remains. The surrounding 64×64 temple grounds have been cleared of all four houses, market stalls, well and the old village gate. Lilith's willow and the temple entrance remain because the opening sequence still uses them. The former 128×128 village has **no buildings or streets and cannot be entered from the temple**. A retired server area identity and older NPC/business records remain temporarily for compatibility with M66 systems; they are not imported as playable settlements. Future builds must migrate those economic records before removing the legacy ID completely.
+
+**Real terrain, not a picture.** The four connected 128×128 wilderness regions represent **256×256 walkable 32px tiles**, or 65,536 actual terrain positions, on M67's 4,096×4,096 master grid. Their precise M67 cell identities are **dk.cell.world.12.14, 13.14, 12.15 and 13.15**. The same existing 16×16-sector browser streaming applies inside each region. Terrain and roads are deterministic from global coordinates, so they continue across sector and region edges. Inland terrain includes forests, heath, highlands, cliffs, northern glaciers, a branching river system, a lake, southwestern wetland and a western ocean shore. Seas, cliffs, boulders and deep water block walking; roads and bridges are physical tiles. No 16-million-tile browser allocation is made. The remaining parts of the master world have **not** been populated yet.
+
+**One-tile borders:** Cardinal movement crosses wilderness region edges without diagonal steps. An actual northbound connection links the retained temple grounds to the southwest wilderness region. The previous village gateway is gone. All three requested worker camps are represented by full-size inspectable overhead pixel-tile footprints: a timber camp, quarry camp and marsh camp. They are terrain fixtures in this slice, **not yet staffed business simulations**. No capital, towns, or villages are fabricated before their detailed design.
+
+The approved existing character images, temple scene, Lilith sequence, DK Architect, music and mouse controls remain in the browser game. This build adds shared browser/Node terrain code, physical overhead tiles and eight regression contracts. Syntax and targeted movement/geometry simulations passed; the entire Node suite and a full live browser acceptance run remain outstanding.
+
 ## M67 | Empty replacement-world grid and editable building foundations
 
 The existing temple, courtyard and village layouts are **retired from the design of the replacement world**. M67 adds a separate, server-saved, initially empty **4,096 × 4,096 tile grid** with 32 px logical tiles, 16 × 16 terrain sectors and 128 × 128 Streaming Cells. The new grid has **zero imported structures or scenery**. Global coordinates, cardinal steps, cross-cell bounds and draft structure footprints are implemented without allocating millions of tiles or generating a new map illustration.
