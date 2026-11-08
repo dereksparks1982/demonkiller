@@ -71,7 +71,7 @@ test('M36 protects temple, story anchor, paths, other buildings and stale writes
  const command=(action,fields={})=>ARCH.edit(w,
   {action,area_id:R.COURT,expected_revision:w.revision,...fields});
  assert.throws(()=>command('move_building',{object_id:'temple_exterior',x:25,y:48}),/protected/);
- assert.throws(()=>command('move_building',{object_id:HOUSE,x:47,y:37}),/overlaps/);
+ assert.throws(()=>command('move_building',{object_id:HOUSE,x:47,y:37}),/overlaps|Blocked/);
  assert.throws(()=>command('move_building',{object_id:HOUSE,x:26,y:38}),/path|garden|overlaps|wall/);
  assert.throws(()=>command('set_door',{object_id:HOUSE,x:5,y:37}),/corner/);
  assert.throws(()=>command('remove_door',{object_id:'lilith_willow'}),/protected/);
@@ -109,7 +109,7 @@ test('M36 browser includes usable bottom tools, controlled F8 and no gameplay bu
  for(const id of ['select','move','door','erase','ground','inspect'])
   assert(html.includes('data-tool="'+id+'"'));
  assert(html.includes('id="export"'));
- assert(game.includes("e.key==='F8'"));
+ assert(game.includes('DKOutdoorArchitectBridge')); // F8 is now captured by the on-screen construction controller.
  assert(client.includes("async editOutdoor("));
  assert(ui.includes("map.addEventListener('pointerdown'"));
  assert(ui.includes("map.addEventListener('pointermove'"));

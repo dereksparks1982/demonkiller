@@ -14,6 +14,7 @@ const TILE=32,VIEW=20;
 const images=new Map();
 let area=null,world=null,player=null,living=null,gameplay=null,social=null,law=null,housing=null,busy=false,rightHeld=false;
 let pointer=null,camera={x:0,y:0},lastMove=0,lastDraw=0,animStart=0;
+let architectCamera=null,architectZoom=1;
 const visual={x:0,y:0,queue:[]};
 function resetVisual(){if(player){visual.x=player.x;visual.y=player.y;visual.queue.length=0;}}
 let lilithPhase='finished',firstVisit=false,doorOpen=true,clock=null;
@@ -181,7 +182,7 @@ async function loadArea(id){
  if(terrainSession){terrainSession.close();terrainSession=null;}
  terrainFailures=0;
  let nextArea=null;
- if(SERVER&&window.DKSectorTerrain){
+ if(SERVER&&window.DKSectorTerrain&&!window.DKOutdoorArchitect?.isOpen()){
   let candidate=null;
   try{
    const manifest=await SERVER.sectorManifest(id);
@@ -204,6 +205,7 @@ async function loadArea(id){
  if(!area||!area.floor||area.floor.length!==area.width*area.height)
   throw Error('Invalid region geometry');
  if(changed){resetVisual();sectorView=null;sectorCursor=null;cellShells?.reset();cellContents?.reset();}
+ if(window.DKOutdoorArchitect?.isOpen())cellShells?.reset();
  $('areaName').textContent=title();
  const door=area.objects.find(o=>o.id==='courtyard_temple_door');
  if(door){if(SERVER)doorOpen=!!door.open;else door.open=doorOpen;}
@@ -211,6 +213,13 @@ async function loadArea(id){
  if(SERVER){void refreshCellView();void refreshCellContents();}
 }
 function viewCamera(){
+ if(architectCamera){
+  const span=VIEW/architectZoom;
+  camera.x=Math.max(0,Math.min(Math.max(0,area.width-span),architectCamera.x));
+  camera.y=Math.max(0,Math.min(Math.max(0,area.height-span),architectCamera.y));
+  architectCamera.x=camera.x;architectCamera.y=camera.y;
+  return;
+ }
  // Follow the interpolated actor, not the next authoritative tile.
  camera.x=Math.max(0,Math.min(area.width-VIEW,visual.x-VIEW/2));
  camera.y=Math.max(0,Math.min(area.height-VIEW,visual.y-VIEW/2));
@@ -700,10 +709,12 @@ function draw(){
  viewCamera();
  ctx.imageSmoothingEnabled=false;ctx.setTransform(1,0,0,1,0,0);
  ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.save();ctx.translate(-Math.round(camera.x*TILE),-Math.round(camera.y*TILE));
+ ctx.save();const editorScale=architectCamera?architectZoom:1;
+ const viewSpan=VIEW/editorScale;ctx.scale(editorScale,editorScale);
+ ctx.translate(-Math.round(camera.x*TILE),-Math.round(camera.y*TILE));
  const left=Math.floor(camera.x),top=Math.floor(camera.y);
- const right=Math.min(area.width,Math.ceil(camera.x+VIEW));
- const bottom=Math.min(area.height,Math.ceil(camera.y+VIEW));
+ const right=Math.min(area.width,Math.ceil(camera.x+viewSpan));
+ const bottom=Math.min(area.height,Math.ceil(camera.y+viewSpan));
  for(let y=top;y<bottom;y++)
   for(let x=left;x<right;x++)floor(x,y);
  for(let y=top;y<bottom;y++)
@@ -712,7 +723,7 @@ function draw(){
  // Reuse lightweight object shells. Their source objects remain the
  // same authoritative area records, including live door and gate state.
  const visibleObjects=cellShells?
-  cellShells.visible(area,camera,VIEW):area.objects;
+  cellShells.visible(area,camera,viewSpan):area.objects;
  for(const o of visibleObjects)drawObject(o);
  drawResources();
  drawTerrainMarks();
@@ -1291,6 +1302,33 @@ async function begin(){
 }
 // Read-only access for the classic UI; server-owned gameplay stays authoritative.
 window.DKOutdoorState=()=>({player,gameplay,serverConnected:!!SERVER});
+window.DKOutdoorArchitectBridge=Object.freeze({
+ snapshot:()=>area?{area_id:area.area_id,camera:{...camera},
+  span:VIEW/(architectCamera?architectZoom:1),zoom:architectZoom,
+  form:player?.form||'ghost',cutscene:lilithPhase==='playing'}:null,
+ begin:()=>{
+  if(!area||!player||lilithPhase==='playing')return false;
+  rightHeld=false;architectZoom=1;viewCamera();
+  architectCamera={x:camera.x,y:camera.y};draw();return true;
+ },
+ end:()=>{architectCamera=null;architectZoom=1;rightHeld=false;if(area)draw();},
+ pan:(x,y)=>{
+  if(!architectCamera||!area)return;
+  architectCamera.x+=x;architectCamera.y+=y;draw();
+ },
+ zoom:(amount,ax=.5,ay=.5)=>{
+  if(!architectCamera||!area)return;
+  const was=VIEW/architectZoom;
+  architectZoom=Math.max(.35,Math.min(2,architectZoom*amount));
+  const now=VIEW/architectZoom;
+  architectCamera.x+=(was-now)*ax;
+  architectCamera.y+=(was-now)*ay;draw();
+ },
+ refresh:async()=>{
+  if(area){await loadArea(area.area_id);draw();}
+ },
+ draw:()=>{if(area)draw();}
+});
 
 window.addEventListener('dk-inventory-updated',()=>{if(SERVER)refreshGameplay();});
 begin();

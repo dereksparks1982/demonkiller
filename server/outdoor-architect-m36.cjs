@@ -2,6 +2,7 @@
 // M36: author-owned exterior edits. Server world stays authoritative.
 // All edits are one transaction; building cells retain their stable IDs.
 const {COURT,VILLAGE}=require('./regions.cjs');
+const GEOMETRY=require('../dk-architect-exterior-m38.js');
 const BUILDINGS=new Set(['house','bank','bakery','smithy','tavern']);
 const FIXTURES=new Set(['well','stall']);
 const TILE_FIELDS=['floor','walls','wallStyles','wallVariants','wallPacks','wallRotations','floorArt'];
@@ -109,32 +110,15 @@ function edit(world,command){
  const action=command.action,id=command.area_id;
  const specs={move_building:['object_id','x','y'],move_fixture:['object_id','x','y'],
   set_door:['object_id','x','y'],remove_door:['object_id'],
+  paint_wall:['x','y'],erase_wall:['x','y'],
+  wall_line:['x','y','w','h'],room_outline:['x','y','w','h'],
   paint_ground:['x','y','floor'],paint_rectangle:['x','y','w','h','floor']};
  if(!Object.hasOwn(specs,action))throw Error('Unsupported exterior edit action');
  commandKeys(command,specs[action]);
  const next=structuredClone(world),area=areaFor(next,id);
  let target=null;
  if(action==='move_building'){
-  target=editable(area,command.object_id,BUILDINGS);
-  if(!integer(command.x)||!integer(command.y))throw Error('Invalid building coordinates');
-  if(target.x===command.x&&target.y===command.y)throw Error('Building is already there');
-  const old=rect(target),deltaX=command.x-target.x,deltaY=command.y-target.y;
-  // Copy the building's actual tile layers, not merely its visible object shell.
-  const image=[];
-  for(let y=old.y;y<old.y+old.h;y++)for(let x=old.x;x<old.x+old.w;x++){
-   const i=at(area,x,y);image.push(TILE_FIELDS.map(field=>area[field][i]));
-   blank(area,x,y);
-  }
-  try{validDestination(next,area,target,{...target,x:command.x,y:command.y});}
-  catch(error){throw error;}
-  target.x=command.x;target.y=command.y;
-  if(target.door)target.door={x:target.door.x+deltaX,y:target.door.y+deltaY};
-  let n=0;
-  for(let y=target.y;y<target.y+target.h;y++)for(let x=target.x;x<target.x+target.w;x++){
-   const i=at(area,x,y),row=image[n++];
-   TILE_FIELDS.forEach((field,k)=>{area[field][i]=row[k];});
-  }
-  if(target.door)freeOutside(area,target,target.door.x,target.door.y);
+  target=GEOMETRY.move(area,command.object_id,command.x,command.y);
   syncAttached(next,target,id);
  }else if(action==='move_fixture'){
   target=editable(area,command.object_id,FIXTURES);
@@ -174,6 +158,8 @@ function edit(world,command){
    target.door=null;
   }
   syncAttached(next,target,id);
+ }else if(['paint_wall','erase_wall','wall_line','room_outline'].includes(action)){
+  GEOMETRY.wallEdit(area,action,command);
  }else{
   const rectangle=action==='paint_rectangle';
   const w=rectangle?command.w:1,h=rectangle?command.h:1;

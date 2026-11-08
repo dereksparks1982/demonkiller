@@ -18,7 +18,10 @@ const ROOT_FILES = new Set([
   'outdoor-ui.js','temple-ui.js','temple-ui.css','sector-terrain-m32.js','streaming-cell-shells-m33.js','streaming-cell-contents-m34.js','dk-architect-interiors-m35.html','dk-architect-interiors-m35.js',
    'dk-architect-outdoors-m36.html','dk-architect-outdoors-m36.js',
    'dk-architect-dock-m37.css','dk-architect-temple-m37.js',
-   'dk-architect-game-m37.js','dk-architect-preview-m37.js'
+   'dk-architect-game-m37.js','dk-architect-preview-m37.js',
+   'dk-architect-exterior-m38.js','dk-architect-menu-m38.js',
+   'dk-architect-menu-m38.css','dk-architect-temple-m38.js',
+   'dk-architect-game-m38.js'
 ]);
 
 function localRequestAllowed(req, port) {

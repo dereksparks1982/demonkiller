@@ -1,95 +1,82 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const R=require('../world-regions.js');
-test('M37 temple Architect button opens a bottom construction dock, not old floating builder',()=>{
- const html=read('test-center.html'),dock=read('dk-architect-temple-m37.js'),
-  css=read('dk-architect-dock-m37.css');
- assert.match(html,/id="editMode"/);
- assert.match(html,/dk-architect-temple-m37\.js/);
- assert.match(html,/dk-architect-dock-m37\.css/);
- assert.match(dock,/edit\.addEventListener\('click',\(\)=>sync\(true\)\)/);
- assert.match(dock,/walk\.addEventListener\('click',\(\)=>sync\(false\)\)/);
- assert.match(dock,/event\.key!=='F8'/);
- assert.match(dock,/event\.preventDefault\(\);event\.stopImmediatePropagation\(\)/);
- assert.match(dock,/originalViewport=\$\('uoPaletteViewport'\)/);
- assert.match(dock,/palette\.append\(originalViewport\)/);
- for(const group of ['foundations','materials','rooms','objects','staff',
+test('M38 replaces the M37 two-editor arrangement in both playable screens',()=>{
+ const temple=read('test-center.html'),outside=read('outdoor.html');
+ assert(temple.includes('id="editMode"'));
+ assert(outside.includes('id="editMode"'));
+ for(const s of [temple,outside]){
+  assert.match(s,/dk-architect-menu-m38\.css/);
+  assert.match(s,/dk-architect-menu-m38\.js/);
+ }
+ assert.match(temple,/dk-architect-temple-m38\.js/);
+ assert.match(outside,/dk-architect-game-m38\.js/);
+ assert.doesNotMatch(temple,/dk-architect-temple-m37\.js/);
+ assert.doesNotMatch(outside,/dk-architect-game-m37\.js/);
+ assert.doesNotMatch(outside,/<iframe/);
+});
+test('M38 shared PA category bar and context flyout are the actual editor menus',()=>{
+ const ui=read('dk-architect-menu-m38.js');
+ const css=read('dk-architect-menu-m38.css');
+ for(const key of ['foundations','materials','rooms','objects','staff',
   'utilities','deployment','logistics','intelligence','emergencies','clone','planning'])
-  assert(dock.includes("id:'"+group+"'"),'Missing tab '+group);
- assert.match(css,/body\.dk-architect-v37 #architectWindow\{display:none!important\}/);
- assert.match(css,/#dkArchitectDock\{position:fixed;z-index:80;bottom:0/);
- assert.doesNotThrow(()=>new vm.Script(dock));
+  assert(ui.includes("'"+key+"'"),'Missing Prison Architect category: '+key);
+ assert(ui.includes('class="dk-pa-flyout"'));
+ assert(ui.includes('class="dk-pa-bottom"'));
+ assert.match(css,/\.dk-pa-flyout\{position:absolute;bottom:69px/);
+ assert.match(css,/\.dk-pa-tool-grid\{display:grid/);
+ assert.match(ui,/button\.disabled=!yes/);
+ assert.doesNotThrow(()=>new vm.Script(ui));
 });
-test('M37 outdoor Architect is opened in the live game, and F8 works without server',()=>{
- const html=read('outdoor.html'),game=read('dk-architect-game-m37.js'),
-  world=read('outdoor.js'),host=read('server/local-game.cjs');
- assert.match(html,/id="editMode"/);
- assert.match(html,/id="dkOutdoorArchitect"/);
- assert.match(html,/id="dkOutdoorArchitectFrame"/);
- assert.match(html,/dk-architect-game-m37\.js/);
- assert.match(game,/button\.addEventListener\('click',toggle\)/);
- assert.match(game,/if\(e\.key!=='F8'/);
- assert.match(game,/frame\.src='\.\/dk-architect-outdoors-m36\.html\?'/);
- assert.match(game,/window\.dispatchEvent\(new Event\('dk-architect-resume'\)\)/);
- assert.match(world,/dk-architect-resume/);
- assert.match(world,/DKOutdoorArchitect\?\.isOpen\(\)/);
- assert.doesNotMatch(world,/World editing needs the local DK Server/);
- for(const f of ['dk-architect-game-m37.js','dk-architect-temple-m37.js',
-  'dk-architect-preview-m37.js','dk-architect-dock-m37.css'])
-  assert(host.includes("'"+f+"'"),'Local server cannot serve '+f);
- assert.doesNotThrow(()=>new vm.Script(game));
+test('M38 temple menu keeps original DK Architect tools and sprites, F8 works',()=>{
+ const adapter=read('dk-architect-temple-m38.js');
+ assert.match(adapter,/window\.DKArchitectMenus\.create/);
+ assert.match(adapter,/palette=\$\('uoPaletteViewport'\)/);
+ assert.match(adapter,/button\.addEventListener\('click',\(\)=>refresh\(true\)\)/);
+ assert.match(adapter,/e\.key!=='F8'/);
+ assert.match(adapter,/e\.stopImmediatePropagation\(\)/);
+ assert.match(adapter,/place_door:'tool:door'/);
+ assert.doesNotThrow(()=>new vm.Script(adapter));
 });
-test('M37 outdoor build bar shows categorized buttons and functional tool submenus',()=>{
- const html=read('dk-architect-outdoors-m36.html'),
-  js=read('dk-architect-outdoors-m36.js');
- for(const group of ['foundations','materials','rooms','objects','staff',
-  'utilities','deployment','logistics','intelligence','emergencies','clone','planning'])
-  assert(html.includes('data-group="'+group+'"'),'Missing bottom category '+group);
- for(const mode of ['select','move','door','erase','ground','inspect'])
-  assert(html.includes('data-tool="'+mode+'"'),'Missing subtool '+mode);
- assert.match(js,/function groupSet\(name\)/);
- assert.match(js,/document\.querySelectorAll\('\[data-group\]'\)/);
- assert.match(js,/window\.parent\.postMessage\(\{dkArchitect:'close'\}/);
- assert.match(html,/dk-architect-preview-m37\.js/);
- assert.doesNotThrow(()=>new vm.Script(js));
+test('M38 outdoor editor edits the real viewport rather than a new map',()=>{
+ const adapter=read('dk-architect-game-m38.js'),game=read('outdoor.js');
+ assert.match(adapter,/const game=\$\('world'\)/);
+ assert.match(adapter,/game\.parentElement\.insertBefore\(wrap,game\)/);
+ assert.match(adapter,/bridge\.snapshot\(\)/);
+ assert.match(adapter,/bridge\.pan\(/);
+ assert.match(adapter,/bridge\.zoom\(/);
+ assert.match(adapter,/GEOMETRY|Geo\.test/);
+ assert.match(adapter,/async function submit\(/);
+ assert.match(adapter,/api\.editOutdoor\(/);
+ assert.match(adapter,/window\.DKOutdoorArchitect=Object\.freeze/);
+ assert.match(game,/window\.DKOutdoorArchitectBridge=Object\.freeze/);
+ assert.match(game,/architectCamera/);
+ assert.doesNotMatch(adapter,/<iframe|\.src='\.\/dk-architect-outdoors-m36\.html/);
+ assert.doesNotThrow(()=>new vm.Script(adapter));
 });
-test('M37 static preview edits map-only browser drafts and exports without server writes',async()=>{
- const src=read('dk-architect-preview-m37.js');
+test('M38 public browser draft still preserves exports separately from characters',async()=>{
+ const src=read('dk-architect-preview-m37.js'),shared=read('dk-architect-exterior-m38.js');
  const storage=new Map();
  const context={window:{DemonKillerRegions:R},
-  localStorage:{
-   getItem:key=>storage.get(key)||null,
-   setItem:(key,val)=>storage.set(key,val)
-  },
+  localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},
   JSON,Set,Object,Number,Error,Math};
- vm.runInNewContext(src,context,{filename:'dk-architect-preview-m37.js'});
+ vm.runInNewContext(shared,context);
+ vm.runInNewContext(src,context);
  const api=context.window.DemonKillerServer;
- assert(context.window.DKArchitectPreviewActive);
- const prev=await api.area(R.COURT);
- const oldHouse=prev.area.objects.find(o=>o.id==='courtyard_house_sw');
- assert(oldHouse);
- const first=await api.editOutdoor('move_building',R.COURT,prev.revision,
-  {object_id:oldHouse.id,x:oldHouse.x+1,y:oldHouse.y});
- assert.equal(first.revision,1);
- const saved=await api.area(R.COURT),moved=saved.area.objects.find(o=>o.id===oldHouse.id);
- assert.equal(moved.x,oldHouse.x+1);
- assert.equal(moved.door.x,oldHouse.door.x+1);
- const exportJSON=await api.exportOutdoor(R.COURT);
- assert.equal(exportJSON.format,'dk.outdoor.layout.m36');
- assert.equal(exportJSON.preview_draft,true);
- assert.equal(exportJSON.map.objects.find(o=>o.id===oldHouse.id).x,oldHouse.x+1);
- assert(!('living' in exportJSON));
- await assert.rejects(()=>api.editOutdoor('move_building',R.COURT,0,
-  {object_id:oldHouse.id,x:oldHouse.x+2,y:oldHouse.y}),/Stale exterior revision/);
- assert.equal((await api.area(R.COURT)).revision,1);
-});
-test('M37 game preview actually reloads edited layout while keeping character saves separate',()=>{
- const world=read('outdoor.js'),preview=read('dk-architect-preview-m37.js');
- assert(world.includes("const key='dkSoftworks.demonkiller.architect.outdoorDraft.m37.'+id"));
- assert(preview.includes("const KEY='dkSoftworks.demonkiller.architect.outdoorDraft.m37.'"));
- assert(world.includes('return R.checkRegion(record.area)'));
- assert.match(preview,/localStorage\.setItem\(KEY\+id/);
- assert(!preview.includes('dkSoftworks.demonkiller.characters.v1'));
+ const before=await api.area(R.COURT);
+ const first=await api.previewOutdoor('move_building',R.COURT,
+  {object_id:'courtyard_house_sw',x:6,y:37});
+ assert.equal(first.ok,true,first.error);
+ await api.editOutdoor('move_building',R.COURT,before.revision,
+  {object_id:'courtyard_house_sw',x:6,y:37});
+ const after=await api.area(R.COURT);
+ assert.equal(after.area.objects.find(o=>o.id==='courtyard_house_sw').x,6);
+ assert.equal(after.revision,1);
+ const exportData=await api.exportOutdoor(R.COURT);
+ assert.equal(exportData.preview_draft,true);
+ assert.equal(exportData.map.tile_size,32);
+ assert(!('characters' in exportData)&&!('living' in exportData));
+ assert(!src.includes('dkSoftworks.demonkiller.characters.v1'));
 });
