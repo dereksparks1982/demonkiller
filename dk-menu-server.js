@@ -66,6 +66,21 @@
       });
     },
     async clock() { return request('/api/v1/clock'); },
+    async walkWorldView() { return request('/api/v1/world/walk'); },
+    async walkWorldPlace(x,y) {
+      return request('/api/v1/world/walk',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Editor':'place'},
+        body:JSON.stringify({action:'place',x,y})
+      });
+    },
+    async walkWorldStep(direction) {
+      return request('/api/v1/world/walk',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Walk':'step'},
+        body:JSON.stringify({action:'step',direction})
+      });
+    },
     async atlasViewport({x,y,scale,columns=72,rows=72}) {
       return request('/api/v1/world/terrain/atlas?'+
         new URLSearchParams({x,y,scale,columns,rows}));

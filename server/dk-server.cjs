@@ -11,6 +11,7 @@ const { localRequestAllowed, serveGame } = require('./local-game.cjs');
 const WORLD_GRID=require('./world-grid-m67.cjs');
 const WORLD_TERRAIN=require('./world-terrain-editor-m69.cjs');
 const WORLD_ATLAS=require('./world-atlas-m70.cjs');
+const WORLD_WALKER=require('./world-walker-m72.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
@@ -346,6 +347,25 @@ async function createDKServer({
     writeQueue=pending.catch(()=>{});
     return pending;
   }
+  async function saveWorldWalk(command){
+    const pending=writeQueue.then(async()=>{
+      if(command.action==='step'&&!world.runtime?.running)
+        throw Error('World is paused; press Start Server');
+      // World walking is separate from the old temple/courtyard movement route.
+      // It owns global 9,216² coordinates and always checks the latest terrain.
+      const result=WORLD_WALKER.perform(world,command);
+      validateWorld(result.world);
+      await snapshots.save(result.world);
+      world=result.world;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('World walking history failed:',error);}
+      for(const viewer of streams)push(viewer,'world.walker.moved',
+        {revision:world.revision,actor:result.actor});
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});
+    return pending;
+  }
   async function saveWorldTerrain(command){
     const pending=writeQueue.then(async()=>{
       // Authoring is permitted while the world simulation is paused.
@@ -489,6 +509,32 @@ async function createDKServer({
         return sendJSON(res,400,{error:'Invalid world tile coordinates'},method);
       return sendJSON(res,200,WORLD_GRID.overview(world,
         x===null?null:Number(x),y===null?null:Number(y)),method);
+    }
+    if(url.pathname==='/api/v1/world/walk'&&!write){
+      try{return sendJSON(res,200,WORLD_WALKER.worldView(world),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/world/walk'&&method==='POST'){
+      let command;
+      try{command=await readJSON(req);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
+      if(command.action==='place'&&req.headers['x-dk-world-editor']!=='place')
+        return sendJSON(res,403,{error:'Place a walker through DK Architect'},method);
+      if(command.action==='step'&&req.headers['x-dk-world-walk']!=='step')
+        return sendJSON(res,403,{error:'Use the connected world walking controls'},method);
+      if(!['place','step'].includes(command.action))
+        return sendJSON(res,422,{error:'Unknown world walking action'},method);
+      try{
+        await saveWorldWalk(command);
+        return sendJSON(res,200,WORLD_WALKER.worldView(world),method);
+      }catch(error){
+        if(/World is paused|impassable|boundary|too steep|before walking/.test(error.message))
+          return sendJSON(res,409,{error:error.message},method);
+        if(/Invalid|Cardinal|Unknown world walking/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('World walking save failed:',error);
+        return sendJSON(res,500,{error:'World walking state not saved'},method);
+      }
     }
     if(url.pathname==='/api/v1/world/terrain/atlas'&&!write){
       const fields={};

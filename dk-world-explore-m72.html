@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demon Killer | Walk the New World</title>
+<link rel="stylesheet" href="./dk-world-explore-m72.css?v=m72">
+</head><body>
+<main>
+<header><strong>DEMON KILLER · WORLD WALK TEST</strong>
+<span>THE GREEN WORLD · 9,216 × 9,216 TILES</span>
+<a href="./dk-world-architect-m70.html">DK ARCHITECT</a>
+<a href="./index.html">MAIN MENU</a></header>
+<section class="world-layout">
+<div class="world-frame"><canvas id="dkWalkCanvas" width="800" height="800"
+ tabindex="0" aria-label="Top-down 32 pixel world with walkable surveyor"></canvas></div>
+<aside>
+<h1>WALK THE WORLD</h1>
+<p>One continuous server-saved terrain grid. No old temple, village, or generated roads.</p>
+<p><b>WASD / ARROW KEYS</b><br>Move one tile, cardinal directions only.</p>
+<p><b>HOLD RIGHT MOUSE</b><br>Walk toward the cursor, one tile at a time.</p>
+<p><b>LEFT CLICK</b><br>Inspect terrain and elevation.</p>
+<p>Water, cliffs, deep crevasses and steep height changes block walking.</p>
+<p id="dkWalkPosition">Connecting to DK Server…</p>
+<p id="dkWalkInspect">Ground: grass · Elevation: 0</p>
+<p id="dkWalkStatus" role="status" aria-live="polite">Loading saved position…</p>
+<p class="world-note">This is a <strong>terrain traversal prototype</strong>.
+It saves the surveyor's position to the actual world, but doesn't yet replace
+the main character, NPC, combat, or building gameplay.</p>
+</aside>
+</section>
+</main>
+<script src="./dk-menu-server.js?v=m72"></script>
+<script src="./dk-world-explore-m72.js?v=m72"></script>
+</body></html>

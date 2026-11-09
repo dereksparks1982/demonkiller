@@ -4,7 +4,7 @@ This document is the working continuity reference if a conversation thread fills
 
 ## Source and release discipline
 
-Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The current M71 release target is game **0.2.69**, server **2.31.15**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
+Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The current M72 release target is game **0.2.70**, server **2.31.16**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
@@ -21,6 +21,18 @@ Do not build until explicitly instructed. When authorized: inspect current HEAD,
 - Kilns and heavy industrial equipment should have **very rare** breakdowns after years, not constantly wear out. M50/M66 failures need rebalancing.
 - NPCs must autonomously found differentiated settlements, disagree and secede, trade and make peace or war, operate companies and continue independent lives. Avoid WorldBox's arbitrary population blobs and repetitive all-out war.
 - Study the full private-server mod list in the master roadmap, prioritizing Nerun's Distro, OWLTR, FS-ATS, Xanthos Evo/Shrink, Knives Town Houses and Knives Chat. Do not copy proprietary UO art or unsuitable GPL code into commercial game source.
+
+## M72: persistent top-down world walking (November 8, 2026)
+
+The replacement world now has a **persistent single-surveyor walking test** in `server/world-walker-m72.cjs`. Its record is optional `world.world_grid.walker={x,y,facing,steps}`, and `world-grid-m67.cjs` plus `world.cjs` validate it. No old playable courtyard/temple area is copied into this new atlas and no giant floor matrix is saved. The surveyor is not yet the legacy `characters['1']` player entity, so it is important **not** to claim full character/NPC simulation has migrated.
+
+**Author access:** connected DK Architect **WORLD PIXEL PAINTER → WALK HERE** (uses hovered coordinate or camera center), or Main Menu **Options → Persistent World → WALK THE WORLD (TEST)** to resume an already placed surveyor. New browser route `dk-world-explore-m72.html` renders a crisp 25×25 tile area, nearest-neighbor pixels and original 32×32 human direction sprites. WASD/arrows step one tile; hold RMB to move in one dominant cardinal direction; LMB inspects material/elevation. The authoritative loopback DK Server saves each step. There is no 3D, no generated terrain art, and no browser-trusted world movement.
+
+**Server:** `GET /api/v1/world/walk` reads nearby material/elevations from the real M71 sparse default+overrides. `POST /api/v1/world/walk` with strict `place` or `step` commands serializes save with simulation and editor writes. The server refuses world edges, water, untraversable cliffs/boulders/crevasses and height gaps >1. Unbuilt building drafts are not physical barriers. Whole-cell and fine impassable brushes cannot paint over the occupied walker. Saves preserve previous M68 runtime world data; walker is a separate optional field.
+
+**Verification:** isolated V8 code checks passed cell seam transitions, blocked water, resculpted walkable grass, one-level slope vs >1 steep block, world validators and protection from broad ocean painting. New `tests/world-walker-m72.cjs` covers Node HTTP save/restart. Full Node suite and actual Firefox walking are NOT verified in this remote editing environment.
+
+**Next:** integrate the real character, NPCs, entities, and persistence/sector streaming into replacement atlas travel, then continue with simple 2D pixel elevation art, richer slope/cave/rivers and the larger construction/NPC autonomy plan. A prototype surveyor isn't the end state.
 
 ## M71: flat-green world baseline (November 8, 2026)
 

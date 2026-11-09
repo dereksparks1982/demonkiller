@@ -83,7 +83,7 @@ function validate(world){
     (plan.width===4096&&plan.height===4096))||
   plan.tile_size!==TILE||plan.cell_size!==CELL||plan.sector_size!==SECTOR||
   !plan.buildings||Array.isArray(plan.buildings)||typeof plan.buildings!=='object'||
-  Object.keys(plan).some(key=>!['schema','width','height','tile_size','sector_size','cell_size','buildings','terrain'].includes(key)))
+  Object.keys(plan).some(key=>!['schema','width','height','tile_size','sector_size','cell_size','buildings','terrain','walker'].includes(key)))
   throw Error('Invalid replacement world grid');
  const entries=Object.entries(plan.buildings);
  if(entries.length>4096)throw Error('Too many building drafts');

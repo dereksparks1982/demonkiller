@@ -11,12 +11,13 @@ const MIME = Object.freeze({
   '.ogg':'audio/ogg','.mp3':'audio/mpeg','.mid':'audio/midi','.midi':'audio/midi'
 });
 const ROOT_FILES = new Set([
-  'index.html','dk-world-architect-m70.html','test-center.html','test-center.js','test-center.css',
+  'index.html','dk-world-architect-m70.html','dk-world-explore-m72.html','test-center.html','test-center.js','test-center.css',
   'cult-system.js','cult-network.js','cult-journal.css',
   'citizen-population.js','temple-music.js','dk-midi-soundtrack.js',
   'dk-uo-controls-m60.js','dk-uo-controls-m60.css','dk-dungeon-art.js',
   'dk-skills.js','dk-menu-server.js','dk-world-terrain-m68.js',
-   'dk-world-atlas-m70.js','dk-world-atlas-m70.css','world-regions.js','outdoor.html','outdoor.js','outdoor.css',
+   'dk-world-atlas-m70.js','dk-world-atlas-m70.css',
+   'dk-world-explore-m72.js','dk-world-explore-m72.css','world-regions.js','outdoor.html','outdoor.js','outdoor.css',
   'dk-lilith-cinematic-m40.js','dk-lilith-cinematic-m40.css',
   'outdoor-ui.js','temple-ui.js','temple-ui.css','sector-terrain-m32.js','streaming-cell-shells-m33.js','streaming-cell-contents-m34.js','dk-architect-interiors-m35.html','dk-architect-interiors-m35.js',
    'dk-architect-outdoors-m36.html','dk-architect-outdoors-m36.js',

@@ -250,7 +250,8 @@
    '<button type="button" data-home>FULL WORLD</button>'+
    '<button type="button" data-undo>UNDO</button>'+
    '<button type="button" data-redo>REDO</button>'+
-   '<button type="button" data-export>EXPORT WORLD</button></div>'+
+   '<button type="button" data-export>EXPORT WORLD</button>'+
+   '<button type="button" data-walk>WALK HERE</button></div>'+
    '<div class="dk-atlas-body"><div class="dk-atlas-board">'+
    '<canvas width="720" height="720" data-canvas tabindex="0"'+
    ' aria-label="Pixel grid world terrain; left drag paints, right drag pans"></canvas>'+
@@ -312,6 +313,12 @@
   $('[data-undo]').addEventListener('click',()=>history('undo'));
   $('[data-redo]').addEventListener('click',()=>history('redo'));
   $('[data-export]').addEventListener('click',exportWorld);
+  $('[data-walk]').addEventListener('click',()=>{
+   const tile=hover||{wx:x+36*scale,wy:y+36*scale};
+   const tx=Math.min(WORLD-1,Math.floor(tile.wx)),
+    ty=Math.min(WORLD-1,Math.floor(tile.wy));
+   root.location.href='./dk-world-explore-m72.html?x='+tx+'&y='+ty;
+  });
   $('[data-close]').addEventListener('click',close);
   document.addEventListener('keydown',e=>{
    if(open&&e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}

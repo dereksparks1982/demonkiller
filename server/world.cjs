@@ -5,6 +5,7 @@
 const {TEMPLE,COURT,VILLAGE,TERRAIN,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
 const WORLD_GRID=require('./world-grid-m67.cjs');
 const WORLD_TERRAIN=require('./world-terrain-editor-m69.cjs');
+const WORLD_WALKER=require('./world-walker-m72.cjs');
 const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
 const {ensureSocial,validateSocial}=require('./social-m6.cjs');
@@ -204,6 +205,7 @@ function validateWorld(world) {
     throw new Error('Required approved temple objects missing');
   WORLD_GRID.validate(world);
   WORLD_TERRAIN.validate(world);
+  WORLD_WALKER.valid(world);
   if(world.areas[COURT])checkRegion(world.areas[COURT]);
   if(world.areas[VILLAGE])checkRegion(world.areas[VILLAGE]);
   for(const id of TERRAIN.IDS)if(world.areas[id])checkRegion(world.areas[id]);

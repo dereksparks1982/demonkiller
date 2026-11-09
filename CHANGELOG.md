@@ -1,3 +1,13 @@
+## v0.2.70 / M72 | 2026-11-08 | Walk the user-painted world
+
+- Added a server-owned walking surveyor across the full 9,216 × 9,216 flat grass atlas, persisting global position, direction and steps without materializing thousands of regions.
+- A bounded 25×25 tile view streams actual authored ground and signed elevation. Cardinal movement crosses 128-tile Streaming Cells, blocks water/cliffs/steep slopes and does not wrap at world edges. Unbuilt blueprint drafts do not physically obstruct walking.
+- GET/POST `/api/v1/world/walk` perform validated loopback-only placement and one-step movement through the existing durable writer. Existing saves and terrain strokes remain intact.
+- Added a simple 2D browser walking view using existing original 32×32 human sprites, WASD, arrow keys, held RMB movement, LMB terrain inspection, and an editor **WALK HERE** button. No generated art, 3D or image smoothing.
+- Whole-cell and fine material brush operations protect the surveyor from being buried in impassable terrain; editor previews and native RPG character state remain separate for now.
+- Added 10 test contracts, updated README and development handoff, and recorded limitations in `docs/releases/M72.md`. Isolated V8 movement and terrain tests passed; full Node and browser tests were not run.
+- The walking surveyor is an **authoring/traversal prototype**, not yet the full legacy character/NPC/combat system connected to the replacement world.
+
 ## v0.2.69 / M71 | 2026-11-08 | Flat green default world
 
 - The entire new **9,216 × 9,216 tile world** now starts as **flat grass at elevation 0**, including coordinates temporarily overlapping old M68 wilderness samples in the atlas. No oceans, mountains, rivers or settlements are automatically generated into the replacement atlas.

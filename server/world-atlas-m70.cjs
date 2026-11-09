@@ -40,6 +40,8 @@ function impassableBlocked(world,cx,cy,material){
  if(!TERRAIN.SOLID.has(material))return false;
  const bounds=GRID.cellBounds(cx,cy);
  const contained=(x,y)=>x>=bounds.x&&y>=bounds.y&&x<bounds.x+bounds.width&&y<bounds.y+bounds.height;
+ const walker=world.world_grid?.walker;
+ if(walker&&contained(walker.x,walker.y))return true;
  for(const b of Object.values(world.world_grid?.buildings||{}))
   if(b.x<bounds.x+bounds.width&&b.x+b.width>bounds.x&&
    b.y<bounds.y+bounds.height&&b.y+b.height>bounds.y)return true;
