@@ -55,17 +55,27 @@ function at(elapsed,form='ghost',playerY=47){
  }
  return scene;
 }
-// Source crops: column boundaries are the six approved panels; the top and
-// bottom row annotations are deliberately excluded. The lower row's caption
-// starts at y≈755, so stop at y745 to retain the tree roots, not the text.
+// The owner-approved 1774x887 sheet is not a uniform grid. Its poses occupy
+// uneven columns; dividing width by six painted fragments of adjacent poses.
+// These twelve measured rectangles exclude their neighbors and captions.
+// Original artwork is retained. SHA: f1f3bf29226f3b344f0b6fff5bdf260256ab6f7d.
+const FRAME_RECTS=Object.freeze([
+ Object.freeze([
+  [64,84,213,328],[291,80,475,330],[516,74,735,330],
+  [778,65,1031,330],[1046,67,1332,330],[1360,58,1748,330]
+ ]),
+ Object.freeze([
+  [64,520,211,748],[294,514,467,748],[521,515,732,748],
+  [773,512,1030,748],[1058,522,1328,748],[1360,512,1748,750]
+ ])
+]);
 function sourceRect(img,row,frameIndex){
- const width=img?.naturalWidth||1774;
- const height=img?.naturalHeight||887;
- const scaleX=width/1774,scaleY=height/887;
- const n=clamp(Math.floor(frameIndex),0,5),x0=Math.round(n*1774/6),
-  x1=Math.round((n+1)*1774/6),y0=row===0?60:505,y1=row===0?340:745;
- return {sx:Math.round(x0*scaleX),sy:Math.round(y0*scaleY),
-  sw:Math.round((x1-x0)*scaleX),sh:Math.round((y1-y0)*scaleY)};
+ const width=img?.naturalWidth||1774,height=img?.naturalHeight||887;
+ const n=clamp(Math.floor(frameIndex),0,5);
+ const [x0,y0,x1,y1]=FRAME_RECTS[row===1?1:0][n];
+ const sx=Math.round(x0*width/1774),sy=Math.round(y0*height/887);
+ const ex=Math.round(x1*width/1774),ey=Math.round(y1*height/887);
+ return {sx,sy,sw:ex-sx,sh:ey-sy};
 }
 function drawPanel(ctx,img,row,n,centerX,bottomY,width,height){
  if(!img||!img.complete||!img.naturalWidth)return false;
@@ -83,16 +93,11 @@ function drawLilith(ctx,img,state){
 }
 function drawTree(ctx,img,row,frameIndex,centerX,bottomY){
  const n=clamp(Math.floor(frameIndex),0,5);
- // M77 visual correction: the printed reference sheet's middle panels spill
- // into adjacent panel crops. A middle source rectangle can therefore paint
- // Lilith and a detached piece of the next willow side-by-side. NEVER render
- // those contaminated intermediate crops. Start with her clean first-panel
- // silhouette; grow the complete approved sixth-panel willow from the SAME
- // centered ground anchor. The last frame remains exactly the accepted tree.
+ // Each stage is its actual source pose, never a scaled copy of final tree.
+ // The same ground anchor and approved in-game size are retained throughout.
  const widths=[47,69,83,102,126,166],
   heights=[55,77,96,117,139,161];
- const sourcePanel=n===0?0:5;
- return drawPanel(ctx,img,row,sourcePanel,centerX,bottomY,widths[n],heights[n]);
+ return drawPanel(ctx,img,row,n,centerX,bottomY,widths[n],heights[n]);
 }
 return Object.freeze({SHEET,PRAYER,PAN,WALK,PRAYER_TIME,TRANSFORM,HOLD,RETURN,
  TOTAL,at,sourceRect,drawLilith,drawTree});

@@ -1,3 +1,10 @@
+## M77 exact-willow-frame correction | 2026-11-09
+
+- Confirmed the user-approved 1774×887 willow master against Git blob f1f3bf29226f3b344f0b6fff5bdf260256ab6f7d. The six figures are unevenly spaced horizontally on each of two rows.
+- Replaced dividing the original illustration into six equal source columns with twelve hand-measured sprite crops; adjacent figures and text captions are excluded.
+- Removed the interim M77 workaround that enlarged the final tree image instead of displaying unique transition poses. All twelve original golden and sickly poses play, precisely ground-anchored and with unchanged destination size.
+- Added source-rectangle regression coverage and updated M40/M57 tests. Source sheet, saves, player and story are unchanged. Firefox visual approval remains pending.
+
 ## M77 | 2026-11-09 | Lilith willow transformation panel fix
 
 - Fixed displaced, truncated and doubled tree fragments during Lilith's courtyard transformation. The original reference sheet's equal-width intermediate crops can include art from adjacent reference columns. The animation now displays the clean original first-panel Lilith at the start and grows the accepted complete last-panel willow in five additional stage sizes, anchored consistently at the same base. Both gold and diseased variants use the identical correction.

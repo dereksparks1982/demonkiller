@@ -63,8 +63,8 @@ test('M40 all six original panels render for either world form',()=>{
  const dummy={naturalWidth:1774,naturalHeight:887};
  const gold=scene.sourceRect(dummy,0,5);
  const black=scene.sourceRect(dummy,1,5);
- assert.equal(gold.sy,60);assert.equal(gold.sh,280);
- assert.equal(black.sy,505);assert.equal(black.sh,240);
+ assert.deepEqual(gold,{sx:1360,sy:58,sw:388,sh:272});
+ assert.deepEqual(black,{sx:1360,sy:512,sw:388,sh:238});
  assert(black.sy+black.sh<755,'Annotations from approved reference must be cropped');
  assert.equal(scene.at(firstTransform+scene.TRANSFORM+400,'ghost',47).treeFrame,5);
 });

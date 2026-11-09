@@ -11,6 +11,7 @@ Explore with cardinal movement, investigate hidden cults, practice skills, fight
 ## Controls
 
 - **Right mouse hold:** Move during gameplay.
+- **Lilith's willow (M77):** All six distinct golden and six sickly transformation poses now draw from their individually measured positions in the original art sheet, with no fragments borrowed from neighboring figures. Size, dialogue, camera and tree footprint remain unchanged.
 - **Opening soundtrack:** The temple sacrifice now plays the original 50-second MIDI cue **The Last Breath** (ritual buildup, timed execution impact, spectral aftermath). This one-shot score stops when the introductory scene finishes and the normal temple music returns. Browser audio may require a user gesture.
 - **Left click / double-click:** Inspect and interact.
 - **F8:** DK Architect, with construction and terrain-editing tools.

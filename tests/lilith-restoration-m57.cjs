@@ -19,7 +19,7 @@ test('M57 reinstates the owner-approved 12-panel source and both distinct branch
  }
  const top=C.sourceRect({naturalWidth:1774,naturalHeight:887},0,5);
  const bottom=C.sourceRect({naturalWidth:1774,naturalHeight:887},1,5);
- assert(top.sy<bottom.sy&&top.sh===280&&bottom.sh===240);
+ assert(top.sy<bottom.sy&&top.sh===272&&bottom.sh===238);
  assert(JS.includes('CINEMATIC.drawLilith(')&&JS.includes('CINEMATIC.drawTree('));
  assert(!JS.includes('ctx.lineTo(cx+i*15'),'Retired procedural coat-hanger willow must be gone');
 });
@@ -52,7 +52,7 @@ test('M57 replays when earlier broken releases wrongly claimed the first courtya
  assert(!JS.includes("setTimeout(()=>{lilithPhase='finished'"));
  const i=JS.indexOf("await refreshSectorInterest();"),j=JS.indexOf("if(firstVisit){\n   // Begin the complete timeline only AFTER");
  assert(i>0&&j>i,'Cutscene timeline must restart after network startup finishes');
- assert(HTML.includes('dk-lilith-cinematic-m40.js?v=m57'));
+ assert(HTML.includes('dk-lilith-cinematic-m40.js?v=m77-calibrated-frames'));
  assert(HTML.includes('outdoor.js?v=0.2.55-lilith-m57'));
 });
 test('M57 never paints the retired placeholder people underneath the approved character art',()=>{
