@@ -594,7 +594,7 @@ async function createDKServer({
       try{command=await readJSON(req);}
       catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
       const action=command.action;
-      if(['enter','new_character'].includes(action)&&
+      if(['enter','new_character','enter_temple','witness'].includes(action)&&
          req.headers['x-dk-world-character']!==action)
         return sendJSON(res,403,{error:'Use the connected character controls'},method);
       if(action==='step'&&req.headers['x-dk-world-move']!=='step')
@@ -604,7 +604,7 @@ async function createDKServer({
       if(['introduce_npc','remove_npc'].includes(action)&&
          req.headers['x-dk-architect']!=='atlas-npcs')
         return sendJSON(res,403,{error:'DK Architect NPC editing required'},method);
-      if(!['enter','new_character','step','introduce_npc','remove_npc','gather'].includes(action))
+      if(!['enter','new_character','enter_temple','witness','step','introduce_npc','remove_npc','gather'].includes(action))
         return sendJSON(res,422,{error:'Unsupported atlas actor operation'},method);
       try{
         const result=await saveAtlasActor(command);

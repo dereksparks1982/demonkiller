@@ -1,3 +1,10 @@
+## M78 | 2026-11-09 | One world, temple only, complete exterior
+
+- Integrated the approved Lilith circle into the 9,216 × 9,216 sparse terrain as an authored 64 × 64 village anchor. Open land continues through the next Streaming Cells. No duplicate northern settlement, buildings, or existing town outside the temple.
+- Original Forsaken Temple preserved, its **complete 16 × 16 exterior visible** in a 37 × 37 atlas viewport with tiled roof and masonry rather than a map icon.
+- The original story character leaves the temple directly into the atlas at the temple door, approaches the Queen and sees the approved six-pose golden/sickly transformation and Gothic prayer. Click the willow for the two established lines.
+- Development saves are discarded as needed. Server/runtime and real Firefox scene acceptance remain to be tested. Architect protects the temple footprint but permits authored circle terrain to be repainted; canon documents pending death, caches, demon flashes and original audio.
+
 ## M77 exact-willow-frame correction | 2026-11-09
 
 - Confirmed the user-approved 1774×887 willow master against Git blob f1f3bf29226f3b344f0b6fff5bdf260256ab6f7d. The six figures are unevenly spaced horizontally on each of two rows.

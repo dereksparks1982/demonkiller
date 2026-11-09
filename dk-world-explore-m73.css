@@ -25,3 +25,10 @@
 @media(max-width:980px){.world-layout{flex-direction:column;align-items:center}
  .world-frame{width:min(800px,100%)}
  .atlas-actors-panel{width:min(800px,100%);flex:auto}}
+
+/* M78 story prayer and full exterior framing. */
+.dk-willow-dialog:not([hidden]){position:fixed;z-index:40;left:50%;bottom:7vh;transform:translateX(-50%);width:min(90vw,720px);background:#17131e;border:3px double #b99c67;box-shadow:0 12px 40px #000b;padding:20px 28px;text-align:center;color:#e9dec9;pointer-events:none}
+.dk-willow-dialog strong{font-size:1.1rem;letter-spacing:.18em;color:#e0bc76}
+.dk-willow-dialog p{font-size:1.1rem;line-height:1.45;margin:.6rem 0 0}
+.world-frame{overflow:hidden}
+#dkActorCanvas{transition:transform 650ms ease;transform-origin:center center}

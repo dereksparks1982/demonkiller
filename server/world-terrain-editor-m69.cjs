@@ -1,6 +1,7 @@
 'use strict';
 // M69: sparse, persistent, server-owned top-down world terrain. No prefabs or art.
 const GRID=require('./world-grid-m67.cjs');
+const ANCHOR=require('./world-anchor-m78.cjs');
 const M68=require('../dk-world-terrain-m68.js');
 const SCHEMA=1,MAX_SECTORS=262144,MAX_BRUSH=1024;
 const MATERIALS=new Set([
@@ -96,9 +97,9 @@ function areaTile(world,x,y){
  return area?{area,id,lx,ly,index:ly*area.width+lx}:null;
 }
 function readTile(world,x,y){
- const a=areaTile(world,x,y),o=override(world,x,y);
+ const a=areaTile(world,x,y),o=override(world,x,y),home=ANCHOR.tile(x,y);
  return {x,y,material:o?.material??world.world_grid?.terrain?.cells?.[
-   Math.floor(x/GRID.CELL)+'.'+Math.floor(y/GRID.CELL)]??DEFAULTS.material,
+   Math.floor(x/GRID.CELL)+'.'+Math.floor(y/GRID.CELL)]??home?.material??DEFAULTS.material,
   elevation:o?.elevation??DEFAULTS.elevation,
   override:o?{...o}:null,sector:address(x,y).sector,
   materialized:Boolean(a)};
@@ -154,6 +155,8 @@ function brushTiles(command){
  return tiles;
 }
 function obstructed(world,x,y,material){
+ const building=ANCHOR.TEMPLE;
+ if(x>=building.x&&x<building.x+building.w&&y>=building.y&&y<building.y+building.h)return true;
  // A staked site protects every tile against both painting and elevation edits.
  if(Object.values(world.living?.atlas_sites?.records||{}).some(s=>
   x>=s.x&&y>=s.y&&x<s.x+s.width&&y<s.y+s.height))return true;
@@ -207,7 +210,7 @@ function edit(world,command){
    throw Error('Terrain edit would obstruct a character, fixture, protected construction site or building plan');
   const next={};
   const cellBase=world.world_grid?.terrain?.cells?.[
-    Math.floor(pos.x/GRID.CELL)+'.'+Math.floor(pos.y/GRID.CELL)]??DEFAULTS.material;
+    Math.floor(pos.x/GRID.CELL)+'.'+Math.floor(pos.y/GRID.CELL)]??ANCHOR.tile(pos.x,pos.y)?.material??DEFAULTS.material;
   if(material!==null&&material!==cellBase)next.material=material;
   if(elevation!==null&&elevation!==DEFAULTS.elevation)next.elevation=elevation;
   updates.push({x:pos.x,y:pos.y,previous:prev?{...prev}:null,next});

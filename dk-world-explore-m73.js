@@ -25,7 +25,21 @@ const PALETTE={grass:'#547a41',heath:'#77804c',forest:'#345a34',pine:'#2a503b',
  lake:'#4c8699',marsh:'#627557',bog:'#475f4c',reed:'#869161',
  beach:'#c1aa7c',dirt:'#8b7357',path:'#9b8867',stone:'#8a8988',
  dark:'#34333a',cracked:'#606068',sigil:'#995058',garden:'#5d8650',bridge:'#96805f'};
-const N=25,RADIUS=12,TILE=32;
+const N=37,RADIUS=18,TILE=32;
+// 37 tiles frame all sixteen temple rows when a character leaves its door.
+const CINEMATIC=window.DKLilithCinematic;
+const treeSheet=new Image();
+if(CINEMATIC){treeSheet.src='./assets/art/'+CINEMATIC.SHEET;treeSheet.onload=()=>draw();}
+const prayer=document.getElementById('dkActorPrayer'),
+ prayerText=document.getElementById('dkActorPrayerText');
+const GOLDEN_WORDS='Death does not reveal another world. It reveals the truth this one has always hidden.';
+const BLACK_WORDS='The living fear what they cannot understand. Even a miracle looks like a curse through mortal eyes.';
+const PRAYER_DURATION=8400,TRANSFORM_DURATION=5400,HOLD_DURATION=1600;
+const templeDoorSprite=new Image();
+templeDoorSprite.src='./assets/art/temple/doors/door_open_north.png';
+templeDoorSprite.onload=()=>draw();
+let willowScene=null;
+
 let view=null,chosen=null,busy=false,pressed=false,pointer=null,tick=null,poll=null;
 const images={living:{},ghost:{}};
 for(const form of ['living','ghost'])for(const dir of ['north','south','east','west']){
@@ -81,6 +95,74 @@ function drawInterior(room){
   ctx.fillStyle='#496b55';ctx.fillRect(ox+c.x*t+31,oy+c.y*t+45,34,40);
  }
 }
+function landmark(kind){return view?.landmarks?.find(o=>o.type===kind)||null;}
+function screen(x,y){return {x:x-view.actor.x+RADIUS,y:y-view.actor.y+RADIUS};}
+function treeClicked(x,y){
+ const o=landmark('willow');return !!o&&x>=o.x-2&&x<o.x+o.w+2&&y>=o.y-5&&y<o.y+o.h+2;
+}
+function drawTemple(){
+ const t=landmark('temple');if(!t)return;
+ const a=screen(t.x,t.y);
+ // Full 16x16 roof and exterior walls, not a one-tile temple icon.
+ for(let by=0;by<t.h;by++)for(let bx=0;bx<t.w;bx++){
+  const x=(a.x+bx)*TILE,y=(a.y+by)*TILE;
+  const edge=bx===0||by===0||bx===t.w-1||by===t.h-1;
+  ctx.fillStyle=edge?'#6c6261':(bx+by)%2?'#51484c':'#564b51';
+  ctx.fillRect(x,y,TILE,TILE);
+  ctx.fillStyle=edge?'#b8a996':'#75696d';
+  ctx.fillRect(x+2,y+2,TILE-4,edge?7:2);
+  if(!edge&&by%4===0){ctx.fillStyle='#302d34';ctx.fillRect(x+2,y+11,TILE-4,3);}
+ }
+ const door=landmark('temple_door');
+ if(door){
+  const d=screen(door.x,door.y),dx=d.x*TILE,dy=d.y*TILE;
+  ctx.fillStyle='#201c25';ctx.fillRect(dx+5,dy+4,22,28);
+  ctx.fillStyle='#bfa878';ctx.fillRect(dx+5,dy+3,22,4);
+  if(templeDoorSprite.complete&&templeDoorSprite.naturalWidth)
+   ctx.drawImage(templeDoorSprite,dx,dy,TILE,TILE);
+ }
+}
+function drawQueen(){
+ const tree=landmark('willow');
+ if(!tree||!CINEMATIC||!treeSheet.complete||!treeSheet.naturalWidth)return;
+ const a=screen(tree.x,tree.y),row=view.actor.form==='ghost'?0:1;
+ const cx=(a.x+1.5)*TILE,by=(a.y+3)*TILE;
+ if(willowScene){
+  const elapsed=performance.now()-willowScene.start;
+  if(elapsed<PRAYER_DURATION){
+   CINEMATIC.drawLilith(ctx,treeSheet,{womanVisible:true,row,womanX:a.x+1.5,womanY:a.y+2.625});
+  }else{
+   const frame=Math.min(5,Math.floor((elapsed-PRAYER_DURATION)/(TRANSFORM_DURATION/6)));
+   CINEMATIC.drawTree(ctx,treeSheet,row,frame,cx,by);
+  }
+ }else if(view.actor.lilith_witnessed)CINEMATIC.drawTree(ctx,treeSheet,row,5,cx,by);
+ else CINEMATIC.drawLilith(ctx,treeSheet,{womanVisible:true,row,womanX:a.x+1.5,womanY:a.y+2.625});
+}
+function maybeStartWillow(){
+ if(!view?.started||view.interior||view.actor.lilith_witnessed||willowScene||!CINEMATIC)return;
+ const t=landmark('willow');if(!t)return;
+ const d=Math.abs(view.actor.x-(t.x+1))+Math.abs(view.actor.y-(t.y+1));
+ if(d<3||d>9)return;
+ willowScene={start:performance.now(),saving:false};
+ pressed=false;pointer=null;
+ const focus=screen(t.x+1,t.y+1);
+ canvas.style.transformOrigin=(focus.x*TILE)+'px '+(focus.y*TILE)+'px';
+ canvas.style.transform='scale(1.12)';
+ say('The Queen of the Underworld prepares her final prayer.');
+}
+async function finishWillow(){
+ if(!willowScene||willowScene.saving)return;
+ willowScene.saving=true;
+ try{
+  const result=await api.worldActorWitness();
+  willowScene=null;canvas.style.transform='';
+  refreshUI(result);
+  say('The Queen has taken root. Click the willow to hear her words.');
+ }catch(e){
+  willowScene=null;canvas.style.transform='';
+  say('Unable to save the willow transformation: '+e.message,true);
+ }
+}
 function draw(){
  if(!ctx)return;
  ctx.imageSmoothingEnabled=false;
@@ -118,6 +200,7 @@ function draw(){
    ctx.fillRect(x+3,y+4,4,3);
   }
  }
+ drawTemple();
  for(const site of view.sites||[]){
   const col=site.x-view.actor.x+RADIUS,row=site.y-view.actor.y+RADIUS;
   ctx.fillStyle=['#9e977e','#7c817f','#a27c51','#594a3f'][site.phase];
@@ -145,6 +228,7 @@ function draw(){
    n.role==='worker'?'#cd9380':'#a3bede';
   ctx.fillRect(col*TILE+2,row*TILE+2,6,5);
  }
+ drawQueen();
  paintActor(RADIUS,RADIUS,view.actor.form,view.actor.facing,'#dbcba5');
  if(chosen){
   const col=chosen.x-view.actor.x+RADIUS,row=chosen.y-view.actor.y+RADIUS;
@@ -156,6 +240,8 @@ function draw(){
 }
 function refreshUI(data){
  view=data;
+ maybeStartWillow();
+ startForm.hidden=Boolean(data.started);
  startButton.textContent=data.has_character?
   'ENTER / MOVE CHARACTER HERE':'CREATE NEW ATLAS CHARACTER';
  document.getElementById('dkActorName').disabled=Boolean(data.has_character);
@@ -364,7 +450,7 @@ document.getElementById('dkNpcRemove').addEventListener('click',()=>{
  void action(()=>api.worldActorRemoveNPC(id),'NPC removed from the atlas.');
 });
 function directionToCursor(){
- if(!view?.started||!pointer)return null;
+ if(willowScene||!view?.started||!pointer)return null;
  const rect=canvas.getBoundingClientRect();
  const dx=(pointer.x-rect.left)/rect.width*N-(RADIUS+.5);
  const dy=(pointer.y-rect.top)/rect.height*N-(RADIUS+.5);
@@ -372,6 +458,7 @@ function directionToCursor(){
  return Math.abs(dx)>Math.abs(dy)?(dx>0?'east':'west'):(dy>0?'south':'north');
 }
 function move(direction){
+ if(willowScene)return;
  if(!view?.started){say('Create or enter a character first',true);return;}
  void action(()=>api.worldActorStep(direction),'Walked '+direction+' · position saved.');
 }
@@ -383,9 +470,13 @@ if(canvas){
    canvas.setPointerCapture(e.pointerId);return;
   }
   if(e.button===0){
+   if(willowScene)return;
    if(view?.interior){inspectEl.textContent='Interior floor · Walk with WASD or arrows · Use room fixtures from the building panel';return;}
    const p=clientPosition(e);
    if(p?.tile){
+    if(treeClicked(p.x,p.y)&&view.actor.lilith_witnessed){
+     say(view.actor.form==='ghost'?GOLDEN_WORDS:BLACK_WORDS);return;
+    }
     chosen={x:p.x,y:p.y};
     const selectedSite=(view.sites||[]).find(s=>
       p.x>=s.x&&p.x<s.x+s.width&&p.y>=s.y&&p.y<s.y+s.height);
@@ -400,6 +491,16 @@ if(canvas){
     draw();
    }
   }
+ });
+ canvas.addEventListener('dblclick',e=>{
+  if(willowScene||!view?.started||view.interior)return;
+  const p=clientPosition(e),door=landmark('temple_door');
+  if(!p||!door||p.x!==door.x||p.y!==door.y)return;
+  if(Math.abs(view.actor.x-door.x)+Math.abs(view.actor.y-(door.y-1))>2)
+   return say('Stand beside the temple doorway.',true);
+  void api.worldActorEnterTemple().then(()=>
+   location.href='./test-center.html?dkSlot=1&walk=continuous1'
+  ).catch(e=>say(e.message,true));
  });
  canvas.addEventListener('pointermove',e=>{
   if(pressed)pointer={x:e.clientX,y:e.clientY};
@@ -427,7 +528,7 @@ document.addEventListener('keydown',e=>{
  if(dir){e.preventDefault();move(dir);}
 });
 async function sync(){
- if(busy||!api?.worldActorView)return;
+ if(busy||willowScene||!api?.worldActorView)return;
  try{refreshUI(await api.worldActorView());}
  catch(e){say(e.message,true);}
 }
@@ -445,6 +546,20 @@ async function sync(){
  }
  await sync();
  poll=setInterval(sync,5000);
+ function cinematicTick(){
+  if(willowScene){
+   const elapsed=performance.now()-willowScene.start;
+   if(prayer){
+    prayer.hidden=elapsed>=PRAYER_DURATION;
+    if(!prayer.hidden)prayerText.textContent=CINEMATIC.PRAYER[Math.min(
+      CINEMATIC.PRAYER.length-1,Math.floor(elapsed/(PRAYER_DURATION/CINEMATIC.PRAYER.length)))];
+   }
+   if(elapsed>=PRAYER_DURATION+TRANSFORM_DURATION+HOLD_DURATION)void finishWillow();
+   draw();
+  }else if(prayer)prayer.hidden=true;
+  requestAnimationFrame(cinematicTick);
+ }
+ requestAnimationFrame(cinematicTick);
  window.addEventListener('pagehide',()=>{clearInterval(tick);clearInterval(poll);});
 })();
 })();

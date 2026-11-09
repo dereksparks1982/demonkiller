@@ -939,7 +939,7 @@
       }));
     }
     rightMouseHeld=false;clickDestination=null;
-    window.location.href='./outdoor.html?walk=continuous1'+(SERVER?'&dkSlot='+activeSlot:'');
+    window.location.href='./dk-world-explore-m73.html'+(SERVER?'?dkSlot='+activeSlot:'');
   }
   function step(dx,dy) {
     if(SERVER){

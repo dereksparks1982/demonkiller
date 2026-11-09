@@ -196,15 +196,16 @@ try{if(localStorage.getItem(UO_MIGRATION)!=='1'){
 async function launch(id){
  if(SERVER){
    await SERVER.startWorld();
-   location.href='./test-center.html?dkSlot='+id+'&walk=continuous1';
+   const saved=await SERVER.getCharacter(id);
+   location.href=saved?.atlas_position?
+    './dk-world-explore-m73.html?dkSlot='+id:
+    './test-center.html?dkSlot='+id+'&walk=continuous1';
    return;
  }
  try{
   localStorage.setItem(ACTIVE_KEY,String(id));
-  let outdoor=null;try{outdoor=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.outdoors.preview.v1')||'null');}catch(_){}
-  location.href=outdoor&&outdoor.firstCourtyardSeen&&
-    ['dk.courtyard.lilith.001','dk.village.001'].includes(outdoor.area_id)?
-    './outdoor.html?v=0.2.47-continuous1':'./test-center.html?v=0.2.47-continuous1';
+  // Static preview cannot simulate the server-owned atlas. Always begin in the temple.
+  location.href='./test-center.html?v=m78';
 }
  catch(e){notice('Storage unavailable. Try enabling browser storage to keep a named save.');}
 }

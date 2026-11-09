@@ -4,6 +4,10 @@
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M78: The Original Willow Village Is the World
+
+The approved town circle is authored at (4096,4096) through (4159,4159) directly into the same sparse **9,216 × 9,216-tile world**. The only building present initially is the Forsaken Temple. Its **entire 16 × 16 tile exterior footprint** appears visibly in the playable world, including full roof and boundary walls. There is no second northern village or set of premade houses. Every new structure requires player or autonomous NPC construction. Temple exit now transfers the existing character directly into this world, where approaching the Queen triggers the form-dependent prayer and transformation. The tree speaks different lines when clicked as a ghost or living character. Development saves are disposable.
+
 ## Gameplay
 
 Explore with cardinal movement, investigate hidden cults, practice skills, fight creatures, gather resources, operate businesses, and shape the world using **DK Architect**. **The new world starts as one enormous, flat green grass plane at elevation zero.** You paint the oceans, rivers, mountains, forests and other terrain yourself in DK Architect. The long-term goal is a single seamless world where settlements, work, trade, conflict, and rebuilding continue through the persistent server.
@@ -38,3 +42,5 @@ The public link is a **browser preview**, not a hosted persistent server. The se
 - [Recovered Godot archive, preserved historical source references and audio/licence records](docs/history/godot-recovery/README.md)
 
 The project uses independent code and appropriately licensed/original artwork. No game engine is required.
+
+**Life/death and story canon:** see `docs/underworld-two-worlds-canon.md` for the exact tree lines, original mythology, non-decaying caches, corpse-looting consequences, apparition flashes, and 90-second original temple soundtrack. The document explicitly distinguishes implemented M78 work from future requirements.

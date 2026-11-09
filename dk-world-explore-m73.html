@@ -11,7 +11,7 @@
 <a href="./dk-world-architect-m70.html">DK ARCHITECT</a>
 <a href="./index.html">MAIN MENU</a></header>
 <section class="world-layout">
-<div class="world-frame"><canvas id="dkActorCanvas" width="800" height="800"
+<div class="world-frame"><canvas id="dkActorCanvas" width="1184" height="1184"
   tabindex="0" aria-label="Top-down server-owned character and NPCs"></canvas></div>
 <aside class="atlas-actors-panel">
 <h1>YOUR CHARACTER</h1>
@@ -23,8 +23,8 @@
 <label for="dkActorName">CHARACTER NAME</label>
 <input id="dkActorName" autocomplete="off" maxlength="8" minlength="1" pattern="[A-Za-z0-9 _-]{1,8}" value="TRAVELER">
 <div class="coordinate-row">
-<label>WORLD X <input id="dkActorX" type="number" min="0" max="9215" value="4608" required></label>
-<label>WORLD Y <input id="dkActorY" type="number" min="0" max="9215" value="4608" required></label>
+<label>WORLD X <input id="dkActorX" type="number" min="0" max="9215" value="4128" required></label>
+<label>WORLD Y <input id="dkActorY" type="number" min="0" max="9215" value="4143" required></label>
 </div>
 <button type="submit" id="dkActorStart">CREATE NEW WORLD CHARACTER</button>
 </form>
@@ -90,9 +90,10 @@
 <h1>MOVEMENT</h1>
 <p>WASD / ARROWS · one cardinal step.<br>HOLD RIGHT MOUSE · walk toward cursor.<br>LEFT CLICK · inspect and select an NPC location.</p>
 <p id="dkActorStatus" role="status" aria-live="polite">Loading the world…</p>
-<p class="world-note">Your old temple character, if one exists, can enter this atlas without losing its character identity. Use Options on the main menu for an explicit development-world reset.</p>
+<p class="world-note">This is the original willow town circle extended to the entire 9,216 by 9,216 world. Only the temple and its complete 16 by 16 exterior start built. No additional village or prebuilt houses. Development saves are disposable.</p>
 </aside></section>
 </main>
-<script src="./dk-menu-server.js?v=m76"></script>
-<script src="./dk-world-explore-m73.js?v=m76"></script>
+<div id="dkActorPrayer" class="dk-willow-dialog" hidden role="status"><strong>QUEEN OF THE UNDERWORLD</strong><p id="dkActorPrayerText"></p></div>
+<script src="./dk-menu-server.js?v=m78"></script><script src="./dk-lilith-cinematic-m40.js?v=m77-calibrated-frames"></script>
+<script src="./dk-world-explore-m73.js?v=m78"></script>
 </body></html>

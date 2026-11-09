@@ -77,6 +77,16 @@
         headers:{'Content-Type':'application/json','X-DK-World-Character':'new_character'},
         body:JSON.stringify({action:'new_character',name,x,y})});
     },
+    async worldActorWitness(){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Character':'witness'},
+        body:JSON.stringify({action:'witness'})});
+    },
+    async worldActorEnterTemple(){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Character':'enter_temple'},
+        body:JSON.stringify({action:'enter_temple'})});
+    },
     async worldActorStep(direction){
       return request('/api/v1/world/actors',{method:'POST',
         headers:{'Content-Type':'application/json','X-DK-World-Move':'step'},

@@ -5,6 +5,7 @@
 const GRID=require('./world-grid-m67.cjs');
 const TERRAIN=require('./world-terrain-editor-m69.cjs');
 const SITES=require('./atlas-construction-m75.cjs');
+const ANCHOR=require('./world-anchor-m78.cjs');
 const DIRECTION=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
 const BLOCKED=new Set(['sea','deepwater','river','lake','cliff','boulder','crevasse']);
 const MAX_RISE=1;
@@ -22,7 +23,7 @@ function valid(world){
 function walkable(world,x,y){
  GRID.tile(x,y);
  const material=TERRAIN.readTile(world,x,y).material;
- if(BLOCKED.has(material))return false;
+ if(BLOCKED.has(material)||ANCHOR.blocked(x,y))return false;
  // Unbuilt M67 plans have no physical walls. A future construction-site system
  // will add real collision only when a foundation actually exists.
  return !SITES.blocks(world,x,y);

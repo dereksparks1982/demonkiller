@@ -4,6 +4,7 @@
 // Forsaken Temple. No player-character progression is shared or invented here.
 const {TEMPLE,COURT,VILLAGE,TERRAIN,courtyard,village,ensureRegions,traversable,portal,checkRegion}=require('./regions.cjs');
 const WORLD_GRID=require('./world-grid-m67.cjs');
+const ANCHOR=require('./world-anchor-m78.cjs');
 const WORLD_TERRAIN=require('./world-terrain-editor-m69.cjs');
 const WORLD_WALKER=require('./world-walker-m72.cjs');
 const WORLD_ACTORS=require('./world-actors-m73.cjs');
@@ -361,12 +362,14 @@ function applyCharacterAction(world, slot, command) {
     }
     if (regionPortal) {
       if(character.area_id===AREA_ID&&regionPortal.area_id===COURT){
+        // Temple leads into the ACTUAL global village, never a second
+        // courtyard level or northern village. Saves are disposable.
         character.courtyard_visit_count=(character.courtyard_visit_count||0)+1;
-        if(character.courtyard_visit_count===1){
+        if(character.courtyard_visit_count===1)
           character.lilith_branch=character.form==='ghost'?'golden':'sickly';
-          const willow=next.areas[COURT]?.objects.find(o=>o.id==='lilith_willow');
-          if(willow)willow.world_form=character.lilith_branch;
-        }
+        character.atlas_position={...ANCHOR.SPAWN,steps:
+          character.atlas_position?.steps||0};
+        delete next.world_grid.walker;
       }
       character.area_id=regionPortal.area_id;
       character.x=regionPortal.x;character.y=regionPortal.y;

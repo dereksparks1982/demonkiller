@@ -1,3 +1,7 @@
+## M78 willow-square world consolidation, November 9, 2026
+
+Single canonical outdoor world: **9,216 × 9,216**, sparse tile terrain. The approved town circle from the original 64 × 64 courtyard is anchored at (4096,4096), not spawned as a separate second outdoor map. Temple at (4120,4144), complete 16 × 16 footprint through (4135,4159), willow at (4127,4122). Only the temple starts built. Other prior buildings and the northern village are retired. Explorer 37 × 37 tile view ensures entire exterior is in view when leaving doorway at (4128,4143). The encounter begins on approach, not on temple exit. No save migration.
+
 # Demon Killer | Developer Handoff (November 8, 2026)
 
 This document is the working continuity reference if a conversation thread fills. Read `docs/demon-killer-master-roadmap.md` first for the current owner-approved direction, then the release-specific files.

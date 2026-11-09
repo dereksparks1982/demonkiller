@@ -8,9 +8,10 @@ const WALK=require('./world-walker-m72.cjs');
 const GATHER=require('./atlas-gathering-m74.cjs');
 const CONSTRUCTION=require('./atlas-construction-m75.cjs');
 const BUILDINGS=require('./atlas-buildings-m76.cjs');
+const ANCHOR=require('./world-anchor-m78.cjs');
 const ROLES=new Set(['scout','guard','forager','worker']);
 const DIRECTIONS=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
-const LIMIT=32,RADIUS=12,INTERVAL=4;
+const LIMIT=32,RADIUS=18,INTERVAL=4;
 function positionValid(p){
  if(!p||Array.isArray(p)||typeof p!=='object'||
     Object.keys(p).sort().join(',')!=='facing,steps,x,y'||
@@ -116,8 +117,9 @@ function view(world,{radius=RADIUS}={}){
   kind:'character',world_revision:world.revision,
   actor:{...actor,cell_id:location.cell.id,sector_id:location.sector.id,
    name:player.name,form:player.form,slot:player.slot,character_revision:player.revision,
-   war_mode:player.war_mode===true},
+   war_mode:player.war_mode===true,lilith_witnessed:player.lilith_witnessed===true},
   radius,tiles:rows,npcs,sites,buildings:housing.buildings,interior:housing.interior,
+  landmarks:ANCHOR.landmarks(actor.x,actor.y,radius),village_spawn:ANCHOR.SPAWN,
   supplies:GATHER.inventory(world,'player'),
   gold:player.gold??0,
   world_minute:world.living.minute,
@@ -189,6 +191,29 @@ function perform(world,command){
    facing:'south',steps:0,coins:0};
   e=event(next,'atlas.npc.arrive',command.name+' arrived in the world atlas',
    {npc_id:id,x:command.x,y:command.y});
+ }else if(command.action==='witness'){
+  if(keys!=='action')throw Error('Invalid willow witness command');
+  if(!old?.atlas_position||old.atlas_interior)throw Error('Visit the village willow in person');
+  const d=ANCHOR.treeDistance(old.atlas_position.x,old.atlas_position.y);
+  if(d>10||d<3)throw Error('Approach the willow from a short distance');
+  if(old.lilith_witnessed)throw Error('The transformation has already been witnessed');
+  next.characters['1'].lilith_witnessed=true;
+  next.characters['1'].revision++;
+  e=event(next,'underworld.queen.transformation',
+   'The Queen of the Underworld became the willow before the character.',
+   {x:ANCHOR.TREE.x,y:ANCHOR.TREE.y,form:old.form,slot:1});
+ }else if(command.action==='enter_temple'){
+  if(keys!=='action')throw Error('Invalid temple entry command');
+  if(!old?.atlas_position||old.atlas_interior)throw Error('Approach the temple from outside');
+  if(ANCHOR.doorDistance(old.atlas_position.x,old.atlas_position.y)>2)
+   throw Error('Stand beside the temple entrance');
+  if(!next.areas['dk.temple.sacrifice.001']?.objects?.find(o=>o.id==='temple_north_door')?.open)
+   throw Error('The temple door is closed');
+  next.characters['1'].area_id='dk.temple.sacrifice.001';
+  next.characters['1'].x=8;next.characters['1'].y=1;next.characters['1'].facing='south';
+  delete next.characters['1'].atlas_position;
+  next.characters['1'].revision++;
+  e=event(next,'atlas.temple.entry',old.name+' entered the Forsaken Temple',{slot:1});
  }else if(command.action==='gather'){
   if(keys!=='action,x,y')throw Error('Invalid atlas resource command');
   if(!old?.atlas_position)throw Error('Enter the world before gathering');

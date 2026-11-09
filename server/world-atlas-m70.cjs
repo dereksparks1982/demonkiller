@@ -3,6 +3,7 @@
 // Each 128x128 Streaming Cell can be painted by one sparse material entry.
 // Fine tile overrides from M69 always take precedence.
 const GRID=require('./world-grid-m67.cjs');
+const ANCHOR=require('./world-anchor-m78.cjs');
 const TERRAIN=require('./world-terrain-editor-m69.cjs');
 const M68=require('../dk-world-terrain-m68.js');
 const MAX_CELLS_PER_EDIT=5184;
@@ -38,6 +39,11 @@ function validateCellCommand(c){
 }
 function impassableBlocked(world,cx,cy,material){
  const bounds=GRID.cellBounds(cx,cy);
+ // Even broad 128x128 atlas fills cannot erase the only authored
+ // starting building, the real 16x16 temple exterior.
+ const temple=ANCHOR.TEMPLE;
+ if(temple.x<bounds.x+bounds.width&&temple.x+temple.w>bounds.x&&
+    temple.y<bounds.y+bounds.height&&temple.y+temple.h>bounds.y)return true;
  // Protect building stakes even from broad passable material fills.
  if(Object.values(world.living?.atlas_sites?.records||{}).some(s=>
    s.x<bounds.x+bounds.width&&s.x+s.width>bounds.x&&
