@@ -6,7 +6,7 @@
 **Authority:** The owner and creator
 **Adopted:** 2026-11-04
 **Status:** Binding **development procedures**, not lore and not permission to build
-**Source:** Adapted from Capital & Consequence `COMPANY_BIBLE.md`, read at source blob `a1773d33ebae0c48b31aed77fbf89e5f593ff251`, incorporating shared owner directives. Project-specific C&C storyline, chronology, mechanics, and its own prerelease save policy are **not automatically transferred** to Demon Killer.
+**Source:** Adapted from Capital & Consequence `COMPANY_BIBLE.md`, read at source blob `a1773d33ebae0c48b31aed77fbf89e5f593ff251`, incorporating shared owner directives. Project-specific C&C storyline, chronology, mechanics, and its other game-specific rules are **not automatically transferred** to Demon Killer. Demon Killer's active-development save policy below is an explicit owner directive dated November 9, 2026.
 
 > **FIX THE PROBLEM. PRESERVE THE WORLD.**
 
@@ -21,7 +21,7 @@ The owner decides what belongs in the game, what changes, and what stays. Develo
 Permission for one named exception or change applies to that change alone. A named art request does not authorize game code, a new area, a release, a branch deletion or other unrequested work.
 
 ### 3. Preserve established gameplay
-A repair must not break, erase, bypass or casually simplify another working or approved system. Keep story progression and gates, local save/export behavior, player movement and approved room/editor geometry unless the owner explicitly approves a change.
+A repair must not break, erase, bypass or casually simplify another working or approved system. Keep story progression and gates, player movement and approved room/editor geometry unless the owner explicitly approves a change. **Existing playtest save files and backwards compatibility are explicitly exempt during active development; see the save policy below.**
 
 ### 4. Never assume story or lore
 Character identities, world-state differences, relationships, secrets, scene timing, location and plot outcomes remain authoritative. Do not invent facts, abilities or dialogue to make implementation easier. Proposals must be labeled as proposals.
@@ -60,13 +60,23 @@ Before a change, identify:
 
 If the intended repair requires an unapproved collateral change, stop that collateral work and explain the options.
 
+## Active-development save policy (owner directive, November 9, 2026)
+
+**DURING ACTIVE DEVELOPMENT, OLD SAVES DO NOT MATTER. DO NOT SPEND TIME PRESERVING SAVE COMPATIBILITY.**
+
+- Playtest characters, localStorage state, stored inventories, snapshots and server save files are **disposable test data** until the owner explicitly announces a different policy.
+- Developers are **authorized to break old save compatibility, reset/delete test saves and regenerate the world** when required by an owner-approved build, redesign, world-layout change or test. **Do not stop to ask about preserving saves; do not delay an approved change to design migrations.**
+- If the owner directs a major map replacement, such as expanding Lilith's temple courtyard/town circle into the **single 9,216 × 9,216-tile world** and eliminating the redundant northern village, implement that target directly. **Do not retain obsolete maps or portals merely to make old saves load.**
+- **Distinguish old playtest saves from project source.** This rule does *not* authorize deletion of source code history, approved art, documentation or unrelated user files. Save resets do not override the explicit build-authorization and stop rules above.
+- A new save-compatibility commitment only applies if the owner expressly introduces one later, such as for a released game.
+
 ## Development and release rules
 
 - **Technology direction:** Demon Killer uses its own HTML/CSS/JavaScript and Canvas renderer with a hand-built, old-school Ultima Online-inspired client/gameplay approach. **No Godot or other off-the-shelf engine** unless the owner changes that directive.
 - **Temple-first:** Keep the original Forsaken Temple and DK Architect as the working scene until expansion is separately authorized. Do not alter the established altar or architect layout to simplify a script.
 - **Mouse-control contract:** In Walk Temple mode, right mouse is continuous movement; left mouse is inspection/interaction, with the crystal's later approved **double-left-click to resurrect**. In Architect Mode mouse actions remain editing controls. Reference [opening canon](docs/forsaken-temple-opening-canon.md).
 - **Art:** Use original approved assets and cardinal variants. Keep the 32 × 32 art/grid conventions. Do not silently substitute off-style assets or invent lore-bearing art.
-- **No assumptions about old saves:** The Capital & Consequence-specific prerelease save replacement rule is not automatically a Demon Killer rule. Preserve working current-project save/export behavior unless the owner expressly directs otherwise.
+- **Save compatibility is not a development constraint:** See the binding active-development save policy above. Old test saves may be discarded during authorized builds without discussion, migration work or preservation attempts.
 - **GitHub Actions and compute:** Allowed but **use sparingly**, per owner directive. Prefer proportionate local Linux checks. Avoid rerunning hosted CI unnecessarily, uploading oversized artifacts, excessive retention or avoidable charges. Report what verification actually ran.
 - **Linux-first:** Work with the existing project. Never silently clone a replacement project as the new active game.
 - **Terminal practices:** No password prompts, SSH-agent/keyring dependencies, automatic browser openings or `set -e` terminal traps. Use the approved single-command changed-files patch method when the user wants a local patch.
