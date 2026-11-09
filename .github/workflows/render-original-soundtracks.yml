@@ -1,0 +1,46 @@
+name: Render original Demon Killer MP3 scores
+on:
+  push:
+    paths:
+      - 'assets/audio/music/demon-killer-the-last-breath-v2.mid'
+      - 'assets/audio/music/demon-killer-overworld-shadowlands-v2.mid'
+      - '.github/workflows/render-original-soundtracks.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install open-source audio renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fluidsynth fluid-soundfont-gm ffmpeg
+      - name: Render original scores into browser-readable MP3
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+          sf=Path('/usr/share/sounds/sf2/FluidR3_GM.sf2')
+          if not sf.is_file():
+              raise SystemExit('FluidR3 GM SoundFont not installed')
+          root=Path('assets/audio/music')
+          for name in ('demon-killer-the-last-breath-v2','demon-killer-overworld-shadowlands-v2'):
+              midi=root/(name+'.mid')
+              wav=Path('/tmp')/(name+'.wav')
+              mp3=root/(name+'.mp3')
+              subprocess.run(['fluidsynth','-ni','-F',str(wav),'-r','32000',str(sf),str(midi)],check=True)
+              subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(wav),'-codec:a','libmp3lame','-b:a','160k',str(mp3)],check=True)
+              print(name,mp3.stat().st_size)
+          PY
+      - name: Commit rendered soundtrack files
+        shell: bash
+        run: |
+          git add assets/audio/music/demon-killer-the-last-breath-v2.mp3 assets/audio/music/demon-killer-overworld-shadowlands-v2.mp3
+          if ! git diff --cached --quiet; then
+            git -c user.name='DK Softworks Audio Builder' -c user.email='github-actions[bot]@users.noreply.github.com' commit -m 'M79: render original 108s temple and 96s overworld MP3s'
+            git push
+          fi

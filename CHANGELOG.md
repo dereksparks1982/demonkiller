@@ -1,3 +1,11 @@
+## M79 | 2026-11-09 | Original continuous temple and dark overworld scores
+
+- Composed **The Last Breath**, an original **108-second** temple score with execution at 0:05 and repeatable atmospheric segment from 0:24 to 1:48. Re-entering the temple starts at the ambient segment. Finishing the Lilith cutscene never stops or replaces the music.
+- Composed **The Shrouded Road**, a separate **96-second** dark overworld cue used by both the legacy outdoor map and connected 9,216-tile living world.
+- Original Standard MIDI sources verified in the in-game parser (346 and 300 note events). Primary browser MP3 playback uses the identical composition with precise loop points; MIDI synthesis is the backup if MP3 is unavailable. Previous old organ and previous cheerful outdoors music no longer have active playback routes; menu theme is untouched.
+- Added a GitHub Actions audio-rendering job to create and commit distribution MP3s from the checked-in MIDI sources. Completion of that workflow and Firefox audible playback still require verification.
+- Added source credits, README, release note, local server allowlist, tests and cache invalidation. No save/world changes.
+
 ## M78 | 2026-11-09 | One world, temple only, complete exterior
 
 - Integrated the approved Lilith circle into the 9,216 × 9,216 sparse terrain as an authored 64 × 64 village anchor. Open land continues through the next Streaming Cells. No duplicate northern settlement, buildings, or existing town outside the temple.

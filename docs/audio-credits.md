@@ -1,5 +1,14 @@
 # Demon Killer Audio Credits
 
+## Current original soundtracks (M79)
+
+- **Title theme:** Original DK Softworks MIDI composition at `assets/audio/music/demon-killer-title-theme-v1.mid` (unchanged).
+- **Forsaken Temple:** **The Last Breath**, original 108-second DK Softworks MIDI composition and MP3 render at `assets/audio/music/demon-killer-the-last-breath-v2.*`. Starts with ritual buildup and death blow at 0:05, then a ghostly 84-second repeatable passage. The old temple-organ arrangement is retired from playback.
+- **Overworld:** **The Shrouded Road**, original 96-second DK Softworks MIDI composition and MP3 render at `assets/audio/music/demon-killer-overworld-shadowlands-v2.*`. Used across the atlas and legacy outdoors. The former v1 outdoors track is no longer played.
+- **MP3 rendering:** GitHub Actions FluidSynth/ffmpeg task synthesizes MIDI using a third-party SoundFont, so the MIDI composition is original but the rendering instrument samples may carry separate licence obligations. Audit before commercial distribution. Source MIDI and the built-in oscillator fallback have no external sample dependencies.
+
+## Retired historical prototype credit (inactive)
+
 ## Main menu: Creepy Ambient Loop
 
 - **Composer:** epb9000

@@ -37,7 +37,8 @@ test('M58 title, outdoors, temple and user preference retain separate music boun
  assert(menu.includes('menuMusic?.stop()'));
  assert(menu.includes("menuMusic?.setVolume(level)"));
  assert(outdoorHTML.includes('dk-midi-soundtrack.js?v=m58'));
- assert(outdoor.includes('demon-killer-overworld-theme-v1.mid'));
+ assert(outdoor.includes('demon-killer-overworld-shadowlands-v2.mid'));
+ assert(outdoor.includes('demon-killer-overworld-shadowlands-v2.mp3'));
  assert(outdoor.includes("prefs.musicEnabled===false"));
  assert(outdoor.includes('MUSIC?.stop()'));
  assert(temple.includes('temple-music.js'),'Temple sound must be unchanged');

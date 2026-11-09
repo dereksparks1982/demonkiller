@@ -7,12 +7,14 @@ const R=window.DemonKillerRegions,D=window.DKArchitectDungeon||null;
 const TERRAIN=window.DKWorldTerrain||null;
 const CINEMATIC=window.DKLilithCinematic;
  // The same original MIDI score plays in every outdoor region.
- const MUSIC=window.DKMidiSoundtrack?.create({
-  url:'./assets/audio/music/demon-killer-overworld-theme-v1.mid',
+ const MUSIC=window.DKRenderedSoundtrack?.create({
+  url:'./assets/audio/music/demon-killer-overworld-shadowlands-v2.mp3',
+  midiUrl:'./assets/audio/music/demon-killer-overworld-shadowlands-v2.mid',
+  loopStart:0,loopEnd:96,startAt:0,
   volume:100,baseGain:.26
  })||null;
  function startOutdoorMusic(){
-  if(!MUSIC||MUSIC.playing)return;
+  if(!MUSIC)return;
   let prefs={};
   try{prefs=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.menuPrefs.v1')||'{}')||{};}catch(_){}
   if(prefs.musicEnabled===false)return;

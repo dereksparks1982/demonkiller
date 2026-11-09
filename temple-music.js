@@ -1,60 +1,63 @@
-/* DK Softworks | Temple soundtrack controller.
- * The legacy temple organ arrangement is retired. Do not fetch, play or
- * resume it, including after the opening cue ends.
- * The complete 90+ second original replacement remains a separate asset task.
+/* DK Softworks M79 | The Last Breath. One original score, no old organ.
+ * Intro 0–24 seconds plays once; atmospheric 24–108 seconds loops until exit.
+ * Cutscene completion and resurrection choice never interrupt the music.
  */
 (function(){
-  'use strict';
-  const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
-  const EXECUTION_URL='./assets/audio/music/demon-killer-the-last-breath-v1.mid';
-  const button=document.getElementById('templeMusicToggle');
-  let enabled=true, executionPlayer=null, executionMode=false;
-  try{
-    const prefs=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');
-    if(prefs&&typeof prefs.musicEnabled==='boolean')enabled=prefs.musicEnabled;
-  }catch(_){}
-  function updateButton(){
-    if(!button)return;
-    button.textContent=enabled?'♪ MUSIC ON':'♪ MUSIC OFF';
-    button.setAttribute('aria-pressed',String(enabled));
-  }
-  function stopPlayer(){
-    if(executionPlayer){executionPlayer.stop();executionPlayer=null;}
-  }
-  function beginExecution(){
-    executionMode=true;
-    stopPlayer();
-    if(!enabled)return;
-    executionPlayer=window.DKMidiSoundtrack?.create({
-      url:EXECUTION_URL,volume:100,baseGain:.48,loop:false
-    })||null;
-    void executionPlayer?.play();
-  }
-  function finishExecution(){
-    executionMode=false;
-    stopPlayer();
-    // Deliberately silent. Never restart the retired temple soundtrack.
-  }
-  function savePreference(){
-    try{
-      const prefs=JSON.parse(localStorage.getItem(PREFS_KEY)||'{}')||{};
-      prefs.musicEnabled=enabled;
-      localStorage.setItem(PREFS_KEY,JSON.stringify(prefs));
-    }catch(_){}
-  }
-  if(button)button.addEventListener('click',()=>{
-    enabled=!enabled;
-    savePreference();updateButton();
-    if(!enabled)stopPlayer();
-    else if(executionMode)beginExecution();
-  });
-  function retry(){
-    if(enabled&&executionMode&&executionPlayer&&!executionPlayer.playing)
-      void executionPlayer.play();
-  }
-  document.addEventListener('pointerdown',retry,{passive:true});
-  document.addEventListener('keydown',retry);
-  window.addEventListener('pagehide',stopPlayer);
-  window.DKTempleMusic=Object.freeze({beginExecution,finishExecution});
-  updateButton();
+'use strict';
+const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
+const button=document.getElementById('templeMusicToggle');
+let enabled=true,opening=false,player=null;
+try{const p=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');
+ if(p&&typeof p.musicEnabled==='boolean')enabled=p.musicEnabled;
+}catch(_){}
+function display(){
+ if(button){button.textContent=enabled?'♪ MUSIC ON':'♪ MUSIC OFF';
+  button.setAttribute('aria-pressed',String(enabled));}
+}
+function volume(){
+ try{const p=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');
+  if(Number.isFinite(p?.volumePercent))return p.volumePercent;
+ }catch(_){}
+ return 100;
+}
+function start(at){
+ player?.stop();player=null;
+ if(!enabled)return;
+ player=window.DKRenderedSoundtrack?.create({
+  url:'./assets/audio/music/demon-killer-the-last-breath-v2.mp3',
+  midiUrl:'./assets/audio/music/demon-killer-the-last-breath-v2.mid',
+  startAt:at,loopStart:24,loopEnd:108,
+  volume:volume(),baseGain:.42
+ })||null;
+ void player?.play();
+}
+function beginExecution(){opening=true;start(0);}
+function finishExecution(){
+ opening=false;
+ // Keep exactly the same score playing after Lilith leaves.
+ if(enabled&&!player)start(24);
+}
+function startAmbient(){
+ if(opening)return;
+ if(enabled&&!player)start(24);
+}
+if(button)button.addEventListener('click',()=>{
+ enabled=!enabled;
+ try{const p=JSON.parse(localStorage.getItem(PREFS_KEY)||'{}')||{};
+  p.musicEnabled=enabled;localStorage.setItem(PREFS_KEY,JSON.stringify(p));
+ }catch(_){}
+ display();
+ if(!enabled){player?.stop();player=null;}
+ else start(opening?0:24);
+});
+function wake(){
+ if(!enabled)return;
+ if(!player&&!opening)start(24);
+ else if(player)void player.play();
+}
+document.addEventListener('pointerdown',wake,{passive:true});
+document.addEventListener('keydown',wake);
+window.addEventListener('pagehide',()=>{player?.stop();player=null;});
+window.DKTempleMusic=Object.freeze({beginExecution,finishExecution,startAmbient});
+display();
 }());

@@ -16,7 +16,7 @@ Explore with cardinal movement, investigate hidden cults, practice skills, fight
 
 - **Right mouse hold:** Move during gameplay.
 - **Lilith's willow (M77):** All six distinct golden and six sickly transformation poses now draw from their individually measured positions in the original art sheet, with no fragments borrowed from neighboring figures. Size, dialogue, camera and tree footprint remain unchanged.
-- **Opening soundtrack:** The temple sacrifice now plays the original 50-second MIDI cue **The Last Breath** (ritual buildup, timed execution impact, spectral aftermath). This one-shot score stops when the introductory scene finishes. The previous temple organ arrangement is disabled and does not return. A continuous 90-second-or-longer replacement score remains pending. Browser audio may require a user gesture.
+- **Original soundtrack (M79):** **The Last Breath** is a new **108-second** continuous temple score with a five-second sacrifice impact and an **84-second atmosphere section** that repeats without replaying the execution. Music continues across the ghost encounter, resurrection choice and temple exploration until exit; the old organ cannot return. **The Shrouded Road** is a separate **96-second** darker overworld theme, playing in both outdoor clients. The MP3 renders are published by an Actions workflow when available, and the same original MIDI scores are the browser fallback. Browser audio may require a user gesture.
 - **Left click / double-click:** Inspect and interact.
 - **F8:** DK Architect, with construction and terrain-editing tools.
 - **World Pixel Painter:** From **Options → Persistent World → Open DK Architect** (when connected to DK Server), or from **F8 → Logistics → World Pixel Painter**. Paint all 9,216 × 9,216 world tiles using simple, hard-edged pixel blocks matching the existing 32×32 characters. Use whole-cell ocean/biome painting, or zoom in to individual terrain tiles. Painting grass restores the default land without allocating extra grass records.
@@ -38,6 +38,7 @@ The public link is a **browser preview**, not a hosted persistent server. The se
 - [World design, architecture, implementation roadmap, and UO/Life is Feudal research](docs/demon-killer-master-roadmap.md)
 - [Current developer handoff and known gaps](docs/development-handoff.md)
 - [Release history](CHANGELOG.md)
+- [Original soundtrack, loop design, MP3 workflow and source credits](docs/releases/M79-original-soundtracks.md)
 - [Historical development notes](docs/history/README-through-M68.md)
 - [Recovered Godot archive, preserved historical source references and audio/licence records](docs/history/godot-recovery/README.md)
 

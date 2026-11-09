@@ -4,6 +4,26 @@
  */
 (function(){
 'use strict';
+// Dark original overworld score also plays in the real 9,216-tile atlas.
+const DK_WORLD_MUSIC=window.DKRenderedSoundtrack?.create({
+ url:'./assets/audio/music/demon-killer-overworld-shadowlands-v2.mp3',
+ midiUrl:'./assets/audio/music/demon-killer-overworld-shadowlands-v2.mid',
+ loopStart:0,loopEnd:96,startAt:0,volume:100,baseGain:.35
+})||null;
+function dkWorldMusicStart(){
+ if(!DK_WORLD_MUSIC)return;
+ try{
+  const prefs=JSON.parse(localStorage.getItem('dkSoftworks.demonkiller.menuPrefs.v1')||'{}')||{};
+  if(prefs.musicEnabled===false){DK_WORLD_MUSIC.stop();return;}
+  DK_WORLD_MUSIC.setVolume(Number.isFinite(prefs.volumePercent)?prefs.volumePercent:100);
+ }catch(_){}
+ void DK_WORLD_MUSIC.play();
+}
+document.addEventListener('pointerdown',dkWorldMusicStart,{passive:true});
+document.addEventListener('keydown',dkWorldMusicStart);
+window.addEventListener('pagehide',()=>DK_WORLD_MUSIC?.stop());
+dkWorldMusicStart();
+
 const api=window.DemonKillerServer,canvas=document.getElementById('dkActorCanvas');
 const ctx=canvas?.getContext('2d');
 const status=document.getElementById('dkActorStatus');

@@ -1988,6 +1988,7 @@
         serverReady=true;
         mountCultJournal();
         if(typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
+        else window.DKTempleMusic?.startAmbient();
         palette();draw();
         if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);
         if(scene.introSeen)message('DK Server character loaded: '+character.name+'.');
@@ -2002,6 +2003,7 @@
     uoControls?.sync();
     mountCultJournal();
     if(typeof window!=='undefined'&&typeof requestAnimationFrame==='function'&&!scene.introSeen)startOpening();
+    else window.DKTempleMusic?.startAmbient();
     palette();draw();
     if(typeof requestAnimationFrame==='function')requestAnimationFrame(advanceFrame);
   }

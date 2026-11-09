@@ -73,17 +73,25 @@ function parseMidi(buffer){
  if(!notes.length||!Number.isFinite(length)||length<=0)throw Error('Empty MIDI');
  return {notes,length};
 }
-function create({url,volume=100,baseGain=.28,loop=true}={}){
+function create({url,volume=100,baseGain=.28,loop=true,loopFromSeconds=0,startAtSeconds=0}={}){
  if(!url)throw Error('MIDI URL required');
  let enabled=false,ctx=null,output=null,timer=null,notes=null,length=0;
  let voices=new Set(),loading=null,position=0,cycleStart=0,generation=0,finished=false;
+ let loopIndex=0,startIndex=0,loopOffset=0;
  let volumePercent=Math.max(0,Math.min(200,Number(volume)||0));
  async function load(){
   if(notes)return true;
   if(!loading)loading=fetch(url).then(r=>{
    if(!r.ok)throw Error('MIDI unavailable: '+r.status);
    return r.arrayBuffer();
-  }).then(b=>{const parsed=parseMidi(b);notes=parsed.notes;length=parsed.length;return true;})
+  }).then(b=>{
+   const parsed=parseMidi(b);notes=parsed.notes;length=parsed.length;
+   loopOffset=Math.max(0,Math.min(length-.01,Number(loopFromSeconds)||0));
+   const startingAt=Math.max(0,Math.min(length-.01,Number(startAtSeconds)||0));
+   loopIndex=Math.max(0,notes.findIndex(n=>n.at>=loopOffset));
+   startIndex=Math.max(0,notes.findIndex(n=>n.at>=startingAt));
+   return true;
+  })
     .catch(e=>{loading=null;console.warn('DK soundtrack unavailable',url,e);return false;});
   return loading;
  }
@@ -120,7 +128,10 @@ function create({url,volume=100,baseGain=.28,loop=true}={}){
  }
  function schedule(){
   if(!ctx||!enabled||!notes?.length||finished)return;
-  if(cycleStart<ctx.currentTime-length-1){cycleStart=ctx.currentTime+.07;position=0;}
+  if(cycleStart<ctx.currentTime-length-1){
+   position=loop&&loopOffset>0?loopIndex:0;
+   cycleStart=ctx.currentTime+.07-notes[position].at;
+  }
   const horizon=ctx.currentTime+.35;
   let cap=0;
   while(cycleStart+notes[position].at<horizon&&cap++<256){
@@ -129,7 +140,7 @@ function create({url,volume=100,baseGain=.28,loop=true}={}){
    position++;
    if(position===notes.length){
     if(!loop){finished=true;if(timer){clearInterval(timer);timer=null;}break;}
-    position=0;cycleStart+=length;
+    position=loopIndex;cycleStart+=length-loopOffset;
    }
   }
  }
@@ -145,7 +156,7 @@ function create({url,volume=100,baseGain=.28,loop=true}={}){
    limiter.threshold.value=-7;limiter.ratio.value=12;
    limiter.attack.value=.003;limiter.release.value=.2;
    output.connect(limiter);limiter.connect(ctx.destination);
-   cycleStart=ctx.currentTime+.10;position=0;setVolume(volumePercent);
+   position=startIndex;cycleStart=ctx.currentTime+.10-notes[startIndex].at;setVolume(volumePercent);
   }
   try{await ctx.resume();}catch(_){return false;}
   if(!enabled||ticket!==generation)return false;
