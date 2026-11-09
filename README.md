@@ -16,7 +16,7 @@ Explore with cardinal movement, investigate hidden cults, practice skills, fight
 
 - **Right mouse hold:** Move during gameplay.
 - **Lilith's willow (M77):** All six distinct golden and six sickly transformation poses now draw from their individually measured positions in the original art sheet, with no fragments borrowed from neighboring figures. Size, dialogue, camera and tree footprint remain unchanged.
-- **Opening soundtrack:** The temple sacrifice now plays the original 50-second MIDI cue **The Last Breath** (ritual buildup, timed execution impact, spectral aftermath). This one-shot score stops when the introductory scene finishes and the normal temple music returns. Browser audio may require a user gesture.
+- **Opening soundtrack:** The temple sacrifice now plays the original 50-second MIDI cue **The Last Breath** (ritual buildup, timed execution impact, spectral aftermath). This one-shot score stops when the introductory scene finishes. The previous temple organ arrangement is disabled and does not return. A continuous 90-second-or-longer replacement score remains pending. Browser audio may require a user gesture.
 - **Left click / double-click:** Inspect and interact.
 - **F8:** DK Architect, with construction and terrain-editing tools.
 - **World Pixel Painter:** From **Options → Persistent World → Open DK Architect** (when connected to DK Server), or from **F8 → Logistics → World Pixel Painter**. Paint all 9,216 × 9,216 world tiles using simple, hard-edged pixel blocks matching the existing 32×32 characters. Use whole-cell ocean/biome painting, or zoom in to individual terrain tiles. Painting grass restores the default land without allocating extra grass records.
