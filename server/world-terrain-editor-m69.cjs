@@ -204,7 +204,7 @@ function edit(world,command){
    }
   const current=readTile(world,pos.x,pos.y);
   if(obstructed(world,pos.x,pos.y,material??current.material))
-   throw Error('Terrain edit would obstruct a character, fixture or building plan');
+   throw Error('Terrain edit would obstruct a character, fixture, protected construction site or building plan');
   const next={};
   const cellBase=world.world_grid?.terrain?.cells?.[
     Math.floor(pos.x/GRID.CELL)+'.'+Math.floor(pos.y/GRID.CELL)]??DEFAULTS.material;
