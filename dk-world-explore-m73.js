@@ -12,6 +12,9 @@ const inspectEl=document.getElementById('dkActorInspect');
 const suppliesEl=document.getElementById('dkActorSupplies');
 const siteList=document.getElementById('dkBuildSites');
 const siteSummary=document.getElementById('dkBuildSummary');
+const houseList=document.getElementById('dkBuildingList');
+const houseSummary=document.getElementById('dkBuildingSummary');
+const housePanel=document.getElementById('dkBuildingControls');
 const startForm=document.getElementById('dkActorStartForm');
 const startButton=document.getElementById('dkActorStart');
 const npcForm=document.getElementById('dkNpcForm');
@@ -44,11 +47,46 @@ function paintActor(x,y,form,direction,color){
   ctx.fillRect(x*TILE+9,y*TILE+14,15,14);
  }
 }
+function drawInterior(room){
+ const t=96,ox=Math.floor((N*TILE-room.width*t)/2),
+  oy=Math.floor((N*TILE-room.height*t)/2);
+ ctx.fillStyle='#25242b';ctx.fillRect(0,0,N*TILE,N*TILE);
+ ctx.fillStyle='#151b1f';ctx.fillRect(ox-12,oy-12,room.width*t+24,room.height*t+24);
+ for(let y=0;y<room.height;y++)for(let x=0;x<room.width;x++){
+  const px=ox+x*t,py=oy+y*t;
+  ctx.fillStyle=(x+y)%2?'#827560':'#8f806b';
+  ctx.fillRect(px,py,t,t);
+  ctx.fillStyle='#625d58';
+  ctx.fillRect(px+t-3,py,3,t);ctx.fillRect(px,py+t-3,t,3);
+ }
+ const door=room.door,px=ox+door.ix*t,py=oy+door.iy*t;
+ ctx.fillStyle='#d7ad65';
+ if(door.side==='north')ctx.fillRect(px+12,py,t-24,7);
+ if(door.side==='south')ctx.fillRect(px+12,py+t-7,t-24,7);
+ if(door.side==='west')ctx.fillRect(px,py+12,7,t-24);
+ if(door.side==='east')ctx.fillRect(px+t-7,py+12,7,t-24);
+ ctx.fillStyle='#503a29';ctx.fillRect(ox+12,oy+10,32,32);
+ ctx.fillStyle='#be9259';ctx.fillRect(ox+17,oy+13,22,5);
+ const bx=ox+(room.width-1)*t;
+ ctx.fillStyle=room.bench.installed?'#6b5240':'#4c4139';
+ ctx.fillRect(bx+t-48,oy+14,35,27);
+ if(room.bench.installed){
+  ctx.fillStyle='#d9d0ae';ctx.fillRect(bx+t-40,oy+20,21,3);
+ }
+ const c=room.position,im=images[view.actor.form]?.[c.facing];
+ if(im?.complete&&im.naturalWidth>0)
+  ctx.drawImage(im,ox+c.x*t+20,oy+c.y*t+12,t-40,t-20);
+ else{
+  ctx.fillStyle='#e1cc9d';ctx.fillRect(ox+c.x*t+37,oy+c.y*t+25,22,20);
+  ctx.fillStyle='#496b55';ctx.fillRect(ox+c.x*t+31,oy+c.y*t+45,34,40);
+ }
+}
 function draw(){
  if(!ctx)return;
  ctx.imageSmoothingEnabled=false;
  ctx.fillStyle=PALETTE.grass;ctx.fillRect(0,0,N*TILE,N*TILE);
  if(!view?.started)return;
+ if(view.interior){drawInterior(view.interior);return;}
  for(let row=0;row<N;row++)for(let col=0;col<N;col++){
   const item=view.tiles[row]?.[col];
   const x=col*TILE,y=row*TILE;
@@ -91,6 +129,14 @@ function draw(){
    ctx.fillStyle=['#9e977e','#7c817f','#a27c51','#594a3f'][site.phase];
   }
  }
+ for(const b of view.buildings||[]){
+  const col=b.door.x-view.actor.x+RADIUS,
+   row=b.door.y-view.actor.y+RADIUS;
+  if(col<0||row<0||col>=N||row>=N)continue;
+  ctx.fillStyle=b.locked?'#b85e54':'#e0c173';
+  ctx.fillRect(col*TILE+8,row*TILE+8,16,16);
+  ctx.fillStyle='#292825';ctx.fillRect(col*TILE+14,row*TILE+15,4,5);
+ }
  for(const n of view.npcs||[]){
   const col=n.x-view.actor.x+RADIUS,row=n.y-view.actor.y+RADIUS;
   if(col<0||row<0||col>=N||row>=N)continue;
@@ -122,11 +168,18 @@ function refreshUI(data){
   npcList.replaceChildren(new Option('No nearby NPCs',''));
   siteList.replaceChildren(new Option('NO SITES',''));
   siteSummary.textContent='Enter the world to start construction.';
+  houseList.replaceChildren(new Option('NO COMPLETED BUILDINGS',''));
+  houseSummary.textContent='Complete a construction site first.';
   draw();return;
  }
  const a=data.actor;
- pos.textContent=a.name+' · WORLD '+a.x.toLocaleString()+','+a.y.toLocaleString()+
-  ' · '+a.cell_id+' · STEPS '+a.steps;
+ pos.textContent=data.interior?
+  a.name+' · INSIDE '+data.interior.kind.toUpperCase()+
+   ' · ROOM '+data.interior.position.x+','+data.interior.position.y:
+  a.name+' · WORLD '+a.x.toLocaleString()+','+a.y.toLocaleString()+
+   ' · '+a.cell_id+' · STEPS '+a.steps;
+ if(data.interior)housePanel.open=true;
+ startButton.disabled=Boolean(data.interior);
  document.getElementById('dkActorName').value=a.name;
  if(!chosen)chosen={x:a.x+1,y:a.y};
  const center=data.tiles[RADIUS]?.[RADIUS];
@@ -142,6 +195,18 @@ function refreshUI(data){
  if((data.sites||[]).some(site=>site.id===selectedSite))siteList.value=selectedSite;
  else if((data.sites||[]).length)siteList.value=data.sites[0].id;
  updateSiteSummary();
+ const oldHouse=houseList.value;
+ houseList.replaceChildren(new Option((data.buildings||[]).length?
+  'SELECT COMPLETED BUILDING':'NO COMPLETED BUILDINGS',''));
+ for(const b of data.buildings||[]){
+  houseList.add(new Option(b.id+' · '+b.kind+' · '+
+   (b.owner_self?'yours':b.unclaimed?'unclaimed':'private'),b.id));
+ }
+ if(data.interior&&data.buildings.some(b=>b.id===data.interior.id))
+  houseList.value=data.interior.id;
+ else if((data.buildings||[]).some(b=>b.id===oldHouse))houseList.value=oldHouse;
+ else if((data.buildings||[]).length)houseList.value=data.buildings[0].id;
+ updateHouseSummary();
  const previous=npcList.value;
  npcList.replaceChildren(new Option(data.npcs.length?'SELECT NEARBY NPC':'NONE NEARBY',''));
  for(const n of data.npcs)
@@ -160,8 +225,54 @@ function updateSiteSummary(){
   ' · your gold '+(view?.gold??0);
 }
 siteList.addEventListener('change',updateSiteSummary);
+function updateHouseSummary(){
+ const b=(view?.buildings||[]).find(x=>x.id===houseList.value);
+ if(!b){houseSummary.textContent='No completed building nearby. Finish construction first.';return;}
+ const room=view?.interior?.id===b.id?view.interior:null;
+ const stored=room?Object.entries(room.chest.stock).map(([k,v])=>k+':'+v).join(' · '):'enter to inspect';
+ houseSummary.textContent=b.kind.toUpperCase()+' · DOOR '+b.door.x+','+b.door.y+
+  ' · '+(b.locked?'LOCKED':'UNLOCKED')+' · '+
+  (b.owner_self?'YOUR PROPERTY':b.unclaimed?'UNCLAIMED':'OTHER OWNER')+
+  ' · caretaker '+(b.caretaker_id||'none')+
+  (room?' · chest '+(stored||'empty')+' · bench '+(room.bench.installed?'installed':'not installed'):'');
+}
+houseList.addEventListener('change',updateHouseSummary);
+function houseCommand(operation,details={}){
+ if(!api?.worldBuilding||!view?.started)
+  return say('Connect and enter the living world before using buildings',true);
+ const withBuilding=new Set(['enter','lock','unlock','claim','assign_caretaker','unassign_caretaker']);
+ const id=houseList.value;
+ if(withBuilding.has(operation)&&!id)
+  return say('Choose a completed building first',true);
+ void action(()=>api.worldBuilding({
+  action:operation,expected_revision:view.world_revision,
+  ...(withBuilding.has(operation)?{building_id:id}:{}),...details
+ }),'Saved building operation: '+operation+'.');
+}
+document.getElementById('dkHouseEnter').addEventListener('click',()=>houseCommand('enter'));
+document.getElementById('dkHouseExit').addEventListener('click',()=>houseCommand('exit'));
+document.getElementById('dkHouseLock').addEventListener('click',()=>houseCommand('lock'));
+document.getElementById('dkHouseUnlock').addEventListener('click',()=>houseCommand('unlock'));
+document.getElementById('dkHouseClaim').addEventListener('click',()=>houseCommand('claim'));
+for(const cmd of ['deposit','withdraw']){
+ document.getElementById(cmd==='deposit'?'dkHouseDeposit':'dkHouseWithdraw')
+  .addEventListener('click',()=>{
+   const quantity=Number(document.getElementById('dkHouseQuantity').value);
+   if(!Number.isSafeInteger(quantity)||quantity<1||quantity>8)
+    return say('Storage transfer must be 1 to 8 items',true);
+   houseCommand(cmd,{item:document.getElementById('dkHouseItem').value,quantity});
+  });
+}
+document.getElementById('dkHouseBench').addEventListener('click',()=>houseCommand('install_bench'));
+document.getElementById('dkHousePlank').addEventListener('click',()=>houseCommand('craft',{recipe:'plank'}));
+document.getElementById('dkHouseCord').addEventListener('click',()=>houseCommand('craft',{recipe:'cord'}));
+document.getElementById('dkHouseAssign').addEventListener('click',()=>{
+ if(!npcList.value)return say('Select a nearby NPC worker first',true);
+ houseCommand('assign_caretaker',{npc_id:npcList.value});
+});
+document.getElementById('dkHouseUnassign').addEventListener('click',()=>houseCommand('unassign_caretaker'));
 function buildCommand(operation,details={}){
- if(!api?.worldConstruction||!view?.started){
+ if(!api?.worldConstruction||!view?.started||view.interior){
   say('Connect and enter the world to construct',true);return;
  }
  const siteId=siteList.value;
@@ -242,7 +353,7 @@ npcForm.addEventListener('submit',e=>{
   name+' was introduced to the persistent world.');
 });
 document.getElementById('dkActorGather').addEventListener('click',()=>{
- if(!view?.started)return say('Enter the world before gathering',true);
+ if(!view?.started||view.interior)return say('Exit the building before gathering',true);
  if(!chosen)return say('Select a resource tile with left click first',true);
  void action(()=>api.worldActorGather(chosen.x,chosen.y),
   'Gathered a physical supply and saved it in your atlas pack.');
@@ -272,12 +383,18 @@ if(canvas){
    canvas.setPointerCapture(e.pointerId);return;
   }
   if(e.button===0){
+   if(view?.interior){inspectEl.textContent='Interior floor · Walk with WASD or arrows · Use room fixtures from the building panel';return;}
    const p=clientPosition(e);
    if(p?.tile){
     chosen={x:p.x,y:p.y};
     const selectedSite=(view.sites||[]).find(s=>
       p.x>=s.x&&p.x<s.x+s.width&&p.y>=s.y&&p.y<s.y+s.height);
-    if(selectedSite){siteList.value=selectedSite.id;updateSiteSummary();}
+    if(selectedSite){
+     siteList.value=selectedSite.id;updateSiteSummary();
+     if((view.buildings||[]).some(b=>b.id===selectedSite.id)){
+      houseList.value=selectedSite.id;updateHouseSummary();
+     }
+    }
     inspectEl.textContent=p.x+','+p.y+' · '+p.tile[0]+
      ' · elevation '+p.tile[1]+' · selected for NPC placement';
     draw();

@@ -1,3 +1,14 @@
+## v0.2.74 / M76 | 2026-11-08 | Usable buildings and world-space interiors
+
+- Completed M75 construction now creates a persistent, titled building with an exterior doorway selected from passable adjacent ground; never creates free housing.
+- New small indoor movement grid matching the building footprint, with cardinal walking, collision at walls, doorway entry/exit and server-owned saved player indoor position.
+- Serial-based property ownership, owner locking/unlocking and abandoned-property registration for five gold; retiring a character releases title rather than giving it to a successor.
+- Real physical-material chest capacity 160 units, guarded player pack transfers, installed workbench consuming two timber plus one stone, and recipes converting two timber to one plank or two reeds to one cord.
+- Optional explicit caretaker worker assignment: each hour, a stationed NPC deposits one genuine carried item into the chest for one gold deducted from the player and credited to the NPC.
+- Connected Living World renders a doorway marker and a tiny pixel-art interior and presents building actions in a collapsible side panel. Strict `/api/v1/world/buildings` route saves all writes with revision checks.
+- Regression test contracts include real construction linkage, inventory conservation, paid caretakers, serial ownership/character retirement and HTTP command controls. Full Node regressions and Firefox testing remain pending.
+- Buildings are currently small 2×2/3×3 spaces. More realistic multi-room structures, NPC indoor paths, rental contracts and full manufacturing loops remain future work.
+
 ## v0.2.73 / M75 | 2026-11-08 | Real paid multi-stage construction
 
 - Added sparse global 2×2 shed and 3×3 cottage sites, level footprint validation, collision, spatial proximity and legacy-plan overlap protection. DK Architect is the preparation tool.

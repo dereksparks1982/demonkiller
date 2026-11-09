@@ -97,6 +97,11 @@
         headers:{'Content-Type':'application/json','X-DK-World-Work':'construction'},
         body:JSON.stringify(command)});
     },
+    async worldBuilding(command){
+      return request('/api/v1/world/buildings',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Work':'building'},
+        body:JSON.stringify(command)});
+    },
     async worldActorRemoveNPC(npc_id){
       return request('/api/v1/world/actors',{method:'POST',
         headers:{'Content-Type':'application/json','X-DK-Architect':'atlas-npcs'},

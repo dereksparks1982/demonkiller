@@ -11,7 +11,7 @@ const RESOURCE=Object.freeze({
  stone:{item:'stone',job:'worker'},dirt:{item:'clay',job:'worker'},
  beach:{item:'clay',job:'worker'}
 });
-const ITEMS=new Set(['timber','herbs','reeds','stone','clay']);
+const ITEMS=new Set(['timber','herbs','reeds','stone','clay','plank','cord']);
 const REGEN_MINUTES=360,WORK_INTERVAL=60,MAX_NODES=4096;
 const MAX_PLAYER_CARRY=64,MAX_NPC_CARRY=24;
 function newStore(){return {schema:1,nodes:{},packs:{player:{},npcs:{}}};}

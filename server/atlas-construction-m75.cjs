@@ -4,6 +4,7 @@
 const GRID=require('./world-grid-m67.cjs');
 const TERRAIN=require('./world-terrain-editor-m69.cjs');
 const GATHER=require('./atlas-gathering-m74.cjs');
+const BUILDINGS=require('./atlas-buildings-m76.cjs');
 const RECIPES=Object.freeze({
  shed:{width:2,height:2,stages:[
   {name:'foundation',work:3,items:{stone:2,clay:1}},
@@ -78,8 +79,12 @@ function validate(world){
  const workers=new Set();
  for(const [id,s] of entries){
   if(!/^atlas_site_[1-9][0-9]{0,5}$/.test(id)||!s||s.id!==id||
-   Object.keys(s).sort().join(',')!==
-    'created_minute,elevation,height,id,inventory,kind,phase,progress,width,workers,x,y'||
+   (Object.keys(s).sort().join(',')!==
+    'created_minute,elevation,height,id,inventory,kind,phase,progress,width,workers,x,y'&&
+    Object.keys(s).sort().join(',')!==
+    'created_minute,elevation,height,id,inventory,kind,owner_serial,phase,progress,width,workers,x,y')||
+   (s.owner_serial!==undefined&&s.owner_serial!==null&&
+    (typeof s.owner_serial!=='string'||s.owner_serial.length<1||s.owner_serial.length>120))||
    !own(RECIPES,s.kind)||!Number.isSafeInteger(s.phase)||
    s.phase<0||s.phase>3||
    s.width!==RECIPES[s.kind].width||s.height!==RECIPES[s.kind].height||
@@ -116,6 +121,8 @@ function validate(world){
 function player(world){
  const p=world.characters?.['1']?.atlas_position;
  if(!p)throw Error('Enter the world to build');
+ if(world.characters['1'].atlas_interior)
+  throw Error('Exit the building before construction work');
  return p;
 }
 function accessible(site,actor){
@@ -164,7 +171,8 @@ function place(world,command){
   throw Error('Construction site limit reached');
  const root=world.living.atlas_sites,id='atlas_site_'+(++root.sequence);
  root.records[id]={id,kind:command.kind,...site,elevation,phase:0,progress:0,
-  inventory:{},workers:[],created_minute:world.living.minute};
+  inventory:{},workers:[],created_minute:world.living.minute,
+  owner_serial:world.entity_registry?.refs?.['player:1']?.serial??null};
  return root.records[id];
 }
 function deliver(world,command){
@@ -202,7 +210,7 @@ function work(world,s){
   if(!s.inventory[item])delete s.inventory[item];
  }
  s.phase++;s.progress=0;
- if(s.phase===3)s.workers=[];
+ if(s.phase===3){s.workers=[];BUILDINGS.sync(world);}
  return true;
 }
 function assign(world,command,on){

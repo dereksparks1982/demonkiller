@@ -4,7 +4,7 @@ This document is the working continuity reference if a conversation thread fills
 
 ## Source and release discipline
 
-Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M75 source target is game **0.2.73**, server **2.31.19**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
+Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M76 source target is game **0.2.74**, server **2.31.20**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
@@ -27,6 +27,14 @@ Critical limits: the GitHub archive was only **39 files**. Its own recovery docu
 - Kilns and heavy industrial equipment should have **very rare** breakdowns after years, not constantly wear out. M50/M66 failures need rebalancing.
 - NPCs must autonomously found differentiated settlements, disagree and secede, trade and make peace or war, operate companies and continue independent lives. Avoid WorldBox's arbitrary population blobs and repetitive all-out war.
 - Study the full private-server mod list in the master roadmap, prioritizing Nerun's Distro, OWLTR, FS-ATS, Xanthos Evo/Shrink, Knives Town Houses and Knives Chat. Do not copy proprietary UO art or unsuitable GPL code into commercial game source.
+
+## M76: completed buildings become usable rooms, not scenery
+
+M76 adds `server/atlas-buildings-m76.cjs`: a sparse registry of completed M75 structures, each with an exterior doorway on land, an indoor grid corresponding to its actual footprint, an owner tied to the entity-registry character serial, a lock, a physical material chest and an optional real workbench. Enter at an exterior door, walk using the real character indoors with persisted interior coordinates, and exit at the interior door. The external atlas position remains unchanged indoors; outdoor gathering and construction actions are rejected. The player can lock doors, move materials between their M74 pack and the building chest, install a workbench for timber/stone, and convert actual timber/reeds to plank/cord in the existing resource inventory. A stationed NPC caretaker can be assigned to move **carried** supplies into the chest on the hourly server tick for one real gold per item. No free materials or imaginary villages.
+
+Character retirement relinquishes title/caretaker and former carried atlas pack instead of letting a later character in the same slot inherit the old identity. Unclaimed property may be registered for five gold. The connected Living World client displays visible door markers, a low-detail indoor room and an expandable building panel. Strict serialized `POST /api/v1/world/buildings` persists all operations. Tests `tests/atlas-buildings-m76.cjs` are added. V8 construction/room behavior was checked in isolation; full Linux Node tests, browser visual acceptance and occupied-save restart still require verification.
+
+The original M75 2×2 and 3×3 footprints remain exact instead of manufacturing oversized interiors. Further owner-authorized builds should add larger multi-room structures, property rental, physical furniture placement and NPC indoor behavior, then autonomous settlement economics. The Godot history consolidated into main remains historical documentation only.
 
 ## M75: physical staged construction and paid autonomous work
 

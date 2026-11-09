@@ -15,6 +15,7 @@ const WORLD_WALKER=require('./world-walker-m72.cjs');
 const WORLD_ACTORS=require('./world-actors-m73.cjs');
 const ATLAS_GATHER=require('./atlas-gathering-m74.cjs');
 const ATLAS_SITES=require('./atlas-construction-m75.cjs');
+const ATLAS_BUILDINGS=require('./atlas-buildings-m76.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
@@ -180,6 +181,7 @@ async function createDKServer({
     const atlasActorsAdded=WORLD_ACTORS.ensure(world);
     const atlasResourcesAdded=ATLAS_GATHER.ensure(world);
     const atlasSitesAdded=ATLAS_SITES.ensure(world);
+    const atlasBuildingsAdded=ATLAS_BUILDINGS.ensure(world);
     const resourcesAdded=ensureResources(world);
     const socialAdded=ensureSocial(world);
     const combatAdded=ensureCombat(world);
@@ -230,7 +232,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(gridAdded||terrainAdded||atlasActorsAdded||atlasResourcesAdded||atlasSitesAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
+    if(gridAdded||terrainAdded||atlasActorsAdded||atlasResourcesAdded||atlasSitesAdded||atlasBuildingsAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -400,6 +402,22 @@ async function createDKServer({
       catch(error){console.error('Atlas construction history failed:',error);}
       for(const viewer of streams)push(viewer,'world.atlas.construction',
         {revision:world.revision,site_id:result.site_id});
+      return WORLD_ACTORS.view(world);
+    });
+    writeQueue=pending.catch(()=>{});return pending;
+  }
+  async function saveAtlasBuilding(command){
+    const pending=writeQueue.then(async()=>{
+      if(['craft','install_bench'].includes(command.action)&&!world.runtime?.running)
+        throw Error('World is paused; press Start Server');
+      const result=ATLAS_BUILDINGS.perform(world,command);
+      validateWorld(result.world);
+      await snapshots.save(result.world);
+      world=result.world;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('Atlas building event archive failed:',error);}
+      for(const viewer of streams)push(viewer,'world.atlas.building',
+        {revision:world.revision,building:result.event.building_id});
       return WORLD_ACTORS.view(world);
     });
     writeQueue=pending.catch(()=>{});return pending;
@@ -622,6 +640,30 @@ async function createDKServer({
           return sendJSON(res,422,{error:error.message},method);
         console.error('Atlas construction transaction failed:',error);
         return sendJSON(res,500,{error:'Construction change was not saved'},method);
+      }
+    }
+    if(url.pathname==='/api/v1/world/buildings'&&!write){
+      try{return sendJSON(res,200,WORLD_ACTORS.view(world),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/world/buildings'&&method==='POST'){
+      let command;
+      try{command=await readJSON(req);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
+      if(req.headers['x-dk-world-work']!=='building')
+        return sendJSON(res,403,{error:'Connected building controls required'},method);
+      if(!['enter','exit','deposit','withdraw','install_bench','craft',
+          'lock','unlock','claim','assign_caretaker','unassign_caretaker']
+          .includes(command.action))
+        return sendJSON(res,422,{error:'Invalid building operation'},method);
+      try{return sendJSON(res,200,await saveAtlasBuilding(command),method);}
+      catch(error){
+        if(/Stale|paused|door|doorway|near|inside|outside|already|inventory|capacity|requires|needed|not own|locked|Not enough|without|five gold|gold|stock|blocked|obstructed|workbench|worker|caretaker|fully completed|Claim|unknown owner/i.test(error.message))
+          return sendJSON(res,409,{error:error.message},method);
+        if(/Invalid|Unknown|Cardinal/i.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Atlas building transaction failed:',error);
+        return sendJSON(res,500,{error:'Building change was not saved'},method);
       }
     }
     if(url.pathname==='/api/v1/world/walk'&&!write){

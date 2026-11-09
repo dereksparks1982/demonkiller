@@ -4,6 +4,7 @@
 const {COURT,VILLAGE,traversable,portal}=require('./regions.cjs');
 const WORLD_ACTORS=require('./world-actors-m73.cjs');
 const ATLAS_SITES=require('./atlas-construction-m75.cjs');
+const ATLAS_BUILDINGS=require('./atlas-buildings-m76.cjs');
 const {regenerate}=require('./gameplay.cjs');
 const {tick:socialTick}=require('./social-m6.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
@@ -278,6 +279,7 @@ function advance(world,now=Date.now(),limit=180){
   minuteTick(next,m,events);
   WORLD_ACTORS.advance(next,m);
   ATLAS_SITES.advance(next,m,events);
+  ATLAS_BUILDINGS.advance(next,m,events);
  }
  reconcileEntities(next);
  next.revision++;

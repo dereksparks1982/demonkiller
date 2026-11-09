@@ -7,6 +7,7 @@ const TERRAIN=require('./world-terrain-editor-m69.cjs');
 const WALK=require('./world-walker-m72.cjs');
 const GATHER=require('./atlas-gathering-m74.cjs');
 const CONSTRUCTION=require('./atlas-construction-m75.cjs');
+const BUILDINGS=require('./atlas-buildings-m76.cjs');
 const ROLES=new Set(['scout','guard','forager','worker']);
 const DIRECTIONS=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
 const LIMIT=32,RADIUS=12,INTERVAL=4;
@@ -91,7 +92,7 @@ function view(world,{radius=RADIUS}={}){
  if(!actor)return {started:false,world_revision:world.revision,
   has_character:Boolean(player),character_name:player?.name??null,
   atlas:{width:GRID.WIDTH,height:GRID.HEIGHT,cell_size:GRID.CELL},
-  default_material:TERRAIN.DEFAULTS.material,npcs:[]};
+  default_material:TERRAIN.DEFAULTS.material,npcs:[],sites:[],buildings:[],interior:null};
  const rows=[];
  for(let dy=-radius;dy<=radius;dy++){
   const row=[];
@@ -105,6 +106,7 @@ function view(world,{radius=RADIUS}={}){
  }
  const location=GRID.tile(actor.x,actor.y);
  const sites=CONSTRUCTION.nearby(world,actor.x,actor.y,radius);
+ const housing=BUILDINGS.view(world);
  const npcs=Object.values(world.living?.atlas_npcs?.records||{})
   .filter(n=>Math.abs(n.x-actor.x)<=radius&&Math.abs(n.y-actor.y)<=radius)
   .map(n=>({id:n.id,name:n.name,role:n.role,x:n.x,y:n.y,
@@ -115,7 +117,8 @@ function view(world,{radius=RADIUS}={}){
   actor:{...actor,cell_id:location.cell.id,sector_id:location.sector.id,
    name:player.name,form:player.form,slot:player.slot,character_revision:player.revision,
    war_mode:player.war_mode===true},
-  radius,tiles:rows,npcs,sites,supplies:GATHER.inventory(world,'player'),
+  radius,tiles:rows,npcs,sites,buildings:housing.buildings,interior:housing.interior,
+  supplies:GATHER.inventory(world,'player'),
   gold:player.gold??0,
   world_minute:world.living.minute,
   atlas:{width:GRID.WIDTH,height:GRID.HEIGHT,cell_size:GRID.CELL}};
@@ -140,6 +143,7 @@ function perform(world,command){
   if(keys!=='action,x,y')throw Error('Invalid atlas entry command');
   if(!old)throw Error('Create a saved character first');
   GRID.tile(command.x,command.y);
+  if(old.atlas_interior)throw Error('Exit the building before reentering the atlas');
   // The real character supersedes the disposable M72 surveyor entirely:
   // do not leave an invisible, impassable old testing avatar elsewhere.
   delete next.world_grid.walker;
@@ -154,15 +158,21 @@ function perform(world,command){
   if(keys!=='action,direction'||!Object.hasOwn(DIRECTIONS,command.direction))
    throw Error('Cardinal movement only');
   if(!old?.atlas_position)throw Error('Enter the world before moving');
-  const newPos=GRID.step(old.atlas_position.x,old.atlas_position.y,command.direction);
-  if(!newPos)throw Error('World boundary reached');
-  if(!traversable(world,newPos.x,newPos.y,old.atlas_position,'player'))
-   throw Error('World terrain is blocked, occupied or too steep');
-  next.characters['1'].atlas_position={x:newPos.x,y:newPos.y,
-    facing:command.direction,steps:old.atlas_position.steps+1};
-  next.characters['1'].revision++;
-  e=event(next,'atlas.player.step',old.name+' moved '+command.direction,
-   {x:newPos.x,y:newPos.y,slot:1});
+  if(old.atlas_interior){
+   BUILDINGS.move(next,command.direction);
+   e=event(next,'atlas.player.indoor.step',old.name+' walked inside a building',
+    {building_id:old.atlas_interior.id,slot:1});
+  }else{
+   const newPos=GRID.step(old.atlas_position.x,old.atlas_position.y,command.direction);
+   if(!newPos)throw Error('World boundary reached');
+   if(!traversable(world,newPos.x,newPos.y,old.atlas_position,'player'))
+    throw Error('World terrain is blocked, occupied or too steep');
+   next.characters['1'].atlas_position={x:newPos.x,y:newPos.y,
+     facing:command.direction,steps:old.atlas_position.steps+1};
+   next.characters['1'].revision++;
+   e=event(next,'atlas.player.step',old.name+' moved '+command.direction,
+    {x:newPos.x,y:newPos.y,slot:1});
+  }
  }else if(command.action==='introduce_npc'){
   if(keys!=='action,name,role,x,y')throw Error('Invalid atlas NPC placement');
   GRID.tile(command.x,command.y);
@@ -182,6 +192,7 @@ function perform(world,command){
  }else if(command.action==='gather'){
   if(keys!=='action,x,y')throw Error('Invalid atlas resource command');
   if(!old?.atlas_position)throw Error('Enter the world before gathering');
+  if(old.atlas_interior)throw Error('Exit the building before gathering');
   const result=GATHER.harvest(next,'player',command.x,command.y);
   next.characters['1'].revision++;
   e=event(next,'atlas.player.gather',old.name+' gathered '+result.item,
@@ -193,6 +204,8 @@ function perform(world,command){
   if(!npc)throw Error('Unknown atlas NPC');
   delete next.living.atlas_npcs.records[command.npc_id];
   delete next.living.atlas_resources.packs.npcs[command.npc_id];
+  for(const house of Object.values(next.living.atlas_buildings?.records||{}))
+   if(house.caretaker_id===command.npc_id)house.caretaker_id=null;
   for(const site of Object.values(next.living.atlas_sites?.records||{}))
    site.workers=site.workers.filter(id=>id!==command.npc_id);
   e=event(next,'atlas.npc.depart',npc.name+' left the world atlas',

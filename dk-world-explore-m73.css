@@ -17,6 +17,10 @@
 #dkActorStatus[data-error="true"]{color:#eea48c}
 .build-controls{display:grid;gap:6px;padding:7px 0;border-bottom:1px solid #52606b}
 .build-controls #dkBuildCancel{border-color:#947a69}
+.dk-house-panel{border:1px solid #647783;padding:7px 5px;background:#263743}
+.dk-house-panel summary{cursor:pointer;color:#e9d197;font:bold 12px "Courier New",monospace;padding:7px}
+.dk-house-panel[open] summary{border-bottom:1px solid #536372}
+.dk-house-panel .coordinate-row button{font-size:10px}
 #dkBuildSummary{font:11px/1.5 "Courier New",monospace;white-space:normal}
 @media(max-width:980px){.world-layout{flex-direction:column;align-items:center}
  .world-frame{width:min(800px,100%)}

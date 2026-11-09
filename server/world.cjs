@@ -9,6 +9,7 @@ const WORLD_WALKER=require('./world-walker-m72.cjs');
 const WORLD_ACTORS=require('./world-actors-m73.cjs');
 const ATLAS_GATHER=require('./atlas-gathering-m74.cjs');
 const ATLAS_SITES=require('./atlas-construction-m75.cjs');
+const ATLAS_BUILDINGS=require('./atlas-buildings-m76.cjs');
 const {seed,validateLiving}=require('./living-world.cjs');
 const {ensureProgress,ensureResources,validateProgress}=require('./gameplay.cjs');
 const {ensureSocial,validateSocial}=require('./social-m6.cjs');
@@ -112,6 +113,7 @@ function makeWorld(now = Date.now()) {
   WORLD_ACTORS.ensure(result);
   ATLAS_GATHER.ensure(result);
   ATLAS_SITES.ensure(result);
+  ATLAS_BUILDINGS.ensure(result);
   ensureResources(result);
   ensureSocial(result);
   ensureCombat(result);
@@ -215,6 +217,7 @@ function validateWorld(world) {
   WORLD_ACTORS.validate(world);
   ATLAS_GATHER.validate(world);
   ATLAS_SITES.validate(world);
+  ATLAS_BUILDINGS.validate(world);
   if(world.areas[COURT])checkRegion(world.areas[COURT]);
   if(world.areas[VILLAGE])checkRegion(world.areas[VILLAGE]);
   for(const id of TERRAIN.IDS)if(world.areas[id])checkRegion(world.areas[id]);

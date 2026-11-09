@@ -58,12 +58,41 @@
 <button type="button" id="dkBuildCancel">CANCEL UNFINISHED SITE / REFUND UNUSED STOCK</button>
 <p class="world-note">Foundation, frame and roof each consume real supplies. Assigned workers deliver their own materials and earn one gold per item or work step. No funds or inputs, no work. Completed foundations are solid.</p>
 </div>
+<details id="dkBuildingControls" class="dk-house-panel">
+<summary>BUILDINGS, INTERIORS & WORKSHOPS · M76</summary>
+<div class="build-controls">
+<label>COMPLETED BUILDING <select id="dkBuildingList"><option value="">NO COMPLETED BUILDINGS</option></select></label>
+<p id="dkBuildingSummary" class="world-note">Build a shed or cottage to open its interior.</p>
+<button type="button" id="dkHouseEnter">ENTER BUILDING AT DOORWAY</button>
+<button type="button" id="dkHouseExit">EXIT THROUGH DOOR</button>
+<div class="coordinate-row">
+<button type="button" id="dkHouseLock">LOCK DOOR</button>
+<button type="button" id="dkHouseUnlock">UNLOCK DOOR</button></div>
+<button type="button" id="dkHouseClaim">CLAIM ABANDONED PROPERTY · 5 GOLD</button>
+<label>STORAGE MATERIAL <select id="dkHouseItem">
+<option value="timber">TIMBER</option><option value="stone">STONE</option>
+<option value="clay">CLAY</option><option value="reeds">REEDS</option>
+<option value="herbs">HERBS</option><option value="plank">PLANK</option>
+<option value="cord">CORD</option></select></label>
+<label>AMOUNT <input id="dkHouseQuantity" type="number" min="1" max="8" value="1"></label>
+<div class="coordinate-row">
+<button type="button" id="dkHouseDeposit">STORE IN CHEST</button>
+<button type="button" id="dkHouseWithdraw">TAKE FROM CHEST</button></div>
+<button type="button" id="dkHouseBench">INSTALL WORKBENCH · 2 TIMBER + 1 STONE</button>
+<div class="coordinate-row">
+<button type="button" id="dkHousePlank">CRAFT PLANK · 2 TIMBER</button>
+<button type="button" id="dkHouseCord">CRAFT CORD · 2 REEDS</button></div>
+<div class="coordinate-row">
+<button type="button" id="dkHouseAssign">HIRE SELECTED WORKER AS CARETAKER</button>
+<button type="button" id="dkHouseUnassign">RELEASE CARETAKER</button></div>
+<p class="world-note">A completed building gets a real door, a small indoor grid, ownership, a lock, a chest and craftable bench. Walk to its marked exterior doorway before entering, return to the interior door before exiting. Caretakers stock chest supplies from their packs for one gold per item every server hour. This is an early physically scaled interior, not full housing or NPC settlement management.</p>
+</div></details>
 <h1>MOVEMENT</h1>
 <p>WASD / ARROWS · one cardinal step.<br>HOLD RIGHT MOUSE · walk toward cursor.<br>LEFT CLICK · inspect and select an NPC location.</p>
 <p id="dkActorStatus" role="status" aria-live="polite">Loading the world…</p>
 <p class="world-note">Your old temple character, if one exists, can enter this atlas without losing its character identity. Use Options on the main menu for an explicit development-world reset.</p>
 </aside></section>
 </main>
-<script src="./dk-menu-server.js?v=m75"></script>
-<script src="./dk-world-explore-m73.js?v=m75"></script>
+<script src="./dk-menu-server.js?v=m76"></script>
+<script src="./dk-world-explore-m73.js?v=m76"></script>
 </body></html>

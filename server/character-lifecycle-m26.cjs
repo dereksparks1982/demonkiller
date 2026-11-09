@@ -57,6 +57,15 @@ function deleteCharacter(world,slot,name){
   record.player_visits=0;
   if(record.npc_visits===0)delete l.region_history.records[id];
  }
+ // Retirement relinquishes title and caretakers, never erases world buildings.
+ for(const b of Object.values(l.atlas_buildings?.records||{})){
+  if(b.owner_serial!==oldSerial)continue;
+  b.owner_serial=null;b.locked=false;b.caretaker_id=null;
+ }
+ for(const s of Object.values(l.atlas_sites?.records||{}))
+  if(s.owner_serial===oldSerial)s.owner_serial=null;
+ // A new character cannot inherit the former character's hand-carried atlas pack.
+ if(l.atlas_resources?.packs)l.atlas_resources.packs.player={};
  delete next.characters['1'];
  // Visit history belongs to the retired character, not a future one.
  // The cells themselves and every object in the world remain intact.
