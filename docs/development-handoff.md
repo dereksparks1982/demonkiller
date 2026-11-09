@@ -8,6 +8,12 @@ Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. T
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
+## Historical Godot archive branch consolidation (documentation-only)
+
+The user requested retiring the extra `archive/godot-recovery-2026-11-04` branch **after** transferring needed material into `main`, but asked to perform deletion personally. The branch tip is `c57e15934ab29d9c0f1023f3e65039a640f6662f`. Its four archive-only commits, old Godot files and incomplete `recovery/source_payload` fragments were merged into `main`'s Git ancestry as a **second parent**; this keeps the entire partial branch retrievable by commit SHA after branch deletion. A curated read-only selection is now visible at `docs/history/godot-recovery/`, and six historical licence/attribution documents at `docs/licences/historical-godot/`. **No active game source, art or server behavior was changed; keep game 0.2.73 and server 2.31.19.** No runnable Godot engine or third-party code was imported into active paths.
+
+Critical limits: the GitHub archive was only **39 files**. Its own recovery documentation says the authentic original 4,920-file v0.5.03 source tree and 62 source audio files were in separately supplied original ZIPs and were never uploaded to that branch. Keeping this Git history therefore does **not** protect those unreproduced binary/source backups. See `docs/history/godot-recovery/README.md` for exact archived commit identifiers and safeguards. Do not confuse historic licences with commercial-use clearance. The owner may delete the branch **name only** after verifying the two-parent merge.
+
 ## Owner's design decisions that supersede the old prototype
 
 - All original temple and village architecture is scrapped for the replacement world. M68 still carries temple/Willow story compatibility and old economic area IDs; they are **temporary dependencies**, not approval to reuse the old physical design.

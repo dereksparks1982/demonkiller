@@ -30,5 +30,6 @@ The public link is a **browser preview**, not a hosted persistent server. The se
 - [Current developer handoff and known gaps](docs/development-handoff.md)
 - [Release history](CHANGELOG.md)
 - [Historical development notes](docs/history/README-through-M68.md)
+- [Recovered Godot archive, preserved historical source references and audio/licence records](docs/history/godot-recovery/README.md)
 
 The project uses independent code and appropriately licensed/original artwork. No game engine is required.
