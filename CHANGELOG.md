@@ -1,3 +1,9 @@
+## M77 | 2026-11-09 | Lilith willow transformation panel fix
+
+- Fixed displaced, truncated and doubled tree fragments during Lilith's courtyard transformation. The original reference sheet's equal-width intermediate crops can include art from adjacent reference columns. The animation now displays the clean original first-panel Lilith at the start and grows the accepted complete last-panel willow in five additional stage sizes, anchored consistently at the same base. Both gold and diseased variants use the identical correction.
+- The approved final tree artwork, 166×161 final dimensions, camera timing, 5.4-second transformation, prayer, and world state remain unchanged. No new sprite assets.
+- Added targeted draw-call regression checks and cache-busted the script. Connected browser visual acceptance remains pending.
+
 ## M76 execution-audio patch | 2026-11-09 | Original ritual music
 
 - Composed **The Last Breath**, an original 50-second, nine-track Standard MIDI File for the player's altar execution: dark organ/choir, rising strings and drums, an orchestral blow at the scripted five-second sacrifice mark, followed by a spectral lament.

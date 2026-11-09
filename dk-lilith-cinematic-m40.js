@@ -82,10 +82,17 @@ function drawLilith(ctx,img,state){
  return drawPanel(ctx,img,state.row,0,state.womanX*32,bottom,47,55);
 }
 function drawTree(ctx,img,row,frameIndex,centerX,bottomY){
- const n=clamp(frameIndex,0,5);
- const widths=[54,69,83,102,126,166],
-  heights=[62,77,96,117,139,161];
- return drawPanel(ctx,img,row,n,centerX,bottomY,widths[n],heights[n]);
+ const n=clamp(Math.floor(frameIndex),0,5);
+ // M77 visual correction: the printed reference sheet's middle panels spill
+ // into adjacent panel crops. A middle source rectangle can therefore paint
+ // Lilith and a detached piece of the next willow side-by-side. NEVER render
+ // those contaminated intermediate crops. Start with her clean first-panel
+ // silhouette; grow the complete approved sixth-panel willow from the SAME
+ // centered ground anchor. The last frame remains exactly the accepted tree.
+ const widths=[47,69,83,102,126,166],
+  heights=[55,77,96,117,139,161];
+ const sourcePanel=n===0?0:5;
+ return drawPanel(ctx,img,row,sourcePanel,centerX,bottomY,widths[n],heights[n]);
 }
 return Object.freeze({SHEET,PRAYER,PAN,WALK,PRAYER_TIME,TRANSFORM,HOLD,RETURN,
  TOTAL,at,sourceRect,drawLilith,drawTree});
