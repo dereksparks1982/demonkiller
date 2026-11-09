@@ -110,7 +110,7 @@ test('M72 browser uses original sprites and integrated world authoring entry',()
  assert.match(js,/walkWorldStep/);
  assert.match(html,/dkWalkCanvas/);
  assert.match(read('dk-world-atlas-m70.js'),/data-walk/);
- assert.match(read('index.html'),/dk-world-explore-m72[.]html/);
+ assert.match(read('index.html'),/dk-world-explore-m7[23][.]html/);
  assert.match(read('server/local-game.cjs'),/dk-world-explore-m72[.]js/);
 });
 test('M72 authoritative world-walking endpoint persists and rejects forged placement',async()=>{

@@ -14,13 +14,13 @@ Explore with cardinal movement, investigate hidden cults, practice skills, fight
 - **Left click / double-click:** Inspect and interact.
 - **F8:** DK Architect, with construction and terrain-editing tools.
 - **World Pixel Painter:** From **Options → Persistent World → Open DK Architect** (when connected to DK Server), or from **F8 → Logistics → World Pixel Painter**. Paint all 9,216 × 9,216 world tiles using simple, hard-edged pixel blocks matching the existing 32×32 characters. Use whole-cell ocean/biome painting, or zoom in to individual terrain tiles. Painting grass restores the default land without allocating extra grass records.
-- **Walk the New World (test):** Choose **WALK HERE** in the connected World Pixel Painter, or open **Options → Persistent World → Walk the World** after placing a surveyor. WASD, arrow keys, or held right mouse move across your server-saved terrain; water and steep slopes block movement. This walking surveyor is a terrain test, not the final player-character system.
+- **Living World:** Choose **WALK HERE** in DK Architect or **Options → Persistent World → Enter the Living World**. Create a development character or enter with your existing character, walk using WASD/arrows or held right mouse, and place independent NPC scouts, guards, foragers and workers. Your painted terrain and elevations govern movement.
 - **In DK Architect:** Left drag paints or places, **right mouse drag pans**, mouse wheel zooms (or rotates the active placement preview). The pixel painter offers world overview, zoom, undo/redo, water percentage and server export.
 - **Tab:** War/Peace stance. **P** opens the paper doll; **I** opens inventory; **C** opens cult investigations.
 
 ## Persistent world
 
-The public link is a **browser preview**, not a hosted persistent server. The separate DK Server runs the authoritative world simulation and stores its saves when connected. Read the [server operations guide](server/README.md) for supported setup.
+The public link is a **browser preview**, not a hosted persistent server. The separate DK Server runs the authoritative world simulation and saves changes when connected. Early development saves are disposable: **Options → Reset Development World** creates a fresh green world after typed confirmation. Read the [server operations guide](server/README.md) for supported setup.
 
 ## Project documentation
 

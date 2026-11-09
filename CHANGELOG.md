@@ -1,3 +1,15 @@
+## v0.2.71 / M73 | 2026-11-08 | Real character and autonomous atlas NPC foundations
+
+- Added `server/world-actors-m73.cjs`: the real saved slot-one character can enter the 9,216² green atlas and cross Streaming Cell boundaries while retaining their name, inventory, skill progression and entity identity. Atlas coordinates, facing and steps live on the character record, not a separate surveyor.
+- New development atlas-character creation uses the existing character pipeline, then temporarily starts living in the atlas rather than replaying the retired temple opening. Existing characters can enter without duplication. The old `area_id` remains a temporary compatibility field for other systems, not a finished gameplay migration.
+- Atlas NPCs are named, individually persisted scouts, guards, foragers and workers. Bounded NPC patrols advance on the persistent server clock independently of the browser, and workers currently remain at their chosen sites. No automated settlements or NPC production economy yet.
+- Added collision between the real atlas character and NPCs; fine tile paints and broad ocean/cliff brushes prevent impassable terrain from swallowing them. Cardinal movement uses the same terrain material and elevation authority.
+- Added allowlisted `GET/POST /api/v1/world/actors` routes for new development character, entering, stepping, adding NPCs and removing NPCs, with serialized durable server saves. Existing M72 traversal source remains separately available for regression tests.
+- Added connected `dk-world-explore-m73.html` with existing 32×32 sprites and simple pixel ground. WASD/arrows/RMB walking, ground inspection and deliberate NPC placement/removal are integrated with DK Architect's WALK HERE and the main-menu Living World entry.
+- Main-menu Options includes **RESET DEVELOPMENT WORLD**, requiring the user to type `RESET WORLD`, using the existing revision-checked reset endpoint. No development data was reset automatically; future builds can make clean schema breaks without elaborate save migration work.
+- Nine focused M73 regression contracts cover player identity, NPC clock movement, occupied terrain, malformed commands, browser integration, API persistence/restart and reset. Isolated source-level smoke tests passed, while the full Node suite and browser interaction remain unverified.
+- Detailed development notes and limitations remain in `docs/`; no new 3D or generated world artwork.
+
 ## v0.2.70 / M72 | 2026-11-08 | Walk the user-painted world
 
 - Added a server-owned walking surveyor across the full 9,216 × 9,216 flat grass atlas, persisting global position, direction and steps without materializing thousands of regions.

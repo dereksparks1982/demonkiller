@@ -317,7 +317,7 @@
    const tile=hover||{wx:x+36*scale,wy:y+36*scale};
    const tx=Math.min(WORLD-1,Math.floor(tile.wx)),
     ty=Math.min(WORLD-1,Math.floor(tile.wy));
-   root.location.href='./dk-world-explore-m72.html?x='+tx+'&y='+ty;
+   root.location.href='./dk-world-explore-m73.html?x='+tx+'&y='+ty;
   });
   $('[data-close]').addEventListener('click',close);
   document.addEventListener('keydown',e=>{

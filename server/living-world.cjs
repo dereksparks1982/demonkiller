@@ -2,6 +2,7 @@
 // DK Server living world. The server advances NPCs even when no browser is open.
 // All randomness uses a saved seed; no client timer or reload-triggered events.
 const {COURT,VILLAGE,traversable,portal}=require('./regions.cjs');
+const WORLD_ACTORS=require('./world-actors-m73.cjs');
 const {regenerate}=require('./gameplay.cjs');
 const {tick:socialTick}=require('./social-m6.cjs');
 const {chooseStep}=require('./npc-navigation-m6.cjs');
@@ -274,6 +275,7 @@ function advance(world,now=Date.now(),limit=180){
  for(let m=next.living.minute+1;m<=endMinute;m++){
   next.living.minute=m;
   minuteTick(next,m,events);
+  WORLD_ACTORS.advance(next,m);
  }
  reconcileEntities(next);
  next.revision++;

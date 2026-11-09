@@ -2,7 +2,7 @@
 
 The old temple-only editor proposal has been retired and preserved under `docs/history/architect-plan-temple-era.md`. The authoritative owner-approved design lives in [the master roadmap](demon-killer-master-roadmap.md).
 
-## Implemented foundation through M72
+## Implemented foundation through M73
 
 - The logical world grid is 9,216×9,216 tiles, each 32px in original top-down art scale, addressed through 128×128 Streaming Cells and 16×16 sectors.
 - **M71 default:** Every unpainted tile in the replacement atlas is green grass at elevation 0, without any generated mountains, ocean or buildings. The server stores one default plus sparse changes rather than 84.9 million grass tiles. Painting whole Streaming Cells back to grass removes their cell material overrides, leaving fine details and height changes individually editable.
@@ -11,7 +11,9 @@ The old temple-only editor proposal has been retired and preserved under `docs/h
 - Hold right mouse and drag to pan. Wheel zooms eight levels from full atlas (128 tiles per block) to exact 1:1 tile. Left drag paints.
 - **Whole-cell mode** is for oceans and major biomes; each 128×128-tile fill is a sparse record. **Fine mode** writes exact tile materials and heights, supporting raise/lower/flatten/smooth, original M69 paint and exact undo.
 - Painting operations are serialized and durable on DK Server, with revision checks and safe collision protections. UI supports export, undo/redo and water-area coverage.
-- M72 adds a **real server-owned walking surveyor**, using the same painted grass/water and height grid. Open **WALK HERE** in DK Architect and walk with WASD/arrows or held RMB across 128×128 cell seams in the 25×25 tile top-down view. This is a terrain test avatar, not yet connected to the full character/NPC simulation. The old four-region M68 sample still serves its own prototype.
+- M72 established the first **server-owned walking surveyor**, using the same painted grass/water and height grid. Open **WALK HERE** in DK Architect and walk with WASD/arrows or held RMB across 128×128 cell seams in the 25×25 tile top-down view. This is a terrain test avatar, not yet connected to the full character/NPC simulation. The old four-region M68 sample still serves its own prototype.
+
+- M73 makes the real slot-one character a world actor with actual global position and introduces deliberate named NPC scouts, guards, foragers and stationary workers with deterministic server-clock local movement. The editor's WALK HERE launches the living-world atlas; old M72 surveyor exists only as a testing adapter. Development resets are explicitly allowed through typed-confirmation Options. Legacy temple metadata remains temporary, and professions/quests are not yet migrated.
 
 ## Next development sequence
 

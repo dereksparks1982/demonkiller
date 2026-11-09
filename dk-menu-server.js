@@ -66,6 +66,32 @@
       });
     },
     async clock() { return request('/api/v1/clock'); },
+    async worldActorView() {return request('/api/v1/world/actors');},
+    async worldActorEnter(x,y){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Character':'enter'},
+        body:JSON.stringify({action:'enter',x,y})});
+    },
+    async worldActorCreate(name,x,y){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Character':'new_character'},
+        body:JSON.stringify({action:'new_character',name,x,y})});
+    },
+    async worldActorStep(direction){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Move':'step'},
+        body:JSON.stringify({action:'step',direction})});
+    },
+    async worldActorNPC(name,role,x,y){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-Architect':'atlas-npcs'},
+        body:JSON.stringify({action:'introduce_npc',name,role,x,y})});
+    },
+    async worldActorRemoveNPC(npc_id){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-Architect':'atlas-npcs'},
+        body:JSON.stringify({action:'remove_npc',npc_id})});
+    },
     async walkWorldView() { return request('/api/v1/world/walk'); },
     async walkWorldPlace(x,y) {
       return request('/api/v1/world/walk',{
@@ -205,6 +231,7 @@
   const start = $('dkServerStart'), stop = $('dkServerStop');
   const refreshButton = $('dkServerRefresh'), help = $('dkServerHelp');
   const checkpoint = $('dkServerCheckpoint'), backupStatus = $('dkServerSaveStatus');
+  const devReset = $('dkServerDevReset');
 
   function showOffline(details) {
     status.textContent = details;
@@ -212,6 +239,7 @@
     start.disabled = false;
     stop.disabled = true;
     checkpoint.disabled = true;
+    if(devReset)devReset.disabled=true;
     backupStatus.textContent='Verified world backups: not connected';
   }
   async function refresh() {
@@ -236,6 +264,7 @@
       start.disabled = !!worldClock.running;
       stop.disabled = !worldClock.running;
       checkpoint.disabled = false;
+      if(devReset)devReset.disabled=false;
       backupStatus.textContent = 'Verified world backups: '+saves.backup_count+
         ' · Saved revision '+saves.primary.revision+
         (saves.invalid_backups?' · '+saves.invalid_backups+' invalid backups':'')+
@@ -245,6 +274,23 @@
       help.textContent = 'DK Server is unavailable at this game address.';
     }
   }
+  if(devReset)devReset.addEventListener('click',async()=>{
+    if(!client)return;
+    const typed=window.prompt(
+     'This discards ALL current development characters, terrain and NPCs. '+
+     'Type RESET WORLD to start fresh:');
+    if(typed!=='RESET WORLD')return;
+    devReset.disabled=true;
+    try{
+      const state=await client.serverState();
+      await client.resetWorld(state.revision);
+      status.textContent='DEVELOPMENT WORLD RESET · new flat grass world ready';
+      await refresh();
+    }catch(error){
+      status.textContent='RESET NOT COMPLETED · '+error.message;
+      devReset.disabled=false;
+    }
+  });
   start.addEventListener('click', async () => {
     if (!client) {
       showOffline('CANNOT START · No persistent server has been deployed for the website.');

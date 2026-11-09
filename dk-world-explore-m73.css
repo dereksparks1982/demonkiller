@@ -1,0 +1,20 @@
+/* M73 living atlas controls, matching the plain existing pixel game UI. */
+.atlas-actors-panel{width:320px;flex:0 0 320px}
+.atlas-actors-panel form{display:grid;gap:6px;padding:8px 0;border-bottom:1px solid #52606b}
+.atlas-actors-panel label{display:grid;gap:3px;font-size:11px;color:#d8cba7}
+.atlas-actors-panel input,.atlas-actors-panel select,.atlas-actors-panel button{
+ font:12px "Courier New",monospace;border:2px solid #657d8d;border-radius:0;
+ padding:5px;background:#2f4554;color:#f4eacd;min-width:0}
+.atlas-actors-panel button{cursor:pointer;font-weight:700}
+.atlas-actors-panel button:hover,.atlas-actors-panel button:focus-visible{
+ background:#486073;outline-color:#f2d694}
+.atlas-actors-panel button:disabled{opacity:.55;cursor:not-allowed}
+.coordinate-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#dkNpcRemove{margin-top:6px}
+#dkActorCanvas{width:100%;height:auto;display:block;aspect-ratio:1;
+ image-rendering:pixelated;touch-action:none;cursor:crosshair;background:#547a41}
+.world-frame{width:min(800px,calc(100vw - 385px));border:4px solid #526a75}
+#dkActorStatus[data-error="true"]{color:#eea48c}
+@media(max-width:980px){.world-layout{flex-direction:column;align-items:center}
+ .world-frame{width:min(800px,100%)}
+ .atlas-actors-panel{width:min(800px,100%);flex:auto}}

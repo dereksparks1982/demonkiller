@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demon Killer | Living World Atlas</title>
+<link rel="stylesheet" href="./dk-world-explore-m72.css?v=m72">
+<link rel="stylesheet" href="./dk-world-explore-m73.css?v=m73">
+</head>
+<body><main>
+<header><strong>DEMON KILLER · LIVING WORLD</strong>
+<span>ONE WORLD · 9,216 × 9,216 · FLAT GRASS START</span>
+<a href="./dk-world-architect-m70.html">DK ARCHITECT</a>
+<a href="./index.html">MAIN MENU</a></header>
+<section class="world-layout">
+<div class="world-frame"><canvas id="dkActorCanvas" width="800" height="800"
+  tabindex="0" aria-label="Top-down server-owned character and NPCs"></canvas></div>
+<aside class="atlas-actors-panel">
+<h1>YOUR CHARACTER</h1>
+<p id="dkActorPosition">Connecting to DK Server…</p>
+<p id="dkActorInspect">Ground: grass · Elevation: 0</p>
+<form id="dkActorStartForm">
+<label for="dkActorName">CHARACTER NAME</label>
+<input id="dkActorName" autocomplete="off" maxlength="8" minlength="1" pattern="[A-Za-z0-9 _-]{1,8}" value="TRAVELER">
+<div class="coordinate-row">
+<label>WORLD X <input id="dkActorX" type="number" min="0" max="9215" value="4608" required></label>
+<label>WORLD Y <input id="dkActorY" type="number" min="0" max="9215" value="4608" required></label>
+</div>
+<button type="submit" id="dkActorStart">CREATE NEW WORLD CHARACTER</button>
+</form>
+<p class="world-note">New atlas characters use the real player slot, inventory and skills. This development route temporarily skips the retired temple opening. Resetting development saves is allowed.</p>
+<h1>NPC WORLD WORKERS</h1>
+<form id="dkNpcForm">
+<label>NAME <input id="dkNpcName" type="text" maxlength="24" value="Wanderer" required pattern="[A-Za-z][A-Za-z ' -]{0,23}"></label>
+<label>ROLE <select id="dkNpcRole"><option value="scout">SCOUT</option>
+<option value="guard">GUARD</option><option value="forager">FORAGER</option>
+<option value="worker">WORKER</option></select></label>
+<button type="submit">PLACE NPC AT SELECTED TILE</button>
+</form>
+<label>NEARBY NPCS <select id="dkNpcList"><option value="">None nearby</option></select></label>
+<button type="button" id="dkNpcRemove">REMOVE SELECTED NPC</button>
+<p class="world-note">Scouts, guards and foragers move on the server clock. Workers currently remain at their sites. This is the start of autonomous world populations, not finished city-building AI.</p>
+<h1>MOVEMENT</h1>
+<p>WASD / ARROWS · one cardinal step.<br>HOLD RIGHT MOUSE · walk toward cursor.<br>LEFT CLICK · inspect and select an NPC location.</p>
+<p id="dkActorStatus" role="status" aria-live="polite">Loading the world…</p>
+<p class="world-note">Your old temple character, if one exists, can enter this atlas without losing its character identity. Use Options on the main menu for an explicit development-world reset.</p>
+</aside></section>
+</main>
+<script src="./dk-menu-server.js?v=m73"></script>
+<script src="./dk-world-explore-m73.js?v=m73"></script>
+</body></html>

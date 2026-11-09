@@ -12,6 +12,7 @@ const WORLD_GRID=require('./world-grid-m67.cjs');
 const WORLD_TERRAIN=require('./world-terrain-editor-m69.cjs');
 const WORLD_ATLAS=require('./world-atlas-m70.cjs');
 const WORLD_WALKER=require('./world-walker-m72.cjs');
+const WORLD_ACTORS=require('./world-actors-m73.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
@@ -174,6 +175,7 @@ async function createDKServer({
     const regionsAdded=ensureRegions(world),livingAdded=ensureLivingWorld(world);
     const gridAdded=WORLD_GRID.ensure(world);
     const terrainAdded=WORLD_TERRAIN.ensure(world);
+    const atlasActorsAdded=WORLD_ACTORS.ensure(world);
     const resourcesAdded=ensureResources(world);
     const socialAdded=ensureSocial(world);
     const combatAdded=ensureCombat(world);
@@ -224,7 +226,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(gridAdded||terrainAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
+    if(gridAdded||terrainAdded||atlasActorsAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -342,6 +344,41 @@ async function createDKServer({
       world=result.world;
       try{await appendEvents([result.event]);}
       catch(error){console.error('Interior draft event archive failed:',error);}
+      return result;
+    });
+    writeQueue=pending.catch(()=>{});
+    return pending;
+  }
+  async function saveAtlasActor(command){
+    const pending=writeQueue.then(async()=>{
+      const isStep=command.action==='step';
+      if(isStep&&!world.runtime?.running)
+        throw Error('World is paused; press Start Server');
+      let result;
+      if(command.action==='new_character'){
+        if(Object.keys(command).sort().join(',')!=='action,name,x,y')
+          throw Error('Invalid atlas character creation');
+        if(world.characters?.['1'])
+          throw Error('A character already exists; use ENTER WORLD or reset development world');
+        WORLD_GRID.tile(command.x,command.y);
+        const created=createCharacter(world,1,command.name,now());
+        // Temporary development shortcut: begin with the existing character's
+        // genuine serial, inventory, skills and ownership, but skip obsolete
+        // temple opening. These saves are disposable until story migration.
+        const player=created.world.characters['1'];
+        player.form='living';player.opening_state='resurrected';
+        player.crystal_spent=true;player.revision++;
+        result=WORLD_ACTORS.perform(created.world,{
+          action:'enter',x:command.x,y:command.y
+        });
+      }else result=WORLD_ACTORS.perform(world,command);
+      validateWorld(result.world);
+      await snapshots.save(result.world);
+      world=result.world;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('Atlas actor history failed:',error);}
+      for(const viewer of streams)push(viewer,'world.atlas.actor',
+        {revision:world.revision,actor:result.view.actor||null});
       return result;
     });
     writeQueue=pending.catch(()=>{});
@@ -509,6 +546,37 @@ async function createDKServer({
         return sendJSON(res,400,{error:'Invalid world tile coordinates'},method);
       return sendJSON(res,200,WORLD_GRID.overview(world,
         x===null?null:Number(x),y===null?null:Number(y)),method);
+    }
+    if(url.pathname==='/api/v1/world/actors'&&!write){
+      try{return sendJSON(res,200,WORLD_ACTORS.view(world),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/world/actors'&&method==='POST'){
+      let command;
+      try{command=await readJSON(req);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
+      const action=command.action;
+      if(['enter','new_character'].includes(action)&&
+         req.headers['x-dk-world-character']!==action)
+        return sendJSON(res,403,{error:'Use the connected character controls'},method);
+      if(action==='step'&&req.headers['x-dk-world-move']!=='step')
+        return sendJSON(res,403,{error:'Use the connected walking controls'},method);
+      if(['introduce_npc','remove_npc'].includes(action)&&
+         req.headers['x-dk-architect']!=='atlas-npcs')
+        return sendJSON(res,403,{error:'DK Architect NPC editing required'},method);
+      if(!['enter','new_character','step','introduce_npc','remove_npc'].includes(action))
+        return sendJSON(res,422,{error:'Unsupported atlas actor operation'},method);
+      try{
+        const result=await saveAtlasActor(command);
+        return sendJSON(res,200,result.view,method);
+      }catch(error){
+        if(/paused|already exists|Create a saved character|before moving|blocked|occupied|impassable|boundary|too steep|population limit|beyond home/.test(error.message))
+          return sendJSON(res,409,{error:error.message},method);
+        if(/Invalid|Cardinal|Unknown atlas|Unsupported|Empty character|Character name|slot/.test(error.message))
+          return sendJSON(res,422,{error:error.message},method);
+        console.error('Atlas actor transaction failed:',error);
+        return sendJSON(res,500,{error:'Atlas actor change was not saved'},method);
+      }
     }
     if(url.pathname==='/api/v1/world/walk'&&!write){
       try{return sendJSON(res,200,WORLD_WALKER.worldView(world),method);}

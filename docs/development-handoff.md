@@ -4,7 +4,7 @@ This document is the working continuity reference if a conversation thread fills
 
 ## Source and release discipline
 
-Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The current M72 release target is game **0.2.70**, server **2.31.16**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
+Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M73 release target is game **0.2.71**, server **2.31.17**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
@@ -21,6 +21,20 @@ Do not build until explicitly instructed. When authorized: inspect current HEAD,
 - Kilns and heavy industrial equipment should have **very rare** breakdowns after years, not constantly wear out. M50/M66 failures need rebalancing.
 - NPCs must autonomously found differentiated settlements, disagree and secede, trade and make peace or war, operate companies and continue independent lives. Avoid WorldBox's arbitrary population blobs and repetitive all-out war.
 - Study the full private-server mod list in the master roadmap, prioritizing Nerun's Distro, OWLTR, FS-ATS, Xanthos Evo/Shrink, Knives Town Houses and Knives Chat. Do not copy proprietary UO art or unsuitable GPL code into commercial game source.
+
+## M73: actual character, atlas NPCs, clean development resets
+
+**Owner explicitly prefers disposable development saves and clean resets.** Do not spend subsequent builds maintaining compatibility with old temple/wilderness save data when schema changes warrant resetting. Existing world terrain, streaming-cell architecture, editor, inventory and NPC modules remain useful, but the old rendered temple/village geometry is retired as a design target. A fresh development world remains the same green plane; it is reset by a typed-confirmation **Options → RESET DEVELOPMENT WORLD** button, using the existing server reset endpoint. Do not reset without the owner's explicit action.
+
+`server/world-actors-m73.cjs` adds the first actual slot-one `character.atlas_position={x,y,facing,steps}`, **not** just M72's detached surveyor. New development characters are created using `WORLD.createCharacter` with ordinary slot, inventory, skills, entity registry and identity; then temporarily start **living** in the atlas with obsolete opening skipped. Existing saved character profiles can be entered without duplication. The old `area_id` remains as a compatibility-only field for legacy systems; this does NOT constitute final migration of old RPG quest/combat/job services. A later build should retire that field after relocating dependent systems.
+
+Autonomous atlas NPC prototypes are named `atlas_npc_N` and live under `world.living.atlas_npcs`, separately from legacy village NPCs. Allowed roles are scout, guard, forager and worker. The world minute calls `WORLD_ACTORS.advance(next,m)`, moving nonworkers on bounded, deterministic local routes and leaving workers at the site. All movements use authoritative height/material checks and occupation. Nothing automatically populates a city; NPCs are added deliberately through the M73 connected atlas UI. Protect real atlas characters/NPCs from impassable world brushes.
+
+**UI:** `dk-world-explore-m73.html` and JS/CSS show original 32×32 characters, a 25×25 top-down view, real character name/form, local NPCs, creation/enter, WASD/arrows/RMB travel, and NPC placement/removal. DK Architect WALK HERE and Main Menu link to this route; the old M72 test page still exists for regression purposes. DK Server `GET/POST /api/v1/world/actors` powers the new view; action-dependent allowlisted headers and revisioned transactional server saves prevent arbitrary world snapshots.
+
+**Not yet complete:** real NPC inventories, hiring, craft contracts, player-owned real estate, item spawning, combat on global atlas, final retirement of temple-area bookkeeping, autonomous towns, and permanent hosted server. The tiny NPC patrol is not an autonomous civilization. New `tests/world-actors-m73.cjs` adds focused and HTTP contracts. Isolated source-level tests passed entity navigation, patrol movement, worker stationarity, malformed requests and source syntax; full Node and Firefox verification require a checkout.
+
+**Next:** M74 should remove the old-area dependence of actual character/NPC gameplay and begin common world-space entity queries, with minimal 2D cliff/shore legibility. Maintain owner control of terrain; do not auto-build a city or impose 3D rendering.
 
 ## M72: persistent top-down world walking (November 8, 2026)
 

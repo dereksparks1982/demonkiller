@@ -156,6 +156,10 @@ function brushTiles(command){
 function obstructed(world,x,y,material){
  if(!SOLID.has(material))return false;
  if(world.world_grid?.walker?.x===x&&world.world_grid.walker.y===y)return true;
+ const actor=world.characters?.['1']?.atlas_position;
+ if(actor?.x===x&&actor.y===y)return true;
+ if(Object.values(world.living?.atlas_npcs?.records||{}).some(n=>
+   n.x===x&&n.y===y))return true;
  const a=areaTile(world,x,y);
  if(a){
   const c=world.characters?.['1'];
