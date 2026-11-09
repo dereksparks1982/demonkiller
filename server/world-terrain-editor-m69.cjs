@@ -154,6 +154,9 @@ function brushTiles(command){
  return tiles;
 }
 function obstructed(world,x,y,material){
+ // A staked site protects every tile against both painting and elevation edits.
+ if(Object.values(world.living?.atlas_sites?.records||{}).some(s=>
+  x>=s.x&&y>=s.y&&x<s.x+s.width&&y<s.y+s.height))return true;
  if(!SOLID.has(material))return false;
  if(world.world_grid?.walker?.x===x&&world.world_grid.walker.y===y)return true;
  const actor=world.characters?.['1']?.atlas_position;

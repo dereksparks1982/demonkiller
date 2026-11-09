@@ -4,7 +4,7 @@ This document is the working continuity reference if a conversation thread fills
 
 ## Source and release discipline
 
-Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M74 source target is game **0.2.72**, server **2.31.18**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
+Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M75 source target is game **0.2.73**, server **2.31.19**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
@@ -21,6 +21,14 @@ Do not build until explicitly instructed. When authorized: inspect current HEAD,
 - Kilns and heavy industrial equipment should have **very rare** breakdowns after years, not constantly wear out. M50/M66 failures need rebalancing.
 - NPCs must autonomously found differentiated settlements, disagree and secede, trade and make peace or war, operate companies and continue independent lives. Avoid WorldBox's arbitrary population blobs and repetitive all-out war.
 - Study the full private-server mod list in the master roadmap, prioritizing Nerun's Distro, OWLTR, FS-ATS, Xanthos Evo/Shrink, Knives Town Houses and Knives Chat. Do not copy proprietary UO art or unsuitable GPL code into commercial game source.
+
+## M75: physical staged construction and paid autonomous work
+
+M75 stores sparse real-world shed (2×2) and cottage (3×3) site footprints. A connected player stakes a preflattened, passable, unoccupied nearby area; terrain editing stays the DK Architect landscape tool. Site inventories receive real player/NPC M74 resources and only consume materials on completion of each separate foundation, frame and roof stage. Manual work is step-by-step. Workers must be stationed nearby and explicitly assigned, operate every fifteen world minutes while the server process is running, and receive one gold per item delivered or work step. That gold is debited from the real character and credited to a saved NPC `coins` field. Progress pauses for missing gold/materials. Completed foundations block player/NPC travel; staked footprints are protected against fine/broad terrain paint. An unfinished site can be canceled with unused inventory refunded if space allows. The old M67 plan schema stays distinct and cannot overlap an active construction site.
+
+The connected living-world page shows site phases, stage materials, work/progress, stocks and crew. Server writes are serialized through `POST /api/v1/world/construction` and require expected revision. New `tests/atlas-construction-m75.cjs` add direct and HTTP regression contracts. Only syntax and isolated V8 behavior have been verified remotely. Run the complete Node suite and visually verify connected Firefox before acceptance. No automatic city founding, indoor rooms, finished-home interactions or remote hauling has been implemented.
+
+**Next M76:** treat completed building footprints as usable structures with doors and interiors, player and NPC ownership, storage and workplace access. Then develop explicit transport and contracts for autonomous settlers.
 
 ## M74: terrain gathering and persistent NPC material packs
 

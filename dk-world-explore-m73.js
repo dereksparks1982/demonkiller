@@ -10,6 +10,8 @@ const status=document.getElementById('dkActorStatus');
 const pos=document.getElementById('dkActorPosition');
 const inspectEl=document.getElementById('dkActorInspect');
 const suppliesEl=document.getElementById('dkActorSupplies');
+const siteList=document.getElementById('dkBuildSites');
+const siteSummary=document.getElementById('dkBuildSummary');
 const startForm=document.getElementById('dkActorStartForm');
 const startButton=document.getElementById('dkActorStart');
 const npcForm=document.getElementById('dkNpcForm');
@@ -78,6 +80,17 @@ function draw(){
    ctx.fillRect(x+3,y+4,4,3);
   }
  }
+ for(const site of view.sites||[]){
+  const col=site.x-view.actor.x+RADIUS,row=site.y-view.actor.y+RADIUS;
+  ctx.fillStyle=['#9e977e','#7c817f','#a27c51','#594a3f'][site.phase];
+  for(let dy=0;dy<site.height;dy++)for(let dx=0;dx<site.width;dx++){
+   const gx=col+dx,gy=row+dy;
+   if(gx<0||gy<0||gx>=N||gy>=N)continue;
+   ctx.fillRect(gx*TILE+3,gy*TILE+3,TILE-6,TILE-6);
+   ctx.fillStyle='#d1bb84';ctx.fillRect(gx*TILE+5,gy*TILE+5,TILE-10,2);
+   ctx.fillStyle=['#9e977e','#7c817f','#a27c51','#594a3f'][site.phase];
+  }
+ }
  for(const n of view.npcs||[]){
   const col=n.x-view.actor.x+RADIUS,row=n.y-view.actor.y+RADIUS;
   if(col<0||row<0||col>=N||row>=N)continue;
@@ -107,6 +120,8 @@ function refreshUI(data){
   inspectEl.textContent='Default ground: grass · Elevation: 0';
   suppliesEl.textContent='Supplies: empty';
   npcList.replaceChildren(new Option('No nearby NPCs',''));
+  siteList.replaceChildren(new Option('NO SITES',''));
+  siteSummary.textContent='Enter the world to start construction.';
   draw();return;
  }
  const a=data.actor;
@@ -119,6 +134,14 @@ function refreshUI(data){
   (Object.entries(data.supplies||{}).map(([k,v])=>k+' '+v).join(' · ')||'empty');
  inspectEl.textContent='Ground: '+(center?.[0]||'unknown')+
   ' · Elevation: '+(center?.[1]??0)+' · NPCs nearby: '+data.npcs.length;
+ const selectedSite=siteList.value;
+ siteList.replaceChildren(new Option((data.sites||[]).length?'SELECT NEARBY SITE':'NO SITES',''));
+ for(const site of data.sites||[]){
+  siteList.add(new Option(site.id+' · '+site.kind+' · '+site.stage,site.id));
+ }
+ if((data.sites||[]).some(site=>site.id===selectedSite))siteList.value=selectedSite;
+ else if((data.sites||[]).length)siteList.value=data.sites[0].id;
+ updateSiteSummary();
  const previous=npcList.value;
  npcList.replaceChildren(new Option(data.npcs.length?'SELECT NEARBY NPC':'NONE NEARBY',''));
  for(const n of data.npcs)
@@ -127,6 +150,49 @@ function refreshUI(data){
  if(data.npcs.some(n=>n.id===previous))npcList.value=previous;
  draw();
 }
+function updateSiteSummary(){
+ const site=(view?.sites||[]).find(s=>s.id===siteList.value);
+ if(!site){siteSummary.textContent='Select level ground near your character, then stake a building site.';return;}
+ const list=part=>Object.entries(part).map(([k,v])=>k+':'+v).join(' · ')||'none';
+ siteSummary.textContent=site.kind.toUpperCase()+' · '+site.stage.toUpperCase()+
+  ' · '+site.progress+'/'+site.work_required+' work · stock '+list(site.stock)+
+  ' · stage needs '+list(site.missing)+' · assigned '+site.workers.length+
+  ' · your gold '+(view?.gold??0);
+}
+siteList.addEventListener('change',updateSiteSummary);
+function buildCommand(operation,details={}){
+ if(!api?.worldConstruction||!view?.started){
+  say('Connect and enter the world to construct',true);return;
+ }
+ const siteId=siteList.value;
+ if(operation!=='place'&&!siteId){say('Select a nearby construction site first',true);return;}
+ void action(()=>api.worldConstruction({
+  action:operation,expected_revision:view.world_revision,
+  ...(operation==='place'?details:{site_id:siteId,...details})
+ }),operation==='place'?'Construction site staked and saved.':
+  'Construction command saved on DK Server.');
+}
+document.getElementById('dkBuildPlace').addEventListener('click',()=>{
+ if(!chosen)return say('Choose the northwest tile with left click',true);
+ buildCommand('place',{kind:document.getElementById('dkBuildKind').value,
+  x:chosen.x,y:chosen.y});
+});
+document.getElementById('dkBuildDeliver').addEventListener('click',()=>{
+ const quantity=Number(document.getElementById('dkBuildQuantity').value);
+ if(!Number.isSafeInteger(quantity)||quantity<1||quantity>8)
+  return say('Choose a delivery amount between 1 and 8',true);
+ buildCommand('deliver',{item:document.getElementById('dkBuildMaterial').value,quantity});
+});
+document.getElementById('dkBuildLabor').addEventListener('click',()=>buildCommand('labor'));
+document.getElementById('dkBuildAssign').addEventListener('click',()=>{
+ if(!npcList.value)return say('Select a worker NPC',true);
+ buildCommand('assign',{npc_id:npcList.value});
+});
+document.getElementById('dkBuildUnassign').addEventListener('click',()=>{
+ if(!npcList.value)return say('Select a worker NPC',true);
+ buildCommand('unassign',{npc_id:npcList.value});
+});
+document.getElementById('dkBuildCancel').addEventListener('click',()=>buildCommand('cancel'));
 const query=new URLSearchParams(location.search);
 function preferred(){
  const x=Number(document.getElementById('dkActorX').value),
@@ -209,6 +275,9 @@ if(canvas){
    const p=clientPosition(e);
    if(p?.tile){
     chosen={x:p.x,y:p.y};
+    const selectedSite=(view.sites||[]).find(s=>
+      p.x>=s.x&&p.x<s.x+s.width&&p.y>=s.y&&p.y<s.y+s.height);
+    if(selectedSite){siteList.value=selectedSite.id;updateSiteSummary();}
     inspectEl.textContent=p.x+','+p.y+' · '+p.tile[0]+
      ' · elevation '+p.tile[1]+' · selected for NPC placement';
     draw();

@@ -6,6 +6,7 @@ const GRID=require('./world-grid-m67.cjs');
 const TERRAIN=require('./world-terrain-editor-m69.cjs');
 const WALK=require('./world-walker-m72.cjs');
 const GATHER=require('./atlas-gathering-m74.cjs');
+const CONSTRUCTION=require('./atlas-construction-m75.cjs');
 const ROLES=new Set(['scout','guard','forager','worker']);
 const DIRECTIONS=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
 const LIMIT=32,RADIUS=12,INTERVAL=4;
@@ -44,8 +45,11 @@ function validate(world){
  const used=new Set();
  for(const [id,n] of entries){
   if(!/^atlas_npc_[1-9][0-9]{0,5}$/.test(id)||!n||n.id!==id||
-   Object.keys(n).sort().join(',')!==
-    'alive,facing,home_x,home_y,id,name,role,steps,x,y'||
+   (Object.keys(n).sort().join(',')!==
+    'alive,facing,home_x,home_y,id,name,role,steps,x,y'&&
+    Object.keys(n).sort().join(',')!==
+    'alive,coins,facing,home_x,home_y,id,name,role,steps,x,y')||
+   (n.coins!==undefined&&(!Number.isSafeInteger(n.coins)||n.coins<0||n.coins>1e9))||
    typeof n.name!=='string'||!/^[A-Za-z][A-Za-z '-]{1,23}$/.test(n.name)||
    !ROLES.has(n.role)||n.alive!==true||
    !Object.hasOwn(DIRECTIONS,n.facing)||
@@ -100,17 +104,19 @@ function view(world,{radius=RADIUS}={}){
   rows.push(row);
  }
  const location=GRID.tile(actor.x,actor.y);
+ const sites=CONSTRUCTION.nearby(world,actor.x,actor.y,radius);
  const npcs=Object.values(world.living?.atlas_npcs?.records||{})
   .filter(n=>Math.abs(n.x-actor.x)<=radius&&Math.abs(n.y-actor.y)<=radius)
   .map(n=>({id:n.id,name:n.name,role:n.role,x:n.x,y:n.y,
-    facing:n.facing,steps:n.steps,pack:GATHER.inventory(world,n.id)}))
+    facing:n.facing,steps:n.steps,pack:GATHER.inventory(world,n.id),coins:n.coins||0}))
   .sort((a,b)=>a.id.localeCompare(b.id));
  return {started:true,has_character:true,character_name:player.name,
   kind:'character',world_revision:world.revision,
   actor:{...actor,cell_id:location.cell.id,sector_id:location.sector.id,
    name:player.name,form:player.form,slot:player.slot,character_revision:player.revision,
    war_mode:player.war_mode===true},
-  radius,tiles:rows,npcs,supplies:GATHER.inventory(world,'player'),
+  radius,tiles:rows,npcs,sites,supplies:GATHER.inventory(world,'player'),
+  gold:player.gold??0,
   world_minute:world.living.minute,
   atlas:{width:GRID.WIDTH,height:GRID.HEIGHT,cell_size:GRID.CELL}};
 }
@@ -170,7 +176,7 @@ function perform(world,command){
   const store=next.living.atlas_npcs,id='atlas_npc_'+(++store.sequence);
   store.records[id]={id,name:command.name,role:command.role,alive:true,
    x:command.x,y:command.y,home_x:command.x,home_y:command.y,
-   facing:'south',steps:0};
+   facing:'south',steps:0,coins:0};
   e=event(next,'atlas.npc.arrive',command.name+' arrived in the world atlas',
    {npc_id:id,x:command.x,y:command.y});
  }else if(command.action==='gather'){
@@ -187,6 +193,8 @@ function perform(world,command){
   if(!npc)throw Error('Unknown atlas NPC');
   delete next.living.atlas_npcs.records[command.npc_id];
   delete next.living.atlas_resources.packs.npcs[command.npc_id];
+  for(const site of Object.values(next.living.atlas_sites?.records||{}))
+   site.workers=site.workers.filter(id=>id!==command.npc_id);
   e=event(next,'atlas.npc.depart',npc.name+' left the world atlas',
    {npc_id:command.npc_id});
  }else throw Error('Unknown atlas actor command');

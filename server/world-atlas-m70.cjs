@@ -37,8 +37,12 @@ function validateCellCommand(c){
  return out;
 }
 function impassableBlocked(world,cx,cy,material){
- if(!TERRAIN.SOLID.has(material))return false;
  const bounds=GRID.cellBounds(cx,cy);
+ // Protect building stakes even from broad passable material fills.
+ if(Object.values(world.living?.atlas_sites?.records||{}).some(s=>
+   s.x<bounds.x+bounds.width&&s.x+s.width>bounds.x&&
+   s.y<bounds.y+bounds.height&&s.y+s.height>bounds.y))return true;
+ if(!TERRAIN.SOLID.has(material))return false;
  const contained=(x,y)=>x>=bounds.x&&y>=bounds.y&&x<bounds.x+bounds.width&&y<bounds.y+bounds.height;
  const walker=world.world_grid?.walker;
  if(walker&&contained(walker.x,walker.y))return true;

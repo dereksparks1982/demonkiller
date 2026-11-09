@@ -114,6 +114,8 @@ function planBuilding(world,input){
   state:'draft',x:input.x,y:input.y,width:input.width,height:input.height};
  validBuilding(b.id,b);
  if(world.world_grid.buildings[b.id])throw Error('Building ID already in use');
+ if(Object.values(world.living?.atlas_sites?.records||{}).some(s=>overlap(b,s)))
+  throw Error('Building draft overlaps an atlas construction site');
  world.world_grid.buildings[b.id]=b;
  try{validate(world);}catch(e){delete world.world_grid.buildings[b.id];throw e;}
  // Planning a footprint does not create usable buildings, equipment or supplies.

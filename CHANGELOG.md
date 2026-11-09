@@ -1,3 +1,12 @@
+## v0.2.73 / M75 | 2026-11-08 | Real paid multi-stage construction
+
+- Added sparse global 2×2 shed and 3×3 cottage sites, level footprint validation, collision, spatial proximity and legacy-plan overlap protection. DK Architect is the preparation tool.
+- Player deposits physical M74 materials into each saved construction site. Three distinct foundation/frame/roof work phases consume their actual material recipes; no instant free buildings.
+- Assigned worker NPCs deliver their own materials and work at 15-minute server intervals, receiving one gold per item or step from the player's real wallet. Work halts without funds or required supplies.
+- Construction footprints resist fine sculpting and broad cell-painting; finished foundations become solid. Unfinished site cancellation refunds unspent stock if capacity permits.
+- Connected atlas page adds basic stage visualization, site selection, stock readouts, deliveries, work and worker assignment; one serialized revision-checked construction API.
+- Added M75 Node test contracts and project documentation. Full Node regression and manual browser verification require a Linux checkout. Building interiors, property/business systems, NPC settlement founding and distant-hauling contracts remain for later builds.
+
 ## v0.2.72 / M74 | 2026-11-08 | Terrain-based gathering and real NPC supplies
 
 - Linked finite harvestable timber, herbs, reeds, stone and clay directly to the actual owner-painted global terrain. All default green grass remains empty of resources.

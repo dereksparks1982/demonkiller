@@ -40,12 +40,30 @@
 <label>NEARBY NPCS <select id="dkNpcList"><option value="">None nearby</option></select></label>
 <button type="button" id="dkNpcRemove">REMOVE SELECTED NPC</button>
 <p class="world-note">Foragers gather timber, herbs and reeds from authored woodland and wetland; stationary workers collect stone/clay from nearby terrain once per world hour. Patches recover over six world hours. Carried supplies persist without an open browser while the server runs. These are not yet building crews or a trading economy.</p>
+<h1>REAL CONSTRUCTION · M75</h1>
+<div class="build-controls">
+<label>BUILDING <select id="dkBuildKind"><option value="shed">SHED (2 × 2)</option>
+<option value="cottage">COTTAGE (3 × 3)</option></select></label>
+<button type="button" id="dkBuildPlace">STAKE OUT SITE AT SELECTED TILE</button>
+<label>NEARBY SITES <select id="dkBuildSites"><option value="">NO SITES</option></select></label>
+<p id="dkBuildSummary" class="world-note">Level a footprint in DK Architect before placing.</p>
+<label>DELIVER ITEM <select id="dkBuildMaterial">
+<option value="timber">TIMBER</option><option value="stone">STONE</option>
+<option value="clay">CLAY</option><option value="reeds">REEDS</option></select></label>
+<label>QUANTITY <input id="dkBuildQuantity" type="number" min="1" max="8" value="1"></label>
+<button type="button" id="dkBuildDeliver">DELIVER FROM MY PACK</button>
+<button type="button" id="dkBuildLabor">WORK ONE CONSTRUCTION STEP</button>
+<button type="button" id="dkBuildAssign">ASSIGN SELECTED WORKER NPC</button>
+<button type="button" id="dkBuildUnassign">UNASSIGN SELECTED WORKER NPC</button>
+<button type="button" id="dkBuildCancel">CANCEL UNFINISHED SITE / REFUND UNUSED STOCK</button>
+<p class="world-note">Foundation, frame and roof each consume real supplies. Assigned workers deliver their own materials and earn one gold per item or work step. No funds or inputs, no work. Completed foundations are solid.</p>
+</div>
 <h1>MOVEMENT</h1>
 <p>WASD / ARROWS · one cardinal step.<br>HOLD RIGHT MOUSE · walk toward cursor.<br>LEFT CLICK · inspect and select an NPC location.</p>
 <p id="dkActorStatus" role="status" aria-live="polite">Loading the world…</p>
 <p class="world-note">Your old temple character, if one exists, can enter this atlas without losing its character identity. Use Options on the main menu for an explicit development-world reset.</p>
 </aside></section>
 </main>
-<script src="./dk-menu-server.js?v=m73"></script>
-<script src="./dk-world-explore-m73.js?v=m73"></script>
+<script src="./dk-menu-server.js?v=m75"></script>
+<script src="./dk-world-explore-m73.js?v=m75"></script>
 </body></html>
