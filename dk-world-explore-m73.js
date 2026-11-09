@@ -35,9 +35,14 @@ const siteSummary=document.getElementById('dkBuildSummary');
 const houseList=document.getElementById('dkBuildingList');
 const houseSummary=document.getElementById('dkBuildingSummary');
 const housePanel=document.getElementById('dkBuildingControls');
-const cacheList=document.getElementById('dkCacheList');
+const cacheList=document.getElementById('dkCacheList'),
+ bodyList=document.getElementById('dkBodyList'),
+ gearList=document.getElementById('dkCarriedGear'),
+ cacheGearList=document.getElementById('dkStoredGear'),
+ bodyGearList=document.getElementById('dkBodyGear');
+const afterlifeStatus=document.getElementById('dkAfterlifeStatus');
 const cacheSummary=document.getElementById('dkCacheSummary');
-const cacheMine=document.getElementById('dkCacheMine');
+const bodySummary=document.getElementById('dkBodySummary');
 const startForm=document.getElementById('dkActorStartForm');
 const startButton=document.getElementById('dkActorStart');
 const npcForm=document.getElementById('dkNpcForm');
@@ -243,20 +248,26 @@ function draw(){
   ctx.fillRect(col*TILE+8,row*TILE+8,16,16);
   ctx.fillStyle='#292825';ctx.fillRect(col*TILE+14,row*TILE+15,4,5);
  }
- // Hidden caches are only rendered once this character knows their location.
- for(const hidden of view.caches?.nearby||[]){
-  const col=hidden.x-view.actor.x+RADIUS,row=hidden.y-view.actor.y+RADIUS;
-  if(col<0||row<0||col>=N||row>=N)continue;
-  ctx.fillStyle=hidden.owned?'#c9ad6b':'#aa7754';
-  ctx.fillRect(col*TILE+9,row*TILE+17,14,9);
-  ctx.fillStyle='#34312c';ctx.fillRect(col*TILE+12,row*TILE+18,8,2);
-  ctx.fillStyle='#d6bf8b';ctx.fillRect(col*TILE+11,row*TILE+14,10,3);
+ for(const cache of view.afterlife?.nearby_caches||[]){
+  const gx=cache.x-view.actor.x+RADIUS,gy=cache.y-view.actor.y+RADIUS;
+  if(gx<0||gy<0||gx>=N||gy>=N)continue;
+  ctx.fillStyle='#68513f';ctx.fillRect(gx*TILE+8,gy*TILE+11,17,13);
+  ctx.fillStyle='#c9ad79';ctx.fillRect(gx*TILE+10,gy*TILE+10,13,3);
+  ctx.fillStyle='#2a2630';ctx.fillRect(gx*TILE+16,gy*TILE+16,3,5);
+ }
+ for(const body of view.afterlife?.nearby_corpses||[]){
+  const gx=body.x-view.actor.x+RADIUS,gy=body.y-view.actor.y+RADIUS;
+  if(gx<0||gy<0||gx>=N||gy>=N)continue;
+  ctx.fillStyle=body.stage==='skeletal'?'#bdaf94':body.stage==='gone'?'#605747':'#735350';
+  ctx.fillRect(gx*TILE+6,gy*TILE+16,20,8);
+  ctx.fillRect(gx*TILE+8,gy*TILE+11,7,7);
+  ctx.fillStyle='#302730';ctx.fillRect(gx*TILE+9,gy*TILE+12,3,2);
  }
  for(const n of view.npcs||[]){
   const col=n.x-view.actor.x+RADIUS,row=n.y-view.actor.y+RADIUS;
   if(col<0||row<0||col>=N||row>=N)continue;
   paintActor(col,row,'living',n.facing,'#b8a27b');
-  ctx.fillStyle=n.role==='guard'?'#efb54d':n.role==='forager'?'#94cb7a':
+  ctx.fillStyle=n.role==='monster'?'#c94a60':n.role==='guard'?'#efb54d':n.role==='forager'?'#94cb7a':
    n.role==='worker'?'#cd9380':'#a3bede';
   ctx.fillRect(col*TILE+2,row*TILE+2,6,5);
  }
@@ -283,17 +294,14 @@ function refreshUI(data){
    'No character yet. Choose a name and enter the new world.';
   inspectEl.textContent='Default ground: grass · Elevation: 0';
   suppliesEl.textContent='Supplies: empty';
+  afterlifeStatus.textContent='Enter the atlas to create caches or explore your mortality.';
   npcList.replaceChildren(new Option('No nearby NPCs',''));
   siteList.replaceChildren(new Option('NO SITES',''));
   siteSummary.textContent='Enter the world to start construction.';
   houseList.replaceChildren(new Option('NO COMPLETED BUILDINGS',''));
   houseSummary.textContent='Complete a construction site first.';
-  cacheList.replaceChildren(new Option('NONE DISCOVERED',''));
-  cacheMine.textContent='None yet.';
-  cacheSummary.textContent='Enter the world before creating or finding caches.';
   draw();return;
  }
- updateCacheList(data);
  const a=data.actor;
  pos.textContent=data.interior?
   a.name+' · INSIDE '+data.interior.kind.toUpperCase()+
@@ -329,6 +337,7 @@ function refreshUI(data){
  else if((data.buildings||[]).some(b=>b.id===oldHouse))houseList.value=oldHouse;
  else if((data.buildings||[]).length)houseList.value=data.buildings[0].id;
  updateHouseSummary();
+ updateAfterlife();
  const previous=npcList.value;
  npcList.replaceChildren(new Option(data.npcs.length?'SELECT NEARBY NPC':'NONE NEARBY',''));
  for(const n of data.npcs)
@@ -337,6 +346,58 @@ function refreshUI(data){
  if(data.npcs.some(n=>n.id===previous))npcList.value=previous;
  draw();
 }
+function labelStock(stock){
+ return Object.entries(stock||{}).map(([k,v])=>k+' '+v).join(' · ')||'empty';
+}
+function updateAfterlife(){
+ const a=view?.afterlife||{};
+ afterlifeStatus.textContent=(view?.actor.form==='ghost'?
+  'GHOST · cannot move physical goods':'LIVING · gear and gold remain physical')+
+  ' · carried gold '+(view?.gold??0)+' · physical resources '+labelStock(view?.supplies);
+ const oldCache=cacheList.value,oldBody=bodyList.value;
+ cacheList.replaceChildren(new Option('SELECT CACHE',''));
+ for(const c of a.nearby_caches||[])
+  cacheList.add(new Option(c.id+' @'+c.x+','+c.y+(c.owner_self?' · yours':' · found'),c.id));
+ for(const c of a.cache_index||[]){
+  if((a.nearby_caches||[]).some(x=>x.id===c.id))continue;
+  cacheList.add(new Option(c.id+' @'+c.x+','+c.y+' · mapped',c.id));
+ }
+ if([...cacheList.options].some(o=>o.value===oldCache))cacheList.value=oldCache;
+ else if(cacheList.options.length>1)cacheList.selectedIndex=1;
+ bodyList.replaceChildren(new Option('SELECT BODY',''));
+ for(const b of a.nearby_corpses||[])
+  bodyList.add(new Option(b.id+' · '+b.stage+' @'+b.x+','+b.y,b.id));
+ if([...bodyList.options].some(o=>o.value===oldBody))bodyList.value=oldBody;
+ else if(bodyList.options.length>1)bodyList.selectedIndex=1;
+ gearList.replaceChildren(new Option('SELECT CARRIED SERIAL',''));
+ for(const i of a.gear||[])
+  gearList.add(new Option(i.serial+' · '+i.type+' x'+i.amount,i.serial));
+ updateAfterlifeSelect();
+}
+function updateAfterlifeSelect(){
+ const a=view?.afterlife||{};
+ const c=(a.nearby_caches||[]).find(x=>x.id===cacheList.value);
+ const b=(a.nearby_corpses||[]).find(x=>x.id===bodyList.value);
+ if(c){
+  cacheSummary.textContent=c.id+' · physical supplies '+labelStock(c.stock)+
+   ' · '+c.coins+' coins · gear '+(c.items?.length||0)+
+   (c.marked?' · personal map marked':' · unmarked');
+ }else cacheSummary.textContent='Cache out of reach. Walk beside it or create one. Mapped sites are not remotely accessible.';
+ if(b){
+  bodySummary.textContent=b.stage.toUpperCase()+
+   ' · '+labelStock(b.stock)+' · '+b.coins+' coins · items '+b.items.length+
+   ' · taken by '+(b.stolen_by?.join(', ')||'nobody');
+ }else bodySummary.textContent='No remains selected nearby.';
+ const prevCacheGear=cacheGearList.value,prevBodyGear=bodyGearList.value;
+ cacheGearList.replaceChildren(new Option('SELECT CACHED ITEM',''));
+ for(const i of c?.items||[])cacheGearList.add(new Option(i.serial+' · '+i.type+' x'+i.amount,i.serial));
+ if([...cacheGearList.options].some(o=>o.value===prevCacheGear))cacheGearList.value=prevCacheGear;
+ bodyGearList.replaceChildren(new Option('SELECT CORPSE ITEM',''));
+ for(const i of b?.items||[])bodyGearList.add(new Option(i.serial+' · '+i.type+' x'+i.amount,i.serial));
+ if([...bodyGearList.options].some(o=>o.value===prevBodyGear))bodyGearList.value=prevBodyGear;
+}
+cacheList.addEventListener('change',updateAfterlifeSelect);
+bodyList.addEventListener('change',updateAfterlifeSelect);
 function updateSiteSummary(){
  const site=(view?.sites||[]).find(s=>s.id===siteList.value);
  if(!site){siteSummary.textContent='Select level ground near your character, then stake a building site.';return;}
@@ -347,54 +408,6 @@ function updateSiteSummary(){
   ' · your gold '+(view?.gold??0);
 }
 siteList.addEventListener('change',updateSiteSummary);
-function updateCacheList(data){
- const prior=cacheList.value;
- const nearby=data.caches?.nearby||[];
- cacheList.replaceChildren(new Option(nearby.length?'SELECT CACHE':'NONE DISCOVERED',''));
- for(const c of nearby)cacheList.add(new Option(c.id+' · '+c.x+','+c.y+
-  (c.owned?' · YOURS':' · DISCOVERED'),c.id));
- if(nearby.some(c=>c.id===prior))cacheList.value=prior;
- cacheMine.textContent=(data.caches?.mine||[]).map(c=>
-  c.id+' at '+c.x+','+c.y+' (permanent)').join(' · ')||'None yet.';
- updateCacheSummary();
-}
-function updateCacheSummary(){
- const c=(view?.caches?.nearby||[]).find(x=>x.id===cacheList.value);
- if(!c){cacheSummary.textContent='Move near a known cache or search a nearby tile.';return;}
- cacheSummary.textContent=c.id+' at '+c.x+','+c.y+
-  ' · '+(c.owned?'OWNED':'FOUND, LOOTABLE')+
-  ' · stock '+(Object.entries(c.stock||{}).map(([k,n])=>k+' '+n).join(', ')||'empty')+
-  ' · capacity '+c.capacity+' · DOES NOT DECAY';
-}
-cacheList.addEventListener('change',updateCacheSummary);
-function cacheAction(operation,details={}){
- if(!view?.started||view.interior||!api?.worldCache)
-  return say('Visit the living world outside to use a cache.',true);
- const command={action:operation,expected_revision:view.world_revision,...details};
- void action(()=>api.worldCache(command),
-  operation==='create'?'Permanent hidden cache created and saved.':
-  operation==='discover'?'You searched the selected tile.':
-  'Physical cache transfer saved.');
-}
-document.getElementById('dkCacheCreate').addEventListener('click',()=>{
- if(!chosen)return say('Select nearby ground for the cache first.',true);
- cacheAction('create',{x:chosen.x,y:chosen.y});
-});
-document.getElementById('dkCacheDiscover').addEventListener('click',()=>{
- if(!chosen)return say('Select nearby ground to search.',true);
- cacheAction('discover',{x:chosen.x,y:chosen.y});
-});
-for(const operation of ['deposit','withdraw']){
- document.getElementById(operation==='deposit'?'dkCacheDeposit':'dkCacheWithdraw')
-  .addEventListener('click',()=>{
-   if(!cacheList.value)return say('Select a discovered cache first.',true);
-   const quantity=Number(document.getElementById('dkCacheQuantity').value);
-   if(!Number.isSafeInteger(quantity)||quantity<1||quantity>32)
-    return say('Choose between 1 and 32 items.',true);
-   cacheAction(operation,{cache_id:cacheList.value,
-    item:document.getElementById('dkCacheItem').value,quantity});
-  });
-}
 function updateHouseSummary(){
  const b=(view?.buildings||[]).find(x=>x.id===houseList.value);
  if(!b){houseSummary.textContent='No completed building nearby. Finish construction first.';return;}
@@ -528,6 +541,55 @@ document.getElementById('dkActorGather').addEventListener('click',()=>{
  void action(()=>api.worldActorGather(chosen.x,chosen.y),
   'Gathered a physical supply and saved it in your atlas pack.');
 });
+const afterlifeAction=(operation,message)=>
+ void action(()=>api.worldAfterlife(operation),message);
+function aQuantity(){
+ const n=Number(document.getElementById('dkCacheQuantity').value);
+ if(!Number.isSafeInteger(n)||n<1||n>64)throw Error('Choose 1–64 supplies');
+ return n;
+}
+function aDo(action,extra={},message='Persistent storage updated'){
+ if(!view?.started||!api||view.interior)return say('Enter the exterior atlas first',true);
+ try{afterlifeAction({action,...extra},message);}
+ catch(error){say(error.message,true);}
+}
+document.getElementById('dkCacheCreate').addEventListener('click',()=>{
+ if(!chosen)return say('Left-click ground near you first',true);
+ aDo('cache_create',{x:chosen.x,y:chosen.y},'Buried a permanent cache at '+chosen.x+','+chosen.y);
+});
+for(const [control,mark] of [['dkCacheMark',true],['dkCacheUnmark',false]])
+ document.getElementById(control).addEventListener('click',()=>
+  aDo('cache_mark',{id:cacheList.value,marked:mark},'Cache map marker updated'));
+for(const [control,kind] of [['dkCacheStore','cache_store'],['dkCacheTake','cache_take'],['dkBodyTake','body_take']])
+ document.getElementById(control).addEventListener('click',()=>{
+  try{
+   aDo(kind,{id:kind==='body_take'?bodyList.value:cacheList.value,
+    item:document.getElementById('dkCacheItem').value,quantity:aQuantity()},
+    'Physical supplies transferred');
+  }catch(error){say(error.message,true);}
+ });
+for(const [control,kind] of [['dkCacheStoreCoins','cache_store_coins'],
+ ['dkCacheTakeCoins','cache_take_coins'],['dkBodyTakeCoins','body_take_coins']])
+ document.getElementById(control).addEventListener('click',()=>{
+  try{
+   aDo(kind,{id:kind==='body_take_coins'?bodyList.value:cacheList.value,
+    quantity:aQuantity()},'Physical coins transferred');
+  }catch(error){say(error.message,true);}
+ });
+for(const [control,kind] of [['dkCacheStoreGear','cache_stash_gear'],
+ ['dkCacheTakeGear','cache_take_gear'],['dkBodyTakeGear','body_take_gear']])
+ document.getElementById(control).addEventListener('click',()=>{
+  const serial=(kind==='cache_stash_gear'?gearList:kind==='body_take_gear'?bodyGearList:cacheGearList).value;
+  aDo(kind,{id:kind==='body_take_gear'?bodyList.value:cacheList.value,serial},
+   'Persistent item serial '+serial+' transferred');
+ });
+document.getElementById('dkRitualDeath').addEventListener('click',()=>{
+ if(view?.actor.form!=='living')return say('You are already a ghost',true);
+ if(!confirm('Your body and ALL carried goods will remain on the ground. Monsters can take them. Continue?'))return;
+ aDo('ritual_death',{},'You are now a ghost. Your possessions remain with your corpse.');
+});
+document.getElementById('dkBodyReclaim').addEventListener('click',()=>
+ aDo('body_reclaim',{id:bodyList.value},'Your spirit returned. Your gear remains on the ground until reclaimed.'));
 document.getElementById('dkNpcRemove').addEventListener('click',()=>{
  const id=npcList.value;
  if(!id)return say('Select a nearby NPC first',true);

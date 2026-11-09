@@ -79,7 +79,7 @@ function targets(world,registry){
     add(d.id,d.item,d.quantity);
   // NPC backpacks and house stores have no M9 count mirror; serials are canonical.
   for(const item of Object.values(registry.items))
-    if(item.parent===CHEST||['npc_pack','house_store','work_order'].includes(
+    if(item.parent===CHEST||['npc_pack','house_store','work_order','atlas_cache','atlas_corpse','atlas_loot'].includes(
       registry.containers[item.parent]?.kind))
       want.set(item.parent+'|'+item.type,
         (want.get(item.parent+'|'+item.type)||0)+item.amount);
@@ -224,7 +224,7 @@ function validate(world){
     byParent[item.parent]=(byParent[item.parent]||0)+item.amount;
   }
   for(const [id,c] of Object.entries(r.containers)){
-    if(!c||c.id!==id||!['pack','bank','equip','armory_equip','chest','npc_pack','house_store','vendor_stock','work_order'].includes(c.kind)||
+    if(!c||c.id!==id||!['pack','bank','equip','armory_equip','chest','npc_pack','house_store','vendor_stock','work_order','atlas_cache','atlas_corpse','atlas_loot'].includes(c.kind)||
       !Number.isInteger(c.capacity)||c.capacity<1||c.capacity>500||
       (['chest','house_store','vendor_stock','work_order'].includes(c.kind)&&(!world.areas?.[c.area_id]||
         !Number.isInteger(c.x)||!Number.isInteger(c.y)||

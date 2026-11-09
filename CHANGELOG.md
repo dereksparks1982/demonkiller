@@ -1,11 +1,11 @@
-## M80 | 2026-11-09 | Physical hidden caches and survival logistics
+## v0.2.76 / M80 | 2026-11-09 | Physical caches and consequences of death
 
-- Added a sparse permanent cache registry in the existing 9,216 × 9,216 world. Living characters can conceal a cache on an adjacent passable tile; it cannot be spawned inside the temple or a staked building.
-- Server-owned inventory with 128-unit cache capacity, capped global registry, exact material conservation, strict proximity, world revisions and persisted creation, deposit, discovery and withdrawal transactions.
-- Caches never auto-decay and survive character deletion. Ownership is attached to the entity serial, never a save slot. New characters do not inherit cache coordinates; they must search the actual tile before they can loot an abandoned/foreign cache.
-- Added a connected Living World UI panel for creation, search, known cache selection, material deposit/withdrawal and a private list of permanent cache coordinates. Only the owner's or discoverer's caches display on the map.
-- Protect cached positions against incompatible fine/broad destructive terrain painting. Added isolated transaction checks and Node/HTTP regression contracts. Full Linux Node suite, server restart persistence, and Firefox visual verification are outstanding.
-- This build does not yet add automated monster/NPC cache looting or player corpse-inventory transfers. The one-world temple and new original music remain untouched.
+- Server-owned permanent hidden caches in the single atlas, with physical resources, carried coins and unique inventory/equipment item serials. Proximity access, personal markers, server transaction and capacity limits.
+- Optional non-graphic weapon-required ritual death leaves an actual decaying corpse with carried possessions. Bank money and stored property remain safe; a ghost cannot handle material goods.
+- Return the ghost to its own intact corpse, then separately recover gear, coins and materials, subject to prior monster theft.
+- New saved atlas MONSTER role takes genuine items or resources near remains. Removing a monster leaves its stolen property in a permanent loot bag.
+- One authoritative API, updated living-world control panel, source-code validation and regression tests. No magical world split, no automatically spawning monsters, no save migration.
+- Full Node and Firefox execution/snapshot restart testing not yet confirmed.
 
 ## M79 | 2026-11-09 | Original continuous temple and dark overworld scores
 

@@ -33,6 +33,9 @@
 .world-frame{overflow:hidden}
 #dkActorCanvas{transition:transform 650ms ease;transform-origin:center center}
 
-/* M80 persistent hidden caches use the existing dock/panel visual language. */
-#dkCacheMine{overflow-wrap:anywhere;color:#d6c69a}
-#dkCacheSummary{padding:5px;border-left:3px solid #b9a06e}
+/* M80: the same pixel-art panels as construction, never a second map. */
+#dkAfterlifePanel{margin-top:12px}
+#dkAfterlifePanel .build-controls{display:grid}
+#dkRitualDeath{border-color:#9f5963;background:#542d39;color:#fff0da}
+#dkRitualDeath:hover{background:#79404a}
+#dkCacheSummary,#dkBodySummary,#dkAfterlifeStatus{font:11px/1.5 "Courier New",monospace}

@@ -9,8 +9,8 @@ const GATHER=require('./atlas-gathering-m74.cjs');
 const CONSTRUCTION=require('./atlas-construction-m75.cjs');
 const BUILDINGS=require('./atlas-buildings-m76.cjs');
 const ANCHOR=require('./world-anchor-m78.cjs');
-const CACHES=require('./atlas-caches-m80.cjs');
-const ROLES=new Set(['scout','guard','forager','worker']);
+const AFTERLIFE=require('./atlas-afterlife-m80.cjs');
+const ROLES=new Set(['scout','guard','forager','worker','monster']);
 const DIRECTIONS=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
 const LIMIT=32,RADIUS=18,INTERVAL=4;
 function positionValid(p){
@@ -121,8 +121,8 @@ function view(world,{radius=RADIUS}={}){
    war_mode:player.war_mode===true,lilith_witnessed:player.lilith_witnessed===true},
   radius,tiles:rows,npcs,sites,buildings:housing.buildings,interior:housing.interior,
   landmarks:ANCHOR.landmarks(actor.x,actor.y,radius),village_spawn:ANCHOR.SPAWN,
-  caches:CACHES.listing(world),
   supplies:GATHER.inventory(world,'player'),
+  afterlife:AFTERLIFE.view(world),
   gold:player.gold??0,
   world_minute:world.living.minute,
   atlas:{width:GRID.WIDTH,height:GRID.HEIGHT,cell_size:GRID.CELL}};
@@ -229,6 +229,7 @@ function perform(world,command){
    throw Error('Invalid NPC removal command');
   const npc=next.living.atlas_npcs.records[command.npc_id];
   if(!npc)throw Error('Unknown atlas NPC');
+  AFTERLIFE.onRemoveNPC(next,npc);
   delete next.living.atlas_npcs.records[command.npc_id];
   delete next.living.atlas_resources.packs.npcs[command.npc_id];
   for(const house of Object.values(next.living.atlas_buildings?.records||{}))
@@ -246,7 +247,7 @@ function advance(world,minute){
  const store=world.living?.atlas_npcs;
  if(!store||minute<=store.last_minute)return 0;
  store.last_minute=minute;
- const gathered=GATHER.advance(world,minute);
+ const gathered=GATHER.advance(world,minute)+AFTERLIFE.advance(world,minute);
  if(minute%INTERVAL!==0)return gathered;
  let changed=gathered;
  for(const npc of Object.values(store.records)){
