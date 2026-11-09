@@ -16,6 +16,7 @@ const WORLD_ACTORS=require('./world-actors-m73.cjs');
 const ATLAS_GATHER=require('./atlas-gathering-m74.cjs');
 const ATLAS_SITES=require('./atlas-construction-m75.cjs');
 const ATLAS_BUILDINGS=require('./atlas-buildings-m76.cjs');
+const ATLAS_CACHES=require('./atlas-caches-m80.cjs');
 const {ensureLivingWorld,advance,collectLetter,recordPlayer,recordWorld}=require('./living-world.cjs');
 const {ensureResources,ensureProgress,apply:applyGameplay}=require('./gameplay.cjs');
 const {ensureSocial,listing:socialListing,apply:applySocial}=require('./social-m6.cjs');
@@ -182,6 +183,7 @@ async function createDKServer({
     const atlasResourcesAdded=ATLAS_GATHER.ensure(world);
     const atlasSitesAdded=ATLAS_SITES.ensure(world);
     const atlasBuildingsAdded=ATLAS_BUILDINGS.ensure(world);
+    const atlasCachesAdded=ATLAS_CACHES.ensure(world);
     const resourcesAdded=ensureResources(world);
     const socialAdded=ensureSocial(world);
     const combatAdded=ensureCombat(world);
@@ -232,7 +234,7 @@ async function createDKServer({
       running:true,elapsed_ms:0,resumed_at_utc:new Date(now()).toISOString()
     };
     else if(world.runtime.running)world.runtime.resumed_at_utc=new Date(now()).toISOString();
-    if(gridAdded||terrainAdded||atlasActorsAdded||atlasResourcesAdded||atlasSitesAdded||atlasBuildingsAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
+    if(gridAdded||terrainAdded||atlasActorsAdded||atlasResourcesAdded||atlasSitesAdded||atlasBuildingsAdded||atlasCachesAdded||regionsAdded||livingAdded||resourcesAdded||socialAdded||combatAdded||spawnersAdded||guardsAdded||garrisonAdded||refugeesAdded||trafficAdded||campaignsAdded||reconstructionAdded||storageAdded||entitiesAdded||schedulerAdded||mobileAdded||lawAdded||districtsAdded||housingAdded||vendorsAdded||vendorEntitiesAdded||npcCommerceAdded||workshopsAdded||npcAIAdded||harvestAdded||successionAdded||caravanAdded||scavengersAdded||burialsAdded||cellsAdded||interiorsAdded||playerAdded||bountiesAdded||companionsAdded||millingAdded||businessAdded||maintenanceAdded||armoryAdded||armorerAdded||huntingAdded||doorSynced)world.revision++;
     validateWorld(world);
     await snapshots.save(world,{forceBackup:true});
   }catch(error){await releaseLock();throw error;}
@@ -402,6 +404,20 @@ async function createDKServer({
       catch(error){console.error('Atlas construction history failed:',error);}
       for(const viewer of streams)push(viewer,'world.atlas.construction',
         {revision:world.revision,site_id:result.site_id});
+      return WORLD_ACTORS.view(world);
+    });
+    writeQueue=pending.catch(()=>{});return pending;
+  }
+  async function saveAtlasCache(command){
+    const pending=writeQueue.then(async()=>{
+      const result=ATLAS_CACHES.perform(world,command);
+      validateWorld(result.world);
+      await snapshots.save(result.world);
+      world=result.world;
+      try{await appendEvents([result.event]);}
+      catch(error){console.error('Atlas cache event archive failed:',error);}
+      for(const viewer of streams)push(viewer,'world.atlas.cache',
+       {revision:world.revision,cache_id:result.cache_id});
       return WORLD_ACTORS.view(world);
     });
     writeQueue=pending.catch(()=>{});return pending;
@@ -640,6 +656,28 @@ async function createDKServer({
           return sendJSON(res,422,{error:error.message},method);
         console.error('Atlas construction transaction failed:',error);
         return sendJSON(res,500,{error:'Construction change was not saved'},method);
+      }
+    }
+    if(url.pathname==='/api/v1/world/caches'&&!write){
+      try{return sendJSON(res,200,WORLD_ACTORS.view(world),method);}
+      catch(error){return sendJSON(res,422,{error:error.message},method);}
+    }
+    if(url.pathname==='/api/v1/world/caches'&&method==='POST'){
+      let command;
+      try{command=await readJSON(req);}
+      catch(error){return sendJSON(res,error.status||400,{error:error.message},method);}
+      if(req.headers['x-dk-world-work']!=='cache')
+       return sendJSON(res,403,{error:'Connected cache controls required'},method);
+      if(!['create','discover','deposit','withdraw'].includes(command.action))
+       return sendJSON(res,422,{error:'Unsupported cache operation'},method);
+      try{return sendJSON(res,200,await saveAtlasCache(command),method);}
+      catch(error){
+       if(/Stale|reach|position|must be outside|Ghosts|passable|footprint|limit|already|full|stored|discovered|concealed|out of reach|another cache|Character serial|not enough/i.test(error.message))
+        return sendJSON(res,409,{error:error.message},method);
+       if(/Invalid|Unknown|Nothing|uncovered/i.test(error.message))
+        return sendJSON(res,422,{error:error.message},method);
+       console.error('Atlas cache transaction failed:',error);
+       return sendJSON(res,500,{error:'Cache change was not saved'},method);
       }
     }
     if(url.pathname==='/api/v1/world/buildings'&&!write){

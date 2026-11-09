@@ -107,6 +107,11 @@
         headers:{'Content-Type':'application/json','X-DK-World-Work':'construction'},
         body:JSON.stringify(command)});
     },
+    async worldCache(command){
+      return request('/api/v1/world/caches',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Work':'cache'},
+        body:JSON.stringify(command)});
+    },
     async worldBuilding(command){
       return request('/api/v1/world/buildings',{method:'POST',
         headers:{'Content-Type':'application/json','X-DK-World-Work':'building'},

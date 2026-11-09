@@ -32,3 +32,7 @@
 .dk-willow-dialog p{font-size:1.1rem;line-height:1.45;margin:.6rem 0 0}
 .world-frame{overflow:hidden}
 #dkActorCanvas{transition:transform 650ms ease;transform-origin:center center}
+
+/* M80 persistent hidden caches use the existing dock/panel visual language. */
+#dkCacheMine{overflow-wrap:anywhere;color:#d6c69a}
+#dkCacheSummary{padding:5px;border-left:3px solid #b9a06e}

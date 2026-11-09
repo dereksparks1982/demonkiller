@@ -9,6 +9,7 @@ const GATHER=require('./atlas-gathering-m74.cjs');
 const CONSTRUCTION=require('./atlas-construction-m75.cjs');
 const BUILDINGS=require('./atlas-buildings-m76.cjs');
 const ANCHOR=require('./world-anchor-m78.cjs');
+const CACHES=require('./atlas-caches-m80.cjs');
 const ROLES=new Set(['scout','guard','forager','worker']);
 const DIRECTIONS=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
 const LIMIT=32,RADIUS=18,INTERVAL=4;
@@ -120,6 +121,7 @@ function view(world,{radius=RADIUS}={}){
    war_mode:player.war_mode===true,lilith_witnessed:player.lilith_witnessed===true},
   radius,tiles:rows,npcs,sites,buildings:housing.buildings,interior:housing.interior,
   landmarks:ANCHOR.landmarks(actor.x,actor.y,radius),village_spawn:ANCHOR.SPAWN,
+  caches:CACHES.listing(world),
   supplies:GATHER.inventory(world,'player'),
   gold:player.gold??0,
   world_minute:world.living.minute,

@@ -4,6 +4,12 @@
 
 [Play the browser preview](https://dereksparks1982.github.io/demonkiller/)
 
+## M80: Permanent hidden supply caches
+
+The unified 9,216 × 9,216-tile world now has **server-persisted, non-decaying caches**. A living character can conceal a cache on nearby passable ground (one tile away), transfer real gathered materials into it, withdraw supplies and track their own cache coordinates from anywhere. Caches have a 128-unit physical capacity and a world-wide cap of 64 in the current prototype; deposits and withdrawals must be adjacent and never create goods. **Caches are not invulnerable:** another character can search the actual ground tile within two steps, discover the cache and take its inventory. Retirement leaves the cache and its stock in the world, removes old ownership, and does not disclose the hidden location to the new character. Ocean/solid terrain brushes cannot quietly erase a cache's contents. The connected Living World atlas shows a cache panel, local known cache markers and owner's permanent locations.
+
+**Not yet implemented:** monsters or NPCs automatically discovering/looting caches; deliberate death ritual; inventory transfer onto corpses and monster-held stolen equipment. These remain separate, required milestones. Saves remain disposable. Server-authoritative actions are revision checked and persisted before confirming; no second outdoor world is introduced.
+
 ## M78: The Original Willow Village Is the World
 
 The approved town circle is authored at (4096,4096) through (4159,4159) directly into the same sparse **9,216 × 9,216-tile world**. The only building present initially is the Forsaken Temple. Its **entire 16 × 16 tile exterior footprint** appears visibly in the playable world, including full roof and boundary walls. There is no second northern village or set of premade houses. Every new structure requires player or autonomous NPC construction. Temple exit now transfers the existing character directly into this world, where approaching the Queen triggers the form-dependent prayer and transformation. The tree speaks different lines when clicked as a ghost or living character. Development saves are disposable.

@@ -48,6 +48,10 @@ function impassableBlocked(world,cx,cy,material){
  if(Object.values(world.living?.atlas_sites?.records||{}).some(s=>
    s.x<bounds.x+bounds.width&&s.x+s.width>bounds.x&&
    s.y<bounds.y+bounds.height&&s.y+s.height>bounds.y))return true;
+ // A 128x128 ocean fill cannot silently sink a permanent physical cache.
+ if(TERRAIN.SOLID.has(material)&&Object.values(world.living?.atlas_caches?.records||{})
+    .some(c=>c.x>=bounds.x&&c.x<bounds.x+bounds.width&&
+      c.y>=bounds.y&&c.y<bounds.y+bounds.height))return true;
  if(!TERRAIN.SOLID.has(material))return false;
  const contained=(x,y)=>x>=bounds.x&&y>=bounds.y&&x<bounds.x+bounds.width&&y<bounds.y+bounds.height;
  const walker=world.world_grid?.walker;

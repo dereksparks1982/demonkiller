@@ -35,6 +35,9 @@ const siteSummary=document.getElementById('dkBuildSummary');
 const houseList=document.getElementById('dkBuildingList');
 const houseSummary=document.getElementById('dkBuildingSummary');
 const housePanel=document.getElementById('dkBuildingControls');
+const cacheList=document.getElementById('dkCacheList');
+const cacheSummary=document.getElementById('dkCacheSummary');
+const cacheMine=document.getElementById('dkCacheMine');
 const startForm=document.getElementById('dkActorStartForm');
 const startButton=document.getElementById('dkActorStart');
 const npcForm=document.getElementById('dkNpcForm');
@@ -240,6 +243,15 @@ function draw(){
   ctx.fillRect(col*TILE+8,row*TILE+8,16,16);
   ctx.fillStyle='#292825';ctx.fillRect(col*TILE+14,row*TILE+15,4,5);
  }
+ // Hidden caches are only rendered once this character knows their location.
+ for(const hidden of view.caches?.nearby||[]){
+  const col=hidden.x-view.actor.x+RADIUS,row=hidden.y-view.actor.y+RADIUS;
+  if(col<0||row<0||col>=N||row>=N)continue;
+  ctx.fillStyle=hidden.owned?'#c9ad6b':'#aa7754';
+  ctx.fillRect(col*TILE+9,row*TILE+17,14,9);
+  ctx.fillStyle='#34312c';ctx.fillRect(col*TILE+12,row*TILE+18,8,2);
+  ctx.fillStyle='#d6bf8b';ctx.fillRect(col*TILE+11,row*TILE+14,10,3);
+ }
  for(const n of view.npcs||[]){
   const col=n.x-view.actor.x+RADIUS,row=n.y-view.actor.y+RADIUS;
   if(col<0||row<0||col>=N||row>=N)continue;
@@ -276,8 +288,12 @@ function refreshUI(data){
   siteSummary.textContent='Enter the world to start construction.';
   houseList.replaceChildren(new Option('NO COMPLETED BUILDINGS',''));
   houseSummary.textContent='Complete a construction site first.';
+  cacheList.replaceChildren(new Option('NONE DISCOVERED',''));
+  cacheMine.textContent='None yet.';
+  cacheSummary.textContent='Enter the world before creating or finding caches.';
   draw();return;
  }
+ updateCacheList(data);
  const a=data.actor;
  pos.textContent=data.interior?
   a.name+' · INSIDE '+data.interior.kind.toUpperCase()+
@@ -331,6 +347,54 @@ function updateSiteSummary(){
   ' · your gold '+(view?.gold??0);
 }
 siteList.addEventListener('change',updateSiteSummary);
+function updateCacheList(data){
+ const prior=cacheList.value;
+ const nearby=data.caches?.nearby||[];
+ cacheList.replaceChildren(new Option(nearby.length?'SELECT CACHE':'NONE DISCOVERED',''));
+ for(const c of nearby)cacheList.add(new Option(c.id+' · '+c.x+','+c.y+
+  (c.owned?' · YOURS':' · DISCOVERED'),c.id));
+ if(nearby.some(c=>c.id===prior))cacheList.value=prior;
+ cacheMine.textContent=(data.caches?.mine||[]).map(c=>
+  c.id+' at '+c.x+','+c.y+' (permanent)').join(' · ')||'None yet.';
+ updateCacheSummary();
+}
+function updateCacheSummary(){
+ const c=(view?.caches?.nearby||[]).find(x=>x.id===cacheList.value);
+ if(!c){cacheSummary.textContent='Move near a known cache or search a nearby tile.';return;}
+ cacheSummary.textContent=c.id+' at '+c.x+','+c.y+
+  ' · '+(c.owned?'OWNED':'FOUND, LOOTABLE')+
+  ' · stock '+(Object.entries(c.stock||{}).map(([k,n])=>k+' '+n).join(', ')||'empty')+
+  ' · capacity '+c.capacity+' · DOES NOT DECAY';
+}
+cacheList.addEventListener('change',updateCacheSummary);
+function cacheAction(operation,details={}){
+ if(!view?.started||view.interior||!api?.worldCache)
+  return say('Visit the living world outside to use a cache.',true);
+ const command={action:operation,expected_revision:view.world_revision,...details};
+ void action(()=>api.worldCache(command),
+  operation==='create'?'Permanent hidden cache created and saved.':
+  operation==='discover'?'You searched the selected tile.':
+  'Physical cache transfer saved.');
+}
+document.getElementById('dkCacheCreate').addEventListener('click',()=>{
+ if(!chosen)return say('Select nearby ground for the cache first.',true);
+ cacheAction('create',{x:chosen.x,y:chosen.y});
+});
+document.getElementById('dkCacheDiscover').addEventListener('click',()=>{
+ if(!chosen)return say('Select nearby ground to search.',true);
+ cacheAction('discover',{x:chosen.x,y:chosen.y});
+});
+for(const operation of ['deposit','withdraw']){
+ document.getElementById(operation==='deposit'?'dkCacheDeposit':'dkCacheWithdraw')
+  .addEventListener('click',()=>{
+   if(!cacheList.value)return say('Select a discovered cache first.',true);
+   const quantity=Number(document.getElementById('dkCacheQuantity').value);
+   if(!Number.isSafeInteger(quantity)||quantity<1||quantity>32)
+    return say('Choose between 1 and 32 items.',true);
+   cacheAction(operation,{cache_id:cacheList.value,
+    item:document.getElementById('dkCacheItem').value,quantity});
+  });
+}
 function updateHouseSummary(){
  const b=(view?.buildings||[]).find(x=>x.id===houseList.value);
  if(!b){houseSummary.textContent='No completed building nearby. Finish construction first.';return;}

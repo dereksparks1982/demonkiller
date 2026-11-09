@@ -1,3 +1,12 @@
+## M80 | 2026-11-09 | Physical hidden caches and survival logistics
+
+- Added a sparse permanent cache registry in the existing 9,216 × 9,216 world. Living characters can conceal a cache on an adjacent passable tile; it cannot be spawned inside the temple or a staked building.
+- Server-owned inventory with 128-unit cache capacity, capped global registry, exact material conservation, strict proximity, world revisions and persisted creation, deposit, discovery and withdrawal transactions.
+- Caches never auto-decay and survive character deletion. Ownership is attached to the entity serial, never a save slot. New characters do not inherit cache coordinates; they must search the actual tile before they can loot an abandoned/foreign cache.
+- Added a connected Living World UI panel for creation, search, known cache selection, material deposit/withdrawal and a private list of permanent cache coordinates. Only the owner's or discoverer's caches display on the map.
+- Protect cached positions against incompatible fine/broad destructive terrain painting. Added isolated transaction checks and Node/HTTP regression contracts. Full Linux Node suite, server restart persistence, and Firefox visual verification are outstanding.
+- This build does not yet add automated monster/NPC cache looting or player corpse-inventory transfers. The one-world temple and new original music remain untouched.
+
 ## M79 | 2026-11-09 | Original continuous temple and dark overworld scores
 
 - Composed **The Last Breath**, an original **108-second** temple score with execution at 0:05 and repeatable atmospheric segment from 0:24 to 1:48. Re-entering the temple starts at the ambient segment. Finishing the Lilith cutscene never stops or replaces the music.

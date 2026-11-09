@@ -58,6 +58,12 @@ function deleteCharacter(world,slot,name){
   if(record.npc_visits===0)delete l.region_history.records[id];
  }
  // Retirement relinquishes title and caretakers, never erases world buildings.
+ // A character's known caches survive retirement as ownerless objects.
+ // Their contents remain physical and lootable. The new character does not
+ // inherit hidden positions or the original serial's private ownership.
+ for(const c of Object.values(l.atlas_caches?.records||{})){
+  if(c.owner_serial===oldSerial)c.owner_serial=null;
+ }
  for(const b of Object.values(l.atlas_buildings?.records||{})){
   if(b.owner_serial!==oldSerial)continue;
   b.owner_serial=null;b.locked=false;b.caretaker_id=null;
