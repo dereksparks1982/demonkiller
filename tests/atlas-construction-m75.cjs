@@ -61,6 +61,20 @@ test('M75 no free build: stock is debited from real backpack, consumed stage by 
  assert.throws(()=>site(w,{action:'cancel',site_id:'atlas_site_1'}),/demolition/);
  assert.equal(WORLD.validateWorld(w),w);
 });
+test('M75 an active foundation cannot seal a person inside it',()=>{
+ let w=supplies(traveler());
+ w=site(w,{action:'place',kind:'shed',x:4609,y:4608});
+ for(const [item,quantity] of Object.entries({stone:2,clay:1}))
+  w=site(w,{action:'deliver',site_id:'atlas_site_1',item,quantity});
+ for(let i=0;i<2;i++)w=site(w,{action:'labor',site_id:'atlas_site_1'});
+ w=actor(w,{action:'step',direction:'east'});
+ assert.throws(()=>site(w,{action:'labor',site_id:'atlas_site_1'}),/Clear the foundation/);
+ assert.equal(w.living.atlas_sites.records.atlas_site_1.progress,2);
+ w=actor(w,{action:'step',direction:'west'});
+ w=site(w,{action:'labor',site_id:'atlas_site_1'});
+ assert.equal(w.living.atlas_sites.records.atlas_site_1.phase,1);
+ assert.equal(WORLD.validateWorld(w),w);
+});
 test('M75 assigned worker transfers only carried materials and constructs on server time',()=>{
  let w=traveler();
  w=actor(w,{action:'introduce_npc',name:'Mason',role:'worker',x:4607,y:4608});

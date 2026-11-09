@@ -181,11 +181,20 @@ function deliver(world,command){
  addToPack(s.inventory,command.item,command.quantity);
  return s;
 }
+function footprintOccupied(world,s){
+ const occupants=[
+  world.characters?.['1']?.atlas_position,world.world_grid?.walker,
+  ...Object.values(world.living?.atlas_npcs?.records||{})
+ ].filter(Boolean);
+ return occupants.some(actor=>inside(s,actor.x,actor.y));
+}
 function work(world,s){
  if(s.phase===3)throw Error('Construction already finished');
  const stage=RECIPES[s.kind].stages[s.phase];
  if(Object.entries(stage.items).some(([name,qty])=>(s.inventory[name]||0)<qty))
   throw Error('Construction is waiting for delivered materials');
+ if(s.phase===0&&s.progress+1===stage.work&&footprintOccupied(world,s))
+  throw Error('Clear the foundation footprint before completing construction');
  s.progress++;
  if(s.progress<stage.work)return false;
  for(const [item,qty] of Object.entries(stage.items)){
@@ -313,6 +322,9 @@ function advance(world,minute,events=[]){
    const before=s.phase;
    if((world.characters?.['1']?.gold||0)<1)continue;
    if(Object.keys(needed(s)).length)continue;
+   if(s.phase===0&&
+      s.progress+1===RECIPES[s.kind].stages[0].work&&
+      footprintOccupied(world,s))continue;
    if(!pay(world,npc))continue;
    const complete=work(world,s);count++;
    if(complete){
