@@ -73,10 +73,10 @@ function parseMidi(buffer){
  if(!notes.length||!Number.isFinite(length)||length<=0)throw Error('Empty MIDI');
  return {notes,length};
 }
-function create({url,volume=100,baseGain=.28}={}){
+function create({url,volume=100,baseGain=.28,loop=true}={}){
  if(!url)throw Error('MIDI URL required');
  let enabled=false,ctx=null,output=null,timer=null,notes=null,length=0;
- let voices=new Set(),loading=null,position=0,cycleStart=0,generation=0;
+ let voices=new Set(),loading=null,position=0,cycleStart=0,generation=0,finished=false;
  let volumePercent=Math.max(0,Math.min(200,Number(volume)||0));
  async function load(){
   if(notes)return true;
@@ -119,7 +119,7 @@ function create({url,volume=100,baseGain=.28}={}){
   osc.start(at);osc.stop(end+release+.015);
  }
  function schedule(){
-  if(!ctx||!enabled||!notes?.length)return;
+  if(!ctx||!enabled||!notes?.length||finished)return;
   if(cycleStart<ctx.currentTime-length-1){cycleStart=ctx.currentTime+.07;position=0;}
   const horizon=ctx.currentTime+.35;
   let cap=0;
@@ -127,10 +127,14 @@ function create({url,volume=100,baseGain=.28}={}){
    const n=notes[position],at=cycleStart+n.at;
    if(at>=ctx.currentTime-.06)playNote(n,Math.max(at,ctx.currentTime+.005));
    position++;
-   if(position===notes.length){position=0;cycleStart+=length;}
+   if(position===notes.length){
+    if(!loop){finished=true;if(timer){clearInterval(timer);timer=null;}break;}
+    position=0;cycleStart+=length;
+   }
   }
  }
  async function play(){
+  if(!loop&&finished)return false;
   enabled=true;const ticket=++generation;
   if(!await load()||!enabled||ticket!==generation)return false;
   const Context=typeof window!=='undefined'&&(window.AudioContext||window.webkitAudioContext);
@@ -149,7 +153,7 @@ function create({url,volume=100,baseGain=.28}={}){
   return true;
  }
  function stop(){
-  enabled=false;generation++;
+  enabled=false;generation++;finished=false;position=0;
   if(timer){clearInterval(timer);timer=null;}
   for(const osc of voices){try{osc.stop();}catch(_){}}
   voices.clear();

@@ -1,3 +1,10 @@
+## M76 execution-audio patch | 2026-11-09 | Original ritual music
+
+- Composed **The Last Breath**, an original 50-second, nine-track Standard MIDI File for the player's altar execution: dark organ/choir, rising strings and drums, an orchestral blow at the scripted five-second sacrifice mark, followed by a spectral lament.
+- The opening scene automatically plays the new non-looping cue, suspends the normal temple organ during the sequence, and restores normal temple music when Lilith exits. Music toggle and page-exit cleanup still work.
+- Added non-loop support to the shared MIDI synthesizer without changing default looping for existing menu and overworld tracks.
+- No changes to world state, saves, scene timing, title music, or overworld music. Browser listening and the full Node suite still require owner acceptance.
+
 ## v0.2.74 / M76 | 2026-11-08 | Usable buildings and world-space interiors
 
 - Completed M75 construction now creates a persistent, titled building with an exterior doorway selected from passable adjacent ground; never creates free housing.

@@ -223,6 +223,7 @@
       leader:actor('leader',8,7,'north'),devil:actor('devil',10,6,'west'),
       woman:actor('woman',5,6,'east')};
     rightMouseHeld=false;resetVisual();
+    window.DKTempleMusic?.beginExecution();
     message('Cult members surround the altar. You lie bound, unable to move.');
   }
   function placeOpeningCrystal(){
@@ -303,6 +304,7 @@
         if(moveActor(opening.woman,dt,3.8)){
           setTempleDoor(true);
           opening=null;scene.introSeen=true;dirty=true;resetVisual();persistCharacter();
+          window.DKTempleMusic?.finishExecution();
           if(SERVER){
             serverBusy=true;
             SERVER.action(activeSlot,'finish_opening')

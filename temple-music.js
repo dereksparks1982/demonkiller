@@ -7,6 +7,26 @@
   const PREFS_KEY='dkSoftworks.demonkiller.menuPrefs.v1';
   const MUSIC_URL='./assets/audio/music/lyon-organ-arrangement.mid';
   const button=document.getElementById('templeMusicToggle');
+  const EXECUTION_URL='./assets/audio/music/demon-killer-the-last-breath-v1.mid';
+  let executionMode=false, executionPlayer=null;
+  function beginExecution(){
+    executionMode=true;
+    if(executionPlayer)executionPlayer.stop();
+    executionPlayer=window.DKMidiSoundtrack?.create({
+      url:EXECUTION_URL,volume:100,baseGain:.48,loop:false
+    })||null;
+    // The existing temple organ must not play over the new execution score.
+    void stop();
+    if(enabled)void executionPlayer?.play();
+  }
+  function finishExecution(){
+    if(!executionMode)return;
+    executionMode=false;
+    executionPlayer?.stop();
+    executionPlayer=null;
+    if(enabled)void resume();
+  }
+  window.DKTempleMusic=Object.freeze({beginExecution,finishExecution});
   let enabled=true, ctx=null, output=null, wave=null, notes=null, length=0, timer=null;
   let noteIndex=0, loopStart=0, voices=new Set(), loading=null;
   try{const prefs=JSON.parse(localStorage.getItem(PREFS_KEY)||'null');
@@ -103,7 +123,8 @@
   }
   async function resume(){
     if(!enabled||!window.AudioContext&&!window.webkitAudioContext)return;
-    if(!await prepare()||!enabled)return;
+    if(executionMode){if(executionPlayer&&!executionPlayer.playing)await executionPlayer.play();return;}
+    if(!await prepare()||!enabled||executionMode)return;
     if(!ctx){
       const AudioContextClass=window.AudioContext||window.webkitAudioContext;
       ctx=new AudioContextClass();output=ctx.createGain();
@@ -130,10 +151,10 @@
   }
   if(button)button.addEventListener('click',()=>{
     enabled=!enabled;savePreference();updateButton();
-    if(enabled)resume();else stop();
+    if(enabled)resume();else {executionPlayer?.stop();stop();}
   });
   document.addEventListener('pointerdown',()=>{if(enabled)resume();},{passive:true});
   document.addEventListener('keydown',()=>{if(enabled)resume();});
-  window.addEventListener('pagehide',stop);
+  window.addEventListener('pagehide',()=>{executionPlayer?.stop();stop();});
   updateButton();resume();
 }());
