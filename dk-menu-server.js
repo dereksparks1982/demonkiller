@@ -87,6 +87,11 @@
         headers:{'Content-Type':'application/json','X-DK-Architect':'atlas-npcs'},
         body:JSON.stringify({action:'introduce_npc',name,role,x,y})});
     },
+    async worldActorGather(x,y){
+      return request('/api/v1/world/actors',{method:'POST',
+        headers:{'Content-Type':'application/json','X-DK-World-Work':'gather'},
+        body:JSON.stringify({action:'gather',x,y})});
+    },
     async worldActorRemoveNPC(npc_id){
       return request('/api/v1/world/actors',{method:'POST',
         headers:{'Content-Type':'application/json','X-DK-Architect':'atlas-npcs'},

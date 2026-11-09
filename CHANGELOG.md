@@ -1,3 +1,12 @@
+## v0.2.72 / M74 | 2026-11-08 | Terrain-based gathering and real NPC supplies
+
+- Linked finite harvestable timber, herbs, reeds, stone and clay directly to the actual owner-painted global terrain. All default green grass remains empty of resources.
+- Added 360 world-minute per-tile regrowth, physically adjacent gathering, capped durable player and NPC packs, strict resource-store validation and NPC inventory removal on departure.
+- Real atlas foragers and workers now independently gather one unit per world hour from suitable neighboring terrain during server simulation, including with no browser connected. No fake automatic city or supplies.
+- Added browser terrain-select/GATHER action, player supplies and nearby NPC carried-material readout with a simple pixel elevation and shore cue.
+- Added M74 Node tests, README, server reference, development handoff, and version history. Source syntax was checked in V8; full Node regression and real-browser checks remain outstanding.
+- Not yet constructed: foundations, deliveries, storage piles, paid contracts, NPC hauling, advanced terrain, economy or settlement formation.
+
 ## v0.2.71 / M73 | 2026-11-08 | Real character and autonomous atlas NPC foundations
 
 - Added `server/world-actors-m73.cjs`: the real saved slot-one character can enter the 9,216² green atlas and cross Streaming Cell boundaries while retaining their name, inventory, skill progression and entity identity. Atlas coordinates, facing and steps live on the character record, not a separate surveyor.

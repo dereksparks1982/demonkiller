@@ -5,6 +5,7 @@
 const GRID=require('./world-grid-m67.cjs');
 const TERRAIN=require('./world-terrain-editor-m69.cjs');
 const WALK=require('./world-walker-m72.cjs');
+const GATHER=require('./atlas-gathering-m74.cjs');
 const ROLES=new Set(['scout','guard','forager','worker']);
 const DIRECTIONS=Object.freeze({north:[0,-1],east:[1,0],south:[0,1],west:[-1,0]});
 const LIMIT=32,RADIUS=12,INTERVAL=4;
@@ -102,13 +103,15 @@ function view(world,{radius=RADIUS}={}){
  const npcs=Object.values(world.living?.atlas_npcs?.records||{})
   .filter(n=>Math.abs(n.x-actor.x)<=radius&&Math.abs(n.y-actor.y)<=radius)
   .map(n=>({id:n.id,name:n.name,role:n.role,x:n.x,y:n.y,
-    facing:n.facing,steps:n.steps})).sort((a,b)=>a.id.localeCompare(b.id));
+    facing:n.facing,steps:n.steps,pack:GATHER.inventory(world,n.id)}))
+  .sort((a,b)=>a.id.localeCompare(b.id));
  return {started:true,has_character:true,character_name:player.name,
   kind:'character',world_revision:world.revision,
   actor:{...actor,cell_id:location.cell.id,sector_id:location.sector.id,
    name:player.name,form:player.form,slot:player.slot,character_revision:player.revision,
    war_mode:player.war_mode===true},
-  radius,tiles:rows,npcs,world_minute:world.living.minute,
+  radius,tiles:rows,npcs,supplies:GATHER.inventory(world,'player'),
+  world_minute:world.living.minute,
   atlas:{width:GRID.WIDTH,height:GRID.HEIGHT,cell_size:GRID.CELL}};
 }
 function event(world,kind,text,extra={}){
@@ -125,6 +128,7 @@ function perform(world,command){
  const old=world.characters?.['1'];
  const next=structuredClone(world);
  ensure(next);
+ GATHER.ensure(next);
  let e=null;
  if(command.action==='enter'){
   if(keys!=='action,x,y')throw Error('Invalid atlas entry command');
@@ -169,12 +173,20 @@ function perform(world,command){
    facing:'south',steps:0};
   e=event(next,'atlas.npc.arrive',command.name+' arrived in the world atlas',
    {npc_id:id,x:command.x,y:command.y});
+ }else if(command.action==='gather'){
+  if(keys!=='action,x,y')throw Error('Invalid atlas resource command');
+  if(!old?.atlas_position)throw Error('Enter the world before gathering');
+  const result=GATHER.harvest(next,'player',command.x,command.y);
+  next.characters['1'].revision++;
+  e=event(next,'atlas.player.gather',old.name+' gathered '+result.item,
+   {x:result.x,y:result.y,item:result.item,slot:1});
  }else if(command.action==='remove_npc'){
   if(keys!=='action,npc_id'||typeof command.npc_id!=='string')
    throw Error('Invalid NPC removal command');
   const npc=next.living.atlas_npcs.records[command.npc_id];
   if(!npc)throw Error('Unknown atlas NPC');
   delete next.living.atlas_npcs.records[command.npc_id];
+  delete next.living.atlas_resources.packs.npcs[command.npc_id];
   e=event(next,'atlas.npc.depart',npc.name+' left the world atlas',
    {npc_id:command.npc_id});
  }else throw Error('Unknown atlas actor command');
@@ -186,8 +198,9 @@ function advance(world,minute){
  const store=world.living?.atlas_npcs;
  if(!store||minute<=store.last_minute)return 0;
  store.last_minute=minute;
- if(minute%INTERVAL!==0)return 0;
- let changed=0;
+ const gathered=GATHER.advance(world,minute);
+ if(minute%INTERVAL!==0)return gathered;
+ let changed=gathered;
  for(const npc of Object.values(store.records)){
   if(npc.role==='worker')continue; // Workers remain at assigned worksite.
   // Small, repeatable local routes. No wandering across regions by chance.

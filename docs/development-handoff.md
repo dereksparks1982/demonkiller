@@ -4,7 +4,7 @@ This document is the working continuity reference if a conversation thread fills
 
 ## Source and release discipline
 
-Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M73 release target is game **0.2.71**, server **2.31.17**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
+Repository: `dereksparks1982/demonkiller`, branch `main`. Studio DK Softworks. The M74 source target is game **0.2.72**, server **2.31.18**. Do not assume that source verification equals passed end-to-end gameplay. GitHub Pages runs a static preview. The Node authority is currently loopback-only by design and does not expose a public persistent hosted world. The existing server advances NPC life only while its process is running.
 
 Do not build until explicitly instructed. When authorized: inspect current HEAD, one build at a time, document then create tested code, update release notes, commit/push/verify; no automatic browser launches or password prompts.
 
@@ -21,6 +21,14 @@ Do not build until explicitly instructed. When authorized: inspect current HEAD,
 - Kilns and heavy industrial equipment should have **very rare** breakdowns after years, not constantly wear out. M50/M66 failures need rebalancing.
 - NPCs must autonomously found differentiated settlements, disagree and secede, trade and make peace or war, operate companies and continue independent lives. Avoid WorldBox's arbitrary population blobs and repetitive all-out war.
 - Study the full private-server mod list in the master roadmap, prioritizing Nerun's Distro, OWLTR, FS-ATS, Xanthos Evo/Shrink, Knives Town Houses and Knives Chat. Do not copy proprietary UO art or unsuitable GPL code into commercial game source.
+
+## M74: terrain gathering and persistent NPC material packs
+
+M74 adds `server/atlas-gathering-m74.cjs`: actual painted terrain now yields finite natural material in physical player and NPC packs. Forest and pine produce timber; heath herbs; wetlands reeds; stone and highland stone; dirt and beach clay. The untouched 9,216-tile green world has **no free resources**. Gathering requires adjacency and pack capacity. Every tile regrows after 360 server-world minutes. Forager and worker NPCs gather autonomously from their neighboring suitable tiles once every sixty minutes, including while the browser is closed but the server remains running. Workers remain at their sites rather than wandering aimlessly. These are raw stored supplies, **not** a fictional complete business or village workforce.
+
+The connected M73 living-world page now exposes real manual gathering, live inventory totals and visible NPC packs; a subtle upper tile-edge / shore cue helps 2D elevation readability. The old area's `area_id` is still a temporary dependency. New regression contracts are in `tests/atlas-gathering-m74.cjs`; syntax was checked in isolated V8, but complete Node suite, save/restart and Firefox movement need verification from a Linux checkout. No automatically generated towns or 3D art.
+
+**Next M75:** use harvested materials for genuine player-planned building sites: height/flattening checks, on-site delivery, foundation and assembly stages and paid NPC/player labor over server time, without imaginary free materials.
 
 ## M73: actual character, atlas NPCs, clean development resets
 

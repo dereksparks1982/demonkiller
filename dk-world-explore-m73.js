@@ -9,6 +9,7 @@ const ctx=canvas?.getContext('2d');
 const status=document.getElementById('dkActorStatus');
 const pos=document.getElementById('dkActorPosition');
 const inspectEl=document.getElementById('dkActorInspect');
+const suppliesEl=document.getElementById('dkActorSupplies');
 const startForm=document.getElementById('dkActorStartForm');
 const startButton=document.getElementById('dkActorStart');
 const npcForm=document.getElementById('dkNpcForm');
@@ -64,6 +65,14 @@ function draw(){
   }else if(['sea','deepwater','river','lake'].includes(material)){
    ctx.fillStyle='#689db0';ctx.fillRect(x+6,y+18,13,2);
   }
+  const northern=view.tiles[row-1]?.[col];
+  if(northern&&height>northern[1]){
+   ctx.fillStyle='#34383c';ctx.fillRect(x,y,TILE,3);
+  }
+  if(northern&&['sea','deepwater','lake','river'].includes(northern[0])&&
+     !['sea','deepwater','lake','river'].includes(material)){
+   ctx.fillStyle='#beae79';ctx.fillRect(x,y,TILE,2);
+  }
   if(height!==0){
    ctx.fillStyle=height>0?'#d0cdb7':'#293a48';
    ctx.fillRect(x+3,y+4,4,3);
@@ -96,6 +105,7 @@ function refreshUI(data){
    'Saved character '+data.character_name+' exists. Select a place and enter the atlas.':
    'No character yet. Choose a name and enter the new world.';
   inspectEl.textContent='Default ground: grass · Elevation: 0';
+  suppliesEl.textContent='Supplies: empty';
   npcList.replaceChildren(new Option('No nearby NPCs',''));
   draw();return;
  }
@@ -105,12 +115,15 @@ function refreshUI(data){
  document.getElementById('dkActorName').value=a.name;
  if(!chosen)chosen={x:a.x+1,y:a.y};
  const center=data.tiles[RADIUS]?.[RADIUS];
+ suppliesEl.textContent='Supplies: '+
+  (Object.entries(data.supplies||{}).map(([k,v])=>k+' '+v).join(' · ')||'empty');
  inspectEl.textContent='Ground: '+(center?.[0]||'unknown')+
   ' · Elevation: '+(center?.[1]??0)+' · NPCs nearby: '+data.npcs.length;
  const previous=npcList.value;
  npcList.replaceChildren(new Option(data.npcs.length?'SELECT NEARBY NPC':'NONE NEARBY',''));
  for(const n of data.npcs)
-  npcList.add(new Option(n.name+' ('+n.role+') '+n.x+','+n.y,n.id));
+  npcList.add(new Option(n.name+' ('+n.role+') '+n.x+','+n.y+' · '+
+   (Object.entries(n.pack||{}).map(([k,v])=>k+':'+v).join(' ')||'empty'),n.id));
  if(data.npcs.some(n=>n.id===previous))npcList.value=previous;
  draw();
 }
@@ -161,6 +174,12 @@ npcForm.addEventListener('submit',e=>{
   role=document.getElementById('dkNpcRole').value;
  void action(()=>api.worldActorNPC(name,role,chosen.x,chosen.y),
   name+' was introduced to the persistent world.');
+});
+document.getElementById('dkActorGather').addEventListener('click',()=>{
+ if(!view?.started)return say('Enter the world before gathering',true);
+ if(!chosen)return say('Select a resource tile with left click first',true);
+ void action(()=>api.worldActorGather(chosen.x,chosen.y),
+  'Gathered a physical supply and saved it in your atlas pack.');
 });
 document.getElementById('dkNpcRemove').addEventListener('click',()=>{
  const id=npcList.value;

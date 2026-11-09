@@ -17,6 +17,8 @@
 <h1>YOUR CHARACTER</h1>
 <p id="dkActorPosition">Connecting to DK Server…</p>
 <p id="dkActorInspect">Ground: grass · Elevation: 0</p>
+<p id="dkActorSupplies">Supplies: empty</p>
+<button type="button" id="dkActorGather">GATHER FROM SELECTED TILE</button>
 <form id="dkActorStartForm">
 <label for="dkActorName">CHARACTER NAME</label>
 <input id="dkActorName" autocomplete="off" maxlength="8" minlength="1" pattern="[A-Za-z0-9 _-]{1,8}" value="TRAVELER">
@@ -37,7 +39,7 @@
 </form>
 <label>NEARBY NPCS <select id="dkNpcList"><option value="">None nearby</option></select></label>
 <button type="button" id="dkNpcRemove">REMOVE SELECTED NPC</button>
-<p class="world-note">Scouts, guards and foragers move on the server clock. Workers currently remain at their sites. This is the start of autonomous world populations, not finished city-building AI.</p>
+<p class="world-note">Foragers gather timber, herbs and reeds from authored woodland and wetland; stationary workers collect stone/clay from nearby terrain once per world hour. Patches recover over six world hours. Carried supplies persist without an open browser while the server runs. These are not yet building crews or a trading economy.</p>
 <h1>MOVEMENT</h1>
 <p>WASD / ARROWS · one cardinal step.<br>HOLD RIGHT MOUSE · walk toward cursor.<br>LEFT CLICK · inspect and select an NPC location.</p>
 <p id="dkActorStatus" role="status" aria-live="polite">Loading the world…</p>
